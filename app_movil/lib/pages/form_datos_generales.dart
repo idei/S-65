@@ -102,8 +102,6 @@ class _FormpruebaState extends State<Formprueba> {
 
     return Scaffold(
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text('Datos Generales',
               style: TextStyle(
                   fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -214,12 +212,6 @@ class _FormpruebaState extends State<Formprueba> {
                 FormNivelEducativo(),
                 SizedBox(height: 10.0),
                 FormGrupoConviviente(),
-                /*TelInput(
-                  dialCode: '+54',
-                  includeDialCode: false,
-                  onChange: (String phoneNumber) =>
-                      print('phoneNumber: $phoneNumber'),
-                ),*/
                 TextFormField(
                   controller: celular,
                   keyboardType: TextInputType.number,

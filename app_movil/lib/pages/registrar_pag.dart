@@ -6,10 +6,10 @@ import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 
-TextEditingController email = TextEditingController();
+TextEditingController emailPaciente = TextEditingController();
 TextEditingController passwordNuevo = TextEditingController();
-TextEditingController nombre = TextEditingController();
-TextEditingController apellido = TextEditingController();
+TextEditingController nombrePaciente = TextEditingController();
+TextEditingController apellidoPaciente = TextEditingController();
 TextEditingController passwordRepetido = TextEditingController();
 TextEditingController dni = TextEditingController();
 
@@ -29,18 +29,38 @@ class _FormpruebaState extends State<RegistrarPage> {
         resizeToAvoidBottomInset: false,
         body: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(5.0),
-              ),
-              Container(
-                child: Image.asset('assets/logo1.png'),
-                height: 110.0,
-              ),
-              _registrar(context)
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                ),
+                Container(
+                  child: Image.asset('assets/logo1.png'),
+                  height: 110.0,
+                ),
+                Column(children: <Widget>[
+                  _crearEmail(),
+                  SizedBox(height: 10),
+                  _crearPassword(),
+                  SizedBox(height: 10),
+                  _repetirPassword(),
+                  SizedBox(height: 10),
+                  _crearApellido(),
+                  SizedBox(height: 10),
+                  _crearNombre(),
+                  SizedBox(height: 10),
+                  _crearDNI(),
+                  SizedBox(height: 10),
+                  _crearCheck(),
+                  SizedBox(height: 10),
+                  _crearBotonSesion(context),
+                  SizedBox(height: 10),
+                  _crearBotonRegresar(context),
+                ])
+              ],
+            ),
           ),
         ));
   }
@@ -51,10 +71,10 @@ class _FormpruebaState extends State<RegistrarPage> {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/user_register.php";
     var response = await http.post(url, body: {
-      "email": email.text,
+      "email": emailPaciente.text,
       "password": passwordNuevo.text,
-      "nombre": nombre.text,
-      "apellido": apellido.text,
+      "nombre": nombrePaciente.text,
+      "apellido": apellidoPaciente.text,
       "dni": dni.text,
     });
     print("Hola register");
@@ -64,10 +84,10 @@ class _FormpruebaState extends State<RegistrarPage> {
     if (data[0] == "Success") {
       //return;
       Navigator.pushNamed(context, '/form_datos_generales', arguments: {
-        'nombre': nombre.text,
-        "apellido": apellido.text,
+        'nombre': nombrePaciente.text,
+        "apellido": apellidoPaciente.text,
         "dni": dni.text,
-        "email": email.text,
+        "email": emailPaciente.text,
         "bandera": 1,
       });
 
@@ -130,7 +150,7 @@ class _FormpruebaState extends State<RegistrarPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
-        controller: email,
+        controller: emailPaciente,
         validator: (value) => EmailValidator.validate(value)
             ? null
             : "Por favor ingresar un correo electrónico válido",
@@ -155,7 +175,7 @@ class _FormpruebaState extends State<RegistrarPage> {
         keyboardType: TextInputType.name,
         decoration: InputDecoration(
             labelText: 'Nombre', labelStyle: TextStyle(fontFamily: 'NunitoR')),
-        controller: nombre,
+        controller: nombrePaciente,
       ),
     );
     // });
@@ -194,7 +214,7 @@ class _FormpruebaState extends State<RegistrarPage> {
         decoration: InputDecoration(
             labelText: 'Apellido',
             labelStyle: TextStyle(fontFamily: 'NunitoR')),
-        controller: apellido,
+        controller: apellidoPaciente,
       ),
     );
     // });
@@ -296,12 +316,7 @@ class _FormpruebaState extends State<RegistrarPage> {
               color: Colors.white,
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
-        // color: Colors.lightBlue,
-        // textColor: Colors.white,
       ),
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      //color: Theme.of(context).primaryColor,
-      //textColor: Colors.white,
       onPressed: () {
         Navigator.pushNamed(context, '/');
       },

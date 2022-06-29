@@ -6,6 +6,7 @@
 	$apellido = $_POST['apellido'];
 	$dni = $_POST['dni'];
 	$estado_users = 1;
+	$rela_rol = 0;
 
 	$lista = array();
 
@@ -20,6 +21,7 @@
 	$stmt = $db->prepare('INSERT INTO users(email,password) VALUES(?, ?)');
     $stmt->bindParam(1,$email);
     $stmt->bindParam(2,$password);
+	//$stmt->bindParam(3,$rela_rol);
 
 	$stmt->execute();
 

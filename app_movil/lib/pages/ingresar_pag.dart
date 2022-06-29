@@ -102,7 +102,6 @@ class _FormpruebaState extends State<IngresarPage> {
             arguments: {"email": email.text, "id_paciente": id_paciente});
       } else {
         if (estado_users == 1 && estado_login == "Success") {
-          //Navigator.pushNamed(context, '/form_datos_generales');
           Navigator.pushNamed(context, '/form_datos_generales', arguments: {
             "email": email.text,
             "id_paciente": data['estado_users']
@@ -222,15 +221,15 @@ class _FormpruebaState extends State<IngresarPage> {
   }
 
   Widget _crearBotonRegresar(BuildContext context) {
-    return OutlinedButton(
+    return RaisedButton(
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
         child: Text('REGRESAR',
             style: TextStyle(color: Colors.white, fontFamily: 'Nunito')),
       ),
       //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      //color: Theme.of(context).primaryColor,
-      //textColor: Colors.white,
+      color: Theme.of(context).primaryColor,
+      textColor: Colors.white,
       onPressed: () {
         Navigator.pushNamed(context, '/');
       },
