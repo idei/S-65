@@ -51,7 +51,10 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
               appBar: AppBar(
                 title: Text(
                   'Antecedentes Personales',
-                  style: TextStyle(fontFamily: 'Nunito', fontSize: 19.0),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 19.0),
                 ),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 backgroundColor: Color.fromRGBO(157, 19, 34, 1),
@@ -321,7 +324,9 @@ class AntecedentesWidgetState extends State<Antecedentes> {
           backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text(
             'Antecedentes Personales',
-            style: TextStyle(fontFamily: 'Nunito', fontSize: 19.0),
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 19.0),
           ),
           actions: <Widget>[
             PopupMenuButton<String>(

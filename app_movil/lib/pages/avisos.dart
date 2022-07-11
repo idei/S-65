@@ -64,7 +64,11 @@ class _AvisosState extends State<Avisos> {
                 ),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                title: Text('Avisos', style: TextStyle(fontFamily: 'Nunito')),
+                title: Text('Avisos',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    )),
                 actions: <Widget>[
                   PopupMenuButton<String>(
                     onSelected: choiceAction,
@@ -129,7 +133,11 @@ class _AvisosState extends State<Avisos> {
                 ),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                title: Text('Avisos', style: TextStyle(fontFamily: 'Nunito')),
+                title: Text('Avisos',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    )),
                 actions: <Widget>[
                   PopupMenuButton<String>(
                     onSelected: choiceAction,

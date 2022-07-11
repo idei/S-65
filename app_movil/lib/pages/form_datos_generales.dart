@@ -104,8 +104,8 @@ class _FormpruebaState extends State<Formprueba> {
         appBar: AppBar(
           title: Text('Datos Generales',
               style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontWeight: FontWeight.bold)),
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
           actions: <Widget>[
             PopupMenuButton<String>(
               onSelected: choiceAction,

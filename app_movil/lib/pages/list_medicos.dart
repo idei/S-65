@@ -41,8 +41,11 @@ class _ListMedicosState extends State<ListMedicos> {
                   },
                 ),
                 title: Text(
-                  'Mis Médicos ',
-                  style: TextStyle(fontFamily: 'Nunito', fontSize: 14.2),
+                  'Mis Médicos',
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 14.2),
                 )),
             body: Center(
               child: CircularProgressIndicator(
@@ -61,7 +64,10 @@ class _ListMedicosState extends State<ListMedicos> {
               ),
               title: Text(
                 'Mis Médicos',
-                style: TextStyle(fontFamily: 'Nunito', fontSize: 14.2),
+                style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontSize: 14.2),
               ),
               actions: <Widget>[
                 PopupMenuButton<String>(

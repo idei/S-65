@@ -55,7 +55,10 @@ class _AntecedentesPerState extends State<AntecedentesFamPage> {
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text(
                   'Antecedentes Familiares Registrados ',
-                  style: TextStyle(fontFamily: 'Nunito', fontSize: 14.2),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 14.2),
                 )),
             body: Center(
               child: CircularProgressIndicator(
@@ -109,7 +112,10 @@ class _AntecedentesPerState extends State<AntecedentesFamPage> {
               //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
               title: Text(
                 'Antecedentes Familiares Registrados',
-                style: TextStyle(fontFamily: 'Nunito', fontSize: 14.2),
+                style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontSize: 14.2),
               ),
               actions: <Widget>[
                 PopupMenuButton<String>(
