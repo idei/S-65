@@ -57,7 +57,7 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
                       fontSize: 19.0),
                 ),
                 //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+                backgroundColor: Theme.of(context).primaryColor,
               ),
               body: Center(
                 child: CircularProgressIndicator(
@@ -90,7 +90,7 @@ getStringValuesSF() async {
   print(email);
 }
 
-guardar_datos() async {
+guardar_datos(BuildContext context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/user_antec_personales.php";
   var response = await http.post(url, body: {
@@ -138,8 +138,22 @@ guardar_datos() async {
   });
 
   print(response.body);
-  var data = json.decode(response.body);
-  print(data);
+  if (response.body == '"Success"') {
+    _alert_informe(context, "Antecedentes Guardados", 1);
+    Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
+  }
+}
+
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
 }
 
 read_datos_paciente() async {
@@ -321,7 +335,7 @@ class AntecedentesWidgetState extends State<Antecedentes> {
     return Scaffold(
         appBar: AppBar(
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+          backgroundColor: Theme.of(context).primaryColor,
           title: Text(
             'Antecedentes Personales',
             style: TextStyle(
@@ -370,25 +384,16 @@ class AntecedentesWidgetState extends State<Antecedentes> {
                 SizedBox(height: 30),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(157, 19, 34, 1),
+                    primary: Theme.of(context).primaryColor,
                   ),
                   onPressed: () {
-                    // Validate returns true if the form is valid, or false
-                    // otherwise.
-                    if (_formKey.currentState.validate()) {
-                      // If the form is valid, display a Snackbar.
-                      //Scaffold.of(context).showSnackBar(
-                      //  SnackBar(content: Text('Procesando información')));
-
-                      guardar_datos();
-                      Navigator.of(context)
-                          .pushReplacementNamed('/antecedentes_personales');
-
-                      //Navigator.pushNamed(context, '/antecedentes_personales');
-                    }
+                    guardar_datos(context);
                   },
                   child: Text('Guardar Antecedentes',
-                      style: TextStyle(fontFamily: 'Nunito')),
+                      style: TextStyle(
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily,
+                          fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -486,7 +491,10 @@ class LabeledCheckbox extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -553,7 +561,10 @@ class LabeledCheckboxHabla extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -617,7 +628,10 @@ class LabeledCheckboxDeficit extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -681,7 +695,10 @@ class LabeledCheckboxLesCab extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -745,7 +762,10 @@ class LabeledCheckboxPerdCon extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -810,7 +830,10 @@ class LabeledCheckboxAccCaiGol extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -875,7 +898,10 @@ class LabeledCheckboxLesEspalCuello extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -938,7 +964,10 @@ class LabeledCheckboxInfecciones extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1002,7 +1031,10 @@ class LabeledCheckboxAcv extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1065,7 +1097,10 @@ class LabeledCheckboxTox extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1128,7 +1163,10 @@ class LabeledCheckboxDemencia extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1191,7 +1229,10 @@ class LabeledCheckboxParkinson extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1254,7 +1295,10 @@ class LabeledCheckboxEpilepsia extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1317,7 +1361,10 @@ class LabeledCheckboxEsclerosis extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1380,7 +1427,10 @@ class LabeledCheckboxHun extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1443,7 +1493,10 @@ class LabeledCheckboxDepresion extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1506,7 +1559,10 @@ class LabeledCheckboxBipolar extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1569,7 +1625,10 @@ class LabeledCheckboxEsqui extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1632,7 +1691,10 @@ class LabeledCheckboxEnfDeso extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {
@@ -1698,7 +1760,10 @@ class LabeledCheckboxIntox extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'NunitoR'))),
+                child: Text(label,
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily))),
             Checkbox(
               value: value,
               onChanged: (bool newValue) {

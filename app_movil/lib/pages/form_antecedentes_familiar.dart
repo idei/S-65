@@ -59,10 +59,12 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
               appBar: AppBar(
                 title: Text(
                   'Antecedentes Familiares',
-                  style: TextStyle(fontFamily: 'Nunito', fontSize: 19.0),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 19.0),
                 ),
-                backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                //backgroundColor: Color(0xf9d1322),
+                backgroundColor: Theme.of(context).primaryColor,
               ),
               body: Center(
                 child: CircularProgressIndicator(
@@ -75,15 +77,6 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   }
 }
 
-Widget texto(String entrada) {
-  return Text(entrada,
-      style: new TextStyle(
-          fontSize: 12.0,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Nunito'));
-}
-
 var email;
 
 getStringValuesSF() async {
@@ -94,10 +87,12 @@ getStringValuesSF() async {
   print(email);
 }
 
-guardar_datos() async {
+var response = null;
+
+guardar_datos(BuildContext context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/user_antec_familiares.php";
-  var response = await http.post(url, body: {
+  response = await http.post(url, body: {
     "email": email,
     "retraso": retraso.toString(),
     "desorden": desorden.toString(),
@@ -120,13 +115,13 @@ guardar_datos() async {
     "enfermedad_desorden": enfermedad_desorden.toString(),
     "intoxicaciones": intoxicaciones.toString(),
     "cancer": cancer.toString(),
-    "cirujia": cancer.toString(),
-    "trasplante": cancer.toString(),
-    "hipotiroidismo": cancer.toString(),
-    "cardiologico": cancer.toString(),
-    "diabetes": cancer.toString(),
-    "hipertension": cancer.toString(),
-    "colesterol": cancer.toString(),
+    "cirujia": cirujia.toString(),
+    "trasplante": trasplante.toString(),
+    "hipotiroidismo": hipotiroidismo.toString(),
+    "cardiologico": cardiologico.toString(),
+    "diabetes": diabetes.toString(),
+    "hipertension": hipertension.toString(),
+    "colesterol": colesterol.toString(),
     "cod_event_retraso": cod_event_retraso,
     "cod_event_desorden": cod_event_desorden,
     "cod_event_deficit": cod_event_deficit,
@@ -158,8 +153,10 @@ guardar_datos() async {
   });
 
   print(response.body);
-  var data = json.decode(response.body);
-  print(data);
+  if (response.body == '"Success"') {
+    _alert_informe(context, "Antecedentes Guardados", 1);
+    Navigator.pushNamed(context, '/antecedentes_familiares');
+  }
 }
 
 Future read_datos_paciente() async {
@@ -376,6 +373,18 @@ Future read_datos_paciente() async {
   return true;
 }
 
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
+}
+
 //--------------------------------- Antecedentes Familiares --------------------------
 
 class AntecedentesFam extends StatefulWidget {
@@ -401,10 +410,12 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
         appBar: AppBar(
           title: Text(
             'Antecedentes Familiares',
-            style: TextStyle(fontFamily: 'Nunito', fontSize: 19.0),
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 19.0),
           ),
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+          backgroundColor: Theme.of(context).primaryColor,
           actions: <Widget>[
             PopupMenuButton<String>(
               onSelected: choiceAction,
@@ -481,27 +492,17 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
                 SizedBox(height: 30),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(157, 19, 34, 1),
+                    primary: Theme.of(context).primaryColor,
                   ),
                   onPressed: () {
-                    // Validate returns true if the form is valid, or false
-                    // otherwise.
-                    if (_formKey.currentState.validate()) {
-                      // If the form is valid, display a Snackbar.
-                      //Scaffold.of(context).showSnackBar(
-                      //  SnackBar(content: Text('Procesando información')));
-
-                      guardar_datos();
-
-                      //Navigator.of(context)
-                      //  .pushReplacementNamed('/antecedentes_familiares');
-
-                      Navigator.pushNamed(context, '/antecedentes_familiares');
-                    }
+                    guardar_datos(context);
                   },
                   child: Text(
                     'Guardar Antecedentes',
-                    style: TextStyle(fontFamily: 'Nunito'),
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
                   ),
                 ),
               ],

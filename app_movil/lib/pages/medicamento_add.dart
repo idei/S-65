@@ -84,7 +84,9 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
       appBar: AppBar(
         //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-        title: Text("Buscador", style: TextStyle(fontFamily: 'Nunito')),
+        title: Text("Buscador",
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: choiceAction,
@@ -99,59 +101,71 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          loading
-              ? CircularProgressIndicator()
-              : searchTextField = AutoCompleteTextField<Medicamentos_database>(
-                  key: key,
-                  clearOnSubmit: false,
-                  suggestions: users,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16.0,
-                      fontFamily: 'NunitoR'),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
-                    hintText: "Ingrese el nombre del medicamento",
-                    hintStyle:
-                        TextStyle(color: Colors.grey, fontFamily: 'NunitoR'),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: 10,
+            ),
+            loading
+                ? Container(
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator())
+                : searchTextField =
+                    AutoCompleteTextField<Medicamentos_database>(
+                    key: key,
+                    clearOnSubmit: false,
+                    suggestions: users,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontFamily: 'NunitoR'),
+                    decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
+                      hintText: "Ingrese el nombre del medicamento",
+                      hintStyle:
+                          TextStyle(color: Colors.grey, fontFamily: 'NunitoR'),
+                    ),
+                    itemFilter: (item, query) {
+                      return item.nombre_comercial
+                          .toLowerCase()
+                          .startsWith(query.toLowerCase());
+                    },
+                    itemSorter: (a, b) {
+                      return a.nombre_comercial.compareTo(b.nombre_comercial);
+                    },
+                    itemSubmitted: (item) {
+                      setState(() {
+                        searchTextField.textField.controller.text =
+                            item.nombre_comercial;
+                        data_id = item.id_medicamento;
+                        print(data_id);
+                      });
+                    },
+                    itemBuilder: (context, item) {
+                      // ui for the autocompelete row
+                      return row(item);
+                    },
                   ),
-                  itemFilter: (item, query) {
-                    return item.nombre_comercial
-                        .toLowerCase()
-                        .startsWith(query.toLowerCase());
-                  },
-                  itemSorter: (a, b) {
-                    return a.nombre_comercial.compareTo(b.nombre_comercial);
-                  },
-                  itemSubmitted: (item) {
-                    setState(() {
-                      searchTextField.textField.controller.text =
-                          item.nombre_comercial;
-                      data_id = item.id_medicamento;
-                      print(data_id);
-                    });
-                  },
-                  itemBuilder: (context, item) {
-                    // ui for the autocompelete row
-                    return row(item);
-                  },
-                ),
-          SizedBox(height: 40.0),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                //primary: Color.fromRGBO(157, 19, 34, 1),
-                ),
-            onPressed: () {
-              guardar_medicamento(data_id);
-              Navigator.pushNamed(context, '/medicamentos');
-            },
-            child:
-                Text('Guardar Datos', style: TextStyle(fontFamily: 'Nunito')),
-          )
-        ],
+            SizedBox(height: 40.0),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  //primary: Color.fromRGBO(157, 19, 34, 1),
+                  ),
+              onPressed: () {
+                guardar_medicamento(data_id);
+                Navigator.pushNamed(context, '/medicamentos');
+              },
+              child: Text('Guardar Datos',
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily)),
+            )
+          ],
+        ),
       ),
     );
   }

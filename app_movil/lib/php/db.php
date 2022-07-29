@@ -1,16 +1,19 @@
 <?php
 header('Content-Type: application/json; charset=utf8');
 
-$db_name = "id16812178_app65";
-$db_server = "db4free.net:3306";
-$db_user = "id16812177_s65";
+// Base de datos gratis de db4free
+// $db_name = "id16812178_app65";
+// $db_server = "db4free.net:3306";
+// $db_user = "id16812177_s65";
+// $db_pass = "Mas65-2021bue";
+
+
+// Base de datos de 000WebHost
+$db_name = "id17956189_id16812178_app65";
+$db_server = "localhost";
+$db_user = "id17956189_id16812177_s65";
 $db_pass = "Mas65-2021bue";
 
-
-// $db_name = "db65";
-// $db_server = "nyf1yu6o7nm9.us-east-4.psdb.cloud"; 
-// $db_user = "l3gzjnv19ns9";
-// $db_pass = "pscale_pw_dhpOBO91y_pCNkEjOmkC_Nr4rwsaY5aXkwbetNn3q64";
 
 //-------------- LOCAL -----------------------
 

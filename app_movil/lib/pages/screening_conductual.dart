@@ -616,7 +616,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new RaisedButton(
+                      new ElevatedButton(
                         //onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',
@@ -625,7 +625,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                               fontWeight: FontWeight.normal,
                               color: Colors.white),
                         ),
-                        color: Theme.of(context).accentColor,
+                        //color: Theme.of(context).accentColor,
                       ),
                       new Padding(
                         padding: EdgeInsets.all(4.0),

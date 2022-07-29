@@ -23,17 +23,17 @@ environment:
 dependencies:
   syncfusion_flutter_pdf: ^18.4.49-beta
   open_file: ^3.0.3
-  path_provider: ^1.6.28
+  path_provider: ^2.0.0
   http: ^0.12.0
   fluttertoast: ^7.1.6
-  datetime_picker_formfield: ^1.0.0
+  datetime_picker_formfield: ^2.0.0
   email_validator: '^1.0.0'
-  shared_preferences: ^0.5.12+4
+  shared_preferences: ^2.0.6
   flutter_svg: ^0.18.0
   dio: ^3.0.10
   autocomplete_textfield: ^1.6.4
   rflutter_alert: ^1.0.3
-  intl: ^0.16.0
+  intl: ^0.17.0
   tel_input:
   flutter:
     sdk: flutter

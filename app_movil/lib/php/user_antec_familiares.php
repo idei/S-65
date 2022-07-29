@@ -438,7 +438,7 @@
                     
                     if ($eventos["codigo_evento"] == $cod_event_cancer) {
                         $rowsToInsert[] = array(
-                            'rela_tipo' => $cod_event_cancer,
+                            'rela_tipo' => $cancer,
                                 'rela_evento' => $eventos["id"],
                                 'rela_paciente' => $id_paciente,
                         );
@@ -446,7 +446,7 @@
 
                     if ($eventos["codigo_evento"] == $cod_event_cirujia) {
                         $rowsToInsert[] = array(
-                            'rela_tipo' => $cod_event_cirujia,
+                            'rela_tipo' => $cirujia,
                                 'rela_evento' => $eventos["id"],
                                 'rela_paciente' => $id_paciente,
                         );

@@ -318,7 +318,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new RaisedButton(
+                      new ElevatedButton(
                         //onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',
@@ -327,7 +327,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                               fontWeight: FontWeight.normal,
                               color: Colors.white),
                         ),
-                        color: Theme.of(context).accentColor,
+                        //color: Theme.of(context).accentColor,
                       ),
                       new Padding(
                         padding: EdgeInsets.all(4.0),

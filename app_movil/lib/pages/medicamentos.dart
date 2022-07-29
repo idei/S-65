@@ -130,8 +130,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
                   child: IconButton(
                     icon: Icon(Icons.add, color: Colors.white),
                     onPressed: () {
-                      Navigator.pushNamed(
-                          context, '/new_recordatorio_personal');
+                      Navigator.pushNamed(context, '/medicamentosAdd');
                     },
                   ),
                 ));

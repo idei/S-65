@@ -17,7 +17,8 @@
     $select_id_paciente->execute();
     $id_paciente= $select_id_paciente->fetch();
     $id_paciente= $id_paciente["id"];  
-
+    
+    var_dump($id_paciente);
 
     // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
     $select_antecedentes = $db->prepare("SELECT rela_evento,nombre_evento FROM antecedentes_medicos_familiares 

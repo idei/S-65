@@ -1283,7 +1283,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                                   .fontFamily,
                             )),
                       ),
-                      new RaisedButton(
+                      new ElevatedButton(
                         //  onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',
@@ -1292,7 +1292,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                               fontWeight: FontWeight.normal,
                               color: Colors.white),
                         ),
-                        color: Theme.of(context).accentColor,
+                        //color: Theme.of(context).accentColor,
                       ),
                       new Padding(
                         padding: EdgeInsets.all(4.0),

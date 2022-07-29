@@ -51,8 +51,6 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                         Theme.of(context).textTheme.headline1.fontFamily,
                     fontSize: 14.2),
               ),
-              //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-              //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
             ),
             body: Center(
               child: CircularProgressIndicator(
@@ -83,7 +81,10 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                               fontSize: 14.0,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'NunitoR'),
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         )
                       ]),
                     ),
@@ -128,7 +129,11 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                 tiles: snapshot.data
                     .map((data) => ListTile(
                           title: Text(data.studentName,
-                              style: TextStyle(fontFamily: 'NunitoR')),
+                              style: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily)),
                         ))
                     .toList(),
               ).toList(),
@@ -157,7 +162,10 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                               fontSize: 14.0,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'Nunito'),
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         )
                       ]),
                     ),

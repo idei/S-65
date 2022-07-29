@@ -238,7 +238,7 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new RaisedButton(
+                      new ElevatedButton(
                         // onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',
@@ -247,7 +247,7 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                               fontWeight: FontWeight.normal,
                               color: Colors.white),
                         ),
-                        color: Theme.of(context).accentColor,
+                        //color: Theme.of(context).accentColor,
                       ),
                       new Padding(
                         padding: EdgeInsets.all(4.0),
