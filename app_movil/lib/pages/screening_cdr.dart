@@ -318,7 +318,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new ElevatedButton(
+                      ElevatedButton(
                         //onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',
