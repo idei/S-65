@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/ver_screening.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -19,7 +18,7 @@ class RegistrarPage extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
-final _formKey = GlobalKey<FormState>();
+GlobalKey<FormState> _formKey_registrar = GlobalKey<FormState>();
 
 class _FormpruebaState extends State<RegistrarPage> {
   bool acepto = false;
@@ -28,38 +27,41 @@ class _FormpruebaState extends State<RegistrarPage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: Form(
-          key: _formKey,
+          key: _formKey_registrar,
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Container(
-                  child: Image.asset('assets/logo1.png'),
-                  height: 110.0,
-                ),
-                Column(children: <Widget>[
-                  _crearEmail(),
-                  SizedBox(height: 10),
-                  _crearPassword(),
-                  SizedBox(height: 10),
-                  _repetirPassword(),
-                  SizedBox(height: 10),
-                  _crearApellido(),
-                  SizedBox(height: 10),
-                  _crearNombre(),
-                  SizedBox(height: 10),
-                  _crearDNI(),
-                  SizedBox(height: 10),
-                  _crearCheck(),
-                  SizedBox(height: 10),
-                  _crearBotonSesion(context),
-                  SizedBox(height: 10),
-                  _crearBotonRegresar(context),
-                ])
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(5.0),
+                  ),
+                  Container(
+                    child: Image.asset('assets/logo1.png'),
+                    height: 110.0,
+                  ),
+                  Column(children: <Widget>[
+                    _crearEmail(),
+                    SizedBox(height: 10),
+                    _crearPassword(),
+                    SizedBox(height: 10),
+                    _repetirPassword(),
+                    SizedBox(height: 10),
+                    _crearApellido(),
+                    SizedBox(height: 10),
+                    _crearNombre(),
+                    SizedBox(height: 10),
+                    _crearDNI(),
+                    SizedBox(height: 10),
+                    _crearCheck(),
+                    SizedBox(height: 10),
+                    _crearBotonSesion(context),
+                    SizedBox(height: 10),
+                    _crearBotonRegresar(context),
+                    SizedBox(height: 20),
+                  ])
+                ],
+              ),
             ),
           ),
         ));
@@ -142,7 +144,8 @@ class _FormpruebaState extends State<RegistrarPage> {
         },
       ),
       Text('Acepto términos y condiciones',
-          style: TextStyle(fontFamily: 'NunitoR'))
+          style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily))
     ]);
   }
 
@@ -156,8 +159,13 @@ class _FormpruebaState extends State<RegistrarPage> {
             : "Por favor ingresar un correo electrónico válido",
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
-            labelText: 'Correo electrónico',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'Correo electrónico',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          hintText: 'ejemplo@gmail.com',
+          suffixIcon: Icon(Icons.email_outlined),
+          //icon: Icon(Icons.abc)
+        ),
       ),
     );
   }
@@ -173,8 +181,13 @@ class _FormpruebaState extends State<RegistrarPage> {
           return null;
         },
         keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.words,
         decoration: InputDecoration(
-            labelText: 'Nombre', labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'Nombre',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          suffixIcon: Icon(Icons.person),
+        ),
         controller: nombrePaciente,
       ),
     );
@@ -193,7 +206,11 @@ class _FormpruebaState extends State<RegistrarPage> {
         },
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
-            labelText: 'DNI', labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'DNI',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          suffixIcon: Icon(Icons.tab_outlined),
+        ),
         controller: dni,
       ),
     );
@@ -210,10 +227,14 @@ class _FormpruebaState extends State<RegistrarPage> {
           }
           return null;
         },
+        textCapitalization: TextCapitalization.words,
         keyboardType: TextInputType.text,
         decoration: InputDecoration(
-            labelText: 'Apellido',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'Apellido',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          suffixIcon: Icon(Icons.person),
+        ),
         controller: apellidoPaciente,
       ),
     );
@@ -232,8 +253,11 @@ class _FormpruebaState extends State<RegistrarPage> {
         },
         obscureText: true,
         decoration: InputDecoration(
-            labelText: 'Contraseña',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'Contraseña',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          suffixIcon: Icon(Icons.password),
+        ),
         controller: passwordNuevo,
       ),
     );
@@ -252,28 +276,12 @@ class _FormpruebaState extends State<RegistrarPage> {
         },
         obscureText: true,
         decoration: InputDecoration(
-            labelText: 'Repetir Contraseña',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
+          labelText: 'Repetir Contraseña',
+          labelStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          suffixIcon: Icon(Icons.repeat),
+        ),
         controller: passwordRepetido,
-      ),
-    );
-  }
-
-  Widget _Password() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15.0),
-      child: TextFormField(
-        validator: (value) {
-          if (value.isEmpty) {
-            return 'Por favor repita la contraseña';
-          }
-          return null;
-        },
-        obscureText: true,
-        decoration: InputDecoration(
-            labelText: 'Repetir Contraseña',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
-        //controller: password1,
       ),
     );
   }
@@ -292,7 +300,7 @@ class _FormpruebaState extends State<RegistrarPage> {
       //color: Theme.of(context).primaryColor,
       //textColor: Colors.white,
       onPressed: () {
-        if (_formKey.currentState.validate()) {
+        if (_formKey_registrar.currentState.validate()) {
           if (passwordNuevo.text == passwordRepetido.text) {
             register();
 
@@ -318,7 +326,8 @@ class _FormpruebaState extends State<RegistrarPage> {
             )),
       ),
       onPressed: () {
-        Navigator.pushNamed(context, '/');
+        //Navigator.pop(context);
+        Navigator.popAndPushNamed(context, '/');
       },
     );
   }

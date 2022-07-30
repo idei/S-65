@@ -99,9 +99,17 @@ class _ListMedicosState extends State<ListMedicos> {
                                   data.nombre_medico +
                                       " " +
                                       data.apellido_medico,
-                                  style: TextStyle(fontFamily: 'NunitoR')),
+                                  style: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
                               subtitle: Text(data.especialidad,
-                                  style: TextStyle(fontFamily: 'NunitoR')),
+                                  style: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
                               trailing: Wrap(
                                 spacing: 10, // space between two icons
                                 children: <Widget>[
@@ -188,7 +196,9 @@ class ViewPerfilMedico extends StatelessWidget {
           ),
           title: Text(
             'Perfil del Dr/a ',
-            style: TextStyle(fontFamily: 'Nunito', fontSize: 14.2),
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 14.2),
           ),
           actions: <Widget>[
             PopupMenuButton<String>(
@@ -228,10 +238,14 @@ class CardPerfilMedico extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.person),
               title: Text("$nombre_medico $apellido_medico",
-                  style: TextStyle(fontFamily: 'NunitoR')),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily)),
               subtitle: Text(
                   'Matricula: $matricula \n Especialidad: $especialidad',
-                  style: TextStyle(fontFamily: 'NunitoR')),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily)),
             ),
           ],
         ),

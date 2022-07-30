@@ -1283,7 +1283,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                                   .fontFamily,
                             )),
                       ),
-                      new ElevatedButton(
+                      ElevatedButton(
                         //  onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',

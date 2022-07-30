@@ -10,18 +10,16 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-final _formKey = GlobalKey<_MedicamentoState>();
-List<Medicamentos_database> medicamentos_items;
+List<MedicamentosDatabase> medicamentos_items;
 
 TextEditingController dosis_frecuencia = TextEditingController();
 
 class _MedicamentoState extends State<MedicamentoPage> {
-  double _animatedHeight = 0.0;
   var data_error;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Medicamentos_database>>(
+    return FutureBuilder<List<MedicamentosDatabase>>(
         future: read_medicamentos(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -67,9 +65,17 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     color: Colors.blue,
                                   ),
                                   title: Text(data.nombre_comercial,
-                                      style: TextStyle(fontFamily: 'NunitoR')),
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                   subtitle: Text(data.dosis_frecuencia,
-                                      style: TextStyle(fontFamily: 'NunitoR')),
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                   trailing: Wrap(
                                     spacing: 10, // space between two icons
                                     children: <Widget>[
@@ -140,7 +146,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
 
   var email_argument;
 
-  Future<List<Medicamentos_database>> read_medicamentos() async {
+  Future<List<MedicamentosDatabase>> read_medicamentos() async {
     await getStringValuesSF();
 
     String URL_base = Env.URL_PREFIX;
@@ -154,8 +160,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
 
     if (data_error.toString() != 'Error') {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      medicamentos_items = items.map<Medicamentos_database>((json) {
-        return Medicamentos_database.fromJson(json);
+      medicamentos_items = items.map<MedicamentosDatabase>((json) {
+        return MedicamentosDatabase.fromJson(json);
       }).toList();
       return medicamentos_items;
     }
@@ -185,7 +191,9 @@ class _MedicamentoState extends State<MedicamentoPage> {
           if (button_pressed == 1) {
             return AlertDialog(
               title: Text("Ingrese dosis y frecuencia",
-                  style: TextStyle(fontFamily: 'NunitoR')),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily)),
               content: TextFormField(
                 controller: dosis_frecuencia,
                 validator: (value) {
@@ -222,7 +230,9 @@ class _MedicamentoState extends State<MedicamentoPage> {
           } else {
             return AlertDialog(
               title: Text("¿Esta seguro de querer eliminar este medicamento?",
-                  style: TextStyle(fontFamily: 'NunitoR')),
+                  style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily)),
               actions: <Widget>[
                 ElevatedButton(
                     onPressed: () {
@@ -278,7 +288,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 }
 
-class Medicamentos_database {
+class MedicamentosDatabase {
   String dosis_frecuencia;
   String nombre_comercial;
   String presentacion;
@@ -286,7 +296,7 @@ class Medicamentos_database {
   var rela_medicamento;
   var id_medicamento;
 
-  Medicamentos_database(
+  MedicamentosDatabase(
       {this.dosis_frecuencia,
       this.rela_paciente,
       this.rela_medicamento,
@@ -294,8 +304,8 @@ class Medicamentos_database {
       this.nombre_comercial,
       this.presentacion});
 
-  factory Medicamentos_database.fromJson(Map<String, dynamic> json) {
-    return Medicamentos_database(
+  factory MedicamentosDatabase.fromJson(Map<String, dynamic> json) {
+    return MedicamentosDatabase(
         id_medicamento: json['id_medicamento'],
         dosis_frecuencia: json['dosis_frecuencia'],
         rela_paciente: json['rela_paciente'],

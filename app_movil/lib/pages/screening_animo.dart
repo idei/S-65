@@ -496,7 +496,8 @@ class LabeledCheckboxANI1 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -568,7 +569,8 @@ class LabeledCheckboxANI2 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -637,7 +639,8 @@ class LabeledCheckboxVacia extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -706,7 +709,8 @@ class LabeledCheckboxANIMO4 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -775,7 +779,8 @@ class LabeledCheckboxAnimo5 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -844,7 +849,8 @@ class LabeledCheckboxAnimo6 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -913,7 +919,8 @@ class LabeledCheckboxFeliz extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -981,7 +988,8 @@ class LabeledCheckboxAnimo8 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1051,7 +1059,8 @@ class LabeledCheckboxAnimo9 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1120,7 +1129,8 @@ class LabeledCheckboxAnimo10 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1189,7 +1199,8 @@ class LabeledCheckboxVivo extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1257,7 +1268,8 @@ class LabeledCheckboxAnimo12 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1325,7 +1337,8 @@ class LabeledCheckboxANIMO13 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1393,7 +1406,8 @@ class LabeledCheckboxAnimo14 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),
@@ -1461,7 +1475,8 @@ class LabeledCheckboxAnimo15 extends StatelessWidget {
             Expanded(
                 child: Text(label,
                     style: TextStyle(
-                      fontFamily: 'NunitoR',
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ))),

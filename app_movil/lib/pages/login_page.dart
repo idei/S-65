@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/ajustes.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:email_validator/email_validator.dart';
@@ -7,18 +6,15 @@ import 'package:http/http.dart' as http;
 import 'recuperar_contras.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'DashBoard.dart';
 
-// Define a custom Form widget.
-class IngresarPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _LoginPage createState() => _LoginPage();
 }
 
-final _formKey_ingresar = GlobalKey<FormState>();
+GlobalKey<FormState> _formKey_ingresar = GlobalKey<FormState>();
 
-class _FormpruebaState extends State<IngresarPage> {
-//class IngresarPage extends StatelessWidget {
+class _LoginPage extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController nomb_apellido = TextEditingController();
@@ -27,17 +23,16 @@ class _FormpruebaState extends State<IngresarPage> {
   var estado_clinico;
   var id_paciente;
   String estado_read_date;
-
   String estado_login;
 
-  Widget build(BuildContext context1) {
+  Widget build(BuildContext context) {
     return Scaffold(
         body: Form(
       key: _formKey_ingresar,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          _login(context1),
+          LoginWidget(context),
         ],
       ),
     ));
@@ -47,7 +42,6 @@ class _FormpruebaState extends State<IngresarPage> {
     print("set prefe");
     await consult_preference();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    //prefs.clear();
 
     prefs.setString("email_prefer", email.text);
     prefs.setInt("estado_clinico", estado_clinico);
@@ -77,7 +71,7 @@ class _FormpruebaState extends State<IngresarPage> {
     }
   }
 
-  login() async {
+  fetchLogin() async {
     print("Login");
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/user_login.php";
@@ -91,6 +85,12 @@ class _FormpruebaState extends State<IngresarPage> {
 
     estado_login = data['estado_login'];
     id_paciente = data['id_paciente'];
+
+    setState(() {
+      AlertDialog(
+        title: Text('Cargando'),
+      );
+    });
 
     if (estado_login == "Success") {
       estado_users = data['estado_users'];
@@ -124,115 +124,155 @@ class _FormpruebaState extends State<IngresarPage> {
         textColor: Colors.white);
   }
 
-  Widget _login(BuildContext context) {
+  Widget LoginWidget(BuildContext context1) {
     return Container(
       child: Column(children: <Widget>[
         Container(
           child: Image.asset('assets/logo1.png'),
           height: 110.0,
         ),
-        _crearEmail(),
+        InputEmailWidget(),
         SizedBox(height: 30),
-        _crearPassword(),
+        InputPasswordWidget(),
         SizedBox(height: 30),
-        _crearBotonSesion(context),
+        ButtonIniciarSesion2(context1),
         SizedBox(height: 10),
         GestureDetector(
             child: Text("¿Olvido la contraseña?",
-                style: TextStyle(fontFamily: 'NunitoR')),
+                style: TextStyle(
+                    fontFamily:
+                        Theme.of(context1).textTheme.headline1.fontFamily)),
             onTap: () {
               Navigator.pushReplacement(
-                  context,
+                  context1,
                   MaterialPageRoute(
                       builder: (BuildContext context) => RecuperarPage()));
-              //Navigator.pushNamed(context, '/recuperar');
-            }), // do what you need to do when "Click here" gets clicked
-
+            }),
         SizedBox(height: 20),
-        _crearBotonRegresar(context),
+        ButtonRegresar(context1),
       ]),
     );
   }
 
-  Widget _crearEmail() {
+  Widget InputEmailWidget() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
         controller: email,
+        enabled: _isEnabled,
         validator: (value) => EmailValidator.validate(value)
             ? null
             : "Por favor ingresar un correo electrónico válido",
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
             labelText: 'Correo electrónico',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
+            labelStyle: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
     );
   }
 
-  Widget _crearPassword() {
+  Widget InputPasswordWidget() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
+        controller: password,
+        enabled: _isEnabled,
+        obscureText: true,
+        decoration: InputDecoration(
+            labelText: 'Contraseña',
+            labelStyle: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
         validator: (value) {
           if (value.isEmpty) {
             return 'Por favor ingrese una contraseña';
           }
           return null;
         },
-        controller: password,
-        obscureText: true,
-        decoration: InputDecoration(
-            labelText: 'Contraseña',
-            labelStyle: TextStyle(fontFamily: 'NunitoR')),
       ),
     );
   }
 
-  Widget _crearBotonSesion(BuildContext context) {
+  Widget ButtonIniciarSesion(BuildContext context) {
     return ElevatedButton(
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 60.0, vertical: 15.0),
         child: Text('INICIAR SESION',
-            style: TextStyle(color: Colors.white, fontFamily: 'Nunito')),
+            style: TextStyle(
+                color: Colors.white,
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      style: ButtonStyle(
-          //backgroundColor: Theme.of(context).primaryColor,
-          //textStyle: Colors.white,
-          ),
-
-      //textColor: Colors.white,
       onPressed: () {
-        //if (_formKey_ingresar.currentState.validate()) {
-        login();
+        fetchLogin();
         if (estado_users == 2 && estado_login == "Success menu") {
           Navigator.pushNamed(context, '/menu');
-          //} else {
+
           if (estado_users == 1 && estado_login == "Success datos") {
             Navigator.pushNamed(context, '/menu');
           }
         }
-        //}
-
-        //Navigator.pushNamed(context, 'datospersonales');
       },
     );
   }
 
-  Widget _crearBotonRegresar(BuildContext context) {
-    return ElevatedButton(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
-        child: Text('REGRESAR',
-            style: TextStyle(color: Colors.white, fontFamily: 'Nunito')),
+  bool _isLoading = false;
+  bool _isEnabled = true;
+
+  Widget ButtonIniciarSesion2(BuildContext context) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        maximumSize: const Size(400, 50),
+        minimumSize: const Size(250, 40),
       ),
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      //color: Theme.of(context).primaryColor,
-      //textColor: Colors.white,
-      //style: ButtonStyle(textStyle: TextStyle(color: Colors.white)),
+      icon: _isLoading
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: const CircularProgressIndicator(),
+            )
+          : const Icon(Icons.email_outlined),
+      label: Text(_isLoading ? 'Cargando...' : 'INICIAR SESION',
+          style: TextStyle(
+              color: Colors.white,
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      onPressed: _isLoading ? null : _startLoading,
+    );
+  }
+
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+      _isEnabled = false;
+    });
+
+    await fetchLogin();
+
+    setState(() {
+      _isLoading = false;
+      _isEnabled = true;
+    });
+
+    if (estado_users == 2 && estado_login == "Success menu") {
+      Navigator.pushNamed(context, '/menu');
+
+      if (estado_users == 1 && estado_login == "Success datos") {
+        Navigator.pushNamed(context, '/menu');
+      }
+    }
+  }
+
+  Widget ButtonRegresar(BuildContext context) {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.arrow_circle_left_outlined),
+      label: Text('REGRESAR',
+          style: TextStyle(
+              color: Colors.white,
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      style: ElevatedButton.styleFrom(
+        maximumSize: const Size(400, 50),
+        minimumSize: const Size(250, 40),
+      ),
       onPressed: () {
-        Navigator.pushNamed(context, '/');
+        Navigator.popAndPushNamed(context, '/');
       },
     );
   }

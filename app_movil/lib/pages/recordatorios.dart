@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
 
 class RecordatorioPage extends StatefulWidget {
   @override
@@ -14,7 +13,6 @@ final _formKey = GlobalKey<_RecordatorioState>();
 List<Recordatorios_database> recordatorios_items;
 
 class _RecordatorioState extends State<RecordatorioPage> {
-  double _animatedHeight = 0.0;
   var data_error;
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
                       Navigator.pushNamed(context, '/menu');
                     },
                   ),
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                   title: Text('Recordatorios',
                       style: TextStyle(
                         fontFamily:
@@ -89,16 +86,13 @@ class _RecordatorioState extends State<RecordatorioPage> {
                   ).toList(),
                 ),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    // Add your onPressed code here!
-                  },
+                  onPressed: () {},
                   child: IconButton(
                     icon: Icon(Icons.add, color: Colors.white),
                     onPressed: () {
                       Navigator.pushNamed(
                           context, '/new_recordatorio_personal');
                     },
-                    //color: Color.fromRGBO(157, 19, 34, 1),
                   ),
                 ));
           } else {
@@ -179,9 +173,11 @@ class _RecordatorioState extends State<RecordatorioPage> {
           color: color,
         ),
         title: Text(data.descripcion.toUpperCase(),
-            style: TextStyle(fontFamily: 'NunitoR')),
-        subtitle:
-            Text(data.fecha_limite, style: TextStyle(fontFamily: 'NunitoR')),
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+        subtitle: Text(data.fecha_limite,
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
     );
   }

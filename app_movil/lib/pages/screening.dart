@@ -14,7 +14,6 @@ var select_screening;
 var titulo;
 
 class _ScreeningState extends State<ScreeningPage> {
-  double _animatedHeight = 0.0;
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
@@ -53,7 +52,7 @@ class _ScreeningState extends State<ScreeningPage> {
     if (select_screening == "ENCRO") {
       titulo = "enfermedades crónicas";
     }
-    return FutureBuilder<List<Screenings_database>>(
+    return FutureBuilder<List<ScreeningModel>>(
         future: read_screenings(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -65,7 +64,6 @@ class _ScreeningState extends State<ScreeningPage> {
                       Navigator.pushNamed(context, '/menu_chequeo');
                     },
                   ),
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                   title: Text('Chequeos ' + titulo,
                       style: TextStyle(
                         fontFamily:
@@ -120,9 +118,7 @@ class _ScreeningState extends State<ScreeningPage> {
                   ).toList(),
                 ),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    // Add your onPressed code here!
-                  },
+                  onPressed: () {},
                   child: IconButton(
                     icon: Icon(Icons.add, color: Colors.white),
                     onPressed: () {
@@ -198,16 +194,12 @@ class _ScreeningState extends State<ScreeningPage> {
                           }
                         }
                       }
-
-                      //Navigator.pushNamed(context, '/screening_new');
                     },
-                    //color: Color.fromRGBO(100, 20, 28, 1),
                   ),
                 ));
           } else {
             return Scaffold(
               appBar: AppBar(
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text('Chequeo',
                     style: TextStyle(
                       fontFamily:
@@ -224,7 +216,7 @@ class _ScreeningState extends State<ScreeningPage> {
         });
   }
 
-  Future<List<Screenings_database>> read_screenings() async {
+  Future<List<ScreeningModel>> read_screenings() async {
     await getStringValuesSF();
 
     String URL_base = Env.URL_PREFIX;
@@ -238,8 +230,8 @@ class _ScreeningState extends State<ScreeningPage> {
 
     if (data_error.toString() != 'Error') {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<Screenings_database>((json) {
-        return Screenings_database.fromJson(json);
+      recordatorios_items = items.map<ScreeningModel>((json) {
+        return ScreeningModel.fromJson(json);
       }).toList();
       return recordatorios_items;
     }
@@ -257,12 +249,12 @@ class _ScreeningState extends State<ScreeningPage> {
   }
 }
 
-List<Screenings_database> recordatorios_items;
+List<ScreeningModel> recordatorios_items;
 var data_error;
 var email_argument;
 var id_paciente;
 
-class Screenings_database {
+class ScreeningModel {
   var tipo_screening;
   var id_resultado_screening;
   var id_paciente;
@@ -271,7 +263,7 @@ class Screenings_database {
   String codigo;
   String fecha;
 
-  Screenings_database(
+  ScreeningModel(
       {this.tipo_screening,
       this.id_resultado_screening,
       this.id_paciente,
@@ -280,8 +272,8 @@ class Screenings_database {
       this.codigo,
       this.fecha});
 
-  factory Screenings_database.fromJson(Map<String, dynamic> json) {
-    return Screenings_database(
+  factory ScreeningModel.fromJson(Map<String, dynamic> json) {
+    return ScreeningModel(
       id_resultado_screening: json['id'],
       tipo_screening: json['rela_screening'],
       id_paciente: json['rela_paciente'],

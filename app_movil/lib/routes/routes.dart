@@ -10,7 +10,7 @@ import 'package:app_salud/pages/form_datos_generales.dart';
 import 'package:app_salud/pages/historial_clinico.dart';
 import 'package:app_salud/pages/home_pag.dart';
 import 'package:app_salud/pages/ibupiracejem.dart';
-import 'package:app_salud/pages/ingresar_pag.dart';
+import 'package:app_salud/pages/login_page.dart';
 import 'package:app_salud/pages/medicamento_add.dart';
 import 'package:app_salud/pages/medicamentos.dart';
 import 'package:app_salud/pages/menu.dart';
@@ -29,7 +29,6 @@ import 'package:app_salud/pages/screening_nutricional.dart';
 import 'package:app_salud/pages/screening_queja_cognitiva.dart';
 import 'package:app_salud/pages/ver_recordatorio_personal.dart';
 import 'package:app_salud/pages/ver_recordatorio_screening.dart';
-import 'package:app_salud/pages/avisos.dart';
 import 'package:app_salud/pages/ver_aviso_general.dart';
 import 'package:app_salud/pages/screening_new.dart';
 import 'package:app_salud/pages/list_medicos.dart';
@@ -38,14 +37,12 @@ import 'package:app_salud/pages/screening_encro.dart';
 import 'package:app_salud/pages/menuPrueba.dart';
 import 'package:flutter/material.dart';
 
-import '../pages/menuPrueba.dart';
-
 Map<String, WidgetBuilder> getApplicationRoutes() {
   return <String, WidgetBuilder>{
-    '/': (BuildContext context) => HomePage(),
-    'ingresar': (BuildContext context) => IngresarPage(),
-    'registrar': (BuildContext context) => RegistrarPage(),
-    '/menu': (BuildContext context) => MenuPage(),
+    '/': (context) => HomePage(),
+    'ingresar': (context) => LoginPage(),
+    'registrar': (context) => RegistrarPage(),
+    '/menu': (context) => MenuPage(),
     '/form_datos_generales': (context) => Formprueba(),
     '/form_datos_clinicos': (context) => FormDatosClinicos(),
     '/historial_clinico': (context) => HistorialClinico(),
@@ -53,35 +50,31 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/antecedentes_personales': (context) => AntecedentesPerPage(),
     '/antecedentes_familiares': (context) => AntecedentesFamPage(),
     '/form_antecedentes_familiares': (context) => FormAntecedentesFamiliares(),
-    '/datoscli': (BuildContext context) => DatosCli(),
-    '/medicamentos': (BuildContext context) => MedicamentoPage(),
-    '/medicamentosAdd': (BuildContext context) => MedicamentoAddPage(),
-    '/ajustes': (BuildContext context) => AjustesPage(),
-    '/ibupirac': (BuildContext context) => IbupiracPage(),
-    '/recuperar': (BuildContext context) => RecuperarPage(),
-    '/recordatorio': (BuildContext context) => RecordatorioPage(),
-    '/avisos': (BuildContext context) => Avisos(),
-    '/ver_aviso_general': (BuildContext context) => VerAvisoGeneral(),
-    '/screening': (BuildContext context) => ScreeningPage(),
-    '/screening_new': (BuildContext context) => NewScreening(),
-    '/ver_screening': (BuildContext context) => VerScreening(),
-    '/screening_queja_cognitiva': (BuildContext context) => ScreeningBPage(),
-    '/screening_conductual': (BuildContext context) =>
-        ScreeningConductualPage(),
-    '/screening_fisico': (BuildContext context) => FormScreeningSintomas(),
-    '/ver_recordatorio_screening': (BuildContext context) => VerRecordatorio(),
-    '/ver_recordatorio_personal': (BuildContext context) =>
-        VerRecordatorioPersonal(),
-    '/screening_animo': (BuildContext context) => FormScreeningAnimo(),
-    '/screening_nutricional': (BuildContext context) =>
-        FormScreeningNutricional(),
-    '/screening_cdr': (BuildContext context) => ScreeningCDR(),
-    '/new_recordatorio_personal': (BuildContext context) =>
-        RecordatorioPersonal(),
-    '/menu_chequeo': (BuildContext context) => MenuChequeoPage(),
-    '/list_medicos': (BuildContext context) => ListMedicos(),
-    '/screening_diabetes': (BuildContext context) => ScreeningDiabetes(),
-    '/screening_encro': (BuildContext context) => ScreeningEnfCronicas(),
-    '/menuPrueba': (BuildContext context) => menuPrueba(),
+    '/datoscli': (context) => DatosCli(),
+    '/medicamentos': (context) => MedicamentoPage(),
+    '/medicamentosAdd': (context) => MedicamentoAddPage(),
+    '/ajustes': (context) => AjustesPage(),
+    '/ibupirac': (context) => IbupiracPage(),
+    '/recuperar': (context) => RecuperarPage(),
+    '/recordatorio': (context) => RecordatorioPage(),
+    '/avisos': (context) => Avisos(),
+    '/ver_aviso_general': (context) => VerAvisoGeneral(),
+    '/screening': (context) => ScreeningPage(),
+    '/screening_new': (context) => NewScreening(),
+    '/ver_screening': (context) => VerScreening(),
+    '/screening_queja_cognitiva': (context) => ScreeningBPage(),
+    '/screening_conductual': (context) => ScreeningConductualPage(),
+    '/screening_fisico': (context) => FormScreeningSintomas(),
+    '/ver_recordatorio_screening': (context) => VerRecordatorio(),
+    '/ver_recordatorio_personal': (context) => VerRecordatorioPersonal(),
+    '/screening_animo': (context) => FormScreeningAnimo(),
+    '/screening_nutricional': (context) => FormScreeningNutricional(),
+    '/screening_cdr': (context) => ScreeningCDR(),
+    '/new_recordatorio_personal': (context) => RecordatorioPersonal(),
+    '/menu_chequeo': (context) => MenuChequeoPage(),
+    '/list_medicos': (context) => ListMedicos(),
+    '/screening_diabetes': (context) => ScreeningDiabetes(),
+    '/screening_encro': (context) => ScreeningEnfCronicas(),
+    '/menuPrueba': (context) => menuPrueba(),
   };
 }

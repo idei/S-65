@@ -121,13 +121,16 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16.0,
-                        fontFamily: 'NunitoR'),
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
                     decoration: InputDecoration(
                       contentPadding:
                           EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
                       hintText: "Ingrese el nombre del medicamento",
-                      hintStyle:
-                          TextStyle(color: Colors.grey, fontFamily: 'NunitoR'),
+                      hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
                     ),
                     itemFilter: (item, query) {
                       return item.nombre_comercial

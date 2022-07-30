@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/new_recordatorio_personal.dart';
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
 

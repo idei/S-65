@@ -131,7 +131,10 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                       '  ¿Qué parentesco tiene con (nombre del usuario)?  ',
                                       style: new TextStyle(
                                           fontSize: 18.0,
-                                          fontFamily: 'NunitoR')),
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                 ),
 
                                 Conductual1(),
@@ -140,7 +143,11 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   child: TextFormField(
-                                    style: TextStyle(fontFamily: 'NunitoR'),
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily),
                                     controller: otro,
                                     keyboardType: TextInputType.name,
                                     decoration: InputDecoration(

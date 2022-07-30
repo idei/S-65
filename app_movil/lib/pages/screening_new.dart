@@ -31,7 +31,6 @@ class _NewScreeningState extends State<NewScreening> {
 
     return Scaffold(
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text('Nuevo Screening',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -60,9 +59,7 @@ class _NewScreeningState extends State<NewScreening> {
                     height: 20,
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
+                    style: ElevatedButton.styleFrom(),
                     onPressed: () {
                       consult_code(context);
                     },

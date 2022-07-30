@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'ingresar_pag.dart';
+import 'login_page.dart';
 import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'dart:convert';
@@ -153,7 +153,7 @@ class MostrarPass extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        IngresarPage()));
+                                        LoginPage()));
                           },
                         )
                       ],

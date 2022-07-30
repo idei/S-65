@@ -238,7 +238,7 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new ElevatedButton(
+                      ElevatedButton(
                         // onPressed: validateAnswers,
                         child: new Text(
                           'GUARDAR',

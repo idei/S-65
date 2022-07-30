@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'env.dart';
 
-class Avisos_database {
+class AvisosModel {
   String descripcion;
   String fecha_limite;
   String url_imagen;
@@ -14,7 +14,7 @@ class Avisos_database {
   var rela_creador;
   var rela_medico;
 
-  Avisos_database(
+  AvisosModel(
       {this.descripcion,
       this.fecha_limite,
       this.id_aviso,
@@ -24,8 +24,8 @@ class Avisos_database {
       this.rela_creador,
       this.rela_medico});
 
-  factory Avisos_database.fromJson(Map<String, dynamic> json) {
-    return Avisos_database(
+  factory AvisosModel.fromJson(Map<String, dynamic> json) {
+    return AvisosModel(
       id_aviso: json['id'],
       descripcion: json['descripcion'],
       fecha_limite: json['fecha_limite'],
@@ -43,14 +43,14 @@ class Avisos extends StatefulWidget {
   _AvisosState createState() => _AvisosState();
 }
 
-List<Avisos_database> recordatorios_items;
+List<AvisosModel> recordatorios_items;
 
 class _AvisosState extends State<Avisos> {
   double _animatedHeight = 0.0;
   var data_error;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Avisos_database>>(
+    return FutureBuilder<List<AvisosModel>>(
         future: read_recordatorios(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -62,8 +62,6 @@ class _AvisosState extends State<Avisos> {
                     Navigator.pushNamed(context, '/menu');
                   },
                 ),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text('Avisos',
                     style: TextStyle(
                       fontFamily:
@@ -111,9 +109,17 @@ class _AvisosState extends State<Avisos> {
                                   ),
                                   title: Text(data.descripcion.toUpperCase(),
                                       maxLines: 2,
-                                      style: TextStyle(fontFamily: 'NunitoR')),
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                   subtitle: Text(data.fecha_limite,
-                                      style: TextStyle(fontFamily: 'NunitoR')),
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                 ),
                               ),
                             ),
@@ -131,8 +137,6 @@ class _AvisosState extends State<Avisos> {
                     Navigator.pushNamed(context, '/menu');
                   },
                 ),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text('Avisos',
                     style: TextStyle(
                       fontFamily:
@@ -185,12 +189,12 @@ class _AvisosState extends State<Avisos> {
           title: Text(data.descripcion.toUpperCase(),
               maxLines: 2,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontWeight: font_bold,
               )),
           subtitle: Text(data.fecha_limite,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontWeight: font_bold,
               )),
         ),
@@ -213,12 +217,12 @@ class _AvisosState extends State<Avisos> {
           title: Text(data.descripcion.toUpperCase(),
               maxLines: 2,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontWeight: font_bold,
               )),
           subtitle: Text(data.fecha_limite,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontWeight: font_bold,
               )),
         ),
@@ -228,7 +232,7 @@ class _AvisosState extends State<Avisos> {
 
   var id_paciente_argument;
 
-  Future<List<Avisos_database>> read_recordatorios() async {
+  Future<List<AvisosModel>> read_recordatorios() async {
     await getStringValuesSF();
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_avisos.php";
@@ -240,8 +244,8 @@ class _AvisosState extends State<Avisos> {
 
     if (data_error.toString() != 'Error') {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<Avisos_database>((json) {
-        return Avisos_database.fromJson(json);
+      recordatorios_items = items.map<AvisosModel>((json) {
+        return AvisosModel.fromJson(json);
       }).toList();
       return recordatorios_items;
     }

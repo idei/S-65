@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
-import 'package:app_salud/pages/ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Studentdata {
+class AntecedentesPersonalesData {
   String studentName;
 
-  Studentdata({this.studentName});
+  AntecedentesPersonalesData({this.studentName});
 
-  factory Studentdata.fromJson(Map<String, dynamic> json) {
-    return Studentdata(studentName: json['nombre_evento']);
+  factory AntecedentesPersonalesData.fromJson(Map<String, dynamic> json) {
+    return AntecedentesPersonalesData(studentName: json['nombre_evento']);
   }
 }
 
@@ -32,8 +31,8 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Studentdata>>(
-      future: fetchStudents(),
+    return FutureBuilder<List<AntecedentesPersonalesData>>(
+      future: fetchAntecedentesPersonales(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
@@ -52,9 +51,15 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                     fontSize: 14.2),
               ),
             ),
-            body: Center(
-              child: CircularProgressIndicator(
-                semanticsLabel: "Cargando",
+            body: Container(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                children: [
+                  SizedBox(height: 60),
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text('Cargando...')
+                ],
               ),
             ),
             floatingActionButton: Column(
@@ -69,8 +74,6 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                     },
                     child: CircleAvatar(
                       radius: MediaQuery.of(context).size.width / 8.3,
-                      //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                      //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                       child: new Column(children: <Widget>[
                         SizedBox(height: 10.0),
                         Icon(Icons.edit, color: Colors.white, size: 40.0),
@@ -150,8 +153,6 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                     },
                     child: CircleAvatar(
                       radius: MediaQuery.of(context).size.width / 8.3,
-                      //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                      //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                       child: new Column(children: <Widget>[
                         SizedBox(height: 10.0),
                         Icon(Icons.edit, color: Colors.white, size: 40.0),
@@ -194,7 +195,7 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
 
   //String email = "fabricio@gmail.com";
 
-  Future<List<Studentdata>> fetchStudents() async {
+  Future<List<AntecedentesPersonalesData>> fetchAntecedentesPersonales() async {
     await get_preference();
 
     String URL_base = Env.URL_PREFIX;
@@ -204,11 +205,10 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     if (response.body != "") {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
 
-      List<Studentdata> studentList = items.map<Studentdata>((json) {
-        return Studentdata.fromJson(json);
+      List<AntecedentesPersonalesData> studentList =
+          items.map<AntecedentesPersonalesData>((json) {
+        return AntecedentesPersonalesData.fromJson(json);
       }).toList();
-
-      await new Future.delayed(new Duration(milliseconds: 1000));
 
       return studentList;
     } else {

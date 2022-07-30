@@ -434,7 +434,7 @@ class LabeledCheckboxNutri1 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -508,7 +508,7 @@ class LabeledCheckboxNutri2 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -579,7 +579,7 @@ class LabeledCheckboxNutri3 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -650,7 +650,7 @@ class LabeledCheckboxNutri4 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -721,7 +721,7 @@ class LabeledCheckboxNutri5 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -793,7 +793,7 @@ class LabeledCheckboxNutri6 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -865,7 +865,7 @@ class LabeledCheckboxNutri7 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -935,7 +935,7 @@ class LabeledCheckboxNutri8 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -1006,7 +1006,7 @@ class LabeledCheckboxNutri9 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -1077,7 +1077,7 @@ class LabeledCheckboxNutri10 extends StatelessWidget {
                 child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'NunitoR',
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),

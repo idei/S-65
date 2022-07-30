@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
-import 'package:app_salud/pages/new_recordatorio_personal.dart';
 import 'package:app_salud/pages/screening_fisico.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -44,7 +43,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
     fecha_limite = parametros["fecha_limite"];
     rela_creador = parametros["rela_creador"];
     rela_medico = parametros["rela_medico"];
-    //id_pacientes = parametros['id_paciente'];
 
     return FutureBuilder(
         future: timer(),
@@ -60,9 +58,10 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text('Aviso General',
-                    style: TextStyle(fontFamily: 'Nunito')),
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily)),
               ),
               body: Center(
                 child: CircularProgressIndicator(
@@ -129,8 +128,10 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
           ),
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
 
-          title:
-              Text('Avisos Generales', style: TextStyle(fontFamily: 'Nunito')),
+          title: Text('Avisos Generales',
+              style: TextStyle(
+                  fontFamily:
+                      Theme.of(context).textTheme.headline1.fontFamily)),
           actions: <Widget>[
             PopupMenuButton<String>(
               onSelected: choiceAction,
@@ -167,8 +168,12 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                       update_estado_recordartorio();
                       Navigator.of(context).pushReplacementNamed('/avisos');
                     },
-                    child:
-                        Text('Leído', style: TextStyle(fontFamily: 'Nunito')),
+                    child: Text('Leído',
+                        style: TextStyle(
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily)),
                   ),
                 ]))));
   }
@@ -184,8 +189,10 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
           ),
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title:
-              Text('Avisos Generales', style: TextStyle(fontFamily: 'Nunito')),
+          title: Text('Avisos Generales',
+              style: TextStyle(
+                  fontFamily:
+                      Theme.of(context).textTheme.headline1.fontFamily)),
           actions: <Widget>[
             PopupMenuButton<String>(
               onSelected: choiceAction,
@@ -233,7 +240,11 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                               //generate_vinculation();
                             },
                             child: Text('Acepto',
-                                style: TextStyle(fontFamily: 'Nunito')),
+                                style: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -248,7 +259,11 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                                   2);
                             },
                             child: Text('No Acepto',
-                                style: TextStyle(fontFamily: 'Nunito')),
+                                style: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
                           ),
                         ],
                       )),

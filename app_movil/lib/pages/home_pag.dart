@@ -10,6 +10,8 @@ class HomePage extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
+GlobalKey<FormState> _formKey_home = GlobalKey<FormState>();
+
 class _FormpruebaState extends State<HomePage> {
   AsyncSnapshot snapshot;
   @override

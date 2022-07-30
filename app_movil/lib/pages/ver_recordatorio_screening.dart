@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
-import 'package:app_salud/pages/screening_fisico.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:app_salud/pages/env.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -18,8 +13,6 @@ class VerRecordatorio extends StatefulWidget {
 }
 
 final _formKey = GlobalKey<FormState>();
-final _formKey_email = GlobalKey<FormState>();
-final _formKey_pass = GlobalKey<FormState>();
 var id_paciente;
 var id_medico;
 var rela_estado_recordatorio;

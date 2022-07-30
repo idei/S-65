@@ -27,14 +27,8 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
             Navigator.pushNamed(context, '/menu');
           },
         ),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-
-        //title: Text('Chequeos de ', style: TextStyle(fontFamily: 'Nunito')),
         actions: <Widget>[],
       ),
-      //backgroundColor: Color.fromRGBO(39, 22, 107, 1),
-      //backgroundColor: Color.fromRGBO(128, 40, 48, 1),
-
       body: new Container(
         child: new Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -53,7 +47,6 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                         Navigator.pushNamed(context, '/screening', arguments: {
                           "select_screening": select_screening,
                         });
-                        //do what you want here
                       },
                       child: CircleAvatar(
                         backgroundImage:
@@ -206,7 +199,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
           fontSize: 12.0,
           color: Colors.black,
           fontWeight: FontWeight.bold,
-          fontFamily: 'NunitoR'),
+          fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
     );
   }
 }
