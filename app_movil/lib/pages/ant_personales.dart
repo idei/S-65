@@ -4,13 +4,14 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AntecedentesPersonalesData {
-  String studentName;
+class AntecedentesPersonalesModel {
+  String antecedenteDescripcion;
 
-  AntecedentesPersonalesData({this.studentName});
+  AntecedentesPersonalesModel({this.antecedenteDescripcion});
 
-  factory AntecedentesPersonalesData.fromJson(Map<String, dynamic> json) {
-    return AntecedentesPersonalesData(studentName: json['nombre_evento']);
+  factory AntecedentesPersonalesModel.fromJson(Map<String, dynamic> json) {
+    return AntecedentesPersonalesModel(
+        antecedenteDescripcion: json['nombre_evento']);
   }
 }
 
@@ -20,10 +21,11 @@ class AntecedentesPerPage extends StatefulWidget {
 }
 
 String email;
-final _formKey = GlobalKey<_AntecedentesPerState>();
 
 class _AntecedentesPerState extends State<AntecedentesPerPage> {
-  double _animatedHeight = 0.0;
+  bool isLoading = false;
+  List<AntecedentesPersonalesModel> listAntecPersonales = [];
+
   @override
   void initState() {
     super.initState();
@@ -31,150 +33,123 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<AntecedentesPersonalesData>>(
-      future: fetchAntecedentesPersonales(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: new IconButton(
-                icon: new Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/menu');
-                },
-              ),
-              title: Text(
-                'Antecedentes Personales Registrados',
-                style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                    fontSize: 14.2),
-              ),
-            ),
-            body: Container(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                children: [
-                  SizedBox(height: 60),
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Cargando...')
-                ],
-              ),
-            ),
-            floatingActionButton: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, '/form_antecedentes_personales');
-                    },
-                    child: CircleAvatar(
-                      radius: MediaQuery.of(context).size.width / 8.3,
-                      child: new Column(children: <Widget>[
-                        SizedBox(height: 10.0),
-                        Icon(Icons.edit, color: Colors.white, size: 40.0),
-                        SizedBox(height: 10.0),
-                        Text(
-                          'Modificar',
-                          style: new TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily),
-                        )
-                      ]),
+    Map parametros = ModalRoute.of(context).settings.arguments;
+    if (parametros != null) {
+      email = parametros['email'];
+      print(email);
+    } else {
+      get_preference();
+    }
+
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      appBar: AppBar(
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu');
+            },
+          ),
+          title: Text(
+            'Antecedentes Personales Registrados ',
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 14.2),
+          )),
+      body: Container(
+        child: FutureBuilder<List<AntecedentesPersonalesModel>>(
+          future: fetchAntecedentesPersonales(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: ListTile.divideTiles(
+                  color: Colors.black26,
+                  tiles: snapshot.data
+                      .map((data) => ListTile(
+                            title: GestureDetector(
+                              onTap: () {},
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.arrow_right_rounded,
+                                  color: Colors.blue,
+                                ),
+                                title: Text(data.antecedenteDescripcion,
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ).toList(),
+              );
+            } else {
+              if (!isLoading) {
+                return Container(
+                  alignment: Alignment.center,
+                  child: Positioned(
+                    child: _isLoadingIcon(),
+                    //bottom: 40,
+                    //left: size.width * 0.5 - 30,
+                  ),
+                );
+              } else {
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'No tiene antecedentes personales',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
+                ));
+              }
+            }
+          },
+        ),
+      ),
+      floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/form_antecedentes_personales',
+                    arguments: {
+                      "email": email,
+                    });
+              },
+              child: CircleAvatar(
+                radius: MediaQuery.of(context).size.width / 8.3,
+                child: new Column(children: <Widget>[
+                  SizedBox(height: 10.0),
+                  Icon(Icons.edit, color: Colors.white, size: 40.0),
+                  SizedBox(height: 10.0),
+                  Text(
+                    'Modificar',
+                    style: new TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                     ),
                   )
                 ]),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              leading: new IconButton(
-                icon: new Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/menu');
-                },
               ),
-              //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-              //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-              title: Text(
-                'Antecedentes Personales Registrados',
-                style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                    fontSize: 14.2),
-              ),
-              actions: <Widget>[
-                PopupMenuButton<String>(
-                  onSelected: choiceAction,
-                  itemBuilder: (BuildContext context) {
-                    return Constants.choices.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  },
-                )
-              ],
-            ),
-            body: ListView(
-              children: ListTile.divideTiles(
-                color: Colors.black,
-                tiles: snapshot.data
-                    .map((data) => ListTile(
-                          title: Text(data.studentName,
-                              style: TextStyle(
-                                  fontFamily: Theme.of(context)
-                                      .textTheme
-                                      .headline1
-                                      .fontFamily)),
-                        ))
-                    .toList(),
-              ).toList(),
-            ),
-            floatingActionButton: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, '/form_antecedentes_personales');
-                    },
-                    child: CircleAvatar(
-                      radius: MediaQuery.of(context).size.width / 8.3,
-                      child: new Column(children: <Widget>[
-                        SizedBox(height: 10.0),
-                        Icon(Icons.edit, color: Colors.white, size: 40.0),
-                        SizedBox(height: 10.0),
-                        Text(
-                          'Modificar',
-                          style: new TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily),
-                        )
-                      ]),
-                    ),
-                  )
-                ]),
-          );
-        }
-      },
+            )
+          ]),
     );
   }
 
@@ -193,9 +168,8 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     print(email);
   }
 
-  //String email = "fabricio@gmail.com";
-
-  Future<List<AntecedentesPersonalesData>> fetchAntecedentesPersonales() async {
+  Future<List<AntecedentesPersonalesModel>>
+      fetchAntecedentesPersonales() async {
     await get_preference();
 
     String URL_base = Env.URL_PREFIX;
@@ -205,15 +179,33 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     if (response.body != "") {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
 
-      List<AntecedentesPersonalesData> studentList =
-          items.map<AntecedentesPersonalesData>((json) {
-        return AntecedentesPersonalesData.fromJson(json);
+      listAntecPersonales = items.map<AntecedentesPersonalesModel>((json) {
+        return AntecedentesPersonalesModel.fromJson(json);
       }).toList();
 
-      return studentList;
+      return listAntecPersonales;
     } else {
+      isLoading = true;
       return null;
     }
+  }
+}
+
+class _isLoadingIcon extends StatelessWidget {
+  const _isLoadingIcon({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+      child: const CircularProgressIndicator(color: Colors.blue),
+    );
   }
 }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
-import 'package:app_salud/pages/ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AntecedenteModel {
@@ -15,15 +14,14 @@ class AntecedenteModel {
   }
 }
 
-class AntecedentesFamPage extends StatefulWidget {
+class AntecedentesFamiliarPage extends StatefulWidget {
   @override
-  _AntecedentesPerState createState() => _AntecedentesPerState();
+  _AntecedentesFamiliarState createState() => _AntecedentesFamiliarState();
 }
 
 String email;
-final _formKey = GlobalKey<_AntecedentesPerState>();
 
-class _AntecedentesPerState extends State<AntecedentesFamPage> {
+class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
   bool isLoading = false;
   List<AntecedenteModel> listAntecFamiliares = [];
 
@@ -63,20 +61,29 @@ class _AntecedentesPerState extends State<AntecedentesFamPage> {
           future: fetchStudents(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: listAntecFamiliares.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title:
-                        Text("${snapshot.data[index].antecedenteDescripcion}",
-                            style: TextStyle(
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily,
-                            )),
-                  );
-                },
+              return ListView(
+                children: ListTile.divideTiles(
+                  color: Colors.black26,
+                  tiles: snapshot.data
+                      .map((data) => ListTile(
+                            title: GestureDetector(
+                              onTap: () {},
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.arrow_right_rounded,
+                                  color: Colors.blue,
+                                ),
+                                title: Text(data.antecedenteDescripcion,
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ).toList(),
               );
             } else {
               if (!isLoading) {

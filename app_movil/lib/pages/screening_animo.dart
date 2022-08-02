@@ -127,14 +127,14 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
 }
 
 read_recordatorios() async {
-  await new Future.delayed(new Duration(milliseconds: 500));
+  await Future.delayed(Duration(milliseconds: 500));
   return true;
 }
 
 Widget texto(String entrada) {
   return Text(
     entrada,
-    style: new TextStyle(
+    style: TextStyle(
         fontSize: 12.0,
         color: Colors.white,
         fontWeight: FontWeight.w500,
@@ -205,7 +205,7 @@ guardar_datos(BuildContext context) async {
 }
 
 read_datos_paciente() async {
-  await new Future.delayed(new Duration(milliseconds: 1500));
+  await Future.delayed(Duration(milliseconds: 1500));
 
   return true;
 }
@@ -283,8 +283,8 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "ANIMO",
@@ -319,83 +319,83 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
             child: ListView(
               children: <Widget>[
                 SatisfechoVida(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Abandonado(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Nauseas(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Aburrida(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Humor(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Temor(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Feliz(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Desamparados(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Prefiere(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Memoria(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 EstarVivo(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Inutil(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Energia(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 Situacion(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
                 ),
-                new Divider(height: 3.0, color: Colors.black),
+                Divider(height: 3.0, color: Colors.black),
                 MejorUsted(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                ),
+                SizedBox(
+                  width: 15,
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(100, 20, 28, 1),
-                  ),
                   onPressed: () {
                     guardar_datos(context);
                   },
@@ -403,7 +403,6 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
                       style: TextStyle(
                         fontFamily:
                             Theme.of(context).textTheme.headline1.fontFamily,
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       )),
                 ),

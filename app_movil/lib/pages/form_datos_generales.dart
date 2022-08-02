@@ -198,7 +198,6 @@ class _FormpruebaState extends State<Formprueba> {
                         initialDate: currentValue ?? DateTime.now(),
                         lastDate: DateTime(2100));
                   },
-                  //autovalidate: autoValidate,
                   validator: (date) => date == null ? 'Invalid date' : null,
                   initialValue: initialValue,
                   onChanged: (date) => setState(() {
@@ -266,6 +265,7 @@ class _FormpruebaState extends State<Formprueba> {
                 ),
                 SizedBox(height: 10.0),
                 FormDepartamentos(),
+                SizedBox(height: 15.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     //primary: Color.fromRGBO(157, 19, 34, 1),
@@ -398,18 +398,18 @@ class FormDepartamentos extends StatefulWidget {
 class _MyStatefulWidgetState extends State<FormDepartamentos> {
   List data = List();
 
-  Future getAllName() async {
+  getAllName() async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/departamentos.php";
     var response = await http.post(url, body: {});
     // print(response);
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
-    if (this.mounted) {
-      setState(() {
-        data = jsonDate;
-      });
-    }
+
+    setState(() {
+      data = jsonDate;
+    });
+
     // print(jsonDate);
   }
 
@@ -523,7 +523,7 @@ class FormNivelEducativo extends StatefulWidget {
 class _FormpruebaState1 extends State<FormNivelEducativo> {
   List data = List();
 
-  Future getAllName() async {
+  getAllName() async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/niveles_educ.php";
     var response = await http.post(url, body: {});
@@ -531,12 +531,10 @@ class _FormpruebaState1 extends State<FormNivelEducativo> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     //Excepción arrojada durante la ejecución de la app conectada al Web Hosting
-    if (this.mounted) {
-      setState(() {
-        data = jsonDate;
-      });
-    }
-    //print(jsonDate);
+
+    setState(() {
+      data = jsonDate;
+    });
   }
 
   @override
@@ -552,10 +550,16 @@ class _FormpruebaState1 extends State<FormNivelEducativo> {
         value: rela_nivel_instruccion,
         items: data.map(
           (list) {
-            return DropdownMenuItem<String>(
-              child: Text(list['nombre_nivel']),
-              value: list['id'].toString(),
-            );
+            if (data.length == 0) {
+              // return DropdownMenuItem<String>(
+              //   child: Text('Cargando...'),
+              // );
+            } else {
+              return DropdownMenuItem<String>(
+                child: Text(list['nombre_nivel']),
+                value: list['id'].toString(),
+              );
+            }
           },
         ).toList(),
         onChanged: (String newValue) {
@@ -612,10 +616,16 @@ class _FormpruebaState3 extends State<FormGrupoConviviente> {
       ),*/
         items: data.map(
           (list) {
-            return DropdownMenuItem<String>(
-              child: Text(list['nombre']),
-              value: list['id'].toString(),
-            );
+            if (list == null) {
+              return DropdownMenuItem<String>(
+                child: Text('Cargando...'),
+              );
+            } else {
+              return DropdownMenuItem<String>(
+                child: Text(list['nombre']),
+                value: list['id'].toString(),
+              );
+            }
           },
         ).toList(),
         onChanged: (String newValue) {

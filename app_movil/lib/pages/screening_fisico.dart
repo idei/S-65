@@ -115,17 +115,6 @@ read_recordatorios() async {
   return true;
 }
 
-Widget texto(String entrada) {
-  return Text(
-    entrada,
-    style: new TextStyle(
-        fontSize: 12.0,
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontFamily: "Roboto"),
-  );
-}
-
 var email;
 
 guardar_datos(var cant_check) async {
@@ -446,9 +435,6 @@ class AntecedentesWidgetState extends State<Antecedentes> {
                   padding: new EdgeInsets.all(5.0),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(157, 19, 34, 1),
-                  ),
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       if (cant_check > 3) {

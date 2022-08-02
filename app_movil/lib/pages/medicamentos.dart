@@ -1,3 +1,4 @@
+import 'package:app_salud/models/medicamento_model';
 import 'package:app_salud/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -10,143 +11,127 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-List<MedicamentosDatabase> medicamentos_items;
+List<MedicamentoModel> medicamentos_items;
 
 TextEditingController dosis_frecuencia = TextEditingController();
 
 class _MedicamentoState extends State<MedicamentoPage> {
-  var data_error;
+  var data;
+  bool isLoading = false;
+  var email_argument;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<MedicamentosDatabase>>(
-        future: read_medicamentos(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-                appBar: AppBar(
-                  leading: new IconButton(
-                    icon: new Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/menu');
-                    },
-                  ),
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Medicamentos',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                  actions: <Widget>[
-                    PopupMenuButton<String>(
-                      onSelected: choiceAction,
-                      itemBuilder: (BuildContext context) {
-                        return Constants.choices.map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                ),
-                body: ListView(
+    return Scaffold(
+        appBar: AppBar(
+            leading: new IconButton(
+              icon: new Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushNamed(context, '/menu');
+              },
+            ),
+            title: Text(
+              'Medicamentos ',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              ),
+            )),
+        body: Container(
+          child: FutureBuilder<List<MedicamentoModel>>(
+            future: read_medicamentos(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
                   children: ListTile.divideTiles(
-                    color: Colors.black,
+                    color: Colors.black26,
                     tiles: snapshot.data
                         .map((data) => ListTile(
-                              title: GestureDetector(
-                                onTap: () {},
-                                child: ListTile(
-                                  leading: Icon(
-                                    Icons.medical_services,
-                                    color: Colors.blue,
-                                  ),
-                                  title: Text(data.nombre_comercial,
-                                      style: TextStyle(
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
-                                  subtitle: Text(data.dosis_frecuencia,
-                                      style: TextStyle(
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
-                                  trailing: Wrap(
-                                    spacing: 10, // space between two icons
-                                    children: <Widget>[
-                                      IconButton(
-                                        icon: Icon(Icons.edit),
-                                        color: Colors.green,
-                                        onPressed: () {
-                                          _showAlertDialog(
-                                              data.id_medicamento, 1);
-                                        },
-                                      ), // icon-1
-                                      IconButton(
-                                        icon: Icon(Icons.delete),
-                                        color: Colors.red,
-                                        onPressed: () {
-                                          _showAlertDialog(
-                                              data.id_medicamento, 2);
-                                        },
-                                      ), // icon-2
-                                    ],
-                                  ),
+                              title: ListTile(
+                                leading: Icon(
+                                  Icons.arrow_right_rounded,
+                                  color: Colors.blue,
                                 ),
+                                title: Text(data.nombre_comercial,
+                                    style: TextStyle(
+                                        overflow: TextOverflow.clip,
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                                subtitle: Text(data.dosis_frecuencia,
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                                trailing: Wrap(children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    color: Colors.green,
+                                    onPressed: () {
+                                      _showAlertDialog(data.id_medicamento, 1);
+                                    },
+                                  ), // icon-1
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      _showAlertDialog(data.id_medicamento, 2);
+                                    },
+                                  ),
+                                ]),
                               ),
                             ))
                         .toList(),
                   ).toList(),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    // Add your onPressed code here!
-                  },
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/medicamentosAdd');
-                    },
-                  ),
-                ));
-          } else {
-            return Scaffold(
-                appBar: AppBar(
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Medicamentos',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
+                );
+              } else {
+                if (!isLoading) {
+                  return Container(
+                    alignment: Alignment.center,
+                    child: Positioned(
+                      child: _isLoadingIcon(),
+                      //bottom: 40,
+                      //left: size.width * 0.5 - 30,
+                    ),
+                  );
+                } else {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'No tiene medicamentos registrados',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
                       )),
-                ),
-                body: Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: "Cargando",
-                  ),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    // Add your onPressed code here!
-                  },
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/medicamentosAdd');
-                    },
-                  ),
-                ));
-          }
-        });
+                    ],
+                  ));
+                }
+              }
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Add your onPressed code here!
+          },
+          child: IconButton(
+            icon: Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/medicamentosAdd');
+            },
+          ),
+        ));
   }
 
-  var email_argument;
-
-  Future<List<MedicamentosDatabase>> read_medicamentos() async {
+  Future<List<MedicamentoModel>> read_medicamentos() async {
     await getStringValuesSF();
 
     String URL_base = Env.URL_PREFIX;
@@ -154,24 +139,25 @@ class _MedicamentoState extends State<MedicamentoPage> {
     var response = await http.post(url, body: {
       "email": email_argument,
     });
-    data_error = json.decode(response.body);
-    print("response ");
-    print(response.body);
 
-    if (data_error.toString() != 'Error') {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      medicamentos_items = items.map<MedicamentosDatabase>((json) {
-        return MedicamentosDatabase.fromJson(json);
-      }).toList();
-      return medicamentos_items;
+    if (response.statusCode == 200) {
+      if (response.body != '') {
+        final items = json.decode(response.body).cast<Map<String, dynamic>>();
+        medicamentos_items = items.map<MedicamentoModel>((json) {
+          return MedicamentoModel.fromJson(json);
+        }).toList();
+        return medicamentos_items;
+      } else {
+        isLoading = true;
+        return null;
+      }
+    } else {
+      throw Exception('Error al obtener JSON');
     }
-    await new Future.delayed(new Duration(milliseconds: 500));
-    medicamentos_items = [];
-    return medicamentos_items;
-    //}
   }
 
-  guardar_frecuencia(int id_medicamento, String dosis_frecuencia) async {
+  guardarFrecuenciaMedicamento(
+      int id_medicamento, String dosis_frecuencia) async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/save_dosis_frecuencia.php";
     var response = await http.post(url, body: {
@@ -179,7 +165,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
       "id_medicamento": id_medicamento.toString(),
       "id_paciente": id_paciente.toString(),
     });
-    data_error = json.decode(response.body);
+    data = json.decode(response.body);
     print(response.body);
   }
 
@@ -218,7 +204,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
                     ),
                   ),
                   onPressed: () {
-                    guardar_frecuencia(id_medicamento, dosis_frecuencia.text);
+                    guardarFrecuenciaMedicamento(
+                        id_medicamento, dosis_frecuencia.text);
                     Navigator.popAndPushNamed(
                         context, "/medicamentos"); // push it back in
 
@@ -236,14 +223,11 @@ class _MedicamentoState extends State<MedicamentoPage> {
               actions: <Widget>[
                 ElevatedButton(
                     onPressed: () {
-                      print("Eliminar2");
                       delete_medicamento(context, id_medicamento);
-                      Navigator.popAndPushNamed(context, "/medicamentos");
                     },
                     child: Text("Si")),
                 ElevatedButton(
                     onPressed: () {
-                      print("Eliminar3");
                       Navigator.of(context).pop();
                     },
                     child: Text("No")),
@@ -260,15 +244,26 @@ class _MedicamentoState extends State<MedicamentoPage> {
       "id_medicamento": id_medicamento.toString(),
     });
 
-    print(response.body);
-    var data = json.decode(response.body);
-    if (data.toString() != 'Medicamento eliminado') {
-      print(data.toString());
-    } else {
-      print(data.toString());
+    if (response.statusCode == 200) {
+      _alert_informe(context, "Medicamento Eliminado", 1);
       Navigator.popAndPushNamed(context, "/medicamentos");
-      //Navigator.pop(context, true);
+    } else {
+      var mensajeError = 'Error al obtener JSON: ' + response.body;
+      _alert_informe(context, mensajeError, 2);
+      throw Exception(mensajeError);
     }
+  }
+
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 
   getStringValuesSF() async {
@@ -288,30 +283,21 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 }
 
-class MedicamentosDatabase {
-  String dosis_frecuencia;
-  String nombre_comercial;
-  String presentacion;
-  var rela_paciente;
-  var rela_medicamento;
-  var id_medicamento;
+class _isLoadingIcon extends StatelessWidget {
+  const _isLoadingIcon({
+    Key key,
+  }) : super(key: key);
 
-  MedicamentosDatabase(
-      {this.dosis_frecuencia,
-      this.rela_paciente,
-      this.rela_medicamento,
-      this.id_medicamento,
-      this.nombre_comercial,
-      this.presentacion});
-
-  factory MedicamentosDatabase.fromJson(Map<String, dynamic> json) {
-    return MedicamentosDatabase(
-        id_medicamento: json['id_medicamento'],
-        dosis_frecuencia: json['dosis_frecuencia'],
-        rela_paciente: json['rela_paciente'],
-        rela_medicamento: json['rela_medicamento'],
-        nombre_comercial: json['nombre_comercial'],
-        presentacion: json['presentacion']);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+      child: const CircularProgressIndicator(color: Colors.blue),
+    );
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/ver_screening.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 //import 'package:app_salud/pages/medicamento_model.dart';
@@ -160,7 +161,6 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                   ),
               onPressed: () {
                 guardar_medicamento(data_id);
-                Navigator.pushNamed(context, '/medicamentos');
               },
               child: Text('Guardar Datos',
                   style: TextStyle(
@@ -186,8 +186,15 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
       "id_paciente": id_paciente.toString(),
       "id_medicamento": data_id.toString(),
     });
-    data_error = json.decode(response.body);
-    print(response.body);
+
+    if (response.statusCode == 200) {
+      _alert_informe(context, "Medicamento Agregado", 1);
+      Navigator.pushNamed(context, '/medicamentos');
+    } else {
+      var mensajeError = 'Error al obtener JSON: ' + response.body;
+      _alert_informe(context, mensajeError, 2);
+      throw Exception(mensajeError);
+    }
   }
 
   getStringValuesSF() async {
@@ -196,6 +203,18 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
     email_argument = email_prefer;
     id_paciente = await prefs.getInt("id_paciente");
     print(email_argument);
+  }
+
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 
   void choiceAction(String choice) {

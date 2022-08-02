@@ -80,8 +80,8 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
 
     return Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "CONDUC",
@@ -108,9 +108,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
           ],
         ),
         body: SingleChildScrollView(
-            child: new Container(
+            child: Container(
                 padding: EdgeInsets.all(8.0),
-                child: new Column(
+                child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Card(
@@ -129,8 +129,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                       '  ¿Qué parentesco tiene con (nombre del usuario)?  ',
-                                      style: new TextStyle(
+                                      style: TextStyle(
                                           fontSize: 18.0,
+                                          fontWeight: FontWeight.bold,
                                           fontFamily: Theme.of(context)
                                               .textTheme
                                               .headline1
@@ -157,9 +158,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                               ],
                             ),
                           )),
-                      new Divider(height: 5.0, color: Colors.black),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Divider(height: 5.0, color: Colors.black),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -177,18 +178,19 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Tiene el paciente creencias falsas, como creer que otras personas le están robando o que planean hacerle daño de alguna manera?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 //espacio entre el texto y el radio button
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual2(),
                               ],
@@ -210,25 +212,26 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Tiene el paciente alucinaciones como visiones falsas o voces? ¿Actúa el paciente como si oyera o viera cosas que no están presentes?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual3(),
                               ],
                             ),
                           )),
-                      new Divider(height: 5.0, color: Colors.black),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Divider(height: 5.0, color: Colors.black),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -246,28 +249,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Se resiste el paciente a la ayuda de otros o es difícil de manejar?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual4(),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                               ],
                             ),
                           )),
-                      new Divider(height: 5.0, color: Colors.black),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Divider(height: 5.0, color: Colors.black),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -285,25 +289,23 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Actúa el paciente como si estuviera triste o dice que está deprimido?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 30,
                                 ),
                                 Conductual5(),
                               ],
                             ),
                           )),
-                      new Divider(height: 5.0, color: Colors.black),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Divider(height: 5.0, color: Colors.black),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -320,26 +322,27 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   child: Text(
-                                    '¿Actúa el paciente como si estuviera triste o dice que está deprimido?',
-                                    style: new TextStyle(
+                                    '¿Se molesta el paciente cuando se separa de usted? ¿Muestra otras señales de nerviosismo, como falta de aire, suspiros, incapacidad de relajarse o se siente excesivamente tenso?',
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual6(),
                               ],
                             ),
                           )),
-                      new Divider(height: 5.0, color: Colors.black),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Divider(height: 5.0, color: Colors.black),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -357,28 +360,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Parece que el paciente se siente demasiado bien o actúa excesivamente alegre?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual7(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -396,28 +400,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Parece el paciente menos interesado en sus actividades habituales o en las actividades y planes de los demás?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual8(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -435,28 +440,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Parece que el paciente actúa impulsivamente? Por ejemplo, habla el paciente con extraños como si los conociera o dice cosas que podrían herir los sentimientos de los demás?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual9(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -474,28 +480,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Se muestra el paciente irritable o impaciente? ¿Tiene dificultad para lidiar con retrasos o para esperar actividades planeadas?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual10(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -513,28 +520,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Lleva a cabo el paciente actividades repetitivas, como dar vueltas por la casa, jugar con botones, enrollar hilos o hacer otras cosas repetitivamente?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual11(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -552,28 +560,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿Le despierta el paciente durante la noche, se levanta muy temprano por la mañana o toma siestas excesivas durante el día?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual12(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       Card(
                           shape: RoundedRectangleBorder(
@@ -591,28 +600,29 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Text(
                                     '¿El paciente ha perdido o aumentado de peso o ha tenido algún cambio en la comida que le gusta?',
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontFamily: Theme.of(context)
                                           .textTheme
                                           .headline1
                                           .fontFamily,
                                       fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 30,
+                                  height: 10,
                                 ),
                                 Conductual13(),
                               ],
                             ),
                           )),
-                      new Divider(
+                      Divider(
                         height: 5.0,
                         color: Colors.black,
                       ),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -623,68 +633,57 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      new ElevatedButton(
-                        //onPressed: validateAnswers,
-                        child: new Text(
-                          'GUARDAR',
-                          style: new TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white),
-                        ),
-                        //color: Theme.of(context).accentColor,
-                      ),
-                      new Padding(
+                      Padding(
                         padding: EdgeInsets.all(4.0),
                       ),
                     ]))));
   }
 
   Widget checkbox1() {
-    return new Column(children: <Widget>[
-      new Row(children: <Widget>[
-        new Radio(
+    return Column(children: <Widget>[
+      Row(children: <Widget>[
+        Radio(
           value: 0,
         ),
-        new Text(
+        Text(
           'Si, leve.',
-          style: new TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0),
         ),
       ]),
-      new Row(children: <Widget>[
-        new Radio(
+      Row(children: <Widget>[
+        Radio(
           value: 0,
         ),
-        new Text(
+        Text(
           'Si, moderado.',
-          style: new TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0),
         ),
       ]),
-      new Row(children: <Widget>[
-        new Radio(
+      Row(children: <Widget>[
+        Radio(
           value: 0,
         ),
-        new Text(
+        Text(
           'Si, severo.',
-          style: new TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0),
         ),
       ]),
-      new Row(children: <Widget>[
-        new Radio(
+      Row(children: <Widget>[
+        Radio(
           value: 0,
         ),
-        new Text(
+        Text(
           'No',
-          style: new TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0),
         ),
       ]),
-      new Row(children: <Widget>[
-        new Radio(
+      Row(children: <Widget>[
+        Radio(
           value: 0,
         ),
-        new Text(
+        Text(
           'No sabe',
-          style: new TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0),
         ),
       ]),
     ]);
@@ -901,7 +900,7 @@ class Conductual1WidgetState extends State<Conductual1> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -957,12 +956,12 @@ class Conductual2WidgetState extends State<Conductual2> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1018,12 +1017,12 @@ class Conductual3WidgetState extends State<Conductual3> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1079,12 +1078,12 @@ class Conductual4WidgetState extends State<Conductual4> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1147,12 +1146,12 @@ class Conductual5WidgetState extends State<Conductual5> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1208,12 +1207,12 @@ class Conductual6WidgetState extends State<Conductual6> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1269,12 +1268,12 @@ class Conductual7WidgetState extends State<Conductual7> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1330,12 +1329,12 @@ class Conductual8WidgetState extends State<Conductual8> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1400,12 +1399,12 @@ class Conductual9WidgetState extends State<Conductual9> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1461,12 +1460,12 @@ class Conductual10WidgetState extends State<Conductual10> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1522,12 +1521,12 @@ class Conductual11WidgetState extends State<Conductual11> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1583,12 +1582,12 @@ class Conductual12WidgetState extends State<Conductual12> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -1644,12 +1643,12 @@ class Conductual13WidgetState extends State<Conductual13> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
+      height: 300,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(

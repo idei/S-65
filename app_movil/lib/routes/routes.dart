@@ -4,7 +4,7 @@ import 'package:app_salud/pages/ant_personales.dart';
 import 'package:app_salud/pages/avisos.dart';
 import 'package:app_salud/pages/datosCli_page.dart';
 import 'package:app_salud/pages/form_antecedentes_familiar.dart';
-import 'package:app_salud/pages/form_antecedentes_pers.dart';
+import 'package:app_salud/pages/form_antecedentes_personal.dart';
 import 'package:app_salud/pages/form_datos_clinicos.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
 import 'package:app_salud/pages/historial_clinico.dart';
@@ -48,7 +48,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/historial_clinico': (context) => HistorialClinico(),
     '/form_antecedentes_personales': (context) => FormAntecedentesPersonales(),
     '/antecedentes_personales': (context) => AntecedentesPerPage(),
-    '/antecedentes_familiares': (context) => AntecedentesFamPage(),
+    '/antecedentes_familiares': (context) => AntecedentesFamiliarPage(),
     '/form_antecedentes_familiares': (context) => FormAntecedentesFamiliares(),
     '/datoscli': (context) => DatosCli(),
     '/medicamentos': (context) => MedicamentoPage(),

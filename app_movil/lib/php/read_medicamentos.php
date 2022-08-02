@@ -30,10 +30,7 @@
             $lista[] = $results;
         }
         echo json_encode($lista);
-	}else {
-        $pepe = "Error";
-        echo json_encode($pepe);
-    }
+	}
     
     } catch (PDOException $e) {
         $error = "Error conectando con la base de datos: ".$e->getMessage(); 

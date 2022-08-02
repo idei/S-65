@@ -10,12 +10,12 @@ $id_medicamento = $_POST['id_medicamento'];
         $s = $db->prepare($sql);
         $s->bindValue(':id_medicamento', $id_medicamento);
         $s->execute();
-        echo json_encode('Medicamento eliminado');
+        echo json_encode('Success');
 
     } catch (PDOException $e) {
         $error = 'Error al eliminar medicamento: ' . $e->getMessage();
         echo json_encode($error);
-        exit();
+        
     }
 
 ?>

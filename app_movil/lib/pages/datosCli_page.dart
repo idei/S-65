@@ -34,16 +34,17 @@ class _DatosCliState extends State<DatosCli> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushNamed(context, '/menu');
           },
         ),
         //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text('Datos Clinicos',
-            style:
-                TextStyle(fontFamily: 'NunitoR', fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontWeight: FontWeight.bold)),
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: choiceAction,
@@ -59,19 +60,19 @@ class _DatosCliState extends State<DatosCli> {
         ],
       ),
 
-      body: new Container(
+      body: Container(
         // ThemeData(
         //   primarySwatch: Colors.blue,
         //   primaryColor: const Color(0xFF2196f3),
         //   accentColor: const Color(0xFF2196f3),
         //   canvasColor: const Color(0xFF2949de),
         // ),
-        child: new Row(
+        child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -93,20 +94,21 @@ class _DatosCliState extends State<DatosCli> {
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    new Text(
+                    Text(
                       "     REGISTRAR \n DATOS CLINICO",
-                      style: new TextStyle(
+                      style: TextStyle(
                           fontSize: 12.0,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'NunitoR'),
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
                     ),
                     SizedBox(height: 20.0),
                   ]),
               Padding(
                 padding: const EdgeInsets.all(10.0),
               ),
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,13 +126,14 @@ class _DatosCliState extends State<DatosCli> {
                               color: Colors.white, size: 70.0)),
                     ),
                     SizedBox(height: 10.0),
-                    new Text(
+                    Text(
                       "         HISTORIAL\n           CLÍNICO",
-                      style: new TextStyle(
+                      style: TextStyle(
                           fontSize: 12.0,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'NunitoR'),
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
                     ),
                     SizedBox(height: 20.0),
                   ]),

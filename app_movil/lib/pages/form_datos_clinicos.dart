@@ -80,7 +80,8 @@ class _FormpruebaState extends State<FormDatosClinicos> {
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text('Datos Clínicos',
               style: TextStyle(
-                  fontFamily: 'NunitoR', fontWeight: FontWeight.bold)),
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                  fontWeight: FontWeight.bold)),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.help_outline),
@@ -102,8 +103,8 @@ class _FormpruebaState extends State<FormDatosClinicos> {
         ),
         body: Form(
           key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
+          child: Container(
+            padding: EdgeInsets.all(20.0),
             child: ListView(
               children: <Widget>[
                 Row(
@@ -114,7 +115,10 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                           "Presión Alta ",
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'NunitoR',
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily,
                           ),
                         ),
                       ],
@@ -165,7 +169,12 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                       children: [
                         Text(
                           "Presión Baja ",
-                          style: TextStyle(fontSize: 18, fontFamily: 'NunitoR'),
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         ),
                       ],
                     ),
@@ -203,8 +212,12 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                     Column(
                       children: [
                         Text("Pulso ",
-                            style:
-                                TextStyle(fontSize: 18, fontFamily: 'NunitoR')),
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
                       ],
                     ),
                     Column(
@@ -247,7 +260,12 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                       children: [
                         Text(
                           "Peso(Kg) ",
-                          style: TextStyle(fontSize: 18, fontFamily: 'NunitoR'),
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         ),
                       ],
                     ),
@@ -297,7 +315,12 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                       children: [
                         Text(
                           "Altura (Metros)",
-                          style: TextStyle(fontSize: 18, fontFamily: 'NunitoR'),
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         ),
                       ],
                     ),
@@ -339,7 +362,12 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                       children: [
                         Text(
                           "Circunferencia de Cintura ",
-                          style: TextStyle(fontSize: 18, fontFamily: 'NunitoR'),
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
                         ),
                       ],
                     ),
@@ -413,7 +441,7 @@ class _FormpruebaState extends State<FormDatosClinicos> {
   Widget CardGenerico(StatefulWidget widget, String pregunta) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(18),
+        margin: EdgeInsets.all(10),
         elevation: 10,
         child: ClipRRect(
           // Los bordes del contenido del card se cortan usando BorderRadius
@@ -758,7 +786,7 @@ class Consume_AlcoholWidgetState extends State<Consume_Alcohol> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -817,7 +845,7 @@ class Consume_TabacoWidgetState extends State<Consume_Tabaco> {
       // width: 450,
       child: ListView(
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -875,7 +903,7 @@ class Consume_MarihuanaWidgetState extends State<Consume_Marihuana> {
       // width: 450,
       child: ListView(
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -930,7 +958,7 @@ class Otras_drogasWidgetState extends State<Otras_drogas> {
       height: 230,
       child: ListView(
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(

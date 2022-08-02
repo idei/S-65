@@ -78,8 +78,8 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
 
     return Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "CDR",
@@ -106,9 +106,9 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
           ],
         ),
         body: SingleChildScrollView(
-            child: new Container(
+            child: Container(
                 padding: EdgeInsets.all(8.0),
-                child: new Column(
+                child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Card(
@@ -125,23 +125,23 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     'Memoria',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Memoria(),
                                 SizedBox(
@@ -164,23 +164,23 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     'Orientación',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Orientacion(),
                                 SizedBox(
@@ -203,23 +203,23 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     'Vida Social',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 VidaSocial(),
                                 SizedBox(
@@ -242,23 +242,23 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     'Hogar y Aficiones',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Hogar(),
                                 SizedBox(
@@ -281,23 +281,23 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     'Cuidado Personal',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 CuidadoPersonal(),
                                 SizedBox(
@@ -306,8 +306,8 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                               ],
                             ),
                           )),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -318,18 +318,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      ElevatedButton(
-                        //onPressed: validateAnswers,
-                        child: new Text(
-                          'GUARDAR',
-                          style: new TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white),
-                        ),
-                        //color: Theme.of(context).accentColor,
-                      ),
-                      new Padding(
+                      Padding(
                         padding: EdgeInsets.all(4.0),
                       ),
                     ]))));
@@ -455,12 +444,12 @@ class MemoriaWidgetState extends State<Memoria> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 420,
+      height: 520,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -517,7 +506,7 @@ class OrientacionWidgetState extends State<Orientacion> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -631,7 +620,7 @@ class JuicioResoProblemaWidgetState extends State<JuicioResoProblema> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -688,7 +677,7 @@ class VidaSocialWidgetState extends State<VidaSocial> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -740,12 +729,12 @@ class HogarWidgetState extends State<Hogar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 340,
+      height: 420,
       // width: 350,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(
@@ -802,7 +791,7 @@ class CuidadoPersonalWidgetState extends State<CuidadoPersonal> {
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: data
             .map((list) => RadioListTile(

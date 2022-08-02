@@ -17,11 +17,13 @@ final _formKey_recuperar = GlobalKey<FormState>();
 
 class _RecuperarState extends State<RecuperarPage> {
   @override
-  Widget build(BuildContext context2) {
+  Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Recuperación de Contraseña'),
+          title: Text('Recuperación de Contraseña',
+              style: TextStyle(
+                  fontFamily:
+                      Theme.of(context).textTheme.headline1.fontFamily)),
           actions: <Widget>[],
         ),
         body: Center(
@@ -30,7 +32,6 @@ class _RecuperarState extends State<RecuperarPage> {
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ListView(children: <Widget>[
-                    Text("Ingrese su Dni"),
                     TextFormField(
                       controller: dni,
                       validator: (value) {
@@ -40,23 +41,24 @@ class _RecuperarState extends State<RecuperarPage> {
                         return null;
                       },
                       keyboardType: TextInputType.number,
-                      //keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: ''),
+                      decoration: InputDecoration(labelText: 'Ingrese su Dni'),
                     ),
                     SizedBox(
                       height: 30,
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          textStyle: TextStyle(
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily)),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 60.0, vertical: 15.0),
-                        child: Text('Recuperar'),
+                        child: Text('Recuperar contraseña'),
                       ),
-                      //color: Color.fromRGBO(157, 19, 34, 1),
-                      //textColor: Colors.white,
                       onPressed: () {
                         Navigator.pushReplacement(
-                            context2,
+                            context,
                             MaterialPageRoute(
                                 builder: (BuildContext context) =>
                                     MostrarPass()));
