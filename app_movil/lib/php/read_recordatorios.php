@@ -33,8 +33,8 @@
         }
         echo json_encode($lista);
 	}else {
-        $pepe = "Error";
-        echo json_encode($pepe);
+        
+        echo json_encode("Vacio");
     }
     
     } catch (PDOException $e) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/opciones_navbar.dart';
+import '../models/screening_model.dart';
 import 'env.dart';
 
 class ScreeningPage extends StatefulWidget {
@@ -16,74 +18,42 @@ var titulo;
 class _ScreeningState extends State<ScreeningPage> {
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-
     Map parametros = ModalRoute.of(context).settings.arguments;
     select_screening = parametros["select_screening"];
 
-    if (select_screening == "SFMS") {
-      titulo = "Físicos";
-    }
+    titulo = setTitulo(select_screening);
 
-    if (select_screening == "QCQ") {
-      titulo = "de Cognición";
-    }
-
-    if (select_screening == "ANIMO") {
-      titulo = "de Ánimo";
-    }
-
-    if (select_screening == "CONDUC") {
-      titulo = "Conductuales";
-    }
-
-    if (select_screening == "CDR") {
-      titulo = "de Cognición y Vida Cotidiana";
-    }
-
-    if (select_screening == "RNUTRI") {
-      titulo = "de Nutrición";
-    }
-
-    if (select_screening == "DIAB") {
-      titulo = "de Diabetes";
-    }
-
-    if (select_screening == "ENCRO") {
-      titulo = "enfermedades crónicas";
-    }
-    return FutureBuilder<List<ScreeningModel>>(
-        future: read_screenings(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-                appBar: AppBar(
-                  leading: new IconButton(
-                    icon: new Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/menu_chequeo');
-                    },
-                  ),
-                  title: Text('Chequeos ' + titulo,
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                  actions: <Widget>[
-                    PopupMenuButton<String>(
-                      onSelected: choiceAction,
-                      itemBuilder: (BuildContext context) {
-                        return Constants.choices.map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                ),
-                body: ListView(
+    return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu_chequeo');
+            },
+          ),
+          title: Text('Chequeos ' + titulo,
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: FutureBuilder<List<ScreeningModel>>(
+            future: read_screenings(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
                   children: ListTile.divideTiles(
                     color: Colors.black,
                     tiles: snapshot.data
@@ -116,105 +86,133 @@ class _ScreeningState extends State<ScreeningPage> {
                             ))
                         .toList(),
                   ).toList(),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {},
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      if (select_screening == "SFMS") {
-                        Navigator.of(context).pushReplacementNamed(
-                            '/screening_fisico',
-                            arguments: {
-                              "tipo_screening": select_screening,
-                              "bandera": "screening_nuevo"
-                            });
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: IconButton(
+            icon: Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              if (select_screening == "SFMS") {
+                Navigator.of(context).pushReplacementNamed('/screening_fisico',
+                    arguments: {
+                      "tipo_screening": select_screening,
+                      "bandera": "screening_nuevo"
+                    });
+              } else {
+                if (select_screening == "QCQ") {
+                  Navigator.of(context).pushReplacementNamed(
+                      '/screening_queja_cognitiva',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+                } else {
+                  if (select_screening == "ÁNIMO") {
+                    Navigator.of(context)
+                        .pushReplacementNamed('/screening_animo', arguments: {
+                      "tipo_screening": select_screening,
+                      "bandera": "screening_nuevo"
+                    });
+                  } else {
+                    if (select_screening == "CONDUC") {
+                      Navigator.of(context).pushReplacementNamed(
+                          '/screening_conductual',
+                          arguments: {
+                            "tipo_screening": select_screening,
+                            "bandera": "screening_nuevo"
+                          });
+                    } else {
+                      if (select_screening == "CDR") {
+                        Navigator.of(context)
+                            .pushReplacementNamed('/screening_cdr', arguments: {
+                          "tipo_screening": select_screening,
+                          "bandera": "screening_nuevo"
+                        });
                       } else {
-                        if (select_screening == "QCQ") {
+                        if (select_screening == "RNUTRI") {
                           Navigator.of(context).pushReplacementNamed(
-                              '/screening_queja_cognitiva',
+                              '/screening_nutricional',
                               arguments: {
                                 "tipo_screening": select_screening,
                                 "bandera": "screening_nuevo"
                               });
                         } else {
-                          if (select_screening == "ÁNIMO") {
+                          if (select_screening == "DIAB") {
                             Navigator.of(context).pushReplacementNamed(
-                                '/screening_animo',
+                                '/screening_diabetes',
                                 arguments: {
                                   "tipo_screening": select_screening,
                                   "bandera": "screening_nuevo"
                                 });
                           } else {
-                            if (select_screening == "CONDUC") {
+                            if (select_screening == "ENCRO") {
                               Navigator.of(context).pushReplacementNamed(
-                                  '/screening_conductual',
+                                  '/screening_encro',
                                   arguments: {
                                     "tipo_screening": select_screening,
                                     "bandera": "screening_nuevo"
                                   });
-                            } else {
-                              if (select_screening == "CDR") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_cdr',
-                                    arguments: {
-                                      "tipo_screening": select_screening,
-                                      "bandera": "screening_nuevo"
-                                    });
-                              } else {
-                                if (select_screening == "RNUTRI") {
-                                  Navigator.of(context).pushReplacementNamed(
-                                      '/screening_nutricional',
-                                      arguments: {
-                                        "tipo_screening": select_screening,
-                                        "bandera": "screening_nuevo"
-                                      });
-                                } else {
-                                  if (select_screening == "DIAB") {
-                                    Navigator.of(context).pushReplacementNamed(
-                                        '/screening_diabetes',
-                                        arguments: {
-                                          "tipo_screening": select_screening,
-                                          "bandera": "screening_nuevo"
-                                        });
-                                  } else {
-                                    if (select_screening == "ENCRO") {
-                                      Navigator.of(context)
-                                          .pushReplacementNamed(
-                                              '/screening_encro',
-                                              arguments: {
-                                            "tipo_screening": select_screening,
-                                            "bandera": "screening_nuevo"
-                                          });
-                                    }
-                                  }
-                                }
-                              }
                             }
                           }
                         }
                       }
-                    },
-                  ),
-                ));
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Chequeo',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    )),
-              ),
-              body: Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              ),
-            );
-          }
-        });
+                    }
+                  }
+                }
+              }
+            },
+          ),
+        ));
   }
+
+  String setTitulo(var select_screening) {
+    if (select_screening == "SFMS") {
+      titulo = "Físicos";
+    }
+
+    if (select_screening == "QCQ") {
+      titulo = "de Cognición";
+    }
+
+    if (select_screening == "ÁNIMO") {
+      titulo = "de Ánimo";
+    }
+
+    if (select_screening == "CONDUC") {
+      titulo = "Conductuales";
+    }
+
+    if (select_screening == "CDR") {
+      titulo = "de Cognición y Vida Cotidiana";
+    }
+
+    if (select_screening == "RNUTRI") {
+      titulo = "de Nutrición";
+    }
+
+    if (select_screening == "DIAB") {
+      titulo = "de Diabetes";
+    }
+
+    if (select_screening == "ENCRO") {
+      titulo = "enfermedades crónicas";
+    }
+
+    return titulo;
+  }
+
+  List<ScreeningModel> recordatorios_items;
+  var data_error;
+  var email_argument;
+  var id_paciente;
 
   Future<List<ScreeningModel>> read_screenings() async {
     await getStringValuesSF();
@@ -235,7 +233,7 @@ class _ScreeningState extends State<ScreeningPage> {
       }).toList();
       return recordatorios_items;
     }
-    await new Future.delayed(new Duration(milliseconds: 500));
+
     recordatorios_items = [];
     return recordatorios_items;
   }
@@ -247,57 +245,12 @@ class _ScreeningState extends State<ScreeningPage> {
       Navigator.pushNamed(context, '/');
     }
   }
-}
 
-List<ScreeningModel> recordatorios_items;
-var data_error;
-var email_argument;
-var id_paciente;
-
-class ScreeningModel {
-  var tipo_screening;
-  var id_resultado_screening;
-  var id_paciente;
-  var result_screening;
-  String nombre;
-  String codigo;
-  String fecha;
-
-  ScreeningModel(
-      {this.tipo_screening,
-      this.id_resultado_screening,
-      this.id_paciente,
-      this.result_screening,
-      this.nombre,
-      this.codigo,
-      this.fecha});
-
-  factory ScreeningModel.fromJson(Map<String, dynamic> json) {
-    return ScreeningModel(
-      id_resultado_screening: json['id'],
-      tipo_screening: json['rela_screening'],
-      id_paciente: json['rela_paciente'],
-      result_screening: json['result_screening'],
-      nombre: json['nombre'],
-      codigo: json['codigo'],
-      fecha: json['fecha_alta'],
-    );
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email_prefer = await prefs.getString("email_prefer");
+    email_argument = email_prefer;
+    id_paciente = await prefs.getInt("id_paciente");
+    print(email_argument);
   }
-}
-
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = await prefs.getString("email_prefer");
-  email_argument = email_prefer;
-  id_paciente = await prefs.getInt("id_paciente");
-  print(email_argument);
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

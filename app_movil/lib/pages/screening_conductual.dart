@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
+import '../models/opciones_navbar.dart';
+
 class ScreeningConductualPage extends StatefulWidget {
   @override
   _ScreeningConductualState createState() => _ScreeningConductualState();
@@ -22,16 +24,16 @@ var id_recordatorio;
 var observaciones;
 var email;
 var screening_recordatorio;
+List itemsConductual;
+List itemsConductualOtro;
+bool otroVisible = false;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
-  double _animatedHeight = 0.0;
-
   getStringValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email_prefer = prefs.getString("email_prefer");
     email = email_prefer;
     id_paciente = prefs.getInt("id_paciente");
-    print(email);
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -49,7 +51,6 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
         id_paciente = id_paciente;
         id_recordatorio = null;
         id_medico = null;
-        //tipo_screening = parametros["tipo_screening"];
       }
     }
   }
@@ -68,625 +69,60 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) =>
         _alert_clinicos(context, "Cuestionario NPI", " npiiiiiiiiiiiiii"));
   }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-
     getStringValuesSF();
 
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "CONDUC",
-              });
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "CONDUC",
+            });
+          },
+        ),
+        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+        title: Text('Chequeo de Conducta',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
             },
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Chequeo de Conducta',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: FutureBuilder(
+          future: getAllRespuesta(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ColumnWidgetConductual();
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
         ),
-        body: SingleChildScrollView(
-            child: Container(
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                      '  ¿Qué parentesco tiene con (nombre del usuario)?  ',
-                                      style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
-                                ),
-
-                                Conductual1(),
-
-                                // Usamos Container para el contenedor de la descripción
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily),
-                                    controller: otro,
-                                    keyboardType: TextInputType.name,
-                                    decoration: InputDecoration(
-                                        labelText: "Si es otro, especifique"),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                      Divider(height: 5.0, color: Colors.black),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Tiene el paciente creencias falsas, como creer que otras personas le están robando o que planean hacerle daño de alguna manera?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                //espacio entre el texto y el radio button
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual2(),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Tiene el paciente alucinaciones como visiones falsas o voces? ¿Actúa el paciente como si oyera o viera cosas que no están presentes?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual3(),
-                              ],
-                            ),
-                          )),
-                      Divider(height: 5.0, color: Colors.black),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Se resiste el paciente a la ayuda de otros o es difícil de manejar?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual4(),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Divider(height: 5.0, color: Colors.black),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Actúa el paciente como si estuviera triste o dice que está deprimido?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Conductual5(),
-                              ],
-                            ),
-                          )),
-                      Divider(height: 5.0, color: Colors.black),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Se molesta el paciente cuando se separa de usted? ¿Muestra otras señales de nerviosismo, como falta de aire, suspiros, incapacidad de relajarse o se siente excesivamente tenso?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual6(),
-                              ],
-                            ),
-                          )),
-                      Divider(height: 5.0, color: Colors.black),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Parece que el paciente se siente demasiado bien o actúa excesivamente alegre?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual7(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Parece el paciente menos interesado en sus actividades habituales o en las actividades y planes de los demás?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual8(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Parece que el paciente actúa impulsivamente? Por ejemplo, habla el paciente con extraños como si los conociera o dice cosas que podrían herir los sentimientos de los demás?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual9(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Se muestra el paciente irritable o impaciente? ¿Tiene dificultad para lidiar con retrasos o para esperar actividades planeadas?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual10(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Lleva a cabo el paciente actividades repetitivas, como dar vueltas por la casa, jugar con botones, enrollar hilos o hacer otras cosas repetitivamente?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual11(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿Le despierta el paciente durante la noche, se levanta muy temprano por la mañana o toma siestas excesivas durante el día?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual12(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(15),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    '¿El paciente ha perdido o aumentado de peso o ha tenido algún cambio en la comida que le gusta?',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Conductual13(),
-                              ],
-                            ),
-                          )),
-                      Divider(
-                        height: 5.0,
-                        color: Colors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            //primary: Color.fromRGBO(157, 19, 34, 1),
-                            ),
-                        onPressed: () {
-                          guardar_datos(context);
-                        },
-                        child: Text('GUARDAR'),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                      ),
-                    ]))));
-  }
-
-  Widget checkbox1() {
-    return Column(children: <Widget>[
-      Row(children: <Widget>[
-        Radio(
-          value: 0,
-        ),
-        Text(
-          'Si, leve.',
-          style: TextStyle(fontSize: 16.0),
-        ),
-      ]),
-      Row(children: <Widget>[
-        Radio(
-          value: 0,
-        ),
-        Text(
-          'Si, moderado.',
-          style: TextStyle(fontSize: 16.0),
-        ),
-      ]),
-      Row(children: <Widget>[
-        Radio(
-          value: 0,
-        ),
-        Text(
-          'Si, severo.',
-          style: TextStyle(fontSize: 16.0),
-        ),
-      ]),
-      Row(children: <Widget>[
-        Radio(
-          value: 0,
-        ),
-        Text(
-          'No',
-          style: TextStyle(fontSize: 16.0),
-        ),
-      ]),
-      Row(children: <Widget>[
-        Radio(
-          value: 0,
-        ),
-        Text(
-          'No sabe',
-          style: TextStyle(fontSize: 16.0),
-        ),
-      ]),
-    ]);
+      ),
+    );
   }
 
   void choiceAction(String choice) {
@@ -695,6 +131,499 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     } else if (choice == Constants.Salir) {
       Navigator.pushNamed(context, '/');
     }
+  }
+}
+
+class ColumnWidgetConductual extends StatelessWidget {
+  const ColumnWidgetConductual({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+        Widget>[
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                      '  ¿Qué parentesco tiene con (nombre del usuario)?  ',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context)
+                              .textTheme
+                              .headline1
+                              .fontFamily)),
+                ),
+
+                Conductual1(),
+
+                // Usamos Container para el contenedor de la descripción
+              ],
+            ),
+          )),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Tiene el paciente creencias falsas, como creer que otras personas le están robando o que planean hacerle daño de alguna manera?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                //espacio entre el texto y el radio button
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual2(),
+              ],
+            ),
+          )),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Tiene el paciente alucinaciones como visiones falsas o voces? ¿Actúa el paciente como si oyera o viera cosas que no están presentes?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual3(),
+              ],
+            ),
+          )),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Se resiste el paciente a la ayuda de otros o es difícil de manejar?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual4(),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          )),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Actúa el paciente como si estuviera triste o dice que está deprimido?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Conductual5(),
+              ],
+            ),
+          )),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Se molesta el paciente cuando se separa de usted? ¿Muestra otras señales de nerviosismo, como falta de aire, suspiros, incapacidad de relajarse o se siente excesivamente tenso?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual6(),
+              ],
+            ),
+          )),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Parece que el paciente se siente demasiado bien o actúa excesivamente alegre?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual7(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Parece el paciente menos interesado en sus actividades habituales o en las actividades y planes de los demás?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual8(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Parece que el paciente actúa impulsivamente? Por ejemplo, habla el paciente con extraños como si los conociera o dice cosas que podrían herir los sentimientos de los demás?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual9(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Se muestra el paciente irritable o impaciente? ¿Tiene dificultad para lidiar con retrasos o para esperar actividades planeadas?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual10(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Lleva a cabo el paciente actividades repetitivas, como dar vueltas por la casa, jugar con botones, enrollar hilos o hacer otras cosas repetitivamente?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual11(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿Le despierta el paciente durante la noche, se levanta muy temprano por la mañana o toma siestas excesivas durante el día?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual12(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            // Los bordes del contenido del card se cortan usando BorderRadius
+            borderRadius: BorderRadius.circular(15),
+
+            // EL widget hijo que será recortado segun la propiedad anterior
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    '¿El paciente ha perdido o aumentado de peso o ha tenido algún cambio en la comida que le gusta?',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Conductual13(),
+              ],
+            ),
+          )),
+      Divider(
+        height: 5.0,
+        color: Colors.black,
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      ElevatedButton(
+        child: Text('GUARDAR'),
+        style: ElevatedButton.styleFrom(),
+        onPressed: () {
+          guardarDatosConductual(context);
+        },
+      ),
+      Padding(
+        padding: EdgeInsets.all(4.0),
+      ),
+    ]);
   }
 }
 
@@ -727,6 +656,28 @@ _alert_clinicos(context, title, descripcion) {
   ).show();
 }
 
+Future<List> getAllRespuesta({bool otro = false}) async {
+  var response;
+  var responseOtro;
+
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/tipo_respuesta_conductual.php";
+
+  responseOtro = await http.post(url, body: {"otro": "otro"});
+
+  response = await http.post(url, body: {});
+
+  var jsonData = json.decode(response.body);
+  var jsonDataOtro = json.decode(responseOtro.body);
+
+  if (response.statusCode == 200 && (responseOtro.statusCode == 200)) {
+    itemsConductualOtro = jsonDataOtro;
+    return itemsConductual = jsonData;
+  } else {
+    return null;
+  }
+}
+
 _alert_informe(context, title, descripcion) async {
   Alert(
     context: context,
@@ -754,7 +705,7 @@ _alert_informe(context, title, descripcion) async {
   ).show();
 }
 
-guardar_datos(BuildContext context) async {
+guardarDatosConductual(BuildContext context) async {
   if (id_conductual1 == null) {
     loginToast("Debe responder todas las preguntas");
   } else {
@@ -871,56 +822,57 @@ class Conductual1 extends StatefulWidget {
 }
 
 class Conductual1WidgetState extends State<Conductual1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {"otro": "otro"});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180,
-      // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual1,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual1 = val;
-                    });
-                  },
-                ))
-            .toList(),
+      height: 280,
+      child: Column(
+        children: [
+          ListView(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.all(8.0),
+            children: itemsConductualOtro
+                .map((list) => RadioListTile(
+                      groupValue: id_conductual1,
+                      title: Text(
+                        list['respuesta'],
+                        style: TextStyle(
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily,
+                        ),
+                      ),
+                      value: list['id'].toString(),
+                      onChanged: (val) {
+                        setState(() {
+                          debugPrint('VAL = $val');
+                          id_conductual1 = val;
+                          if (id_conductual1 == "48") {
+                            otroVisible = true;
+                          } else {
+                            otroVisible = false;
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+          Visibility(
+            visible: otroVisible,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: TextFormField(
+                style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+                controller: otro,
+                keyboardType: TextInputType.name,
+                decoration:
+                    InputDecoration(labelText: "Si es otro, especifique"),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -932,38 +884,16 @@ class Conductual2 extends StatefulWidget {
 }
 
 class Conductual2WidgetState extends State<Conductual2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual2,
                   title: Text(
@@ -993,38 +923,16 @@ class Conductual3 extends StatefulWidget {
 }
 
 class Conductual3WidgetState extends State<Conductual3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual3,
                   title: Text(
@@ -1054,38 +962,16 @@ class Conductual4 extends StatefulWidget {
 }
 
 class Conductual4WidgetState extends State<Conductual4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual4,
                   title: Text(
@@ -1122,38 +1008,16 @@ class Conductual5 extends StatefulWidget {
 }
 
 class Conductual5WidgetState extends State<Conductual5> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual5,
                   title: Text(
@@ -1183,38 +1047,16 @@ class Conductual6 extends StatefulWidget {
 }
 
 class Conductual6WidgetState extends State<Conductual6> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual6,
                   title: Text(
@@ -1244,38 +1086,16 @@ class Conductual7 extends StatefulWidget {
 }
 
 class Conductual7WidgetState extends State<Conductual7> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual7,
                   title: Text(
@@ -1305,38 +1125,16 @@ class Conductual8 extends StatefulWidget {
 }
 
 class Conductual8WidgetState extends State<Conductual8> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual8,
                   title: Text(
@@ -1375,38 +1173,16 @@ class Conductual9 extends StatefulWidget {
 }
 
 class Conductual9WidgetState extends State<Conductual9> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual9,
                   title: Text(
@@ -1436,38 +1212,16 @@ class Conductual10 extends StatefulWidget {
 }
 
 class Conductual10WidgetState extends State<Conductual10> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual10,
                   title: Text(
@@ -1497,38 +1251,16 @@ class Conductual11 extends StatefulWidget {
 }
 
 class Conductual11WidgetState extends State<Conductual11> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual11,
                   title: Text(
@@ -1558,38 +1290,16 @@ class Conductual12 extends StatefulWidget {
 }
 
 class Conductual12WidgetState extends State<Conductual12> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual12,
                   title: Text(
@@ -1619,38 +1329,16 @@ class Conductual13 extends StatefulWidget {
 }
 
 class Conductual13WidgetState extends State<Conductual13> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_conductual.php";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: itemsConductual
             .map((list) => RadioListTile(
                   groupValue: id_conductual13,
                   title: Text(
@@ -1672,13 +1360,4 @@ class Conductual13WidgetState extends State<Conductual13> {
       ),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

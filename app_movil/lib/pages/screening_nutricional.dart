@@ -13,19 +13,19 @@ var id_recordatorio;
 var email;
 var screening_recordatorio;
 
-// Define a custom Form widget.
-class FormScreeningNutricional extends StatefulWidget {
+class ScreeningNutricional extends StatefulWidget {
   final pageName = 'screening_nutricional';
 
   @override
-  _ForNutricionalState createState() => _ForNutricionalState();
+  _ScreeningNutricionalState createState() => _ScreeningNutricionalState();
 }
 
-class _ForNutricionalState extends State<FormScreeningNutricional> {
+class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   final myController = TextEditingController();
 
   @override
   void initState() {
+    super.initState();
     myController.addListener(_printLatestValue);
   }
 
@@ -83,59 +83,45 @@ class _ForNutricionalState extends State<FormScreeningNutricional> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return FutureBuilder(
-        future: read_recordatorios(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
-          if (snapshot.hasData) {
-            return ScreeningAnimo();
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                leading: new IconButton(
-                  icon: new Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/screening', arguments: {
-                      "select_screening": "RNUTRI",
-                    });
-                  },
-                ),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                title: Text('Riesgo Nutricional',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    )),
-              ),
-              body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "RNUTRI",
+            });
+          },
+        ),
+        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+        title: Text('Riesgo Nutricional',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+      ),
+      body: FutureBuilder(
+          future: readRecordatorios(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return FormNutricional(context);
+            } else {
+              return Center(
                 child: CircularProgressIndicator(
                   semanticsLabel: "Cargando",
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          }),
+    );
   }
 }
 
-read_recordatorios() async {
-  await new Future.delayed(new Duration(milliseconds: 500));
+readRecordatorios() async {
+  await Future.delayed(Duration(milliseconds: 500));
   return true;
 }
 
-Widget texto(String entrada) {
-  return Text(
-    entrada,
-    style: new TextStyle(
-        fontSize: 12.0,
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontFamily: "Roboto"),
-  );
-}
-
-guardar_datos(BuildContext context) async {
+guardarDatos(BuildContext context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/respuesta_screening_nutricional.php";
   var response = await http.post(url, body: {
@@ -197,25 +183,6 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
   );
 }
 
-_alert_clinicos(context, title, descripcion) {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () => Navigator.pop(context),
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
 _alert_informe(context, title, descripcion) async {
   Alert(
     context: context,
@@ -243,130 +210,79 @@ _alert_informe(context, title, descripcion) async {
   ).show();
 }
 
-read_datos_paciente() async {
-  await new Future.delayed(new Duration(milliseconds: 1500));
-
-  return true;
-}
-
 //----------------------------------------Screening de Sintomas ------------------------------------------
 
-class ScreeningAnimo extends StatefulWidget {
-  ScreeningAnimo({Key key}) : super(key: key);
-
-  @override
-  ScreeningAnimoWidgetState createState() => ScreeningAnimoWidgetState();
-}
-
-/// This is the private State class that goes with MyStatefulWidget.
-class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Riesgo Nutricional',
+Form FormNutricional(BuildContext context) {
+  return Form(
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: <Widget>[
+          Nutri1(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri2(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri3(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri4(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri5(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri6(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri7(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri8(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri9(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri10(),
+          Padding(padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 30.0)),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                //primary: Color.fromRGBO(157, 19, 34, 1),
+                ),
+            onPressed: () {
+              guardarDatos(context);
+            },
+            child: Text(
+              'GUARDAR',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
-        ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: <Widget>[
-                Nutri1(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri2(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri3(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri4(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri5(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri6(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri7(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri8(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri9(),
-                new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                ),
-                new Divider(height: 5.0, color: Colors.black),
-                Nutri10(),
-                Padding(
-                    padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 30.0)),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      //primary: Color.fromRGBO(157, 19, 34, 1),
-                      ),
-                  onPressed: () {
-                    guardar_datos(context);
-                  },
-                  child: Text(
-                    'GUARDAR',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ));
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
+        ],
+      ),
+    ),
+  );
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------

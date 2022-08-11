@@ -161,6 +161,12 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                     height: 30,
                   ),
                   ElevatedButton(
+                    child: Text('Leído',
+                        style: TextStyle(
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily)),
                     style: ElevatedButton.styleFrom(
                         //primary: Color.fromRGBO(157, 19, 34, 1),
                         ),
@@ -168,12 +174,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                       update_estado_recordartorio();
                       Navigator.of(context).pushReplacementNamed('/avisos');
                     },
-                    child: Text('Leído',
-                        style: TextStyle(
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily)),
                   ),
                 ]))));
   }

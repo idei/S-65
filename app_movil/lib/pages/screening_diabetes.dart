@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/opciones_navbar.dart';
 import 'env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,8 +77,8 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
 
     return Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "DIAB",
@@ -104,9 +105,9 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
           ],
         ),
         body: SingleChildScrollView(
-            child: new Container(
+            child: Container(
                 padding: EdgeInsets.all(8.0),
-                child: new Column(
+                child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Card(
@@ -123,23 +124,23 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     '¿Considera que durante este ultimo año aumento de peso?',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 AumentoPeso(),
                                 SizedBox(
@@ -162,23 +163,23 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     '¿Le han encontrado alguna vez valores de glucosa (azúcar) altos?',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Glucosa(),
                                 SizedBox(
@@ -201,23 +202,23 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 Container(
                                   width: 320,
                                   child: Text(
                                     '¿Algunos de sus familiares allegados u otros parientes han sido diagnosticados con diabetes?',
                                     textAlign: TextAlign.center,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0,
                                     ),
                                   ),
                                 ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
                                 ),
                                 FamiliarDiabetes(),
                                 SizedBox(
@@ -226,8 +227,8 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                               ],
                             ),
                           )),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -238,18 +239,7 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
                         },
                         child: Text('GUARDAR'),
                       ),
-                      ElevatedButton(
-                        // onPressed: validateAnswers,
-                        child: new Text(
-                          'GUARDAR',
-                          style: new TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white),
-                        ),
-                        //color: Theme.of(context).accentColor,
-                      ),
-                      new Padding(
+                      Padding(
                         padding: EdgeInsets.all(4.0),
                       ),
                     ]))));
@@ -552,13 +542,4 @@ class FamiliarDiabetesWidgetState extends State<FamiliarDiabetes> {
       ),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

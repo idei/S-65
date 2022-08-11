@@ -30,6 +30,7 @@ $insert_resultado->bindParam(4, $result_screening);
 $insert_resultado->execute();
 $last->execute();
 
+
 $last = $last->fetch();
 $id_respuesta = $last["id"];
 
@@ -349,9 +350,9 @@ try {
     }
 
     if ($result_screening > 1) {
-        echo json_encode("alert");
+        echo json_encode("Alert");
     }else{
-        echo json_encode("");
+        echo json_encode("Success");
     }
 
     

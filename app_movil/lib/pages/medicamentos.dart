@@ -1,4 +1,4 @@
-import 'package:app_salud/models/medicamento_model';
+import '../models/medicamento_model.dart';
 import 'package:app_salud/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -24,8 +24,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            leading: new IconButton(
-              icon: new Icon(Icons.arrow_back),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pushNamed(context, '/menu');
               },

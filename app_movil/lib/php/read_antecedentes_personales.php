@@ -36,6 +36,9 @@
             echo json_encode($lista);
     
         }
+        else{
+            echo json_encode("Vacio");
+        }
 
     } catch (PDOException $e) {
         $error = "Error conectando con la base de datos: ".$e->getMessage(); 

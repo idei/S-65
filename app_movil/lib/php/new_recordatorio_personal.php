@@ -38,10 +38,10 @@
 	$stmt->execute();
 
     $insert_recordatorio = $stmt->rowCount();
-			if ($insert_recordatorio) {
-				array_push($lista, "Success");
-				echo json_encode($lista);
-			}
+	
+    if ($insert_recordatorio) {
+		echo json_encode("Success");
+	}
 
 	}
 

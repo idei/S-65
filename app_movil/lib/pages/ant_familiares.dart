@@ -166,7 +166,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     await get_preference();
 
     String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_list_familiares.php";
+    var url = URL_base + "/read_antecedentes_familiares.php";
     var response = await http.post(url, body: {"email": email});
     if (response.body != "") {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();

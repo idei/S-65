@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
@@ -38,11 +40,7 @@ getStringValuesSF() async {
   print(email_argument);
 }
 
-// Define a corresponding State class.
-// This class holds data related to the Form.
 class _FormpruebaState extends State<Formprueba> {
-  // Create a text controller and use it to retrieve the current value
-  // of the TextField.
   final myController = TextEditingController();
   final pageName = '/form_datos_generales';
 
@@ -51,12 +49,11 @@ class _FormpruebaState extends State<Formprueba> {
     super.initState();
 
     myController.addListener(_printLatestValue);
+    //loadingData();
   }
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is removed from the widget tree.
-    // This also removes the _printLatestValue listener.
     myController.dispose();
     super.dispose();
   }
@@ -75,6 +72,8 @@ class _FormpruebaState extends State<Formprueba> {
     int changedCount = 0;
     String dropdownValue = 'One';
 
+    final size = MediaQuery.of(context).size;
+
     Map parametros = ModalRoute.of(context).settings.arguments;
     // getStringValuesSF();
 
@@ -89,16 +88,19 @@ class _FormpruebaState extends State<Formprueba> {
       apellido.text = post_apellido;
       dni.text = post_dni;
       print("dni");
-      //email.text = post_email;
     } else {
       email_argument = parametros['email'];
-      // email_argument = parametros['email'];
       print(email_argument);
       getStringValuesSF();
       print(email_argument);
       //getStringValuesSF();
-      read_datos_paciente();
+      //read_datos_paciente();
+      //getAllDepartamentos();
     }
+
+    setState(() {
+      loadingData();
+    });
 
     return Scaffold(
         appBar: AppBar(
@@ -120,182 +122,292 @@ class _FormpruebaState extends State<Formprueba> {
             )
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: <Widget>[
-                TextFormField(
-                  controller: apellido,
-                  decoration: InputDecoration(
-                      labelText: 'Apellido',
-                      labelStyle: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontWeight: FontWeight.bold)),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese el apellido';
-                    }
-                    return null;
-                  },
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),
-                TextFormField(
-                  controller: nombre,
-                  decoration: InputDecoration(
-                      labelText: 'Nombre',
-                      labelStyle: TextStyle(
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese el nombre';
-                    }
-                    return null;
-                  },
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),
-                TextFormField(
-                  controller: dni,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      labelText: 'DNI',
-                      labelStyle: TextStyle(
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese el DNI';
-                    }
-                    return null;
-                  },
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),
-                SizedBox(height: 20.0),
-                Text('Fecha de Nacimiento',
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily)),
-                DateTimeField(
-                  controller: fecha_nacimiento,
-                  format: format,
-                  onShowPicker: (context, currentValue) {
-                    return showDatePicker(
-                        context: context,
-                        firstDate: DateTime(1900),
-                        initialDate: currentValue ?? DateTime.now(),
-                        lastDate: DateTime(2100));
-                  },
-                  validator: (date) => date == null ? 'Invalid date' : null,
-                  initialValue: initialValue,
-                  onChanged: (date) => setState(() {
-                    value = date;
-                    changedCount++;
-                  }),
-                ),
-                SizedBox(height: 20.0),
-                FormGenero(),
-                SizedBox(height: 10.0),
-                FormNivelEducativo(),
-                SizedBox(height: 10.0),
-                FormGrupoConviviente(),
-                TextFormField(
-                  controller: celular,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      labelText: 'Celular',
-                      labelStyle: TextStyle(
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese un número de teléfono';
-                    }
-                    return null;
-                  },
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),
-                /*
-                TextFormField(
-                  controller: email,
-                  decoration: InputDecoration(
-                      labelText: 'Correo Electrónico',
-                      hintText: "ejemplo@gmail.com"),
-                  validator: (value) => EmailValidator.validate(value)
-                      ? null
-                      : "Por favor ingresar un correo electrónico válido",
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),*/
-                TextFormField(
-                  controller: contacto,
-                  decoration: InputDecoration(
-                      labelText: 'Contacto',
-                      labelStyle: TextStyle(
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese el contacto';
-                    }
-                    return null;
-                  },
-                  onChanged: (text) {
-                    print("Debe completar el campo");
-                  },
-                ),
-                SizedBox(height: 10.0),
-                FormDepartamentos(),
-                SizedBox(height: 15.0),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    //primary: Color.fromRGBO(157, 19, 34, 1),
-                    textStyle: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily),
-                  ),
-                  onPressed: () {
-                    // Validate returns true if the form is valid, or false
-                    // otherwise.
-                    if (_formKey.currentState.validate()) {
-                      // If the form is valid, display a Snackbar.
-                      //Scaffold.of(context).showSnackBar(
-                      //  SnackBar(content: Text('Procesando información')));
-                      guardar_datos();
-                      Navigator.pushNamed(context, '/menu', arguments: {
-                        'email': email_argument,
-                      });
-                    }
-                  },
-                  child: Text('Guardar Datos',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                ),
-              ],
+        body: Center(
+          child: SingleChildScrollView(
+            child: FutureBuilder(
+              future: loadingData(),
+              builder: (context, snapshot) {
+                if (isDepto) {
+                  return Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            controller: apellido,
+                            decoration: InputDecoration(
+                                labelText: 'Apellido',
+                                labelStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily,
+                                    fontWeight: FontWeight.bold)),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Por favor ingrese el apellido';
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              print("Debe completar el campo");
+                            },
+                          ),
+                          TextFormField(
+                            controller: nombre,
+                            decoration: InputDecoration(
+                                labelText: 'Nombre',
+                                labelStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Por favor ingrese el nombre';
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              print("Debe completar el campo");
+                            },
+                          ),
+                          TextFormField(
+                            controller: dni,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                labelText: 'DNI',
+                                labelStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Por favor ingrese el DNI';
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              print("Debe completar el campo");
+                            },
+                          ),
+                          SizedBox(height: 10.0),
+                          DateTimeField(
+                            decoration: InputDecoration(
+                              labelText: 'Fecha de Nacimiento',
+                            ),
+                            controller: fecha_nacimiento,
+                            format: format,
+                            onShowPicker: (context, currentValue) {
+                              return showDatePicker(
+                                  context: context,
+                                  firstDate: DateTime(1900),
+                                  initialDate: currentValue ?? DateTime.now(),
+                                  lastDate: DateTime(2100));
+                            },
+                            validator: (date) =>
+                                date == null ? 'Invalid date' : null,
+                            initialValue: initialValue,
+                            onChanged: (date) => setState(() {
+                              value = date;
+                              changedCount++;
+                            }),
+                          ),
+                          SizedBox(height: 10.0),
+                          FormGenero(),
+                          SizedBox(height: 10.0),
+                          FormNivelEducativo(),
+                          SizedBox(height: 10.0),
+                          FormGrupoConviviente(),
+                          TextFormField(
+                            controller: celular,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                labelText: 'Celular',
+                                labelStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Por favor ingrese un número de teléfono';
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              print("Debe completar el campo");
+                            },
+                          ),
+                          TextFormField(
+                            controller: contacto,
+                            decoration: InputDecoration(
+                                labelText: 'Contacto',
+                                labelStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Por favor ingrese el contacto';
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              print("Debe completar el campo");
+                            },
+                          ),
+                          SizedBox(height: 10.0),
+                          FormDepartamentos(),
+                          SizedBox(height: 15.0),
+                          Container(
+                            alignment: Alignment.center,
+                            child: ElevatedButton.icon(
+                              icon: _isLoading
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      child: const CircularProgressIndicator(),
+                                    )
+                                  : const Icon(Icons.save_alt),
+                              style: ElevatedButton.styleFrom(
+                                textStyle: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily),
+                              ),
+                              onPressed: () {
+                                if (_formKey.currentState.validate() &&
+                                    !_isLoading) {
+                                  _startLoading();
+                                } else {
+                                  null;
+                                }
+                              },
+                              label: Text('Guardar Datos',
+                                  style: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Cargando...",
+                          style: TextStyle(
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily,
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ));
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Datos",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  guardarDatos() async {
+    String URL_base = Env.URL_PREFIX;
+    var url = URL_base + "/user_datos_personales.php";
+    print(celular.text);
+    print(email_argument);
+    var response = await http.post(url, body: {
+      "nombre": nombre.text,
+      "apellido": apellido.text,
+      "email": email_argument.toString(),
+      "dni": dni.text,
+      "fecha_nacimiento": fecha_nacimiento.text,
+      "rela_genero": rela_genero,
+      "rela_departamento": rela_departamento.toString(),
+      "rela_nivel_instruccion": rela_nivel_instruccion.toString(),
+      "rela_grupo_conviviente": rela_grupo_conviviente.toString(),
+      "celular": celular.text,
+      "contacto": contacto.text,
+      "estado_users": estado_users.toString(),
+      "rela_users": rela_users.toString(),
+    });
+
+    if (response.statusCode == 200) {
+      _alert_informe(context, "Datos Guardados Exitosamente", 1);
+
+      Navigator.pushNamed(context, '/menu', arguments: {
+        'email': email_argument,
+      });
+    } else {
+      _alert_informe(context, "Error al guardar: " + response.body, 2);
+    }
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardarDatos();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void choiceAction(String choice) {
@@ -304,6 +416,77 @@ class _FormpruebaState extends State<Formprueba> {
     } else if (choice == Constants.Salir) {
       Navigator.pushNamed(context, '/');
     }
+  }
+}
+
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
+}
+
+loadingData() async {
+  await getDataPaciente();
+  await getAllDepartamentos();
+  await getAllGeneros();
+  await getAllNivelesEducativos();
+  await getAllGrupoConviviente();
+}
+
+List dataDepartamento;
+bool isDepto = false;
+List dataGenero;
+bool isGenero = false;
+List dataNivelEducativo;
+bool isNiveleducativo = false;
+List dataGrupoConviviente;
+bool isGrupoConviviente = false;
+
+getAllDepartamentos() async {
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/departamentos.php";
+  var response = await http.post(url, body: {});
+
+  if (response.statusCode == 200) {
+    dataDepartamento = json.decode(response.body);
+    isDepto = true;
+  }
+}
+
+getAllGeneros() async {
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/generos.php";
+  var response = await http.post(url, body: {});
+
+  if (response.statusCode == 200) {
+    dataGenero = json.decode(response.body);
+    isGenero = true;
+  }
+}
+
+getAllNivelesEducativos() async {
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/niveles_educ.php";
+  var response = await http.post(url, body: {});
+  if (response.statusCode == 200) {
+    dataNivelEducativo = json.decode(response.body);
+    isNiveleducativo = true;
+  }
+}
+
+getAllGrupoConviviente() async {
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/grupo_conviviente.php";
+  var response = await http.post(url, body: {});
+  if (response.statusCode == 200) {
+    dataGrupoConviviente = json.decode(response.body);
+    isGrupoConviviente = true;
   }
 }
 
@@ -316,7 +499,7 @@ TextEditingController dni = TextEditingController();
 TextEditingController celular = TextEditingController();
 TextEditingController contacto = TextEditingController();
 
-var rela_departamento;
+var rela_departamento = "";
 var rela_genero;
 var rela_nivel_instruccion;
 var rela_grupo_conviviente;
@@ -326,50 +509,15 @@ var return_email;
 var estado_users = 2;
 var rela_users = 0;
 
-guardar_datos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/user_datos_personales.php";
-  print(celular.text);
-  print(email_argument);
-  var response = await http.post(url, body: {
-    "nombre": nombre.text,
-    "apellido": apellido.text,
-    "email": email_argument.toString(),
-    "dni": dni.text,
-    "fecha_nacimiento": fecha_nacimiento.text,
-    "rela_genero": rela_genero,
-    "rela_departamento": rela_departamento.toString(),
-    "rela_nivel_instruccion": rela_nivel_instruccion.toString(),
-    "rela_grupo_conviviente": rela_grupo_conviviente.toString(),
-    "celular": celular.text,
-    "contacto": contacto.text,
-    "estado_users": estado_users.toString(),
-    "rela_users": rela_users.toString(),
-  });
-  print("response.body");
-  print(response.body);
-  var data = json.decode(response.body);
-  // print(data);
-  if (data == "Success") {
-    print("Success del guardar");
-    //loginToast("Bienvenido a Proyecto Salud");
-  } else {
-    print("Nooo");
-    //loginToast(data);
-  }
-}
-
-read_datos_paciente() async {
+getDataPaciente() async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/user_read_datos_personales.php";
   var response = await http.post(url, body: {
     "email": email_argument,
   });
-  // print(response.body);
   var data = json.decode(response.body);
 
-  //print(data);
-  if (data["estado_users"] == "Success") {
+  if (response.statusCode == 200) {
     rela_departamento = data["rela_departamento"].toString();
     rela_nivel_instruccion = data["rela_nivel_instruccion"].toString();
     rela_grupo_conviviente = data["rela_grupo_conviviente"].toString();
@@ -396,27 +544,9 @@ class FormDepartamentos extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<FormDepartamentos> {
-  List data = List();
-
-  getAllName() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/departamentos.php";
-    var response = await http.post(url, body: {});
-    // print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-
-    setState(() {
-      data = jsonDate;
-    });
-
-    // print(jsonDate);
-  }
-
   @override
   void initState() {
     super.initState();
-    getAllName();
   }
 
   @override
@@ -424,19 +554,11 @@ class _MyStatefulWidgetState extends State<FormDepartamentos> {
     return DropdownButton<String>(
         hint: Text("Departamento"),
         value: rela_departamento,
-        /*icon: Icon(Icons.arrow_downward),
-      iconSize: 24,
-      elevation: 16,
-      style: TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),*/
-        items: data.map(
-          (list) {
+        items: dataDepartamento.map(
+          (item) {
             return DropdownMenuItem<String>(
-              child: Text(list['nombre']),
-              value: list['id'].toString(),
+              child: Text(item['nombre']),
+              value: item['id'].toString(),
             );
           },
         ).toList(),
@@ -460,28 +582,9 @@ class FormGenero extends StatefulWidget {
 }
 
 class _GeneroWidgetState extends State<FormGenero> {
-  // ignore: deprecated_member_use
-  List data = List();
-
-  Future getAllName() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/generos.php";
-    var response = await http.post(url, body: {});
-    // print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    if (this.mounted) {
-      setState(() {
-        data = jsonDate;
-      });
-    }
-    // print(jsonDate);
-  }
-
   @override
   void initState() {
     super.initState();
-    getAllName();
   }
 
   @override
@@ -489,15 +592,7 @@ class _GeneroWidgetState extends State<FormGenero> {
     return DropdownButton<String>(
         hint: Text("Géneros"),
         value: rela_genero,
-        /*icon: Icon(Icons.arrow_downward),
-      iconSize: 24,
-      elevation: 16,
-      style: TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),*/
-        items: data.map(
+        items: dataGenero.map(
           (list) {
             return DropdownMenuItem<String>(
               child: Text(list['nombre']),
@@ -517,30 +612,13 @@ class _GeneroWidgetState extends State<FormGenero> {
 
 class FormNivelEducativo extends StatefulWidget {
   @override
-  _FormpruebaState1 createState() => _FormpruebaState1();
+  _FormNivelEducativoState createState() => _FormNivelEducativoState();
 }
 
-class _FormpruebaState1 extends State<FormNivelEducativo> {
-  List data = List();
-
-  getAllName() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/niveles_educ.php";
-    var response = await http.post(url, body: {});
-    //print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    //Excepción arrojada durante la ejecución de la app conectada al Web Hosting
-
-    setState(() {
-      data = jsonDate;
-    });
-  }
-
+class _FormNivelEducativoState extends State<FormNivelEducativo> {
   @override
   void initState() {
     super.initState();
-    getAllName();
   }
 
   @override
@@ -548,18 +626,12 @@ class _FormpruebaState1 extends State<FormNivelEducativo> {
     return DropdownButton<String>(
         hint: Text("Nivel Educativo Alcanzado"),
         value: rela_nivel_instruccion,
-        items: data.map(
+        items: dataNivelEducativo.map(
           (list) {
-            if (data.length == 0) {
-              // return DropdownMenuItem<String>(
-              //   child: Text('Cargando...'),
-              // );
-            } else {
-              return DropdownMenuItem<String>(
-                child: Text(list['nombre_nivel']),
-                value: list['id'].toString(),
-              );
-            }
+            return DropdownMenuItem<String>(
+              child: Text(list['nombre_nivel']),
+              value: list['id'].toString(),
+            );
           },
         ).toList(),
         onChanged: (String newValue) {
@@ -578,27 +650,9 @@ class FormGrupoConviviente extends StatefulWidget {
 }
 
 class _FormpruebaState3 extends State<FormGrupoConviviente> {
-  List data = List();
-
-  Future getAllName() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/grupo_conviviente.php";
-    var response = await http.post(url, body: {});
-    //print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    if (this.mounted) {
-      setState(() {
-        data = jsonDate;
-      });
-    }
-    //print(jsonDate);
-  }
-
   @override
   void initState() {
     super.initState();
-    getAllName();
   }
 
   @override
@@ -606,15 +660,7 @@ class _FormpruebaState3 extends State<FormGrupoConviviente> {
     return DropdownButton<String>(
         hint: Text("Grupo Conviviente"),
         value: rela_grupo_conviviente,
-        /*icon: Icon(Icons.arrow_downward),
-      iconSize: 24,
-      elevation: 16,
-      style: TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),*/
-        items: data.map(
+        items: dataGrupoConviviente.map(
           (list) {
             if (list == null) {
               return DropdownMenuItem<String>(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/opciones_navbar.dart';
 import 'env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,6 +65,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
         context,
         "Cuestionario CDR",
@@ -118,10 +120,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                           margin: EdgeInsets.all(10),
                           elevation: 10,
                           child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
                             borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -157,10 +156,43 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                           margin: EdgeInsets.all(10),
                           elevation: 10,
                           child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
                             borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                ),
+                                Container(
+                                  width: 320,
+                                  child: Text(
+                                    'Juicio y Resolución de Problemas',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),
+                                  ),
+                                ),
+                                Divider(height: 5.0, color: Colors.black),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                ),
+                                JuicioResoProblema(),
+                                SizedBox(
+                                  height: 30,
+                                ),
+                              ],
+                            ),
+                          )),
+                      Card(
+                          color: Colors.blue[50],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          margin: EdgeInsets.all(10),
+                          elevation: 10,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -196,10 +228,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                           margin: EdgeInsets.all(10),
                           elevation: 10,
                           child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
                             borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -235,10 +264,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                           margin: EdgeInsets.all(10),
                           elevation: 10,
                           child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
                             borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -274,10 +300,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
                           margin: EdgeInsets.all(10),
                           elevation: 10,
                           child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
                             borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -342,26 +365,44 @@ loginToast(String toast) {
       textColor: Colors.white);
 }
 
+List itemsRadioList;
+Future<List> getAllRespuesta(var estado) async {
+  String URL_base = Env.URL_PREFIX;
+  var url = URL_base + "/tipo_respuesta_cdr.php";
+  var response = await http.post(url, body: {
+    "estado": "${estado}",
+  });
+  print(response);
+  var jsonBody = response.body;
+  var jsonDate = json.decode(jsonBody);
+  if (response.statusCode == 200) {
+    return itemsRadioList = jsonDate;
+  } else {
+    return null;
+  }
+}
+
 var data;
 
 guardar_datos(BuildContext context) async {
   if (memoria == null) {
-    loginToast("Debe responder si los item de atención");
+    loginToast("Debe responder si los item de memoria");
   } else {
     if (orientacion == null) {
-      loginToast("Debe responder si los item de atención");
+      loginToast("Debe responder si los item de orientacion");
     } else {
       if (juicio_res_problema == null) {
-        loginToast("Debe responder si los item de atención");
+        loginToast(
+            "Debe responder los item de juicio y resolucion de problemas");
       } else {
         if (vida_social == null) {
-          loginToast("Debe responder si los item de atención");
+          loginToast("Debe responder los item de vida social");
         } else {
           if (hogar == null) {
             loginToast("Debe responder si los item de Orientación");
           } else {
             if (cuid_personal == null) {
-              loginToast("Debe responder si los item de Orientación");
+              loginToast("Debe responder si los item de Cuidado Personal");
             } else {
               String URL_base = Env.URL_PREFIX;
               var url = URL_base + "/respuesta_screening_cdr.php";
@@ -377,24 +418,25 @@ guardar_datos(BuildContext context) async {
                 "hogar": hogar,
                 "cuid_personal": cuid_personal,
               });
-              print(response.body);
-              data = json.decode(response.body);
-              print(data);
-
-              if (data == "alert") {
-                _alert_informe(
-                  context,
-                  "Para tener en cuenta",
-                  "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-                );
-              } else {
-                if (screening_recordatorio == true) {
-                  Navigator.pushNamed(context, '/recordatorio');
+              var responseDecoder = json.decode(response.body);
+              if (response.statusCode == 200) {
+                if (responseDecoder == "Alert") {
+                  _alert_informe(
+                    context,
+                    "Para tener en cuenta",
+                    "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+                  );
                 } else {
-                  Navigator.pushNamed(context, '/screening', arguments: {
-                    "select_screening": "CDR",
-                  });
+                  if (screening_recordatorio == true) {
+                    Navigator.pushNamed(context, '/recordatorio');
+                  } else {
+                    Navigator.pushNamed(context, '/screening', arguments: {
+                      "select_screening": "CDR",
+                    });
+                  }
                 }
+              } else {
+                _alertInforme(context, "Error detectado", '${responseDecoder}');
               }
             }
           }
@@ -402,6 +444,33 @@ guardar_datos(BuildContext context) async {
       }
     }
   }
+}
+
+_alertInforme(context, title, descripcion) async {
+  Alert(
+    context: context,
+    title: title,
+    desc: descripcion,
+    alertAnimation: FadeAlertAnimation,
+    buttons: [
+      DialogButton(
+        child: Text(
+          "Entendido",
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        onPressed: () {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "SFMS",
+            });
+          }
+        },
+        width: 120,
+      )
+    ],
+  ).show();
 }
 
 //----------------------------------------MEMORIA------------------------------------------------------------------------------------------
@@ -418,52 +487,38 @@ class Memoria extends StatefulWidget {
 }
 
 class MemoriaWidgetState extends State<Memoria> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "M",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 520,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: memoria,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      memoria = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("M"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: memoria,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            memoria = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
@@ -475,52 +530,38 @@ class Orientacion extends StatefulWidget {
 }
 
 class OrientacionWidgetState extends State<Orientacion> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "O",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 270,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: orientacion,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      orientacion = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("O"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: orientacion,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            orientacion = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
@@ -589,52 +630,38 @@ class JuicioResoProblema extends StatefulWidget {
 }
 
 class JuicioResoProblemaWidgetState extends State<JuicioResoProblema> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "Q",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 330,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: juicio_res_problema,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      juicio_res_problema = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("Q"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: juicio_res_problema,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            juicio_res_problema = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
@@ -646,52 +673,38 @@ class VidaSocial extends StatefulWidget {
 }
 
 class VidaSocialWidgetState extends State<VidaSocial> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "V",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 380,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: vida_social,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      vida_social = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("V"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: vida_social,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            vida_social = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
@@ -703,52 +716,38 @@ class Hogar extends StatefulWidget {
 }
 
 class HogarWidgetState extends State<Hogar> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "H",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 420,
+      height: 350,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: hogar,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      hogar = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("H"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: hogar,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            hogar = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
@@ -760,62 +759,39 @@ class CuidadoPersonal extends StatefulWidget {
 }
 
 class CuidadoPersonalWidgetState extends State<CuidadoPersonal> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_cdr.php";
-    var response = await http.post(url, body: {
-      "estado": "CP",
-    });
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate;
-    });
-    print(jsonDate);
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 270,
       // width: 350,
-      child: ListView(
-        key: list_view_alcohol,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: data
-            .map((list) => RadioListTile(
-                  groupValue: cuid_personal,
-                  title: Text(list['respuesta']),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      cuid_personal = val;
-                    });
-                  },
-                ))
-            .toList(),
+      child: FutureBuilder<List>(
+        future: getAllRespuesta("CP"),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+                physics: NeverScrollableScrollPhysics(),
+                children: ListTile.divideTiles(
+                    color: Colors.black12,
+                    tiles: snapshot.data.map(
+                      (data) => RadioListTile(
+                        groupValue: cuid_personal,
+                        title: Text(data['respuesta']),
+                        value: data['id'].toString(),
+                        onChanged: (val) {
+                          setState(() {
+                            debugPrint('VAL = $val');
+                            cuid_personal = val;
+                          });
+                        },
+                      ),
+                    )));
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

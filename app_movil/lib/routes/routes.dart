@@ -13,6 +13,7 @@ import 'package:app_salud/pages/ibupiracejem.dart';
 import 'package:app_salud/pages/login_page.dart';
 import 'package:app_salud/pages/medicamento_add.dart';
 import 'package:app_salud/pages/medicamentos.dart';
+import 'package:app_salud/pages/medico_perfil.dart';
 import 'package:app_salud/pages/menu.dart';
 import 'package:app_salud/pages/menu_chequeo.dart';
 import 'package:app_salud/pages/new_recordatorio_personal.dart';
@@ -34,7 +35,6 @@ import 'package:app_salud/pages/screening_new.dart';
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:app_salud/pages/screening_diabetes.dart';
 import 'package:app_salud/pages/screening_encro.dart';
-import 'package:app_salud/pages/menuPrueba.dart';
 import 'package:flutter/material.dart';
 
 Map<String, WidgetBuilder> getApplicationRoutes() {
@@ -68,13 +68,13 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/ver_recordatorio_screening': (context) => VerRecordatorio(),
     '/ver_recordatorio_personal': (context) => VerRecordatorioPersonal(),
     '/screening_animo': (context) => FormScreeningAnimo(),
-    '/screening_nutricional': (context) => FormScreeningNutricional(),
+    '/screening_nutricional': (context) => ScreeningNutricional(),
     '/screening_cdr': (context) => ScreeningCDR(),
     '/new_recordatorio_personal': (context) => RecordatorioPersonal(),
     '/menu_chequeo': (context) => MenuChequeoPage(),
     '/list_medicos': (context) => ListMedicos(),
     '/screening_diabetes': (context) => ScreeningDiabetes(),
     '/screening_encro': (context) => ScreeningEnfCronicas(),
-    '/menuPrueba': (context) => menuPrueba(),
+    '/medico_perfil': (context) => MedicoPerfil(),
   };
 }

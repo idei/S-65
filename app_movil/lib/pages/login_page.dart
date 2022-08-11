@@ -135,7 +135,7 @@ class _LoginPage extends State<LoginPage> {
         SizedBox(height: 30),
         InputPasswordWidget(),
         SizedBox(height: 30),
-        ButtonIniciarSesion2(context1),
+        ButtonIniciarSesion(context1),
         SizedBox(height: 10),
         GestureDetector(
             child: Text("¿Olvido la contraseña?",
@@ -193,32 +193,10 @@ class _LoginPage extends State<LoginPage> {
     );
   }
 
-  Widget ButtonIniciarSesion(BuildContext context) {
-    return ElevatedButton(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 60.0, vertical: 15.0),
-        child: Text('INICIAR SESION',
-            style: TextStyle(
-                color: Colors.white,
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-      ),
-      onPressed: () {
-        fetchLogin();
-        if (estado_users == 2 && estado_login == "Success menu") {
-          Navigator.pushNamed(context, '/menu');
-
-          if (estado_users == 1 && estado_login == "Success datos") {
-            Navigator.pushNamed(context, '/menu');
-          }
-        }
-      },
-    );
-  }
-
   bool _isLoading = false;
   bool _isEnabled = true;
 
-  Widget ButtonIniciarSesion2(BuildContext context) {
+  Widget ButtonIniciarSesion(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         maximumSize: const Size(400, 50),

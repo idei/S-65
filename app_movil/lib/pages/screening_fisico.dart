@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -47,7 +49,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
-    get_tiposcreening(parametros["tipo_screening"]);
+    getTipoScreening(parametros["tipo_screening"]);
 
     if (parametros["bandera"] == "recordatorio") {
       screening_recordatorio = true;
@@ -66,7 +68,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
     }
   }
 
-  get_tiposcreening(var codigo_screening) async {
+  getTipoScreening(var codigo_screening) async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_tipo_screening.php";
     var response = await http.post(url, body: {
@@ -82,42 +84,70 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return FutureBuilder(
-        future: read_recordatorios(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "SFMS",
+            });
+          },
+        ),
+        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+        title: Text('Chequeo Fisico',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          )
+        ],
+      ),
+      body: FutureBuilder(
+          future: readRecordatorios(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            print(snapshot.connectionState);
 
-          if (snapshot.hasData) {
-            return Antecedentes();
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                title: Text('Chequeo Fisico',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    )),
-              ),
-              body: Center(
+            if (snapshot.hasData) {
+              return Antecedentes();
+            } else {
+              return Center(
                 child: CircularProgressIndicator(
                   semanticsLabel: "Cargando",
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          }),
+    );
+  }
+
+  void choiceAction(String choice) {
+    if (choice == Constants.Ajustes) {
+      Navigator.pushNamed(context, '/ajustes');
+    } else if (choice == Constants.Salir) {
+      Navigator.pushNamed(context, '/');
+    }
   }
 }
 
-read_recordatorios() async {
-  await new Future.delayed(new Duration(milliseconds: 500));
+readRecordatorios() async {
+  await Future.delayed(Duration(milliseconds: 500));
   return true;
 }
 
 var email;
 
-guardar_datos(var cant_check) async {
+guardarDatos(var cant_check, BuildContext context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/respuesta_screening_fisico.php";
   var response = await http.post(url, body: {
@@ -199,15 +229,24 @@ guardar_datos(var cant_check) async {
     "cod_event_dolor": cod_event_dolor
   });
 
-  print(response.body);
-  var data = json.decode(response.body);
-  print(data);
-}
+  var responseDecoder = json.decode(response.body);
 
-read_datos_paciente() async {
-  await new Future.delayed(new Duration(milliseconds: 1500));
-
-  return true;
+  if (responseDecoder == "Success" && response.statusCode == 200) {
+    if (cant_check > 3) {
+      guardarDatos(cant_check, context);
+      _alertInforme(
+        context,
+        "Para tener en cuenta",
+        "Le sugerimos que consulte con su medico clínico sobre estos síntomas.",
+      );
+    } else {
+      Navigator.pushNamed(context, '/screening', arguments: {
+        "select_screening": "SFMS",
+      });
+    }
+  } else {
+    _alertInforme(context, "Error detectado", '${response.body}');
+  }
 }
 
 //----------------------------------------Screening de Sintomas ------------------------------------------
@@ -225,289 +264,240 @@ class AntecedentesWidgetState extends State<Antecedentes> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "SFMS",
-              });
-            },
-          ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Chequeo Fisico',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
+    return Form(
+      key: _formKey,
+      child: Card(
+        //padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: <Widget>[
+            CheckDolorCabeza(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            CheckMareos(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Nauseas(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Vomitos(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            FatigaExcesiva(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            IncontinenciaUrinaria(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemasInstestinales(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            DebilidadLadoCuerpo(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemasMotricidadFina(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Temblores(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            InestabilidadMarcha(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            TicsMovExtranos(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemaEquilibrio(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ConFrecCosas(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            DesvanDesmayo(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Caidas(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            PerdidaSensibilidad(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            CosqSensaPiel(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            NecesidadOjosClaridad(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            PerdidaAudicion(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            UtilizaAudifonos(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Zumbido(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            UtilizaAnteojosCerca(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            UtilizaAnteojosLejos(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemaVisionLado(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            VisionBorrosa(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            VisionDoble(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            VeCosasNoExisten(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            SensiLucesBrillantes(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            PeriodosCortosCeguera(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            CosasPasanCuerpo(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            DistinguirCalorFrio(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemasGusto(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            ProblemasOlfato(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Dolor(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            ElevatedButton(
+              child: Text('GUARDAR',
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  )),
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  guardarDatos(cant_check, context);
+                }
               },
-            )
+            ),
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: Card(
-            //padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: <Widget>[
-                CheckDolorCabeza(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                CheckMareos(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Nauseas(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Vomitos(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                FatigaExcesiva(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                IncontinenciaUrinaria(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemasInstestinales(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                DebilidadLadoCuerpo(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemasMotricidadFina(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Temblores(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                InestabilidadMarcha(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                TicsMovExtranos(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemaEquilibrio(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ConFrecCosas(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                DesvanDesmayo(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Caidas(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                PerdidaSensibilidad(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                CosqSensaPiel(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                NecesidadOjosClaridad(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                PerdidaAudicion(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                UtilizaAudifonos(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Zumbido(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                UtilizaAnteojosCerca(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                UtilizaAnteojosLejos(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemaVisionLado(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                VisionBorrosa(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                VisionDoble(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                VeCosasNoExisten(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                SensiLucesBrillantes(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                PeriodosCortosCeguera(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                CosasPasanCuerpo(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                DistinguirCalorFrio(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemasGusto(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                ProblemasOlfato(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                new Divider(height: 3.0, color: Colors.black),
-                Dolor(),
-                new Padding(
-                  padding: new EdgeInsets.all(5.0),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      if (cant_check > 3) {
-                        _alert_informe(
-                          context,
-                          "Para tener en cuenta",
-                          "Le sugerimos que consulte con su medico clínico sobre estos síntomas.",
-                        );
-                      } else {
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": "SFMS",
-                        });
-                      }
-
-                      guardar_datos(cant_check);
-                    }
-                  },
-                  child: Text('GUARDAR',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                ),
-              ],
-            ),
-          ),
-        ));
-  }
-
-  _alert_informe(context, title, descripcion) async {
-    Alert(
-      context: context,
-      title: title,
-      desc: descripcion,
-      alertAnimation: FadeAlertAnimation,
-      buttons: [
-        DialogButton(
-          child: Text(
-            "Entendido",
-            style: TextStyle(color: Colors.white, fontSize: 15),
-          ),
-          onPressed: () {
-            if (screening_recordatorio == true) {
-              Navigator.pushNamed(context, '/recordatorio');
-            } else {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "SFMS",
-              });
-            }
-          },
-          width: 120,
-        )
-      ],
-    ).show();
-  }
-
-  Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
-    return Align(
-      child: FadeTransition(
-        opacity: animation,
-        child: child,
       ),
     );
   }
+}
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
+Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
+    Animation<double> secondaryAnimation, Widget child) {
+  return Align(
+    child: FadeTransition(
+      opacity: animation,
+      child: child,
+    ),
+  );
+}
+
+_alertInforme(context, title, descripcion) async {
+  Alert(
+    context: context,
+    title: title,
+    desc: descripcion,
+    alertAnimation: FadeAlertAnimation,
+    buttons: [
+      DialogButton(
+        child: Text(
+          "Entendido",
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        onPressed: () {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "SFMS",
+            });
+          }
+        },
+        width: 120,
+      )
+    ],
+  ).show();
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------

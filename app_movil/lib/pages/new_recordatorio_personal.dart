@@ -24,7 +24,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
   Widget build(BuildContext context2) {
     final format = DateFormat("yyyy-MM-dd");
     final initialValue = DateTime.now();
-    bool autoValidate = false;
+
     DateTime value = DateTime.now();
     int changedCount = 0;
 
@@ -57,7 +57,6 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                           return null;
                         }
                       },
-                      //keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: '',
                         border: OutlineInputBorder(),
@@ -83,7 +82,6 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                             initialDate: currentValue ?? DateTime.now(),
                             lastDate: DateTime(2100));
                       },
-                      //autovalidate: autoValidate,
                       validator: (date) => date == null ? 'Invalid date' : null,
                       initialValue: initialValue,
                       decoration: InputDecoration(
@@ -98,10 +96,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                       height: 30,
                     ),
                     ElevatedButton(
-                      //color: Theme.of(context).primaryColor,
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 60.0, vertical: 15.0),
                         child: Text('Guardar',
                             style: TextStyle(
                               fontFamily: Theme.of(context)
@@ -110,12 +105,9 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                                   .fontFamily,
                             )),
                       ),
-                      //textColor: Colors.white,
                       onPressed: () {
                         if (_formKey_recuperar.currentState.validate()) {
-                          guardar_datos();
-                          Navigator.of(context)
-                              .pushReplacementNamed('/recordatorio');
+                          guardar_datos(context);
                         }
                       },
                     )
@@ -132,7 +124,7 @@ getStringValuesSF() async {
   print(email);
 }
 
-guardar_datos() async {
+guardar_datos(context) async {
   await getStringValuesSF();
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/new_recordatorio_personal.php";
@@ -142,7 +134,25 @@ guardar_datos() async {
     "fecha_limite": fecha_limite.text,
   });
 
-  print(response.body);
-  var data = json.decode(response.body);
-  print(data);
+  var responseDecode = jsonDecode(response.body);
+
+  if (response.statusCode == 200 && responseDecode == "Success") {
+    _alert_informe(context, "Recordatorio creado correctamente", 1);
+    Navigator.of(context).pushReplacementNamed('/recordatorio');
+  } else {
+    _alert_informe(context, "Error al guardar: ${responseDecode}", 2);
+    Navigator.of(context).pushReplacementNamed('/recordatorio');
+  }
+}
+
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
 }

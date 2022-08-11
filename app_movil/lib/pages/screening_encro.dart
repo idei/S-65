@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/opciones_navbar.dart';
 import 'env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,6 +65,7 @@ class _ScreeningEnfCronicasState extends State<ScreeningEnfCronicas> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
         context, "Chequeo de Enfermedades Crónicas", " Descripcion"));
   }
@@ -75,613 +77,602 @@ class _ScreeningEnfCronicasState extends State<ScreeningEnfCronicas> {
     getStringValuesSF();
 
     return Scaffold(
-        appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "ENCRO",
-              });
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "ENCRO",
+            });
+          },
+        ),
+        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+        title: Text('Chequeo Enfermedades Crónicas',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
             },
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Chequeo Enfermedades Crónicas',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              'Si sos mayor de 50 años ¿Te realizaste el test de sangre oculta en materia fecal en el ultimo año?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          TestSangre(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              'Si es mujer mayor de 25 años ¿Cuándo se realizo su ultimo Papanicolau?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Papanicolau(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              'Si es mujer y tiene mas de 40 años ¿Cuándo se realizo su ultima mamografía?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Mamografia(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              'Si tuvo hijos: ¿Durante el embarazo le dijeron que tenia el azúcar elevada?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Azucar(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Tuvo algún hijo que al nacer pesó más de 4 kilos?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          PesoCuatro(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Usted es Hipertenso?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Hipertenso(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Toma medicación para la presión?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          TomaMedicacion(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Dónde retira su medicación?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          //Presion(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Usted tuvo alguna vez un infarto o ACV?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Infacv(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Usted es Diabético?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Diabetico(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Toma medicación para la Diabetes?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          TomaMedicacion(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Dónde retira su medicación?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          //CuidadoPersonal(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Presenta otra enfermedad crónica? Cual?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          //EnfCronica(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Card(
+                    color: Colors.blue[50],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    margin: EdgeInsets.all(10),
+                    elevation: 10,
+                    child: ClipRRect(
+                      // Los bordes del contenido del card se cortan usando BorderRadius
+                      borderRadius: BorderRadius.circular(15),
+
+                      // EL widget hijo que será recortado segun la propiedad anterior
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          Container(
+                            width: 320,
+                            child: Text(
+                              '¿Cuándo realizo su último control de salud?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 5.0, color: Colors.black),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                          ),
+                          UltimoControl(),
+                          SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    )),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      //primary: Color.fromRGBO(157, 19, 34, 1),
+                      ),
+                  onPressed: () {
+                    guardar_datos(context);
+                  },
+                  child: Text('GUARDAR'),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(4.0),
+                ),
+              ]),
         ),
-        body: SingleChildScrollView(
-            child: new Container(
-                padding: EdgeInsets.all(8.0),
-                child: new Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Si sos mayor de 50 años ¿Te realizaste el test de sangre oculta en materia fecal en el ultimo año?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                TestSangre(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Si es mujer mayor de 25 años ¿Cuándo se realizo su ultimo Papanicolau?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Papanicolau(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Si es mujer y tiene mas de 40 años ¿Cuándo se realizo su ultima mamografía?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Mamografia(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Si tuvo hijos: ¿Durante el embarazo le dijeron que tenia el azúcar elevada?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Azucar(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Tuvo algún hijo que al nacer pesó más de 4 kilos?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                PesoCuatro(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Usted es Hipertenso?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Hipertenso(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Toma medicación para la presión?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                TomaMedicacion(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Dónde retira su medicación?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                //Presion(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Usted tuvo alguna vez un infarto o ACV?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Infacv(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Usted es Diabético?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Diabetico(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Toma medicación para la Diabetes?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                TomaMedicacion(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Dónde retira su medicación?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                //CuidadoPersonal(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Presenta otra enfermedad crónica? Cual?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                //EnfCronica(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            // Los bordes del contenido del card se cortan usando BorderRadius
-                            borderRadius: BorderRadius.circular(15),
-
-                            // EL widget hijo que será recortado segun la propiedad anterior
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    '¿Cuándo realizo su último control de salud?',
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                new Divider(height: 5.0, color: Colors.black),
-                                new Padding(
-                                  padding: new EdgeInsets.all(8.0),
-                                ),
-                                UltimoControl(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      new Padding(
-                        padding: new EdgeInsets.all(8.0),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            //primary: Color.fromRGBO(157, 19, 34, 1),
-                            ),
-                        onPressed: () {
-                          guardar_datos(context);
-                        },
-                        child: Text('GUARDAR'),
-                      ),
-                      new ElevatedButton(
-                        // onPressed: validateAnswers,
-                        child: new Text(
-                          'GUARDAR',
-                          style: new TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white),
-                        ),
-                        //color: Theme.of(context).accentColor,
-                      ),
-                      new Padding(
-                        padding: EdgeInsets.all(4.0),
-                      ),
-                    ]))));
+      ),
+    );
   }
 
   void choiceAction(String choice) {
@@ -1511,13 +1502,4 @@ class UltimoControlWidgetState extends State<UltimoControl> {
       ),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

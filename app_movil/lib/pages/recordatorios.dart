@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/recordatorio_model.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,127 +11,125 @@ class RecordatorioPage extends StatefulWidget {
 }
 
 final _formKey = GlobalKey<_RecordatorioState>();
-List<Recordatorios_database> recordatorios_items;
+List<RecordatoriosModel> recordatorios_items;
+bool _isLoading = false;
 
 class _RecordatorioState extends State<RecordatorioPage> {
   var data_error;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Recordatorios_database>>(
-        future: read_recordatorios(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-                appBar: AppBar(
-                  leading: new IconButton(
-                    icon: new Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/menu');
-                    },
-                  ),
-                  title: Text('Recordatorios',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                  actions: <Widget>[
-                    PopupMenuButton<String>(
-                      onSelected: choiceAction,
-                      itemBuilder: (BuildContext context) {
-                        return Constants.choices.map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                ),
-                body: ListView(
-                  children: ListTile.divideTiles(
-                    color: Colors.black,
-                    tiles: snapshot.data
-                        .map((data) => ListTile(
-                              title: GestureDetector(
-                                  onTap: () {
-                                    if (data.estado_recordatorio == 0) {
-                                      Navigator.of(context).pushNamed(
-                                          '/ver_recordatorio_personal',
-                                          arguments: {
-                                            "id_recordatorio":
-                                                data.id_recordatorio,
-                                            "id_paciente": data.id_paciente,
-                                            "descripcion": data.descripcion,
-                                            "fecha_limite": data.fecha_limite,
-                                            "estado_recordatorio":
-                                                data.estado_recordatorio,
-                                          });
-                                    } else {
-                                      Navigator.of(context).pushNamed(
-                                          '/ver_recordatorio_screening',
-                                          arguments: {
-                                            "id_recordatorio":
-                                                data.id_recordatorio,
-                                            "id_paciente": data.id_paciente,
-                                            "descripcion": data.descripcion,
-                                            "fecha_limite": data.fecha_limite,
-                                            "estado_recordatorio":
-                                                data.estado_recordatorio,
-                                          });
-                                    }
-                                  },
-                                  child: CardDinamic(data)),
-                            ))
-                        .toList(),
-                  ).toList(),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {},
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(
-                          context, '/new_recordatorio_personal');
-                    },
-                  ),
-                ));
-          } else {
-            return Scaffold(
-                appBar: AppBar(
-                  //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Recordatorios',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                ),
-                body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/menu');
+          },
+        ),
+        title: Text('Recordatorios',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<RecordatoriosModel>>(
+          future: read_recordatorios(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: ListTile.divideTiles(
+                  color: Colors.black,
+                  tiles: snapshot.data
+                      .map((data) => ListTile(
+                            title: GestureDetector(
+                                onTap: () {
+                                  if (data.estado_recordatorio == 0) {
+                                    Navigator.of(context).pushNamed(
+                                        '/ver_recordatorio_personal',
+                                        arguments: {
+                                          "id_recordatorio":
+                                              data.id_recordatorio,
+                                          "id_paciente": data.id_paciente,
+                                          "descripcion": data.descripcion,
+                                          "fecha_limite": data.fecha_limite,
+                                          "estado_recordatorio":
+                                              data.estado_recordatorio,
+                                        });
+                                  } else {
+                                    Navigator.of(context).pushNamed(
+                                        '/ver_recordatorio_screening',
+                                        arguments: {
+                                          "id_recordatorio":
+                                              data.id_recordatorio,
+                                          "id_paciente": data.id_paciente,
+                                          "descripcion": data.descripcion,
+                                          "fecha_limite": data.fecha_limite,
+                                          "estado_recordatorio":
+                                              data.estado_recordatorio,
+                                        });
+                                  }
+                                },
+                                child: CardDinamic(data)),
+                          ))
+                      .toList(),
+                ).toList(),
+              );
+            } else {
+              if (!_isLoading) {
+                return Center(
                   child: CircularProgressIndicator(
                     semanticsLabel: "Cargando",
                   ),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    // Add your onPressed code here!
-                  },
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(
-                          context, '/new_recordatorio_personal');
-                    },
-                  ),
+                );
+              } else {
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'No tiene recordatorios',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
                 ));
-          }
-        });
+              }
+            }
+          }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: IconButton(
+          icon: Icon(Icons.add, color: Colors.white),
+          onPressed: () {
+            Navigator.pushNamed(context, '/new_recordatorio_personal');
+          },
+        ),
+      ),
+    );
   }
 
   var color;
   var font_bold;
 
   Widget CardDinamic(data) {
-    final now = new DateTime.now();
+    final now = DateTime.now();
     var dia;
     var mes;
 
@@ -184,28 +183,27 @@ class _RecordatorioState extends State<RecordatorioPage> {
 
   var email_argument;
 
-  Future<List<Recordatorios_database>> read_recordatorios() async {
+  Future<List<RecordatoriosModel>> read_recordatorios() async {
     await getStringValuesSF();
 
+    var responseDecode;
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_recordatorios.php";
     var response = await http.post(url, body: {
       "email": email_argument,
     });
-    data_error = json.decode(response.body);
-    print(response.body);
+    responseDecode = json.decode(response.body);
 
-    if (data_error.toString() != 'Error') {
+    if (response.statusCode == 200 && responseDecode != "Vacio") {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<Recordatorios_database>((json) {
-        return Recordatorios_database.fromJson(json);
+      recordatorios_items = items.map<RecordatoriosModel>((json) {
+        return RecordatoriosModel.fromJson(json);
       }).toList();
       return recordatorios_items;
+    } else {
+      _isLoading = true;
+      return null;
     }
-    await new Future.delayed(new Duration(milliseconds: 500));
-    recordatorios_items = [];
-    return recordatorios_items;
-    //}
   }
 
   getStringValuesSF() async {
@@ -222,32 +220,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
     } else if (choice == Constants.Salir) {
       Navigator.pushNamed(context, '/');
     }
-  }
-}
-
-class Recordatorios_database {
-  String descripcion;
-  String fecha_limite;
-  var id_recordatorio;
-  var id_paciente;
-  var estado_recordatorio;
-
-  Recordatorios_database({
-    this.descripcion,
-    this.fecha_limite,
-    this.id_recordatorio,
-    this.id_paciente,
-    this.estado_recordatorio,
-  });
-
-  factory Recordatorios_database.fromJson(Map<String, dynamic> json) {
-    return Recordatorios_database(
-      id_recordatorio: json['id'],
-      descripcion: json['descripcion'],
-      fecha_limite: json['fecha_limite'],
-      id_paciente: json['rela_paciente'],
-      estado_recordatorio: json['rela_estado_recordatorio'],
-    );
   }
 }
 

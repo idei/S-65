@@ -2,41 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/avisos_model.dart';
+import '../models/opciones_navbar.dart';
 import 'env.dart';
-
-class AvisosModel {
-  String descripcion;
-  String fecha_limite;
-  String url_imagen;
-  var estado_leido;
-  var id_aviso;
-  var id_paciente;
-  var rela_creador;
-  var rela_medico;
-
-  AvisosModel(
-      {this.descripcion,
-      this.fecha_limite,
-      this.id_aviso,
-      this.estado_leido,
-      this.id_paciente,
-      this.url_imagen,
-      this.rela_creador,
-      this.rela_medico});
-
-  factory AvisosModel.fromJson(Map<String, dynamic> json) {
-    return AvisosModel(
-      id_aviso: json['id'],
-      descripcion: json['descripcion'],
-      fecha_limite: json['fecha_limite'],
-      id_paciente: json['rela_paciente'],
-      estado_leido: json['estado_leido'],
-      url_imagen: json['url_imagen'],
-      rela_creador: json['rela_creador'],
-      rela_medico: json['rela_medico'],
-    );
-  }
-}
 
 class Avisos extends StatefulWidget {
   @override
@@ -44,44 +12,43 @@ class Avisos extends StatefulWidget {
 }
 
 List<AvisosModel> recordatorios_items;
+bool _isLoading = false;
 
 class _AvisosState extends State<Avisos> {
-  double _animatedHeight = 0.0;
-  var data_error;
+  var responseDecode;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<AvisosModel>>(
-        future: read_recordatorios(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-              appBar: AppBar(
-                leading: new IconButton(
-                  icon: new Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/menu');
-                  },
-                ),
-                title: Text('Avisos',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    )),
-                actions: <Widget>[
-                  PopupMenuButton<String>(
-                    onSelected: choiceAction,
-                    itemBuilder: (BuildContext context) {
-                      return Constants.choices.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ],
-              ),
-              body: ListView(
+    return Scaffold(
+      appBar: AppBar(
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/menu');
+          },
+        ),
+        title: Text('Avisos',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<AvisosModel>>(
+          future: read_avisos(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
                 children: ListTile.divideTiles(
                   color: Colors.black,
                   tiles: snapshot.data
@@ -126,44 +93,35 @@ class _AvisosState extends State<Avisos> {
                           ))
                       .toList(),
                 ).toList(),
-              ),
-            );
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                leading: new IconButton(
-                  icon: new Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/menu');
-                  },
-                ),
-                title: Text('Avisos',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    )),
-                actions: <Widget>[
-                  PopupMenuButton<String>(
-                    onSelected: choiceAction,
-                    itemBuilder: (BuildContext context) {
-                      return Constants.choices.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
+              );
+            } else {
+              if (!_isLoading) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
                   ),
-                ],
-              ),
-              body: Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              ),
-            );
-          }
-        });
+                );
+              } else {
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'No tiene avisos',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
+                ));
+              }
+            }
+          }),
+    );
   }
 
   var color;
@@ -232,27 +190,25 @@ class _AvisosState extends State<Avisos> {
 
   var id_paciente_argument;
 
-  Future<List<AvisosModel>> read_recordatorios() async {
+  Future<List<AvisosModel>> read_avisos() async {
     await getStringValuesSF();
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_avisos.php";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente_argument.toString(),
     });
-    data_error = json.decode(response.body);
-    print(response.body);
+    responseDecode = json.decode(response.body);
 
-    if (data_error.toString() != 'Error') {
+    if (response.statusCode == 200 && responseDecode != 'Vacio') {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
       recordatorios_items = items.map<AvisosModel>((json) {
         return AvisosModel.fromJson(json);
       }).toList();
       return recordatorios_items;
+    } else {
+      _isLoading = true;
+      return null;
     }
-    await new Future.delayed(new Duration(milliseconds: 500));
-    recordatorios_items = [];
-    return recordatorios_items;
-    //}
   }
 
   getStringValuesSF() async {
@@ -269,13 +225,4 @@ class _AvisosState extends State<Avisos> {
       Navigator.pushNamed(context, '/');
     }
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }
