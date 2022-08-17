@@ -1,7 +1,5 @@
-import 'package:app_salud/pages/ver_screening.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-//import 'package:app_salud/pages/medicamento_model.dart';
 import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:app_salud/pages/env.dart';
@@ -17,9 +15,12 @@ class MedicamentoAddPage extends StatefulWidget {
 
 class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   AutoCompleteTextField searchTextField;
+
   GlobalKey<AutoCompleteTextFieldState<Medicamentos_database>> key =
-      new GlobalKey();
-  static List<Medicamentos_database> users = new List<Medicamentos_database>();
+      GlobalKey();
+
+  static List<Medicamentos_database> users;
+
   bool loading = true;
 
   void getUsers() async {

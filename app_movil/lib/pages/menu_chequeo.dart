@@ -19,23 +19,28 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
       print("menu");
     } else {}
 
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushNamed(context, '/menu');
           },
         ),
+        title: Text(
+          "Chequeos",
+          style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+        ),
         actions: <Widget>[],
       ),
-      body: new Container(
-        child: new Row(
+      body: Container(
+        child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -92,7 +97,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
               Padding(
                 padding: const EdgeInsets.all(3.0),
               ),
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -149,7 +154,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
               Padding(
                 padding: const EdgeInsets.all(3.0),
               ),
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -195,8 +200,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
   Widget texto(String entrada) {
     return Text(
       entrada,
-      style: new TextStyle(
-          fontSize: 12.0,
+      style: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
           fontFamily: Theme.of(context).textTheme.headline1.fontFamily),

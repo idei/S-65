@@ -15,7 +15,7 @@ class VerRecordatorioPersonal extends StatefulWidget {
   _VerRecordatorioState createState() => _VerRecordatorioState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_ver_recordatorio = GlobalKey<FormState>();
 
 var id_paciente;
 var fecha_limite;
@@ -86,7 +86,7 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
           ],
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_ver_recordatorio,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

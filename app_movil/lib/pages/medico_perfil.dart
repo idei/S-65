@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/opciones_navbar.dart';
-import 'env.dart';
-import 'package:http/http.dart' as http;
 
 var id_paciente;
 String nombre_medico;

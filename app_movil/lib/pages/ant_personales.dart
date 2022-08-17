@@ -29,6 +29,7 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
   @override
   void initState() {
     super.initState();
+    get_preference();
   }
 
   @override
@@ -162,10 +163,8 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
   }
 
   get_preference() async {
-    print("Hola");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString("email_prefer");
-    print(email);
   }
 
   Future<List<AntecedentesPersonalesModel>>

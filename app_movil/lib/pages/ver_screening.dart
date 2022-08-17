@@ -12,7 +12,7 @@ class VerScreening extends StatefulWidget {
   _VerScreeningState createState() => _VerScreeningState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_ver_screening = GlobalKey<FormState>();
 var id_paciente;
 var nombre;
 var fecha;
@@ -142,7 +142,7 @@ class _VerScreeningState extends State<VerScreening> {
           ],
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_ver_screening,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

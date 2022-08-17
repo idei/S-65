@@ -12,7 +12,7 @@ class ScreeningEnfCronicas extends StatefulWidget {
   _ScreeningEnfCronicasState createState() => _ScreeningEnfCronicasState();
 }
 
-final _formKey = GlobalKey<_ScreeningEnfCronicasState>();
+final _formKey_enfermedades = GlobalKey<_ScreeningEnfCronicasState>();
 var id_paciente;
 var id_medico;
 var tipo_screening;
@@ -72,7 +72,7 @@ class _ScreeningEnfCronicasState extends State<ScreeningEnfCronicas> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_enfermedades = GlobalKey<FormState>();
 
     getStringValuesSF();
 

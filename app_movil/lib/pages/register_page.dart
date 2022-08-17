@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
@@ -13,14 +14,14 @@ TextEditingController passwordRepetido = TextEditingController();
 TextEditingController dni = TextEditingController();
 
 // Define a custom Form widget.
-class RegistrarPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _FormRegisterState createState() => _FormRegisterState();
 }
 
 GlobalKey<FormState> _formKey_registrar = GlobalKey<FormState>();
 
-class _FormpruebaState extends State<RegistrarPage> {
+class _FormRegisterState extends State<RegisterPage> {
   bool acepto = false;
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class _FormpruebaState extends State<RegistrarPage> {
                     SizedBox(height: 10),
                     _crearCheck(),
                     SizedBox(height: 10),
-                    _crearBotonSesion(context),
+                    _crearBotonRegistrar(context),
                     SizedBox(height: 10),
                     _crearBotonRegresar(context),
                     SizedBox(height: 20),
@@ -67,9 +68,7 @@ class _FormpruebaState extends State<RegistrarPage> {
         ));
   }
 
-  var bandera_register = false;
-
-  register() async {
+  registerPaciente() async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/user_register.php";
     var response = await http.post(url, body: {
@@ -79,12 +78,11 @@ class _FormpruebaState extends State<RegistrarPage> {
       "apellido": apellidoPaciente.text,
       "dni": dni.text,
     });
-    print("Hola register");
-    print(response.body);
-    var data = json.decode(response.body);
-    print(data);
-    if (data[0] == "Success") {
-      //return;
+
+    var responseDecoder = json.decode(response.body);
+
+    if (responseDecoder[0] == "Success" && response.statusCode == 200) {
+      await set_preference();
       Navigator.pushNamed(context, '/form_datos_generales', arguments: {
         'nombre': nombrePaciente.text,
         "apellido": apellidoPaciente.text,
@@ -92,12 +90,15 @@ class _FormpruebaState extends State<RegistrarPage> {
         "email": emailPaciente.text,
         "bandera": 1,
       });
-
-      //loginToast("Bienvenido a Proyecto Salud");
     } else {
-      bandera_register = true;
-      loginToast(data);
+      loginToast(responseDecoder);
     }
+  }
+
+  set_preference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setString("email_prefer", emailPaciente.text);
   }
 
   loginToast(String toast) {
@@ -107,30 +108,6 @@ class _FormpruebaState extends State<RegistrarPage> {
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.red,
         textColor: Colors.white);
-  }
-
-  Widget _registrar(BuildContext context) {
-    return Container(
-      child: Column(children: <Widget>[
-        _crearEmail(),
-        SizedBox(height: 10),
-        _crearPassword(),
-        SizedBox(height: 10),
-        _repetirPassword(),
-        SizedBox(height: 10),
-        _crearApellido(),
-        SizedBox(height: 10),
-        _crearNombre(),
-        SizedBox(height: 10),
-        _crearDNI(),
-        SizedBox(height: 10),
-        _crearCheck(),
-        SizedBox(height: 10),
-        _crearBotonSesion(context),
-        SizedBox(height: 10),
-        _crearBotonRegresar(context),
-      ]),
-    );
   }
 
   Widget _crearCheck() {
@@ -286,9 +263,18 @@ class _FormpruebaState extends State<RegistrarPage> {
     );
   }
 
-  Widget _crearBotonSesion(BuildContext context) {
-    return ElevatedButton(
-      child: Container(
+  bool _isLoading = false;
+  bool _isEnabled = true;
+
+  Widget _crearBotonRegistrar(BuildContext context) {
+    return ElevatedButton.icon(
+      icon: _isLoading
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: const CircularProgressIndicator(color: Colors.white70),
+            )
+          : const Icon(Icons.email_outlined),
+      label: Container(
         padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
         child: Text('REGISTRARME',
             style: TextStyle(
@@ -296,28 +282,42 @@ class _FormpruebaState extends State<RegistrarPage> {
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
       ),
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      //color: Theme.of(context).primaryColor,
-      //textColor: Colors.white,
       onPressed: () {
-        if (_formKey_registrar.currentState.validate()) {
+        if (_formKey_registrar.currentState.validate() && acepto == true) {
           if (passwordNuevo.text == passwordRepetido.text) {
-            register();
-
-            //Navigator.pushNamed(context, '/form_datos_generales');
+            if (!_isLoading) {
+              _startLoading();
+            }
           } else {
             loginToast("Las contraseñas no coinciden");
           }
         } else {
-          //loginToast("La contraseña debe tener 6 caracteres como mínimo");
+          if (!acepto) {
+            loginToast("Debe aceptar los términos y condiciones");
+          }
         }
       },
     );
   }
 
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+      _isEnabled = false;
+    });
+
+    await registerPaciente();
+
+    setState(() {
+      _isLoading = false;
+      _isEnabled = true;
+    });
+  }
+
   Widget _crearBotonRegresar(BuildContext context) {
-    return ElevatedButton(
-      child: Container(
+    return ElevatedButton.icon(
+      icon: Icon(Icons.arrow_back),
+      label: Container(
         padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
         child: Text('REGRESAR',
             style: TextStyle(
@@ -326,7 +326,6 @@ class _FormpruebaState extends State<RegistrarPage> {
             )),
       ),
       onPressed: () {
-        //Navigator.pop(context);
         Navigator.popAndPushNamed(context, '/');
       },
     );

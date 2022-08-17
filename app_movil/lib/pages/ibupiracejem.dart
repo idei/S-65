@@ -9,7 +9,7 @@ class _IbupiracState extends State<IbupiracPage> {
   double _animatedHeight = 0.0;
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_ibu = GlobalKey<FormState>();
 
     return Scaffold(
       appBar: AppBar(

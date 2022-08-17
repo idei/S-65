@@ -14,7 +14,7 @@ class NewScreening extends StatefulWidget {
   _NewScreeningState createState() => _NewScreeningState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_screening_new = GlobalKey<FormState>();
 
 getStringValuesSF() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,7 +50,7 @@ class _NewScreeningState extends State<NewScreening> {
           ],
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_screening_new,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

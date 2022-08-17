@@ -16,7 +16,7 @@ class AjustesPage extends StatefulWidget {
   _AjustesState createState() => _AjustesState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_ajustes = GlobalKey<FormState>();
 final _formKey_email = GlobalKey<FormState>();
 final _formKey_pass = GlobalKey<FormState>();
 
@@ -45,7 +45,7 @@ class _AjustesState extends State<AjustesPage> {
           ],
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_ajustes,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

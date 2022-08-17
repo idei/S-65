@@ -12,7 +12,7 @@ class VerRecordatorio extends StatefulWidget {
   _VerRecordatorioState createState() => _VerRecordatorioState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_ver_recordatorio_screening = GlobalKey<FormState>();
 var id_paciente;
 var id_medico;
 var rela_estado_recordatorio;
@@ -74,7 +74,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
           backgroundColor: Colors.lightBlue,
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_ver_recordatorio_screening,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

@@ -40,7 +40,6 @@ class _DatosCliState extends State<DatosCli> {
             Navigator.pushNamed(context, '/menu');
           },
         ),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text('Datos Clinicos',
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,

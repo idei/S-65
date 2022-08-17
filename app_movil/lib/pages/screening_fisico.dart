@@ -260,12 +260,12 @@ class Antecedentes extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class AntecedentesWidgetState extends State<Antecedentes> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey_screening_fisico = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
+      key: _formKey_screening_fisico,
       child: Card(
         //padding: const EdgeInsets.all(16.0),
         child: ListView(
@@ -451,7 +451,7 @@ class AntecedentesWidgetState extends State<Antecedentes> {
                         Theme.of(context).textTheme.headline1.fontFamily,
                   )),
               onPressed: () {
-                if (_formKey.currentState.validate()) {
+                if (_formKey_screening_fisico.currentState.validate()) {
                   guardarDatos(cant_check, context);
                 }
               },

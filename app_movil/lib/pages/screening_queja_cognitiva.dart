@@ -13,7 +13,7 @@ class ScreeningBPage extends StatefulWidget {
   _ScreeningBState createState() => _ScreeningBState();
 }
 
-final _formKey = GlobalKey<_ScreeningBState>();
+final _formKey_quejas_cognitivas = GlobalKey<_ScreeningBState>();
 var id_paciente;
 var id_medico;
 var tipo_screening;
@@ -76,7 +76,7 @@ class _ScreeningBState extends State<ScreeningBPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_quejas_cognitivas = GlobalKey<FormState>();
 
     getStringValuesSF();
 
@@ -205,7 +205,7 @@ class ScreeningQCQ extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey_quejas_cognitivas = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {

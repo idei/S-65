@@ -328,7 +328,7 @@ class Antecedentes extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class AntecedentesWidgetState extends State<Antecedentes> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey_antecedentes_familiares = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -357,7 +357,7 @@ class AntecedentesWidgetState extends State<Antecedentes> {
           ],
         ),
         body: Form(
-          key: _formKey,
+          key: _formKey_antecedentes_familiares,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: ListView(

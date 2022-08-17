@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:app_salud/models/paciente_model.dart';
 import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
@@ -8,25 +9,12 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(MyApp());
-
 String post_nombre;
 String post_apellido;
 String post_dni;
 String post_email;
 var email_argument;
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Datos Generales',
-      home: Formprueba(),
-    );
-  }
-}
-
-// Define a custom Form widget.
 class Formprueba extends StatefulWidget {
   @override
   _FormpruebaState createState() => _FormpruebaState();
@@ -47,35 +35,25 @@ class _FormpruebaState extends State<Formprueba> {
   @override
   void initState() {
     super.initState();
-
-    myController.addListener(_printLatestValue);
-    //loadingData();
+    getStringValuesSF();
   }
 
   @override
-  void dispose() {
-    myController.dispose();
-    super.dispose();
-  }
-
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
+  void setState(VoidCallback fn) {
+    getStringValuesSF();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_datos_personales = GlobalKey<FormState>();
+
     final format = DateFormat("dd-MM-yyyy");
     final initialValue = DateTime.now();
     bool autoValidate = false;
     DateTime value = DateTime.now();
     int changedCount = 0;
-    String dropdownValue = 'One';
-
-    final size = MediaQuery.of(context).size;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
-    // getStringValuesSF();
 
     if (parametros['bandera'] == 1) {
       post_nombre = parametros['nombre'];
@@ -93,17 +71,16 @@ class _FormpruebaState extends State<Formprueba> {
       print(email_argument);
       getStringValuesSF();
       print(email_argument);
-      //getStringValuesSF();
-      //read_datos_paciente();
-      //getAllDepartamentos();
     }
-
-    setState(() {
-      loadingData();
-    });
 
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu');
+            },
+          ),
           title: Text('Datos Generales',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -124,12 +101,16 @@ class _FormpruebaState extends State<Formprueba> {
         ),
         body: Center(
           child: SingleChildScrollView(
-            child: FutureBuilder(
-              future: loadingData(),
+            child: FutureBuilder<PacienteModel>(
+              future: getDataPaciente(),
               builder: (context, snapshot) {
-                if (isDepto) {
+                if (isGenero &&
+                    isDepto &&
+                    isGrupoConviviente &&
+                    isNiveleducativo &&
+                    snapshot.hasData) {
                   return Form(
-                    key: _formKey,
+                    key: _formKey_datos_personales,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -282,7 +263,8 @@ class _FormpruebaState extends State<Formprueba> {
                                         .fontFamily),
                               ),
                               onPressed: () {
-                                if (_formKey.currentState.validate() &&
+                                if (_formKey_datos_personales.currentState
+                                        .validate() &&
                                     !_isLoading) {
                                   _startLoading();
                                 } else {
@@ -432,11 +414,12 @@ _alert_informe(context, message, colorNumber) {
 }
 
 loadingData() async {
-  await getDataPaciente();
-  await getAllDepartamentos();
-  await getAllGeneros();
-  await getAllNivelesEducativos();
-  await getAllGrupoConviviente();
+  if (!isDepto && !isGenero && !isGrupoConviviente && !isNiveleducativo) {
+    await getAllDepartamentos();
+    await getAllGeneros();
+    await getAllNivelesEducativos();
+    await getAllGrupoConviviente();
+  }
 }
 
 List dataDepartamento;
@@ -499,38 +482,47 @@ TextEditingController dni = TextEditingController();
 TextEditingController celular = TextEditingController();
 TextEditingController contacto = TextEditingController();
 
-var rela_departamento = "";
-var rela_genero;
-var rela_nivel_instruccion;
-var rela_grupo_conviviente;
+String rela_departamento;
+String rela_genero;
+String rela_nivel_instruccion;
+String rela_grupo_conviviente;
 var return_apellido;
 var return_nombre;
 var return_email;
 var estado_users = 2;
 var rela_users = 0;
 
-getDataPaciente() async {
+Future<PacienteModel> getDataPaciente() async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/user_read_datos_personales.php";
   var response = await http.post(url, body: {
     "email": email_argument,
   });
-  var data = json.decode(response.body);
 
   if (response.statusCode == 200) {
-    rela_departamento = data["rela_departamento"].toString();
-    rela_nivel_instruccion = data["rela_nivel_instruccion"].toString();
-    rela_grupo_conviviente = data["rela_grupo_conviviente"].toString();
-    nombre.text = data["nombre"];
-    apellido.text = data["apellido"];
-    fecha_nacimiento.text = data["fecha_nacimiento"];
-    dni.text = data["dni"].toString();
-    rela_genero = data["rela_genero"].toString();
-    genero.text = data["genero"];
-    celular.text = data["celular"].toString();
-    contacto.text = data["contacto"];
+    //final items = json.decode(response.body) .Map<String, dynamic>();
+
+    Map pacienteMap = jsonDecode(response.body);
+    var dataPacienteMocel = new PacienteModel.fromJson(pacienteMap);
+
+    await loadingData();
+
+    rela_departamento = dataPacienteMocel.rela_departamento;
+    rela_nivel_instruccion = dataPacienteMocel.rela_nivel_instruccion;
+    rela_grupo_conviviente = dataPacienteMocel.rela_grupo_conviviente;
+    rela_genero = dataPacienteMocel.rela_genero;
+    rela_users = int.parse(dataPacienteMocel.rela_users);
+    nombre.text = dataPacienteMocel.nombre;
+    apellido.text = dataPacienteMocel.apellido;
+    fecha_nacimiento.text = dataPacienteMocel.fecha_nacimiento;
+    dni.text = dataPacienteMocel.dni.toString();
+    celular.text = dataPacienteMocel.celular;
+    contacto.text = dataPacienteMocel.contacto;
+    rela_users = int.parse(dataPacienteMocel.rela_users);
+
+    return dataPacienteMocel;
   } else {
-    //loginToast(data);
+    return null;
   }
 }
 
@@ -553,7 +545,7 @@ class _MyStatefulWidgetState extends State<FormDepartamentos> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
         hint: Text("Departamento"),
-        value: rela_departamento,
+        value: rela_departamento.isNotEmpty ? rela_departamento : null,
         items: dataDepartamento.map(
           (item) {
             return DropdownMenuItem<String>(
@@ -591,7 +583,7 @@ class _GeneroWidgetState extends State<FormGenero> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
         hint: Text("Géneros"),
-        value: rela_genero,
+        value: rela_genero.isNotEmpty ? rela_genero : null,
         items: dataGenero.map(
           (list) {
             return DropdownMenuItem<String>(
@@ -625,7 +617,8 @@ class _FormNivelEducativoState extends State<FormNivelEducativo> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
         hint: Text("Nivel Educativo Alcanzado"),
-        value: rela_nivel_instruccion,
+        value:
+            rela_nivel_instruccion.isNotEmpty ? rela_nivel_instruccion : null,
         items: dataNivelEducativo.map(
           (list) {
             return DropdownMenuItem<String>(
@@ -659,7 +652,8 @@ class _FormpruebaState3 extends State<FormGrupoConviviente> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
         hint: Text("Grupo Conviviente"),
-        value: rela_grupo_conviviente,
+        value:
+            rela_grupo_conviviente.isNotEmpty ? rela_grupo_conviviente : null,
         items: dataGrupoConviviente.map(
           (list) {
             if (list == null) {

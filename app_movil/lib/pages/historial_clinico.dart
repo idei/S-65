@@ -20,7 +20,7 @@ class HistorialClinico extends StatefulWidget {
   _AjustesState createState() => _AjustesState();
 }
 
-final _formKey = GlobalKey<FormState>();
+final _formKey_historial_clinico = GlobalKey<FormState>();
 final _formKey_email = GlobalKey<FormState>();
 final _formKey_pass = GlobalKey<FormState>();
 
@@ -48,7 +48,7 @@ class _AjustesState extends State<HistorialClinico> {
           ],
         ),
         body: Form(
-            key: _formKey,
+            key: _formKey_historial_clinico,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[

@@ -18,7 +18,7 @@ class ListMedicos extends StatefulWidget {
   _ListMedicosState createState() => _ListMedicosState();
 }
 
-final _formKey = GlobalKey<_ListMedicosState>();
+final _formKey_list_medicos = GlobalKey<_ListMedicosState>();
 List<MedicoModel> medicos_items;
 bool _isLoading = false;
 
@@ -75,7 +75,7 @@ class _ListMedicosState extends State<ListMedicos> {
                 children: [
                   ListTile(
                       title: Text(
-                    'No tiene avisos',
+                    'No tiene médicos vinculados',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,

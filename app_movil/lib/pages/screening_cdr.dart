@@ -12,7 +12,7 @@ class ScreeningCDR extends StatefulWidget {
   _ScreeningCDRState createState() => _ScreeningCDRState();
 }
 
-final _formKey = GlobalKey<_ScreeningCDRState>();
+final _formKey_screening_cdr = GlobalKey<_ScreeningCDRState>();
 var id_paciente;
 var id_medico;
 var tipo_screening;
@@ -74,7 +74,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_screening_cdr = GlobalKey<FormState>();
 
     getStringValuesSF();
 

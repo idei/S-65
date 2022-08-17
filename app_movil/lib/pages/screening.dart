@@ -11,7 +11,7 @@ class ScreeningPage extends StatefulWidget {
   _ScreeningState createState() => _ScreeningState();
 }
 
-final _formKey = GlobalKey<_ScreeningState>();
+final _formKey_screening = GlobalKey<_ScreeningState>();
 var select_screening;
 var titulo;
 

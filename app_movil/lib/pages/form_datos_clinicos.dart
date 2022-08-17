@@ -8,22 +8,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 String email;
 
-// Define a custom Form widget.
 class FormDatosClinicos extends StatefulWidget {
   final pageName = '/form_datos_clinicos';
 
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _FormDatosClinicosState createState() => _FormDatosClinicosState();
 }
 
-// Define a corresponding State class.
-// This class holds data related to the Form.
-class _FormpruebaState extends State<FormDatosClinicos> {
-  // Create a text controller and use it to retrieve the current value
-  // of the TextField.
-  final myController = TextEditingController();
-
-  List data = List();
+class _FormDatosClinicosState extends State<FormDatosClinicos> {
+  List dataRespuestas;
 
   getAllRespuesta() async {
     String URL_base = Env.URL_PREFIX;
@@ -34,31 +27,27 @@ class _FormpruebaState extends State<FormDatosClinicos> {
     var jsonDate = json.decode(jsonBody);
     if (this.mounted) {
       setState(() {
-        data = jsonDate;
+        dataRespuestas = jsonDate;
       });
     }
     print(jsonDate);
   }
 
   @override
-  void initState() {
-    super.initState();
-    getAllRespuesta();
+  void setState(VoidCallback fn) {
+    getStringValuesSF();
   }
 
   @override
-  void dispose() {
-    // Clean up the controller when the widget is removed from the widget tree.
-    // This also removes the _printLatestValue listener.
-    myController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    getAllRespuesta();
+    getStringValuesSF();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-
-    getStringValuesSF();
+    final _formKey_datos_clinicos = GlobalKey<FormState>();
 
     void choiceAction(String choice) {
       if (choice == Constants.Ajustes) {
@@ -102,7 +91,7 @@ class _FormpruebaState extends State<FormDatosClinicos> {
           ],
         ),
         body: Form(
-          key: _formKey,
+          key: _formKey_datos_clinicos,
           child: Container(
             padding: EdgeInsets.all(20.0),
             child: ListView(
@@ -415,7 +404,7 @@ class _FormpruebaState extends State<FormDatosClinicos> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(elevation: 8),
                   onPressed: () {
-                    if (_formKey.currentState.validate()) {
+                    if (_formKey_datos_clinicos.currentState.validate()) {
                       verification(context);
                       if (estado_verification == true) {
                         guardar_datos(context);
@@ -485,9 +474,9 @@ guardar_datos(BuildContext context) async {
     "id_otras": id_otras_drogas,
     "id_paciente": id_paciente.toString(),
   });
-  print(response.body);
+
   var data = json.decode(response.body);
-  print(data);
+
   if (data['estado_users'] == "Success") {
     loginToast("Datos Clínicos Guardados Correctamente");
   } else {

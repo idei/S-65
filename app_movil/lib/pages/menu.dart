@@ -7,7 +7,7 @@ var id_paciente;
 
 class MenuPage extends StatefulWidget {
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _FormMenuState createState() => _FormMenuState();
 }
 
 String email_prefer;
@@ -20,10 +20,7 @@ getStringValuesSF() async {
   print(email_argument);
 }
 
-// Define a corresponding State class.
-// This class holds data related to the Form.
-class _FormpruebaState extends State<MenuPage> {
-//class MenuPage extends StatelessWidget {
+class _FormMenuState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
@@ -35,14 +32,14 @@ class _FormpruebaState extends State<MenuPage> {
       getStringValuesSF();
     }
 
-    return new Scaffold(
-      body: new Container(
-        child: new Row(
+    return Scaffold(
+      body: Container(
+        child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +110,7 @@ class _FormpruebaState extends State<MenuPage> {
                     SizedBox(height: 10.0),
                     texto("MIS DOCTORES"),
                   ]),
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -184,7 +181,7 @@ class _FormpruebaState extends State<MenuPage> {
               Padding(
                 padding: const EdgeInsets.all(3.0),
               ),
-              new Column(
+              Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -243,7 +240,7 @@ class _FormpruebaState extends State<MenuPage> {
   Widget texto(String entrada) {
     return Text(
       entrada,
-      style: new TextStyle(
+      style: TextStyle(
           fontSize: 12.0,
           color: Colors.black,
           fontWeight: FontWeight.bold,

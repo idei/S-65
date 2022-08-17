@@ -10,18 +10,20 @@
 
 	$lista = array();
 
+	$token = uniqid($password,true);
+
 	$stmt = $db->prepare("SELECT email FROM users WHERE email = '".$email."'");
 	$stmt->execute();
 	$result = $stmt->rowCount();
 
 	if ($result == 1) {
-		echo json_encode("Error : Ya existe una cuenta con ese email");
+		echo json_encode("Error : Ya existe un paciente con ese email");
 	}else{
 		
-	$stmt = $db->prepare('INSERT INTO users(email,password) VALUES(?, ?)');
+	$stmt = $db->prepare('INSERT INTO users(email,password,token) VALUES(?, ?, ?)');
     $stmt->bindParam(1,$email);
     $stmt->bindParam(2,$password);
-	//$stmt->bindParam(3,$rela_rol);
+	$stmt->bindParam(3,$token);
 
 	$stmt->execute();
 
@@ -33,19 +35,11 @@
 
 			$insert_paciente = $db->prepare('INSERT INTO pacientes(rela_users,nombre,apellido,estado_users,dni)VALUES(?,?,?,?,?)');
 			
-			/*,rela_nivel_instruccion,rela_grupo_conviviente,celular,contacto,
-			rela_departamento*/
-			
 			$insert_paciente->bindParam(1,$rela_users['id']);
 			$insert_paciente->bindParam(2,$nombre);
 			$insert_paciente->bindParam(3,$apellido);
 			$insert_paciente->bindParam(4,$estado_users);
 			$insert_paciente->bindParam(5,$dni);
-			/*$insert_paciente->bindParam(7,0);
-			$insert_paciente->bindParam(8,0);
-			$insert_paciente->bindParam(9,"");
-			$insert_paciente->bindParam(10,"");
-			$insert_paciente->bindParam(11,0);*/
 			$insert_paciente->execute();
 
 			

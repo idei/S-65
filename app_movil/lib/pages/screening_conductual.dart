@@ -13,7 +13,7 @@ class ScreeningConductualPage extends StatefulWidget {
   _ScreeningConductualState createState() => _ScreeningConductualState();
 }
 
-final _formKey = GlobalKey<_ScreeningConductualState>();
+final _formKey_screening_conductual = GlobalKey<_ScreeningConductualState>();
 
 TextEditingController otro = TextEditingController();
 

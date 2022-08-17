@@ -12,7 +12,8 @@ class LoginPage extends StatefulWidget {
   _LoginPage createState() => _LoginPage();
 }
 
-GlobalKey<FormState> _formKey_ingresar = GlobalKey<FormState>();
+GlobalKey<FormState> _formKey_ingresar =
+    GlobalKey<FormState>(debugLabel: 'GlobalFormKey #Login ');
 
 class _LoginPage extends State<LoginPage> {
   TextEditingController email = TextEditingController();
@@ -22,6 +23,7 @@ class _LoginPage extends State<LoginPage> {
   var estado_users;
   var estado_clinico;
   var id_paciente;
+  var tokenId;
   String estado_read_date;
   String estado_login;
 
@@ -39,15 +41,13 @@ class _LoginPage extends State<LoginPage> {
   }
 
   set_preference() async {
-    print("set prefe");
     await consult_preference();
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     prefs.setString("email_prefer", email.text);
+    //prefs.setString("tokenId", tokenId);
     prefs.setInt("estado_clinico", estado_clinico);
     prefs.setInt("id_paciente", id_paciente);
-
-    print(prefs);
   }
 
   consult_preference() async {
@@ -72,46 +72,43 @@ class _LoginPage extends State<LoginPage> {
   }
 
   fetchLogin() async {
-    print("Login");
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/user_login.php";
+
     var response = await http.post(url, body: {
       "email": email.text,
       "password": password.text,
     });
-    print(response.body);
-    var data = json.decode(response.body);
-    print(data);
 
-    estado_login = data['estado_login'];
-    id_paciente = data['id_paciente'];
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
 
-    setState(() {
-      AlertDialog(
-        title: Text('Cargando'),
-      );
-    });
+      estado_login = data['estado_login'];
+      id_paciente = data['id_paciente'];
 
-    if (estado_login == "Success") {
-      estado_users = data['estado_users'];
+      if (estado_login == "Success") {
+        estado_users = data['estado_users'];
 
-      if (estado_users == 2 && estado_login == "Success") {
-        set_preference();
-        print(email.text);
-        Navigator.pushNamed(context, '/menu',
-            arguments: {"email": email.text, "id_paciente": id_paciente});
-      } else {
-        if (estado_users == 1 && estado_login == "Success") {
-          Navigator.pushNamed(context, '/form_datos_generales', arguments: {
-            "email": email.text,
-            "id_paciente": data['estado_users']
-          });
+        if (estado_users == 2 && estado_login == "Success") {
+          set_preference();
+          print(email.text);
+          Navigator.pushNamed(context, '/menu',
+              arguments: {"email": email.text, "id_paciente": id_paciente});
+        } else {
+          if (estado_users == 1 && estado_login == "Success") {
+            Navigator.pushNamed(context, '/form_datos_generales', arguments: {
+              "email": email.text,
+              "id_paciente": data['estado_users']
+            });
+          }
         }
-      }
 
-      loginToast(estado_login);
+        loginToast(estado_login);
+      } else {
+        loginToast(estado_login + ": Usuario o contraseña incorrectos");
+      }
     } else {
-      loginToast(estado_login + ": Usuario o contraseña incorrectos");
+      loginToast("Error: " + response.body);
     }
   }
 

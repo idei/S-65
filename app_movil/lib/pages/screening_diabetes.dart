@@ -12,7 +12,7 @@ class ScreeningDiabetes extends StatefulWidget {
   _ScreeningDiabetesState createState() => _ScreeningDiabetesState();
 }
 
-final _formKey = GlobalKey<_ScreeningDiabetesState>();
+final _formKey_diabetes = GlobalKey<_ScreeningDiabetesState>();
 var id_paciente;
 var id_medico;
 var tipo_screening;
@@ -71,7 +71,7 @@ class _ScreeningDiabetesState extends State<ScreeningDiabetes> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final _formKey_diabetes = GlobalKey<FormState>();
 
     getStringValuesSF();
 

@@ -10,8 +10,9 @@
 	$result = $stmt->rowCount();
     
 	if ($result > 0) {
-		$id_user= $stmt->fetch();
-		$id_user = $id_user['id'];
+		$result_select_users= $stmt->fetch();
+		$id_user = $result_select_users['id'];
+		//$token_id = $result_select_users['token'];
 		
 		$result_estado = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$id_user."'");
 
@@ -29,7 +30,8 @@
 			$array = array(
 				"estado_login" => "Success",
 				"estado_users" => $estado_user,
-				"id_paciente" => $id_paciente
+				"id_paciente" => $id_paciente,
+				//"token"=> $token_id
 			);
 			//array_push($lista, "Success", "estado_login");
 			//array_push($lista, $estado_user, "estado_users");

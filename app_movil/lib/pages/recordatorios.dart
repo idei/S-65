@@ -10,7 +10,7 @@ class RecordatorioPage extends StatefulWidget {
   _RecordatorioState createState() => _RecordatorioState();
 }
 
-final _formKey = GlobalKey<_RecordatorioState>();
+final _formKey_recordatorios = GlobalKey<_RecordatorioState>();
 List<RecordatoriosModel> recordatorios_items;
 bool _isLoading = false;
 

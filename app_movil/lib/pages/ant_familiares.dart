@@ -97,16 +97,21 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                 );
               } else {
                 return Container(
-                    alignment: Alignment.topCenter,
-                    child: ListTile(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
                         title: Text(
                       'No tiene antecedentes familiares',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily),
-                    )));
+                    )),
+                  ],
+                ));
               }
             }
           },

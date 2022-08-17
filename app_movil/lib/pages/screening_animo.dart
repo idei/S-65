@@ -277,7 +277,7 @@ class ScreeningAnimo extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey_screening_animo = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -313,7 +313,7 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
           ],
         ),
         body: Form(
-          key: _formKey,
+          key: _formKey_screening_animo,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: ListView(

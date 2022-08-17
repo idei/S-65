@@ -19,7 +19,7 @@ import 'package:app_salud/pages/menu_chequeo.dart';
 import 'package:app_salud/pages/new_recordatorio_personal.dart';
 import 'package:app_salud/pages/recordatorios.dart';
 import 'package:app_salud/pages/recuperar_contras.dart';
-import 'package:app_salud/pages/registrar_pag.dart';
+import 'package:app_salud/pages/register_page.dart';
 import 'package:app_salud/pages/screening.dart';
 import 'package:app_salud/pages/ver_screening.dart';
 import 'package:app_salud/pages/screening_animo.dart';
@@ -41,7 +41,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
   return <String, WidgetBuilder>{
     '/': (context) => HomePage(),
     'ingresar': (context) => LoginPage(),
-    'registrar': (context) => RegistrarPage(),
+    'registrar': (context) => RegisterPage(),
     '/menu': (context) => MenuPage(),
     '/form_datos_generales': (context) => Formprueba(),
     '/form_datos_clinicos': (context) => FormDatosClinicos(),
