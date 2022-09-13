@@ -151,7 +151,8 @@ guardarDatos(BuildContext context) async {
     "cod_event_nutri10": cod_event_nutri10,
   });
 
-  print(response.body);
+  print(response.statusCode);
+
   var data = json.decode(response.body);
 
   if (data != "Error") {

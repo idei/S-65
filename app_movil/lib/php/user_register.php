@@ -8,9 +8,24 @@
 	$estado_users = 1;
 	$rela_rol = 0;
 
-	$lista = array();
+	$token = uniqid(random_int(100, 999),true);
 
-	$token = uniqid($password,true);
+	$listaprueba = array(
+		"respuesta"=>"Success",
+		"token"=>$token,
+		"email"=>$email,
+		"password"=>$password,
+		"paciente"=>[
+			"nombre"=>$nombre,
+			"apellido"=>$apellido,
+			"dni"=>$dni,
+			"estado_users"=>$estado_users]
+	);
+	
+	echo json_encode($listaprueba);
+
+
+	$lista = array();
 
 	$stmt = $db->prepare("SELECT email FROM users WHERE email = '".$email."'");
 	$stmt->execute();
@@ -45,8 +60,18 @@
 			
 			$insert_paciente = $stmt->rowCount();
 			if ($insert_paciente) {
-				array_push($lista, "Success", $estado_users);
-				echo json_encode($lista);
+				//array_push($lista, "Success", $estado_users);
+				$listaprueba = array(
+					"Success",
+					$token,
+					$email,
+					$password,
+					"paciente"=>[$nombre,$apellido,$dni,$estado_users]
+				);
+				
+				echo json_encode($listaprueba);
+			}else {
+				echo json_encode("No se puedo realizar el registro");
 			}
 		}
 	}

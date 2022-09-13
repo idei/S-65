@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:app_salud/models/paciente_model.dart';
 import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -356,7 +354,7 @@ class _FormpruebaState extends State<Formprueba> {
       "email": email_argument.toString(),
       "dni": dni.text,
       "fecha_nacimiento": fecha_nacimiento.text,
-      "rela_genero": rela_genero,
+      "rela_genero": rela_genero.toString(),
       "rela_departamento": rela_departamento.toString(),
       "rela_nivel_instruccion": rela_nivel_instruccion.toString(),
       "rela_grupo_conviviente": rela_grupo_conviviente.toString(),
@@ -482,10 +480,10 @@ TextEditingController dni = TextEditingController();
 TextEditingController celular = TextEditingController();
 TextEditingController contacto = TextEditingController();
 
-String rela_departamento;
-String rela_genero;
-String rela_nivel_instruccion;
-String rela_grupo_conviviente;
+String rela_departamento = '1';
+String rela_genero = '1';
+String rela_nivel_instruccion = '1';
+String rela_grupo_conviviente = '1';
 var return_apellido;
 var return_nombre;
 var return_email;
@@ -500,8 +498,6 @@ Future<PacienteModel> getDataPaciente() async {
   });
 
   if (response.statusCode == 200) {
-    //final items = json.decode(response.body) .Map<String, dynamic>();
-
     Map pacienteMap = jsonDecode(response.body);
     var dataPacienteMocel = new PacienteModel.fromJson(pacienteMap);
 
@@ -592,9 +588,9 @@ class _GeneroWidgetState extends State<FormGenero> {
             );
           },
         ).toList(),
-        onChanged: (String newValue) {
+        onChanged: (String Value) {
           setState(() {
-            rela_genero = newValue;
+            rela_genero = Value;
           });
         });
   }

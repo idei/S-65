@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -27,6 +26,8 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
 
   @override
   void initState() {
+    super.initState();
+    _resetChecksFalse();
     myController.addListener(_printLatestValue);
   }
 
@@ -94,7 +95,6 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
             });
           },
         ),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text('Chequeo Fisico',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -119,7 +119,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
             print(snapshot.connectionState);
 
             if (snapshot.hasData) {
-              return Antecedentes();
+              return ScreeningFisico();
             } else {
               return Center(
                 child: CircularProgressIndicator(
@@ -140,6 +140,51 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   }
 }
 
+_resetChecksFalse() {
+  dolor_cabeza = false;
+  mareos = false;
+  nauceas = false;
+  vomito = false;
+  fatiga_excesiva = false;
+  urinaria = false;
+  problemas_instestinales = false;
+
+// MOTOR
+
+  debilidad_lado_cuerpo = false;
+  problemas_motricidad = false;
+  temblores = false;
+  inestabilidad_marcha = false;
+  tics_mov_extranos = false;
+  problemas_equilibrio = false;
+  choque_cosas = false;
+  desmayo = false;
+  caidas = false;
+
+// Sensibilidad
+
+  perdida_sensibilidad = false;
+  cosquilleo_piel = false;
+  ojos_claridad = false;
+  perdida_audicion = false;
+
+  utiliza_audifonos = false;
+  zumbido = false;
+  anteojo_cerca = false;
+  anteojo_lejos = false;
+  vision_lado = false;
+  vision_borrosa = false;
+  vision_doble = false;
+  cosas_no_existen = false;
+  sensibilidad_cosas_brillantes = false;
+  periodos_ceguera = false;
+  persibe_cosas_cuerpo = false;
+  dificultad_calor_frio = false;
+  problemas_gusto = false;
+  problemas_olfato = false;
+  dolor = false;
+}
+
 readRecordatorios() async {
   await Future.delayed(Duration(milliseconds: 500));
   return true;
@@ -147,7 +192,7 @@ readRecordatorios() async {
 
 var email;
 
-guardarDatos(var cant_check, BuildContext context) async {
+guardarDatosFisicos(var cant_check, BuildContext context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/respuesta_screening_fisico.php";
   var response = await http.post(url, body: {
@@ -232,8 +277,9 @@ guardarDatos(var cant_check, BuildContext context) async {
   var responseDecoder = json.decode(response.body);
 
   if (responseDecoder == "Success" && response.statusCode == 200) {
+    _resetChecksFalse();
     if (cant_check > 3) {
-      guardarDatos(cant_check, context);
+      guardarDatosFisicos(cant_check, context);
       _alertInforme(
         context,
         "Para tener en cuenta",
@@ -251,15 +297,14 @@ guardarDatos(var cant_check, BuildContext context) async {
 
 //----------------------------------------Screening de Sintomas ------------------------------------------
 
-class Antecedentes extends StatefulWidget {
-  Antecedentes({Key key}) : super(key: key);
+class ScreeningFisico extends StatefulWidget {
+  ScreeningFisico({Key key}) : super(key: key);
 
   @override
-  AntecedentesWidgetState createState() => AntecedentesWidgetState();
+  FisicoWidgetState createState() => FisicoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
-class AntecedentesWidgetState extends State<Antecedentes> {
+class FisicoWidgetState extends State<ScreeningFisico> {
   final _formKey_screening_fisico = GlobalKey<FormState>();
 
   @override
@@ -267,7 +312,6 @@ class AntecedentesWidgetState extends State<Antecedentes> {
     return Form(
       key: _formKey_screening_fisico,
       child: Card(
-        //padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
             CheckDolorCabeza(),
@@ -444,22 +488,76 @@ class AntecedentesWidgetState extends State<Antecedentes> {
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            ElevatedButton(
-              child: Text('GUARDAR',
+            ElevatedButton.icon(
+              icon: _isLoading
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: const CircularProgressIndicator(),
+                    )
+                  : const Icon(Icons.save_alt),
+              style: ElevatedButton.styleFrom(
+                textStyle: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+              onPressed: () => !_isLoading ? _startLoading() : null,
+              label: Text('GUARDAR',
                   style: TextStyle(
                     fontFamily:
                         Theme.of(context).textTheme.headline1.fontFamily,
+                    fontWeight: FontWeight.bold,
                   )),
-              onPressed: () {
-                if (_formKey_screening_fisico.currentState.validate()) {
-                  guardarDatos(cant_check, context);
-                }
-              },
             ),
           ],
         ),
       ),
     );
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardarDatosFisicos(cant_check, context);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Información",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 }
 
@@ -505,48 +603,48 @@ _alertInforme(context, title, descripcion) async {
 var cant_check = 0;
 // FISICO
 
-bool dolor_cabeza = false;
-bool mareos = false;
-bool nauceas = false;
-bool vomito = false;
-bool fatiga_excesiva = false;
-bool urinaria = false;
-bool problemas_instestinales = false;
+bool dolor_cabeza;
+bool mareos;
+bool nauceas;
+bool vomito;
+bool fatiga_excesiva;
+bool urinaria;
+bool problemas_instestinales;
 
 // MOTOR
 
-bool debilidad_lado_cuerpo = false;
-bool problemas_motricidad = false;
-bool temblores = false;
-bool inestabilidad_marcha = false;
-bool tics_mov_extranos = false;
-bool problemas_equilibrio = false;
-bool choque_cosas = false;
-bool desmayo = false;
-bool caidas = false;
+bool debilidad_lado_cuerpo;
+bool problemas_motricidad;
+bool temblores;
+bool inestabilidad_marcha;
+bool tics_mov_extranos;
+bool problemas_equilibrio;
+bool choque_cosas;
+bool desmayo;
+bool caidas;
 
 // Sensibilidad
 
-bool perdida_sensibilidad = false;
-bool cosquilleo_piel = false;
-bool ojos_claridad = false;
-bool perdida_audicion = false;
+bool perdida_sensibilidad;
+bool cosquilleo_piel;
+bool ojos_claridad;
+bool perdida_audicion;
 
-bool utiliza_audifonos = false;
-bool zumbido = false;
-bool anteojo_cerca = false;
-bool anteojo_lejos = false;
-bool vision_lado = false;
-bool vision_borrosa = false;
-bool vision_doble = false;
-bool cosas_no_existen = false;
-bool sensibilidad_cosas_brillantes = false;
-bool periodos_ceguera = false;
-bool persibe_cosas_cuerpo = false;
-bool dificultad_calor_frio = false;
-bool problemas_gusto = false;
-bool problemas_olfato = false;
-bool dolor = false;
+bool utiliza_audifonos;
+bool zumbido;
+bool anteojo_cerca;
+bool anteojo_lejos;
+bool vision_lado;
+bool vision_borrosa;
+bool vision_doble;
+bool cosas_no_existen;
+bool sensibilidad_cosas_brillantes;
+bool periodos_ceguera;
+bool persibe_cosas_cuerpo;
+bool dificultad_calor_frio;
+bool problemas_gusto;
+bool problemas_olfato;
+bool dolor;
 
 String cod_event_dolor_cabeza = "DOLCA";
 String cod_event_mareos = 'MAREO';
@@ -651,7 +749,6 @@ class CheckDolorCabeza extends StatefulWidget {
       CheckCheckDolorCabezaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
   @override
   Widget build(BuildContext context) {
@@ -731,7 +828,6 @@ class CheckMareos extends StatefulWidget {
   CheckCheckMareosWidgetState createState() => CheckCheckMareosWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckCheckMareosWidgetState extends State<CheckMareos> {
   @override
   Widget build(BuildContext context) {
@@ -806,7 +902,6 @@ class Nauseas extends StatefulWidget {
   NauseasWidgetState createState() => NauseasWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class NauseasWidgetState extends State<Nauseas> {
   @override
   Widget build(BuildContext context) {
@@ -881,7 +976,6 @@ class Vomitos extends StatefulWidget {
   VomitosWidgetState createState() => VomitosWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class VomitosWidgetState extends State<Vomitos> {
   @override
   Widget build(BuildContext context) {
@@ -956,7 +1050,6 @@ class FatigaExcesiva extends StatefulWidget {
   FatigaExcesivaWidgetState createState() => FatigaExcesivaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class FatigaExcesivaWidgetState extends State<FatigaExcesiva> {
   @override
   Widget build(BuildContext context) {
@@ -1032,7 +1125,6 @@ class IncontinenciaUrinaria extends StatefulWidget {
       IncontinenciaUrinariaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class IncontinenciaUrinariaWidgetState extends State<IncontinenciaUrinaria> {
   @override
   Widget build(BuildContext context) {
@@ -1108,7 +1200,6 @@ class ProblemasInstestinales extends StatefulWidget {
       ProblemasInstestinalesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemasInstestinalesWidgetState extends State<ProblemasInstestinales> {
   @override
   Widget build(BuildContext context) {
@@ -1183,7 +1274,6 @@ class DebilidadLadoCuerpo extends StatefulWidget {
       DebilidadLadoCuerpoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DebilidadLadoCuerpoWidgetState extends State<DebilidadLadoCuerpo> {
   @override
   Widget build(BuildContext context) {
@@ -1259,7 +1349,6 @@ class ProblemasMotricidadFina extends StatefulWidget {
       ProblemasMotricidadFinaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemasMotricidadFinaWidgetState
     extends State<ProblemasMotricidadFina> {
   @override
@@ -1334,7 +1423,6 @@ class Temblores extends StatefulWidget {
   TembloresWidgetState createState() => TembloresWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class TembloresWidgetState extends State<Temblores> {
   @override
   Widget build(BuildContext context) {
@@ -1409,7 +1497,6 @@ class InestabilidadMarcha extends StatefulWidget {
       InestabilidadMarchaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class InestabilidadMarchaWidgetState extends State<InestabilidadMarcha> {
   @override
   Widget build(BuildContext context) {
@@ -1483,7 +1570,6 @@ class TicsMovExtranos extends StatefulWidget {
   TicsMovExtranosWidgetState createState() => TicsMovExtranosWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class TicsMovExtranosWidgetState extends State<TicsMovExtranos> {
   @override
   Widget build(BuildContext context) {
@@ -1557,7 +1643,6 @@ class ProblemaEquilibrio extends StatefulWidget {
   ProblemaEquiWidgetState createState() => ProblemaEquiWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemaEquiWidgetState extends State<ProblemaEquilibrio> {
   @override
   Widget build(BuildContext context) {
@@ -1631,7 +1716,6 @@ class ConFrecCosas extends StatefulWidget {
   ConFrecWidgetState createState() => ConFrecWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ConFrecWidgetState extends State<ConFrecCosas> {
   @override
   Widget build(BuildContext context) {
@@ -1705,7 +1789,6 @@ class DesvanDesmayo extends StatefulWidget {
   DesvanDesWidgetState createState() => DesvanDesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DesvanDesWidgetState extends State<DesvanDesmayo> {
   @override
   Widget build(BuildContext context) {
@@ -1779,7 +1862,6 @@ class Caidas extends StatefulWidget {
   CaidasWidgetState createState() => CaidasWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CaidasWidgetState extends State<Caidas> {
   @override
   Widget build(BuildContext context) {
@@ -1854,7 +1936,6 @@ class PerdidaSensibilidad extends StatefulWidget {
       PerdidaSensibilidadWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class PerdidaSensibilidadWidgetState extends State<PerdidaSensibilidad> {
   @override
   Widget build(BuildContext context) {
@@ -1928,7 +2009,6 @@ class CosqSensaPiel extends StatefulWidget {
   EsquizofreniaWidgetState createState() => EsquizofreniaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EsquizofreniaWidgetState extends State<CosqSensaPiel> {
   @override
   Widget build(BuildContext context) {
@@ -2003,7 +2083,6 @@ class NecesidadOjosClaridad extends StatefulWidget {
       NecesidadOjosClaridadWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class NecesidadOjosClaridadWidgetState extends State<NecesidadOjosClaridad> {
   @override
   Widget build(BuildContext context) {
@@ -2078,7 +2157,6 @@ class PerdidaAudicion extends StatefulWidget {
   PerdidaAudicionWidgetState createState() => PerdidaAudicionWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class PerdidaAudicionWidgetState extends State<PerdidaAudicion> {
   @override
   Widget build(BuildContext context) {
@@ -2153,7 +2231,6 @@ class UtilizaAudifonos extends StatefulWidget {
   UtilizaAudiWidgetState createState() => UtilizaAudiWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class UtilizaAudiWidgetState extends State<UtilizaAudifonos> {
   @override
   Widget build(BuildContext context) {
@@ -2228,7 +2305,6 @@ class Zumbido extends StatefulWidget {
   ZumbidoWidgetState createState() => ZumbidoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ZumbidoWidgetState extends State<Zumbido> {
   @override
   Widget build(BuildContext context) {
@@ -2304,7 +2380,6 @@ class UtilizaAnteojosCerca extends StatefulWidget {
       UtilizaAnteojosCercaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class UtilizaAnteojosCercaWidgetState extends State<UtilizaAnteojosCerca> {
   @override
   Widget build(BuildContext context) {
@@ -2380,7 +2455,6 @@ class UtilizaAnteojosLejos extends StatefulWidget {
       UtilizaAnteojosLejosWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class UtilizaAnteojosLejosWidgetState extends State<UtilizaAnteojosLejos> {
   @override
   Widget build(BuildContext context) {
@@ -2456,7 +2530,6 @@ class ProblemaVisionLado extends StatefulWidget {
       ProblemaVisionLadoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemaVisionLadoWidgetState extends State<ProblemaVisionLado> {
   @override
   Widget build(BuildContext context) {
@@ -2531,7 +2604,6 @@ class VisionBorrosa extends StatefulWidget {
   VisionBorrosaWidgetState createState() => VisionBorrosaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class VisionBorrosaWidgetState extends State<VisionBorrosa> {
   @override
   Widget build(BuildContext context) {
@@ -2606,7 +2678,6 @@ class VisionDoble extends StatefulWidget {
   VisionDobleWidgetState createState() => VisionDobleWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class VisionDobleWidgetState extends State<VisionDoble> {
   @override
   Widget build(BuildContext context) {
@@ -2681,7 +2752,6 @@ class VeCosasNoExisten extends StatefulWidget {
   VeCosasNoExistenWidgetState createState() => VeCosasNoExistenWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class VeCosasNoExistenWidgetState extends State<VeCosasNoExisten> {
   @override
   Widget build(BuildContext context) {
@@ -2757,7 +2827,6 @@ class SensiLucesBrillantes extends StatefulWidget {
       SensiLucesBrillantesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class SensiLucesBrillantesWidgetState extends State<SensiLucesBrillantes> {
   @override
   Widget build(BuildContext context) {
@@ -2833,7 +2902,6 @@ class PeriodosCortosCeguera extends StatefulWidget {
       PeriodosCortosCegueraWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class PeriodosCortosCegueraWidgetState extends State<PeriodosCortosCeguera> {
   @override
   Widget build(BuildContext context) {
@@ -2908,7 +2976,6 @@ class CosasPasanCuerpo extends StatefulWidget {
   CosasPasanCuerpoWidgetState createState() => CosasPasanCuerpoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
   @override
   Widget build(BuildContext context) {
@@ -2984,7 +3051,6 @@ class DistinguirCalorFrio extends StatefulWidget {
       DistinguirCalorFrioWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
   @override
   Widget build(BuildContext context) {
@@ -3059,7 +3125,6 @@ class ProblemasGusto extends StatefulWidget {
   ProblemasGustoWidgetState createState() => ProblemasGustoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemasGustoWidgetState extends State<ProblemasGusto> {
   @override
   Widget build(BuildContext context) {
@@ -3134,7 +3199,6 @@ class ProblemasOlfato extends StatefulWidget {
   ProblemasOlfatoWidgetState createState() => ProblemasOlfatoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ProblemasOlfatoWidgetState extends State<ProblemasOlfato> {
   @override
   Widget build(BuildContext context) {
@@ -3209,7 +3273,6 @@ class Dolor extends StatefulWidget {
   DolorWidgetState createState() => DolorWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DolorWidgetState extends State<Dolor> {
   @override
   Widget build(BuildContext context) {

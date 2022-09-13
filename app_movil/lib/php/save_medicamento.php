@@ -13,7 +13,7 @@ try {
     $stmt->bindParam(3, $id_medicamento);
 
 	$stmt->execute();
-
+ 
     echo json_encode("Success");
 
 } catch (PDOException $e) {

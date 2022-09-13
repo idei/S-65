@@ -124,7 +124,10 @@ try {
 
     $select_evento->execute();
     $evento = $select_evento->fetchAll();
-
+    
+    
+    echo($evento);
+    var_dump($cod_event_nutri1);
 
     foreach ($evento as $eventos) {
 
@@ -261,6 +264,7 @@ try {
         }
     }
 
+
     //Call our custom function.
     pdoMultiInsert('respuesta_screening', $rowsToInsert, $db);
 
@@ -289,7 +293,7 @@ try {
     
 
 } catch (PDOException $e) {
-    echo json_encode("Error");
+    echo json_encode("Error: " + $e);
 }
 
 
@@ -330,3 +334,5 @@ function pdoMultiInsert($tableName, $data, $pdoObject)
     //Execute our statement (i.e. insert the data).
     return $pdoStatement->execute();
 }
+
+?>

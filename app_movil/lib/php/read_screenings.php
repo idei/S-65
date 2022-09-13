@@ -18,7 +18,7 @@
         }
         echo json_encode($lista);
 	}else {
-        $error = "Error";
+        $error = "Vacio";
         echo json_encode($error);
     }
     

@@ -1,3 +1,4 @@
+import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -70,7 +71,7 @@ class _FormRegisterState extends State<RegisterPage> {
 
   registerPaciente() async {
     String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/user_register.php";
+    var url = "https://alanalizador.000webhostapp.com/php/user_register.php";
     var response = await http.post(url, body: {
       "email": emailPaciente.text,
       "password": passwordNuevo.text,
@@ -82,6 +83,10 @@ class _FormRegisterState extends State<RegisterPage> {
     var responseDecoder = json.decode(response.body);
 
     if (responseDecoder[0] == "Success" && response.statusCode == 200) {
+      // Prueba Modelos------------
+      Map userMap = json.decode(response.body);
+      var user = UsuarioModel.fromJson(userMap);
+      //---------------------------
       await set_preference();
       Navigator.pushNamed(context, '/form_datos_generales', arguments: {
         'nombre': nombrePaciente.text,

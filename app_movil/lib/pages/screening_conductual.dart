@@ -89,7 +89,6 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
             });
           },
         ),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text('Chequeo de Conducta',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -134,11 +133,16 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   }
 }
 
-class ColumnWidgetConductual extends StatelessWidget {
+class ColumnWidgetConductual extends StatefulWidget {
   const ColumnWidgetConductual({
     Key key,
   }) : super(key: key);
 
+  @override
+  State<ColumnWidgetConductual> createState() => _ColumnWidgetConductualState();
+}
+
+class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
@@ -543,10 +547,7 @@ class ColumnWidgetConductual extends StatelessWidget {
           margin: EdgeInsets.all(15),
           elevation: 10,
           child: ClipRRect(
-            // Los bordes del contenido del card se cortan usando BorderRadius
             borderRadius: BorderRadius.circular(15),
-
-            // EL widget hijo que será recortado segun la propiedad anterior
             child: Column(
               children: <Widget>[
                 Container(
@@ -613,17 +614,42 @@ class ColumnWidgetConductual extends StatelessWidget {
       Padding(
         padding: EdgeInsets.all(8.0),
       ),
-      ElevatedButton(
-        child: Text('GUARDAR'),
-        style: ElevatedButton.styleFrom(),
-        onPressed: () {
-          guardarDatosConductual(context);
-        },
+      ElevatedButton.icon(
+        icon: _isLoading
+            ? Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: const CircularProgressIndicator(),
+              )
+            : const Icon(Icons.save_alt),
+        style: ElevatedButton.styleFrom(
+          textStyle: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+        ),
+        onPressed: () => !_isLoading ? _startLoading() : null,
+        label: Text('GUARDAR',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              fontWeight: FontWeight.bold,
+            )),
       ),
       Padding(
         padding: EdgeInsets.all(4.0),
       ),
     ]);
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await guardarDatosConductual(context);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 }
 
@@ -654,6 +680,36 @@ _alert_clinicos(context, title, descripcion) {
       )
     ],
   ).show();
+}
+
+showDialogMessage(context) async {
+  await Future.delayed(Duration(microseconds: 1));
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            height: 80,
+            width: 80,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Guardando Información",
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      });
 }
 
 Future<List> getAllRespuesta({bool otro = false}) async {
@@ -706,95 +762,85 @@ _alert_informe(context, title, descripcion) async {
 }
 
 guardarDatosConductual(BuildContext context) async {
-  if (id_conductual1 == null) {
-    loginToast("Debe responder todas las preguntas");
-  } else {
-    if (id_conductual2 == null) {
-      loginToast("Debe responder todas las preguntas");
-    } else {
-      if (id_conductual3 == null) {
-        loginToast("Debe responder todas las preguntas");
-      } else {
-        if (id_conductual4 == null) {
-          loginToast("Debe responder todas las preguntas");
-        } else {
-          if (id_conductual5 == null) {
-            loginToast("Debe responder todas las preguntas");
-          } else {
-            if (id_conductual6 == null) {
-              loginToast("Debe responder todas las preguntas");
-            } else {
-              if (id_conductual7 == null) {
-                loginToast("Debe responder todas las preguntas");
-              } else {
-                if (id_conductual8 == null) {
-                  loginToast("Debe responder todas las preguntas");
-                } else {
-                  if (id_conductual9 == null) {
-                    loginToast("Debe responder todas las preguntas");
-                  } else {
-                    if (id_conductual10 == null) {
-                      loginToast("Debe responder todas las preguntas");
-                    } else {
-                      if (id_conductual11 == null) {
-                        loginToast("Debe responder todas las preguntas");
-                      } else {
-                        if (id_conductual12 == null) {
-                          loginToast("Debe responder todas las preguntas");
-                        } else {
-                          String URL_base = Env.URL_PREFIX;
-                          var url =
-                              URL_base + "/respuesta_screening_conductual.php";
-                          var response = await http.post(url, body: {
-                            "id_paciente": id_paciente.toString(),
-                            "id_medico": id_medico.toString(),
-                            "id_recordatorio": id_recordatorio.toString(),
-                            "tipo_screening": tipo_screening.toString(),
-                            "id_conductual1": id_conductual1,
-                            "observaciones": otro.text,
-                            "id_conductual2": id_conductual2,
-                            "id_conductual3": id_conductual3,
-                            "id_conductual4": id_conductual4,
-                            "id_conductual5": id_conductual5,
-                            "id_conductual6": id_conductual6,
-                            "id_conductual7": id_conductual7,
-                            "id_conductual8": id_conductual8,
-                            "id_conductual9": id_conductual9,
-                            "id_conductual10": id_conductual10,
-                            "id_conductual11": id_conductual11,
-                            "id_conductual12": id_conductual12,
-                            "id_conductual13": id_conductual13,
-                          });
-                          print(response.body);
-                          var data = json.decode(response.body);
-                          print(data);
+  if (id_conductual1 == null) loginToast("Debe responder todas las preguntas");
 
-                          if (data == "alert") {
-                            _alert_informe(
-                              context,
-                              "Para tener en cuenta",
-                              "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-                            );
-                          } else {
-                            if (data == "Success") {
-                              if (screening_recordatorio == true) {
-                                Navigator.pushNamed(context, '/recordatorio');
-                              } else {
-                                Navigator.pushNamed(context, '/screening',
-                                    arguments: {
-                                      "select_screening": "CONDUC",
-                                    });
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+  if (id_conductual2 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual3 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual4 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual5 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual6 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual7 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual8 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual9 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual10 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual11 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual12 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual13 == null) loginToast("Debe responder todas las preguntas");
+
+  if (id_conductual1 != null &&
+      id_conductual2 != null &&
+      id_conductual3 != null &&
+      id_conductual4 != null &&
+      id_conductual5 != null &&
+      id_conductual6 != null &&
+      id_conductual7 != null &&
+      id_conductual8 != null &&
+      id_conductual9 != null &&
+      id_conductual10 != null &&
+      id_conductual11 != null &&
+      id_conductual12 != null &&
+      id_conductual13 != null) {
+    showDialogMessage(context);
+    String URL_base = Env.URL_PREFIX;
+    var url = URL_base + "/respuesta_screening_conductual.php";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening.toString(),
+      "id_conductual1": id_conductual1,
+      "observaciones": otro.text,
+      "id_conductual2": id_conductual2,
+      "id_conductual3": id_conductual3,
+      "id_conductual4": id_conductual4,
+      "id_conductual5": id_conductual5,
+      "id_conductual6": id_conductual6,
+      "id_conductual7": id_conductual7,
+      "id_conductual8": id_conductual8,
+      "id_conductual9": id_conductual9,
+      "id_conductual10": id_conductual10,
+      "id_conductual11": id_conductual11,
+      "id_conductual12": id_conductual12,
+      "id_conductual13": id_conductual13,
+    });
+
+    var data = json.decode(response.body);
+
+    if (data == "alert") {
+      _alert_informe(
+        context,
+        "Para tener en cuenta",
+        "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+      );
+    } else {
+      if (data == "Success") {
+        if (screening_recordatorio == true) {
+          Navigator.pushNamed(context, '/recordatorio');
+        } else {
+          Navigator.pushNamed(context, '/screening', arguments: {
+            "select_screening": "CONDUC",
+          });
         }
       }
     }

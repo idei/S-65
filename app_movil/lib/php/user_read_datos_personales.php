@@ -3,7 +3,8 @@
 
     $email = $_POST['email'];
 
-    $select_data = $db->prepare("SELECT rela_users, rela_nivel_instruccion,
+    try {
+        $select_data = $db->prepare("SELECT rela_users, rela_nivel_instruccion,
     rela_grupo_conviviente, rela_departamento, rela_genero, nombre, apellido, dni, 
     fecha_nacimiento, celular, contacto 
     FROM pacientes 
@@ -43,5 +44,10 @@
     );
 
     echo json_encode($lista);
-    //
+
+    } catch (PDOException $error) {
+        echo json_encode("Error: "+ $error);
+    }
+
+    
 ?>

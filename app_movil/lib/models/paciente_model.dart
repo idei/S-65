@@ -1,5 +1,3 @@
-import 'package:app_salud/models/usuario_model.dart';
-
 class PacienteModel {
   var rela_users;
   var rela_genero;
@@ -14,25 +12,21 @@ class PacienteModel {
   String contacto;
   var estado_users;
   String email;
-  //UsuarioModel usuarioEmail;
-  //UsuarioModel usuarioTokenId;
 
   PacienteModel({
-    this.rela_users,
-    this.rela_genero,
-    this.rela_nivel_instruccion,
-    this.rela_departamento,
-    this.rela_grupo_conviviente,
+    this.rela_users = "",
+    this.rela_genero = "",
+    this.rela_nivel_instruccion = "",
+    this.rela_departamento = "",
+    this.rela_grupo_conviviente = "",
     this.nombre,
     this.apellido,
-    this.fecha_nacimiento,
+    this.fecha_nacimiento = "",
     this.dni,
-    this.celular,
-    this.contacto,
+    this.celular = "",
+    this.contacto = "",
     this.estado_users,
     this.email,
-    //this.usuarioEmail,
-    //this.usuarioTokenId,
   });
 
   factory PacienteModel.fromJson(Map<String, dynamic> json) {
@@ -50,8 +44,6 @@ class PacienteModel {
       contacto: json['contacto'],
       estado_users: json['estado_users'],
       email: json['estado_users'],
-      //usuarioEmail: UsuarioModel.fromJson(json["email"]),
-      //usuarioTokenId: UsuarioModel.fromJson(json["tokenId"]),
     );
   }
 }

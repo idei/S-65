@@ -386,7 +386,7 @@ try {
     }
 
     //Call our custom function.
-    pdoMultiInsert('respuesta_screening', $rowsToInsert, $db);
+    $responseInsert = pdoMultiInsert('respuesta_screening', $rowsToInsert, $db);
 
     if ($recordatorio_medico <> null) {
         $rela_estado_recordatorio = 2;
@@ -397,8 +397,15 @@ try {
         $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
     }
 
+    $lista = array();
 
-    echo json_encode($result_screening);
+    if ($responseInsert) {
+        array_push($lista, "Success", $result_screening);
+        echo json_encode($lista);
+    }else {
+        echo json_encode("No se puedo realizar el registro");
+    }
+
 } catch (PDOException $e) {
     echo json_encode('Error conectando con la base de datos: ' . $e->getMessage());
 }

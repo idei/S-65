@@ -226,7 +226,7 @@ class _ScreeningState extends State<ScreeningPage> {
     data_error = json.decode(response.body);
     print(response.body);
 
-    if (data_error.toString() != 'Error') {
+    if (data_error.toString() != 'Vacio') {
       final items = json.decode(response.body).cast<Map<String, dynamic>>();
       recordatorios_items = items.map<ScreeningModel>((json) {
         return ScreeningModel.fromJson(json);

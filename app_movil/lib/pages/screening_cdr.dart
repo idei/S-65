@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -66,6 +68,7 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
   @override
   void initState() {
     super.initState();
+    _resetChecksNull();
     WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
         context,
         "Cuestionario CDR",
@@ -79,272 +82,300 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
     getStringValuesSF();
 
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "CDR",
-              });
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "CDR",
+            });
+          },
+        ),
+        title: Text('Actividades de la vida diaria - CDR',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
             },
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Actividades de la vida diaria - CDR',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-            child: Container(
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Memoria',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Memoria(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Juicio y Resolución de Problemas',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        JuicioResoProblema(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Orientación',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Orientacion(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Vida Social',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        VidaSocial(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Hogar y Aficiones',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Hogar(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Card(
+                  color: Colors.blue[50],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(10),
+                  elevation: 10,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Container(
+                          width: 320,
+                          child: Text(
+                            'Cuidado Personal',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                        Divider(height: 5.0, color: Colors.black),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        CuidadoPersonal(),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+              Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Memoria',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Memoria(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Juicio y Resolución de Problemas',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                JuicioResoProblema(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Orientación',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Orientacion(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Vida Social',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                VidaSocial(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Hogar y Aficiones',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Hogar(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Card(
-                          color: Colors.blue[50],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          margin: EdgeInsets.all(10),
-                          elevation: 10,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                Container(
-                                  width: 320,
-                                  child: Text(
-                                    'Cuidado Personal',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                                Divider(height: 5.0, color: Colors.black),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                ),
-                                CuidadoPersonal(),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            //primary: Color.fromRGBO(157, 19, 34, 1),
-                            ),
-                        onPressed: () {
-                          guardar_datos(context);
-                        },
-                        child: Text('GUARDAR'),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                      ),
-                    ]))));
+              ),
+              ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
+                style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
+                ),
+                onPressed: () => !_isLoading ? _startLoading() : null,
+                label: Text('GUARDAR',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
+              Padding(
+                padding: EdgeInsets.all(4.0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await guardar_datos(context);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void choiceAction(String choice) {
@@ -354,6 +385,36 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
       Navigator.pushNamed(context, '/');
     }
   }
+}
+
+showDialogMessage(context) async {
+  await Future.delayed(Duration(microseconds: 1));
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            height: 80,
+            width: 80,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Guardando Información",
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      });
 }
 
 loginToast(String toast) {
@@ -385,65 +446,77 @@ Future<List> getAllRespuesta(var estado) async {
 var data;
 
 guardar_datos(BuildContext context) async {
-  if (memoria == null) {
-    loginToast("Debe responder si los item de memoria");
-  } else {
-    if (orientacion == null) {
-      loginToast("Debe responder si los item de orientacion");
-    } else {
-      if (juicio_res_problema == null) {
-        loginToast(
-            "Debe responder los item de juicio y resolucion de problemas");
+  if (memoria == null) loginToast("Debe responder los item de memoria");
+
+  if (orientacion == null) loginToast("Debe responder los item de orientacion");
+
+  if (juicio_res_problema == null)
+    loginToast("Debe responder los item de juicio y resolucion de problemas");
+
+  if (vida_social == null) loginToast("Debe responder los item de vida social");
+
+  if (hogar == null) loginToast("Debe responder los item de Orientación");
+
+  if (cuid_personal == null) {
+    loginToast("Debe responder los item de Cuidado Personal");
+  }
+
+  if (memoria != null &&
+      orientacion != null &&
+      juicio_res_problema != null &&
+      vida_social != null &&
+      hogar != null &&
+      cuid_personal != null) {
+    showDialogMessage(context);
+
+    String URL_base = Env.URL_PREFIX;
+    var url = URL_base + "/respuesta_screening_cdr.php";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening.toString(),
+      "memoria": memoria,
+      "orientacion": orientacion,
+      "juicio_res_problema": juicio_res_problema,
+      "vida_social": vida_social,
+      "hogar": hogar,
+      "cuid_personal": cuid_personal,
+    });
+
+    var responseDecoder = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      _resetChecksNull();
+
+      if (responseDecoder == "Alert") {
+        _alert_informe(
+          context,
+          "Para tener en cuenta",
+          "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+        );
       } else {
-        if (vida_social == null) {
-          loginToast("Debe responder los item de vida social");
+        if (screening_recordatorio == true) {
+          Navigator.pushNamed(context, '/recordatorio');
         } else {
-          if (hogar == null) {
-            loginToast("Debe responder si los item de Orientación");
-          } else {
-            if (cuid_personal == null) {
-              loginToast("Debe responder si los item de Cuidado Personal");
-            } else {
-              String URL_base = Env.URL_PREFIX;
-              var url = URL_base + "/respuesta_screening_cdr.php";
-              var response = await http.post(url, body: {
-                "id_paciente": id_paciente.toString(),
-                "id_medico": id_medico.toString(),
-                "id_recordatorio": id_recordatorio.toString(),
-                "tipo_screening": tipo_screening.toString(),
-                "memoria": memoria,
-                "orientacion": orientacion,
-                "juicio_res_problema": juicio_res_problema,
-                "vida_social": vida_social,
-                "hogar": hogar,
-                "cuid_personal": cuid_personal,
-              });
-              var responseDecoder = json.decode(response.body);
-              if (response.statusCode == 200) {
-                if (responseDecoder == "Alert") {
-                  _alert_informe(
-                    context,
-                    "Para tener en cuenta",
-                    "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-                  );
-                } else {
-                  if (screening_recordatorio == true) {
-                    Navigator.pushNamed(context, '/recordatorio');
-                  } else {
-                    Navigator.pushNamed(context, '/screening', arguments: {
-                      "select_screening": "CDR",
-                    });
-                  }
-                }
-              } else {
-                _alertInforme(context, "Error detectado", '${responseDecoder}');
-              }
-            }
-          }
+          Navigator.pushNamed(context, '/screening', arguments: {
+            "select_screening": "CDR",
+          });
         }
       }
+    } else {
+      _alertInforme(context, "Error detectado", '${responseDecoder}');
     }
   }
+}
+
+_resetChecksNull() {
+  memoria = null;
+  orientacion = null;
+  juicio_res_problema = null;
+  vida_social = null;
+  hogar = null;
+  cuid_personal = null;
 }
 
 _alertInforme(context, title, descripcion) async {
@@ -474,12 +547,12 @@ _alertInforme(context, title, descripcion) async {
 }
 
 //----------------------------------------MEMORIA------------------------------------------------------------------------------------------
-var memoria = null;
-var orientacion = null;
-var juicio_res_problema = null;
-var vida_social = null;
-var hogar = null;
-var cuid_personal = null;
+var memoria;
+var orientacion;
+var juicio_res_problema;
+var vida_social;
+var hogar;
+var cuid_personal;
 
 class Memoria extends StatefulWidget {
   @override

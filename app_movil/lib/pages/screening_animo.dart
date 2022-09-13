@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 var id_paciente;
@@ -14,7 +13,6 @@ var id_recordatorio;
 var screening_recordatorio;
 var email;
 
-// Define a custom Form widget.
 class FormScreeningAnimo extends StatefulWidget {
   final pageName = 'screening_animo';
 
@@ -27,29 +25,17 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
         context,
         "Cuestionario de Ánimo",
         "Este cuestionario valora cómo está su ánimo actualmente . Por favor responda sinceramente a cada una de las preguntas.  "));
   }
 
-  loginToast(String toast) {
-    return Fluttertoast.showToast(
-        msg: toast,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white);
-  }
-
   @override
   void dispose() {
     myController.dispose();
     super.dispose();
-  }
-
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
   }
 
   getStringValuesSF() async {
@@ -96,55 +82,49 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return FutureBuilder(
-        future: read_recordatorios(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
-          if (snapshot.hasData) {
-            return ScreeningAnimo();
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                title: Text('Chequeo de Animo',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
-              body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "ANIMO",
+            });
+          },
+        ),
+        title: Text('Chequeo de Ánimo',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            )),
+      ),
+      body: FutureBuilder(
+          future: delayScreeningAnimo(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            print(snapshot.connectionState);
+            if (snapshot.hasData) {
+              return ScreeningAnimo();
+            } else {
+              return Center(
                 child: CircularProgressIndicator(
                   semanticsLabel: "Cargando",
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          }),
+    );
   }
 }
 
-read_recordatorios() async {
-  await Future.delayed(Duration(milliseconds: 500));
+delayScreeningAnimo() async {
+  await Future.delayed(Duration(milliseconds: 1500));
   return true;
 }
 
-Widget texto(String entrada) {
-  return Text(
-    entrada,
-    style: TextStyle(
-        fontSize: 12.0,
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontFamily: "Roboto"),
-  );
-}
+var resultadoScreening;
 
-var resultado;
-
-guardar_datos(BuildContext context) async {
+guardar_datos(context) async {
   String URL_base = Env.URL_PREFIX;
   var url = URL_base + "/respuesta_screening_animo.php";
   var response = await http.post(url, body: {
@@ -184,30 +164,33 @@ guardar_datos(BuildContext context) async {
     "cod_event_situacion_mejor": cod_event_situacion_mejor,
   });
 
-  print(response.body);
-  resultado = json.decode(response.body);
+  if (response.statusCode == 200) {
+    resultadoScreening = json.decode(response.body);
 
-  if (int.parse(resultado) > 9) {
+    _resetChecksFalse();
+
+    if (int.parse(resultadoScreening[1]) > 9) {
+      _alert_informe(
+        context,
+        "Para tener en cuenta",
+        "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
+      );
+    } else {
+      if (screening_recordatorio == true) {
+        Navigator.pushNamed(context, '/recordatorio');
+      } else {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ÁNIMO",
+        });
+      }
+    }
+  } else {
     _alert_informe(
       context,
-      "Para tener en cuenta",
-      "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
+      "Error al guardar",
+      response.body,
     );
-  } else {
-    if (screening_recordatorio == true) {
-      Navigator.pushNamed(context, '/recordatorio');
-    } else {
-      Navigator.pushNamed(context, '/screening', arguments: {
-        "select_screening": "ANIMO",
-      });
-    }
   }
-}
-
-read_datos_paciente() async {
-  await Future.delayed(Duration(milliseconds: 1500));
-
-  return true;
 }
 
 Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
@@ -218,6 +201,25 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
       child: child,
     ),
   );
+}
+
+_resetChecksFalse() {
+  satisfecho = false;
+  abandonado = false;
+  vacia = false;
+  aburrida = false;
+  humor = false;
+  temor = false;
+  feliz = false;
+
+  desamparado = false;
+  prefiere = false;
+  memoria = false;
+  estar_vivo = false;
+  inutil = false;
+  energia = false;
+  situacion = false;
+  situacion_mejor = false;
 }
 
 _alert_clinicos(context, title, descripcion) {
@@ -266,8 +268,6 @@ _alert_informe(context, title, descripcion) {
   ).show();
 }
 
-//----------------------------------------Chequeo de Sintomas ------------------------------------------
-
 class ScreeningAnimo extends StatefulWidget {
   ScreeningAnimo({Key key}) : super(key: key);
 
@@ -275,141 +275,164 @@ class ScreeningAnimo extends StatefulWidget {
   ScreeningAnimoWidgetState createState() => ScreeningAnimoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   final _formKey_screening_animo = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "ANIMO",
-              });
-            },
-          ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Chequeo de Animo',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
+    return Form(
+      key: _formKey_screening_animo,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: <Widget>[
+            SatisfechoVida(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Abandonado(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Nauseas(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Aburrida(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Humor(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Temor(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Feliz(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Desamparados(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Prefiere(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Memoria(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            EstarVivo(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Inutil(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Energia(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            Situacion(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Divider(height: 3.0, color: Colors.black),
+            MejorUsted(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            ElevatedButton.icon(
+              icon: _isLoading
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: const CircularProgressIndicator(),
+                    )
+                  : const Icon(Icons.save_alt),
+              style: ElevatedButton.styleFrom(
+                textStyle: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+              onPressed: () => !_isLoading ? _startLoading() : null,
+              label: Text('GUARDAR',
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontWeight: FontWeight.bold,
+                  )),
+            ),
           ],
         ),
-        body: Form(
-          key: _formKey_screening_animo,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: <Widget>[
-                SatisfechoVida(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Abandonado(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Nauseas(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Aburrida(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Humor(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Temor(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Feliz(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Desamparados(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Prefiere(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Memoria(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                EstarVivo(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Inutil(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Energia(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                Situacion(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                MejorUsted(),
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                SizedBox(
-                  width: 15,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    guardar_datos(context);
-                  },
-                  child: Text('GUARDAR',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-              ],
+      ),
+    );
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardar_datos(context);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Información",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        ));
+          );
+        });
   }
 
   void choiceAction(String choice) {
@@ -521,7 +544,6 @@ class SatisfechoVida extends StatefulWidget {
       CheckSatisfechoVidaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckSatisfechoVidaWidgetState extends State<SatisfechoVida> {
   @override
   Widget build(BuildContext context) {
@@ -593,7 +615,6 @@ class Abandonado extends StatefulWidget {
   CheckAbandonadoWidgetState createState() => CheckAbandonadoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckAbandonadoWidgetState extends State<Abandonado> {
   @override
   Widget build(BuildContext context) {
@@ -663,7 +684,6 @@ class Nauseas extends StatefulWidget {
   NauseasWidgetState createState() => NauseasWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class NauseasWidgetState extends State<Nauseas> {
   @override
   Widget build(BuildContext context) {
@@ -733,7 +753,6 @@ class Aburrida extends StatefulWidget {
   AburridaWidgetState createState() => AburridaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class AburridaWidgetState extends State<Aburrida> {
   @override
   Widget build(BuildContext context) {
@@ -803,7 +822,6 @@ class Humor extends StatefulWidget {
   HumorWidgetState createState() => HumorWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class HumorWidgetState extends State<Humor> {
   @override
   Widget build(BuildContext context) {
@@ -873,7 +891,6 @@ class Temor extends StatefulWidget {
   TemorWidgetState createState() => TemorWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class TemorWidgetState extends State<Temor> {
   @override
   Widget build(BuildContext context) {
@@ -943,7 +960,6 @@ class Feliz extends StatefulWidget {
   FelizWidgetState createState() => FelizWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class FelizWidgetState extends State<Feliz> {
   @override
   Widget build(BuildContext context) {
@@ -1012,7 +1028,6 @@ class Desamparados extends StatefulWidget {
   DesamparadosWidgetState createState() => DesamparadosWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DesamparadosWidgetState extends State<Desamparados> {
   @override
   Widget build(BuildContext context) {
@@ -1083,7 +1098,6 @@ class Prefiere extends StatefulWidget {
   PrefiereWidgetState createState() => PrefiereWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class PrefiereWidgetState extends State<Prefiere> {
   @override
   Widget build(BuildContext context) {
@@ -1153,7 +1167,6 @@ class Memoria extends StatefulWidget {
   MemoriaWidgetState createState() => MemoriaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class MemoriaWidgetState extends State<Memoria> {
   @override
   Widget build(BuildContext context) {
@@ -1223,7 +1236,6 @@ class EstarVivo extends StatefulWidget {
   EstarVivoWidgetState createState() => EstarVivoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EstarVivoWidgetState extends State<EstarVivo> {
   @override
   Widget build(BuildContext context) {
@@ -1292,7 +1304,6 @@ class Inutil extends StatefulWidget {
   InutilWidgetState createState() => InutilWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class InutilWidgetState extends State<Inutil> {
   @override
   Widget build(BuildContext context) {
@@ -1361,7 +1372,6 @@ class Energia extends StatefulWidget {
   EnergiaWidgetState createState() => EnergiaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EnergiaWidgetState extends State<Energia> {
   @override
   Widget build(BuildContext context) {
@@ -1430,7 +1440,6 @@ class Situacion extends StatefulWidget {
   ConFrecWidgetState createState() => ConFrecWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ConFrecWidgetState extends State<Situacion> {
   @override
   Widget build(BuildContext context) {
@@ -1499,7 +1508,6 @@ class MejorUsted extends StatefulWidget {
   MejorUstedWidgetState createState() => MejorUstedWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class MejorUstedWidgetState extends State<MejorUsted> {
   @override
   Widget build(BuildContext context) {
