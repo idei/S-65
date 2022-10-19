@@ -18,7 +18,7 @@ export default class MyDocument extends Document{
       }
 }
 
-MyDocument.getInitialProps =  async (ctx) => {
+/*MyDocument.getInitialProps =  async (ctx) => {
     const sheets = new ServerStyleSheets();
     const originalRenderPage = ctx.renderPage;
 
@@ -34,4 +34,4 @@ MyDocument.getInitialProps =  async (ctx) => {
         ...initialProps,
         styles: [...React.Children.toArray(initialProps.styles),sheets.getStyleElement]
     }
-}
+}*/

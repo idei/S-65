@@ -57,10 +57,10 @@ const TablaAvisos = () => {
                                     {value.url_imagen ? value.url_imagen : <label className={`${styles.labelColor}`}>No tiene url</label>}
                                 </TableCell>
                                 <TableCell>
-                                    {value.fecha_creacion}
+                                    {value.fecha_creacion.toString()}
                                 </TableCell>
                                 <TableCell>
-                                    {value.fecha_limite}
+                                    {value.fecha_limite.toString()}
                                 </TableCell>
                                 <TableCell>
                                     <Link href={`avisos/aviso_general/${value.id}`}>

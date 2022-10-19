@@ -43,8 +43,6 @@ const Aviso = () => {
                     <h2>Datos del aviso</h2>
                     <div className="d-flex flex-column">
                         <label><b>Descripcion completa:</b><br></br> {avisoGeneral.descripcion}</label>
-                        <label><b>Fecha limite:</b> {avisoGeneral.fecha_limite}</label>
-                        <label><b>Fecha creacion:</b> {avisoGeneral.fecha_creacion}</label>
                         <label><b>Url:</b> {avisoGeneral.url_imagen}</label>
                     </div>
                     <h3 className="mt-1">Pacientes avisados</h3>
