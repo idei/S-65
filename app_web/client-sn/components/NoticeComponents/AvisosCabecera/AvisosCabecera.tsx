@@ -1,15 +1,11 @@
-import { Button, TextField } from "@material-ui/core"
 import ModalFounded from "../../SearchComponents/ModalFounded/ModalFounded"
 import ModalNotFounded from "../../SearchComponents/ModalNotFounded/ModalNotFounded"
-import Link from "next/link"
-import React, { useState } from "react"
 import { Paciente } from "../../../interfaces/Paciente"
 import pacienteService from "../../../services/PacienteService"
-import styles from "./AvisosCabecera.module.scss"
 const AvisosCabecera = () => {
     const [dni, guardarDni] = useState<number>(null)
     const [paciente, storePaciente] = useState<Paciente>(null)
-    const [mostrarModal, guardarMostrarModal] = useState(false)
+    const [mostrarModal, guardarMostrarModal] = useState(null)
     const onClickFind = async () => {
         const response = await pacienteService.getPaciente(dni)
         if(response){
@@ -43,9 +39,7 @@ const AvisosCabecera = () => {
                     <div className="d-flex justify-content-between ">
                         <h6 className="invisible">Avisos grupales</h6>
                         {/* <TextField type="number" className="mb-2 invisible" placeholder="DNI del paciente" /> */}
-                        <Link href="/avisos/aviso_general">
-                            <Button color="primary" className={`${styles.colorText}`} href="/avisos/aviso_general" variant="contained" >Crear nuevo aviso grupal</Button>
-                        </Link>
+                      
                     </div>
                 </div>
             </div>
@@ -53,3 +47,7 @@ const AvisosCabecera = () => {
     )
 }
 export default AvisosCabecera
+
+function useState<T>(arg0: null): [any, any] {
+    throw new Error("Function not implemented.")
+}
