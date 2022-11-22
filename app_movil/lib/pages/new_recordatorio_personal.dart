@@ -119,7 +119,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
 getStringValuesSF() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String email_prefer = prefs.getString("email_prefer");
-  //var estado_clinico_prefer = prefs.getString("estado_clinico");
+
   email = email_prefer;
   print(email);
 }
@@ -136,11 +136,12 @@ guardar_datos(context) async {
 
   var responseDecode = jsonDecode(response.body);
 
-  if (response.statusCode == 200 && responseDecode == "Success") {
+  if (response.statusCode == 200 && responseDecode['request'] == "Success") {
     _alert_informe(context, "Recordatorio creado correctamente", 1);
     Navigator.of(context).pushReplacementNamed('/recordatorio');
   } else {
-    _alert_informe(context, "Error al guardar: ${responseDecode}", 2);
+    _alert_informe(
+        context, "Error al guardar: ${responseDecode['request']}", 2);
     Navigator.of(context).pushReplacementNamed('/recordatorio');
   }
 }

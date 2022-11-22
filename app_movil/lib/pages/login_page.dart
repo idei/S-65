@@ -1,9 +1,11 @@
 import 'package:app_salud/models/usuario_model.dart';
+import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'recuperar_contras.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +31,8 @@ class _LoginPage extends State<LoginPage> {
   String estado_login;
 
   Widget build(BuildContext context) {
+    final usuarioService = Provider.of<UsuarioServices>(context);
+
     return Scaffold(
         body: Form(
       key: _formKey_ingresar,
@@ -45,28 +49,21 @@ class _LoginPage extends State<LoginPage> {
     await consult_preference();
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    prefs.setString("email_prefer", email.text);
-    //prefs.setString("tokenId", tokenId);
-    prefs.setInt("estado_clinico", estado_clinico);
     prefs.setInt("id_paciente", id_paciente);
   }
 
   consult_preference() async {
-    print("consult prefe");
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/consult_preference.php";
     var response = await http.post(url, body: {"email": email.text});
-    print(email.text);
-    print("response");
-    print(response.body);
-    var data = json.decode(response.body);
-    print("data");
-    print(data);
 
-    estado_read_date = data['estado_read_date'];
+    var data = json.decode(response.body);
+
+    estado_read_date = data['request'];
 
     if (estado_read_date == "Success") {
       estado_clinico = data['estado_users'];
+      id_paciente = data['id_paciente'];
     } else {
       loginToast("Error en counsult preference");
     }
@@ -74,6 +71,7 @@ class _LoginPage extends State<LoginPage> {
 
   fetchLogin() async {
     String URL_base = Env.URL_PREFIX;
+
     var url = URL_base + "/user_login.php";
 
     var response = await http.post(url, body: {
@@ -81,35 +79,40 @@ class _LoginPage extends State<LoginPage> {
       "password": password.text,
     });
 
+    var responseBody = json.decode(response.body);
+
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+      if (responseBody['request'] == "Success") {
+        Map userMap = responseBody;
+        var usuarioModel = UsuarioModel.fromJsonLogin(userMap);
 
-      estado_login = data['estado_login'];
-      id_paciente = data['id_paciente'];
+        final usuarioService =
+            Provider.of<UsuarioServices>(context, listen: false);
+        usuarioService.usuario = usuarioModel;
 
-      if (estado_login == "Success") {
-        estado_users = data['estado_users'];
+        estado_users = userMap['paciente']['estado_users'];
 
-        if (estado_users == 2 && estado_login == "Success") {
+        if (estado_users == 2 && responseBody['request'] == "Success") {
           set_preference();
-          print(email.text);
-          Navigator.pushNamed(context, '/menu',
-              arguments: {"email": email.text, "id_paciente": id_paciente});
+          Navigator.pushNamed(
+            context,
+            '/menu',
+          );
         } else {
-          if (estado_users == 1 && estado_login == "Success") {
-            Navigator.pushNamed(context, '/form_datos_generales', arguments: {
-              "email": email.text,
-              "id_paciente": data['estado_users']
-            });
+          if (estado_users == 1) {
+            Navigator.pushNamed(
+              context,
+              '/form_datos_generales',
+            );
           }
         }
-
-        loginToast(estado_login);
-      } else {
-        loginToast(estado_login + ": Usuario o contraseña incorrectos");
+        loginToast('Cargando información');
+      }
+      if (responseBody['request'] == 'incorrect') {
+        _alert_informe(context, 'Usuario o contraseña incorrectos', 2);
       }
     } else {
-      loginToast("Error: " + response.body);
+      _alert_informe(context, "Error: " + responseBody['request'], 2);
     }
   }
 
@@ -251,5 +254,17 @@ class _LoginPage extends State<LoginPage> {
         Navigator.popAndPushNamed(context, '/');
       },
     );
+  }
+
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 }

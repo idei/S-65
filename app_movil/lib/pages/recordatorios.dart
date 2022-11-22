@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import '../models/recordatorio_model.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,11 +15,16 @@ class RecordatorioPage extends StatefulWidget {
 final _formKey_recordatorios = GlobalKey<_RecordatorioState>();
 List<RecordatoriosModel> recordatorios_items;
 bool _isLoading = false;
+var email_argument;
+var usuarioModel;
 
 class _RecordatorioState extends State<RecordatorioPage> {
   var data_error;
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    email_argument = usuarioModel.usuario.emailUser;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -146,7 +153,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
     }
 
     String formatter = now.year.toString() + "-" + mes + "-" + dia;
-    //String formatter = DateFormat('yMd').format(now);
     print(formatter);
     DateTime fecha_limite1 = DateTime.parse(formatter);
     DateTime fecha_limite = DateTime.parse(data.fecha_limite);
@@ -181,11 +187,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
     );
   }
 
-  var email_argument;
-
   Future<List<RecordatoriosModel>> read_recordatorios() async {
-    await getStringValuesSF();
-
     var responseDecode;
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_recordatorios.php";
@@ -204,14 +206,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
       _isLoading = true;
       return null;
     }
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = await prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    //id_paciente = await prefs.getInt("id_paciente");
-    print(email_argument);
   }
 
   void choiceAction(String choice) {

@@ -1,53 +1,84 @@
 <?php 
     require 'db.php';
+
 	$email = $_POST['email'];
 	$password = $_POST['password'];
-	
-	$lista = array();
 
-	$stmt = $db->prepare("SELECT * FROM users WHERE email = '".$email."' AND password = '".$password."'");
-	$stmt->execute();
-	$result = $stmt->rowCount();
+	try {
+	
+		$stmt = $db->prepare("SELECT * FROM users WHERE email = '".$email."' AND password = '".$password."'");
+	    $stmt->execute();
+	    $result = $stmt->rowCount();
     
 	if ($result > 0) {
 		$result_select_users= $stmt->fetch();
 		$id_user = $result_select_users['id'];
-		//$token_id = $result_select_users['token'];
+		$token_id = $result_select_users['token'];
 		
-		$result_estado = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$id_user."'");
+		$result_paciente = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$id_user."'");
 
-	    $result_estado->execute();
+	    $result_paciente->execute();
 
-		$result_estado_count = $result_estado->rowCount();
+		$result_paciente_count = $result_paciente->rowCount();
 		
-		//if ($result_estado_count > 0) {
-			$estado_user = $result_estado->fetch();
+		if ($result_paciente_count > 0) {
+			$result_paciente = $result_paciente->fetch();
 			
-			$id_paciente = $estado_user['id'];
+			$id_paciente = $result_paciente['id'];
 			 
-			$estado_user = $estado_user['estado_users'];
-             
-			$array = array(
-				"estado_login" => "Success",
-				"estado_users" => $estado_user,
-				"id_paciente" => $id_paciente,
-				//"token"=> $token_id
+
+			$rela_users = $result_paciente['rela_users'];
+			$rela_nivel_instruccion = $result_paciente['rela_nivel_instruccion'];
+			$rela_grupo_conviviente = $result_paciente['rela_grupo_conviviente'];
+			$rela_departamento = $result_paciente['rela_departamento'];
+			$rela_genero = $result_paciente['rela_genero'];
+			$nombre = $result_paciente['nombre'];
+			$apellido = $result_paciente['apellido'];
+			$dni = $result_paciente['dni'];
+			$fecha_nacimiento = $result_paciente['fecha_nacimiento'];
+			$celular = $result_paciente['celular'];
+			$contacto = $result_paciente['contacto'];
+			$estado_users = $result_paciente['estado_users'];
+
+
+			$lista = array(
+				"request"=>"Success",
+				"token"=>$token_id,
+				"email" => $email,
+				//PacienteModel
+				"paciente"=>[
+				"rela_users" => $rela_users,
+				"rela_nivel_instruccion" => $rela_nivel_instruccion,
+				"rela_grupo_conviviente" => $rela_grupo_conviviente,
+				"rela_departamento" => $rela_departamento,
+				"rela_genero" => $rela_genero,
+				"nombre" => $nombre,
+				"apellido" => $apellido,
+				"dni" => $dni,
+				"fecha_nacimiento" => $fecha_nacimiento,
+				"celular" => $celular,
+				"contacto" => $contacto,
+				"estado_users"=>$estado_users
+				],
 			);
-			//array_push($lista, "Success", "estado_login");
-			//array_push($lista, $estado_user, "estado_users");
-			echo json_encode($array);
-		/*}else{
-			$array = array(
-				"estado_login" => "Error",
-			);
-			echo json_encode($array);
-		}*/
+
+			echo json_encode($lista);
+
+		}else{
+			$lista = array ("request"=>"Error al iniciar sesión");
+	        echo json_encode($lista);
+		}
 	
 	}else{
-		$array = array(
-			"estado_login" => "Error"
-		);
-		//array_push($lista, "Error", "estado_login");
-		echo json_encode($array);
+		
+		$lista = array ("request"=>"incorrect");
+	    echo json_encode($lista);
+		
 	}
+	} catch (PDOException $error) {
+		$lista = array ("request"=>$error->getMessage());
+	    echo json_encode($lista);
+	}
+
+	
 ?>

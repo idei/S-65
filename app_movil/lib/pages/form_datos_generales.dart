@@ -1,29 +1,26 @@
 import 'package:app_salud/models/paciente_model.dart';
+import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 String post_nombre;
 String post_apellido;
 String post_dni;
 String post_email;
 var email_argument;
+var userModel;
+var rela_users;
+var usuarioModel;
 
 class Formprueba extends StatefulWidget {
   @override
   _FormpruebaState createState() => _FormpruebaState();
-}
-
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email_prefer");
-  email_argument = email_prefer;
-  print("email");
-  print(email_argument);
 }
 
 class _FormpruebaState extends State<Formprueba> {
@@ -33,43 +30,22 @@ class _FormpruebaState extends State<Formprueba> {
   @override
   void initState() {
     super.initState();
-    getStringValuesSF();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    getStringValuesSF();
   }
 
   @override
   Widget build(BuildContext context) {
     final _formKey_datos_personales = GlobalKey<FormState>();
 
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    rela_users = usuarioModel.usuario.paciente.rela_users;
+    email_argument = usuarioModel.usuario.emailUser;
+
     final format = DateFormat("dd-MM-yyyy");
     final initialValue = DateTime.now();
     bool autoValidate = false;
     DateTime value = DateTime.now();
     int changedCount = 0;
-
-    Map parametros = ModalRoute.of(context).settings.arguments;
-
-    if (parametros['bandera'] == 1) {
-      post_nombre = parametros['nombre'];
-      post_apellido = parametros['apellido'];
-      post_dni = parametros['dni'];
-      email_argument = parametros['email'];
-      print(email_argument);
-
-      nombre.text = post_nombre;
-      apellido.text = post_apellido;
-      dni.text = post_dni;
-      print("dni");
-    } else {
-      email_argument = parametros['email'];
-      print(email_argument);
-      getStringValuesSF();
-      print(email_argument);
-    }
 
     return Scaffold(
         appBar: AppBar(
@@ -100,7 +76,7 @@ class _FormpruebaState extends State<Formprueba> {
         body: Center(
           child: SingleChildScrollView(
             child: FutureBuilder<PacienteModel>(
-              future: getDataPaciente(),
+              future: getDataPaciente(usuarioModel),
               builder: (context, snapshot) {
                 if (isGenero &&
                     isDepto &&
@@ -264,7 +240,7 @@ class _FormpruebaState extends State<Formprueba> {
                                 if (_formKey_datos_personales.currentState
                                         .validate() &&
                                     !_isLoading) {
-                                  _startLoading();
+                                  _startLoading(usuarioModel);
                                 } else {
                                   null;
                                 }
@@ -343,17 +319,16 @@ class _FormpruebaState extends State<Formprueba> {
         });
   }
 
-  guardarDatos() async {
+  guardarDatos(UsuarioServices usuarioModel) async {
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/user_datos_personales.php";
-    print(celular.text);
-    print(email_argument);
+
     var response = await http.post(url, body: {
       "nombre": nombre.text,
       "apellido": apellido.text,
-      "email": email_argument.toString(),
       "dni": dni.text,
       "fecha_nacimiento": fecha_nacimiento.text,
+      "email": email_argument.toString(),
       "rela_genero": rela_genero.toString(),
       "rela_departamento": rela_departamento.toString(),
       "rela_nivel_instruccion": rela_nivel_instruccion.toString(),
@@ -364,7 +339,14 @@ class _FormpruebaState extends State<Formprueba> {
       "rela_users": rela_users.toString(),
     });
 
-    if (response.statusCode == 200) {
+    var responseDecoder = json.decode(response.body);
+
+    if (response.statusCode == 200 && responseDecoder["request"] == 'Success') {
+      Map userMap = json.decode(response.body);
+
+      usuarioModel.usuario.paciente =
+          PacienteModel.fromJsonFromRegisterComplete(userMap);
+
       _alert_informe(context, "Datos Guardados Exitosamente", 1);
 
       Navigator.pushNamed(context, '/menu', arguments: {
@@ -376,14 +358,14 @@ class _FormpruebaState extends State<Formprueba> {
   }
 
   bool _isLoading = false;
-  void _startLoading() async {
+  void _startLoading(UsuarioServices usuarioModel) async {
     setState(() {
       _isLoading = true;
     });
 
     showDialogMessage();
 
-    await guardarDatos();
+    await guardarDatos(usuarioModel);
 
     setState(() {
       _isLoading = false;
@@ -411,7 +393,7 @@ _alert_informe(context, message, colorNumber) {
   ));
 }
 
-loadingData() async {
+loadingSelectData() async {
   if (!isDepto && !isGenero && !isGrupoConviviente && !isNiveleducativo) {
     await getAllDepartamentos();
     await getAllGeneros();
@@ -488,35 +470,27 @@ var return_apellido;
 var return_nombre;
 var return_email;
 var estado_users = 2;
-var rela_users = 0;
 
-Future<PacienteModel> getDataPaciente() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/user_read_datos_personales.php";
-  var response = await http.post(url, body: {
-    "email": email_argument,
-  });
+Future<PacienteModel> getDataPaciente(UsuarioServices usuarioModel) async {
+  if (usuarioModel.existeUsuarioModel) {
+    await loadingSelectData();
 
-  if (response.statusCode == 200) {
-    Map pacienteMap = jsonDecode(response.body);
-    var dataPacienteMocel = new PacienteModel.fromJson(pacienteMap);
+    rela_departamento = usuarioModel.usuario.paciente.rela_departamento;
+    rela_nivel_instruccion =
+        usuarioModel.usuario.paciente.rela_nivel_instruccion;
+    rela_grupo_conviviente =
+        usuarioModel.usuario.paciente.rela_grupo_conviviente;
+    rela_genero = usuarioModel.usuario.paciente.rela_genero;
+    rela_users = usuarioModel.usuario.paciente.rela_users;
+    nombre.text = usuarioModel.usuario.paciente.nombre;
+    apellido.text = usuarioModel.usuario.paciente.apellido;
+    fecha_nacimiento.text = usuarioModel.usuario.paciente.fecha_nacimiento;
+    dni.text = usuarioModel.usuario.paciente.dni.toString();
+    celular.text = usuarioModel.usuario.paciente.celular;
+    contacto.text = usuarioModel.usuario.paciente.contacto;
+    rela_users = usuarioModel.usuario.paciente.rela_users;
 
-    await loadingData();
-
-    rela_departamento = dataPacienteMocel.rela_departamento;
-    rela_nivel_instruccion = dataPacienteMocel.rela_nivel_instruccion;
-    rela_grupo_conviviente = dataPacienteMocel.rela_grupo_conviviente;
-    rela_genero = dataPacienteMocel.rela_genero;
-    rela_users = int.parse(dataPacienteMocel.rela_users);
-    nombre.text = dataPacienteMocel.nombre;
-    apellido.text = dataPacienteMocel.apellido;
-    fecha_nacimiento.text = dataPacienteMocel.fecha_nacimiento;
-    dni.text = dataPacienteMocel.dni.toString();
-    celular.text = dataPacienteMocel.celular;
-    contacto.text = dataPacienteMocel.contacto;
-    rela_users = int.parse(dataPacienteMocel.rela_users);
-
-    return dataPacienteMocel;
+    return usuarioModel.usuario.paciente;
   } else {
     return null;
   }

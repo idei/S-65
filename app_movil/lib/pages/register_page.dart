@@ -2,7 +2,8 @@ import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
@@ -71,7 +72,7 @@ class _FormRegisterState extends State<RegisterPage> {
 
   registerPaciente() async {
     String URL_base = Env.URL_PREFIX;
-    var url = "https://alanalizador.000webhostapp.com/php/user_register.php";
+    var url = URL_base + "/user_register.php";
     var response = await http.post(url, body: {
       "email": emailPaciente.text,
       "password": passwordNuevo.text,
@@ -82,28 +83,26 @@ class _FormRegisterState extends State<RegisterPage> {
 
     var responseDecoder = json.decode(response.body);
 
-    if (responseDecoder[0] == "Success" && response.statusCode == 200) {
-      // Prueba Modelos------------
+    if (responseDecoder['request'] == "Success" && response.statusCode == 200) {
       Map userMap = json.decode(response.body);
-      var user = UsuarioModel.fromJson(userMap);
+      var newUsuarioModel = UsuarioModel.fromJson(userMap);
+
+      final usuarioService =
+          Provider.of<UsuarioServices>(context, listen: false);
+      usuarioService.usuario = newUsuarioModel;
       //---------------------------
-      await set_preference();
+
       Navigator.pushNamed(context, '/form_datos_generales', arguments: {
-        'nombre': nombrePaciente.text,
+        'nombre': newUsuarioModel.paciente.nombre,
         "apellido": apellidoPaciente.text,
         "dni": dni.text,
         "email": emailPaciente.text,
         "bandera": 1,
       });
     } else {
-      loginToast(responseDecoder);
+      var error = response.statusCode + responseDecoder['request'];
+      loginToast(error.toString());
     }
-  }
-
-  set_preference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setString("email_prefer", emailPaciente.text);
   }
 
   loginToast(String toast) {

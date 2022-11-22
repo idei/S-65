@@ -1,6 +1,7 @@
 import 'package:app_salud/models/paciente_model.dart';
+import 'package:flutter/cupertino.dart';
 
-class UsuarioModel {
+class UsuarioModel extends InheritedWidget {
   String tokenId;
   String emailUser;
   String password;
@@ -13,11 +14,32 @@ class UsuarioModel {
     this.password,
   });
 
+  Map<String, dynamic> get map {
+    return {
+      "token": tokenId,
+      "email": emailUser,
+      "paciente": paciente,
+    };
+  }
+
   factory UsuarioModel.fromJson(Map<String, dynamic> json) {
     return UsuarioModel(
         emailUser: json['email'].toString(),
         tokenId: json['token'].toString(),
         password: json['token'].toString(),
+        paciente: PacienteModel.fromJsonFromRegisterInitial(json['paciente']));
+  }
+
+  factory UsuarioModel.fromJsonLogin(Map<String, dynamic> json) {
+    return UsuarioModel(
+        emailUser: json['email'].toString(),
+        tokenId: json['token'].toString(),
+        password: json['token'].toString(),
         paciente: PacienteModel.fromJson(json['paciente']));
+  }
+
+  @override
+  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
+    throw UnimplementedError();
   }
 }

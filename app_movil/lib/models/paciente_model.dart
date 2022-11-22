@@ -11,9 +11,10 @@ class PacienteModel {
   String celular;
   String contacto;
   var estado_users;
-  String email;
+  var id_paciente;
 
   PacienteModel({
+    this.id_paciente,
     this.rela_users = "",
     this.rela_genero = "",
     this.rela_nivel_instruccion = "",
@@ -26,24 +27,48 @@ class PacienteModel {
     this.celular = "",
     this.contacto = "",
     this.estado_users,
-    this.email,
   });
 
   factory PacienteModel.fromJson(Map<String, dynamic> json) {
     return PacienteModel(
+      //id_paciente: json['id_paciente'],
+      nombre: json['nombre'],
+      apellido: json['apellido'],
+      dni: json['dni'],
+      estado_users: json['estado_users'],
       rela_users: json['rela_users'].toString(),
       rela_genero: json['rela_genero'].toString(),
       rela_departamento: json['rela_departamento'].toString(),
       rela_nivel_instruccion: json['rela_nivel_instruccion'].toString(),
       rela_grupo_conviviente: json['rela_grupo_conviviente'].toString(),
+      fecha_nacimiento: json['fecha_nacimiento'],
+      celular: json['celular'],
+      contacto: json['contacto'],
+    );
+  }
+
+  factory PacienteModel.fromJsonFromRegisterInitial(Map<String, dynamic> json) {
+    return PacienteModel(
+      //id_paciente: json['id_paciente'],
+      rela_users: json['rela_users'].toString(),
       nombre: json['nombre'],
       apellido: json['apellido'],
-      fecha_nacimiento: json['fecha_nacimiento'],
       dni: json['dni'],
+      estado_users: json['estado_users'],
+    );
+  }
+
+  factory PacienteModel.fromJsonFromRegisterComplete(
+      Map<String, dynamic> json) {
+    return PacienteModel(
+      rela_genero: json['rela_genero'].toString(),
+      rela_departamento: json['rela_departamento'].toString(),
+      rela_nivel_instruccion: json['rela_nivel_instruccion'].toString(),
+      rela_grupo_conviviente: json['rela_grupo_conviviente'].toString(),
+      fecha_nacimiento: json['fecha_nacimiento'],
       celular: json['celular'],
       contacto: json['contacto'],
       estado_users: json['estado_users'],
-      email: json['estado_users'],
     );
   }
 }

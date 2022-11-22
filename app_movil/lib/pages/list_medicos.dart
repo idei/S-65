@@ -41,8 +41,8 @@ class _ListMedicosState extends State<ListMedicos> {
         title: Text(
           'Mis Médicos',
           style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              fontSize: 14.2),
+            fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+          ),
         ),
         actions: <Widget>[
           PopupMenuButton<String>(

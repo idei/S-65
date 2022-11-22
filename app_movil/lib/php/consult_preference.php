@@ -11,23 +11,25 @@
         $rela_users= $rela_users["id"];
     
     
-        $consult_estado = $db->prepare("SELECT estado_users FROM pacientes WHERE rela_users = '".$rela_users."'");
+        $consult_estado = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$rela_users."'");
         
         $consult_estado->execute();
         
         $result = $consult_estado->fetch();
-        $result = $result["estado_users"];
+        
     
         
         if ($consult_estado->rowCount()) {
-            $result_estado = $result;
+            $result_estado = $result["estado_users"];
+            $result_id_paciente = $result["id"];
         }else{
             $result_estado = 0;
         }
 
         $lista = array(
             "estado_users" => $result_estado,
-            "estado_read_date" => "Success"
+            "id_paciente" => $result_id_paciente,
+            "request" => "Success"
         );
 
         echo json_encode($lista);

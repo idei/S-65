@@ -13,7 +13,7 @@
     $celular = $_POST['celular'];
     $contacto = $_POST['contacto'];
     $estado_users =$_POST['estado_users'];
-    $rela_users=$_POST['rela_users'];
+    
     
         try {            
                 $select_email = $db->prepare("SELECT id FROM users WHERE email = '".$email."'");
@@ -48,7 +48,21 @@
 
                 $insert_paciente->execute([$nombre,$apellido,$dni,$fecha_nacimiento,$rela_genero,$rela_nivel_instruccion,$rela_grupo_conviviente,$celular,$contacto,$rela_departamento,$estado_users,$rela_users]);
                 
-                echo json_encode("Success");
+                $listaRequest = array(
+					"request"=>"Success",
+                    "rela_users"=>$rela_users,
+					"fecha_nacimiento"=>$fecha_nacimiento,
+					"rela_genero"=>$rela_genero,
+					"rela_nivel_instruccion"=>$rela_nivel_instruccion,
+					"rela_grupo_conviviente"=> $rela_grupo_conviviente,
+                    "celular"=> $celular,
+					"contacto"=> $contacto,
+					"rela_departamento"=> $rela_departamento,
+					"estado_users"=> $estado_users,
+
+				);
+
+                echo json_encode($listaRequest);
                 
 
             }

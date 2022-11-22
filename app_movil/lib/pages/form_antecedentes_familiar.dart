@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,28 +20,24 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final myController = TextEditingController();
+  var usuarioModel;
 
   @override
   void initState() {
     super.initState();
     getStringValuesSF();
-    myController.addListener(_printLatestValue);
   }
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is removed from the widget tree.
-    // This also removes the _printLatestValue listener.
     myController.dispose();
     super.dispose();
   }
 
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
-  }
-
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
     return FutureBuilder(
         future: read_datos_paciente(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -394,13 +392,13 @@ class AntecedentesFam extends StatefulWidget {
   AntecedentesFamWidgetState createState() => AntecedentesFamWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class AntecedentesFamWidgetState extends State<AntecedentesFam> {
   final _formKey_antecedentes_familiares = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     var email_prefer;
     Map parametros = ModalRoute.of(context).settings.arguments;
+
     if (parametros != null) {
       email_prefer = parametros['email'];
     } else {
@@ -414,7 +412,6 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontSize: 19.0),
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           backgroundColor: Theme.of(context).primaryColor,
           actions: <Widget>[
             PopupMenuButton<String>(

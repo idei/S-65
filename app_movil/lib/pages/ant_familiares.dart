@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +22,7 @@ class AntecedentesFamiliarPage extends StatefulWidget {
 }
 
 String email;
+var usuarioModel;
 
 class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
   bool isLoading = false;
@@ -32,13 +35,9 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
 
   @override
   Widget build(BuildContext context) {
-    Map parametros = ModalRoute.of(context).settings.arguments;
-    if (parametros != null) {
-      email = parametros['email'];
-      print(email);
-    } else {
-      get_preference();
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    email = usuarioModel.usuario.emailUser;
 
     final size = MediaQuery.of(context).size;
 
@@ -160,16 +159,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     }
   }
 
-  get_preference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString("email_prefer");
-
-    print(prefs);
-  }
-
   Future<List<AntecedenteModel>> fetchStudents() async {
-    await get_preference();
-
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_antecedentes_familiares.php";
     var response = await http.post(url, body: {"email": email});

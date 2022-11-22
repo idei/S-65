@@ -1,8 +1,11 @@
+import 'package:provider/provider.dart';
+
 import '../models/medicamento_model.dart';
 import 'package:app_salud/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,9 +22,14 @@ class _MedicamentoState extends State<MedicamentoPage> {
   var data;
   bool isLoading = false;
   var email_argument;
+  var usuarioModel;
 
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    email_argument = usuarioModel.usuario.emailUser;
+
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -132,8 +140,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 
   Future<List<MedicamentoModel>> read_medicamentos() async {
-    await getStringValuesSF();
-
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_medicamentos.php";
     var response = await http.post(url, body: {
@@ -264,14 +270,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
           textAlign: TextAlign.center,
           style: const TextStyle(color: Colors.white)),
     ));
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = await prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    //rela_paciente = await prefs.getInt("rela_paciente");
-    print(email_argument);
   }
 
   void choiceAction(String choice) {

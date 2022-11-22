@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +23,7 @@ class AntecedentesPerPage extends StatefulWidget {
 }
 
 String email;
+var usuarioModel;
 
 class _AntecedentesPerState extends State<AntecedentesPerPage> {
   bool isLoading = false;
@@ -29,18 +32,13 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
   @override
   void initState() {
     super.initState();
-    get_preference();
   }
 
   @override
   Widget build(BuildContext context) {
-    Map parametros = ModalRoute.of(context).settings.arguments;
-    if (parametros != null) {
-      email = parametros['email'];
-      print(email);
-    } else {
-      get_preference();
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    email = usuarioModel.usuario.emailUser;
 
     final size = MediaQuery.of(context).size;
 
@@ -162,15 +160,8 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     }
   }
 
-  get_preference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString("email_prefer");
-  }
-
   Future<List<AntecedentesPersonalesModel>>
       fetchAntecedentesPersonales() async {
-    await get_preference();
-
     String URL_base = Env.URL_PREFIX;
     var url = URL_base + "/read_antecedentes_personales.php";
     var response = await http.post(url, body: {"email": email});

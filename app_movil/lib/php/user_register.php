@@ -5,24 +5,10 @@
 	$nombre = $_POST['nombre'];
 	$apellido = $_POST['apellido'];
 	$dni = $_POST['dni'];
-	$estado_users = 1;
+	$estado_users = '1';
 	$rela_rol = 0;
 
 	$token = uniqid(random_int(100, 999),true);
-
-	$listaprueba = array(
-		"respuesta"=>"Success",
-		"token"=>$token,
-		"email"=>$email,
-		"password"=>$password,
-		"paciente"=>[
-			"nombre"=>$nombre,
-			"apellido"=>$apellido,
-			"dni"=>$dni,
-			"estado_users"=>$estado_users]
-	);
-	
-	echo json_encode($listaprueba);
 
 
 	$lista = array();
@@ -32,7 +18,8 @@
 	$result = $stmt->rowCount();
 
 	if ($result == 1) {
-		echo json_encode("Error : Ya existe un paciente con ese email");
+		$lista = array("request"=>"Error : Ya existe un paciente con ese email");
+		echo json_encode($lista);
 	}else{
 		
 	$stmt = $db->prepare('INSERT INTO users(email,password,token) VALUES(?, ?, ?)');
@@ -60,20 +47,26 @@
 			
 			$insert_paciente = $stmt->rowCount();
 			if ($insert_paciente) {
-				//array_push($lista, "Success", $estado_users);
-				$listaprueba = array(
-					"Success",
-					$token,
-					$email,
-					$password,
-					"paciente"=>[$nombre,$apellido,$dni,$estado_users]
+				
+				$lista = array(
+					"request"=>"Success",
+					"token"=>$token,
+					"email"=>$email,
+					"password"=>$password,
+					"paciente"=>[
+						
+						"rela_users"=>$rela_users,
+						"nombre"=>$nombre,
+						"apellido"=>$apellido,
+						"dni"=>$dni,
+						"estado_users"=>$estado_users
+						]
 				);
 				
-				echo json_encode($listaprueba);
+				echo json_encode($lista);
 			}else {
-				echo json_encode("No se puedo realizar el registro");
+				$lista = array ("request"=>"No se puedo realizar el registro");
+				echo json_encode($lista);
 			}
 		}
 	}
-
-?>

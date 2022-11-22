@@ -19,7 +19,7 @@
         }
         echo json_encode($lista);
 	}else {
-        $pepe = "Error";
+        $pepe = "Vacio";
         echo json_encode($pepe);
     }
     

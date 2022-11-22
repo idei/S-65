@@ -14,6 +14,8 @@ TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
 String email_set_shared;
+bool _isLoading = false;
+bool _isEnabled = true;
 
 class HistorialClinico extends StatefulWidget {
   @override
@@ -52,24 +54,55 @@ class _AjustesState extends State<HistorialClinico> {
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[
-                  ElevatedButton(
+                  ElevatedButton.icon(
+                    icon: _isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: const CircularProgressIndicator(),
+                          )
+                        : const Icon(Icons.download),
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor,
                     ),
                     onPressed: () {
-                      pdf_table();
+                      _isLoading ? null : _startLoading();
                     },
-                    child: Text(
-                      'Exportar Historial Clínico',
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
+                    label: Text(
+                        _isLoading
+                            ? 'Cargando...'
+                            : 'Exportar Historial Clínico',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily)),
                   ),
                   SizedBox(
                     height: 20,
                   ),
                 ]))));
+  }
+
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+      _isEnabled = false;
+    });
+
+    await getStringValuesSF();
+
+    setState(() {
+      _isLoading = false;
+      _isEnabled = true;
+    });
+
+    if (data != "Error") {
+      pdf_table();
+    } else {
+      _alert_informe(context, 'No tiene datos clínicos registrados', 2);
+    }
   }
 }
 
@@ -82,7 +115,7 @@ getStringValuesSF() async {
   id_paciente = prefs.getInt("id_paciente");
   print(email_prefer);
 
-  //Obtengo datos clinicos del paciente
+  // //Obtengo datos clinicos del paciente
   await read_datos_clinicos();
   await read_respuesta();
 }
@@ -116,9 +149,6 @@ pdf_table() async {
   var consume_marihuana;
   var otras_drogas;
   var fuma_tabaco;
-
-  //Obtengo datos del paciente almacenados en el telefono
-  await getStringValuesSF();
 
 //Create a new PDF document
   PdfDocument document = PdfDocument();
@@ -225,6 +255,18 @@ Future pdf() async {
   await file.writeAsBytes(bytes);
   //Launch the file (used open_file package)
   await open_file.OpenFile.open('$path/output.pdf');
+}
+
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
 }
 
 class Constants {

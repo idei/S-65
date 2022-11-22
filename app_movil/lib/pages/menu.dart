@@ -1,5 +1,7 @@
 import 'package:app_salud/pages/list_medicos.dart';
+import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 var email_argument;
@@ -24,12 +26,10 @@ class _FormMenuState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
-    if (parametros != null) {
-      email_argument = parametros['email'];
-      id_paciente = parametros['id_paciente'];
-      print("menu");
-    } else {
-      getStringValuesSF();
+
+    final usuarioModel = Provider.of<UsuarioServices>(context);
+    if (usuarioModel.existeUsuarioModel) {
+      print(usuarioModel.usuario);
     }
 
     return Scaffold(
@@ -47,18 +47,10 @@ class _FormMenuState extends State<MenuPage> {
                     SizedBox(height: 70.0),
                     GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/form_datos_generales',
-                              arguments: {
-                                "bandera": 0,
-                                "email": email_argument,
-                              });
-                          //do what you want here
+                          Navigator.pushNamed(context, '/form_datos_generales');
                         },
                         child: CircleAvatar(
                             radius: MediaQuery.of(context).size.width / 7.3,
-                            //backgroundColor: Color.fromRGBO(203, 47, 31, 0.8),
-                            //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-
                             child: Icon(Icons.account_box,
                                 color: Colors.white, size: 70.0))),
                     SizedBox(height: 10.0),
@@ -69,11 +61,8 @@ class _FormMenuState extends State<MenuPage> {
                         Navigator.pushNamed(context, '/antecedentes_familiares',
                             arguments: {
                               "bandera": 0,
-                              "email": email_argument,
+                              "email": usuarioModel.usuario.emailUser,
                             });
-                        /*Navigator.pushNamed(
-                            context, '/antecedentes_familiares');*/
-                        //do what you want here
                       },
                       child: CircleAvatar(
                           radius: MediaQuery.of(context).size.width / 7.3,
@@ -119,10 +108,8 @@ class _FormMenuState extends State<MenuPage> {
                     GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, '/datoscli', arguments: {
-                            "email": email_argument,
+                            "email": usuarioModel.usuario.emailUser,
                           });
-                          //Navigator.pushNamed(context, 'datoscli');
-                          //do what you want here
                         },
                         child: CircleAvatar(
                             radius: MediaQuery.of(context).size.width / 7.3,
@@ -147,7 +134,7 @@ class _FormMenuState extends State<MenuPage> {
                       onTap: () {
                         Navigator.pushNamed(context, '/menu_chequeo',
                             arguments: {
-                              "email": email_argument,
+                              "email": usuarioModel.usuario.emailUser,
                               "id_paciente": id_paciente,
                             });
                       },
@@ -166,7 +153,7 @@ class _FormMenuState extends State<MenuPage> {
                             await SharedPreferences.getInstance();
                         prefs.remove('email_prefer');
                         print(email_prefer);
-                        //email_argument.remove();
+
                         Navigator.pushNamed(context, '/');
                       },
                       child: CircleAvatar(
@@ -215,7 +202,6 @@ class _FormMenuState extends State<MenuPage> {
                     ),
                     SizedBox(height: 10.0),
                     texto('AVISOS'),
-                    // SizedBox(height: 20.0),
                     SizedBox(height: 35.0),
                     GestureDetector(
                       onTap: () {

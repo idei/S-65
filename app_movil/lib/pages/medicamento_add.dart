@@ -3,7 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:app_salud/pages/env.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/usuario_services.dart';
 
 class MedicamentoAddPage extends StatefulWidget {
   MedicamentoAddPage() : super();
@@ -23,8 +26,12 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
 
   bool loading = true;
 
+  var usuarioModel;
+
   void getUsers() async {
-    await getStringValuesSF();
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    await getStringValuesSF(usuarioModel);
     try {
       String URL_base = Env.URL_PREFIX;
       var url = URL_base + "/read_medicamentos_vademecum.php";
@@ -80,12 +87,10 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    //getUsers();
+    usuarioModel = Provider.of<UsuarioServices>(context);
 
     return Scaffold(
       appBar: AppBar(
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text("Buscador",
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
@@ -151,15 +156,12 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                       });
                     },
                     itemBuilder: (context, item) {
-                      // ui for the autocompelete row
                       return row(item);
                     },
                   ),
             SizedBox(height: 40.0),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  //primary: Color.fromRGBO(157, 19, 34, 1),
-                  ),
+              style: ElevatedButton.styleFrom(),
               onPressed: () {
                 guardar_medicamento(data_id);
               },
@@ -198,12 +200,15 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
     }
   }
 
-  getStringValuesSF() async {
+  getStringValuesSF(UsuarioServices usuarioServices) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email_prefer = await prefs.getString("email_prefer");
     email_argument = email_prefer;
     id_paciente = await prefs.getInt("id_paciente");
     print(email_argument);
+    if (usuarioServices.existeUsuarioModel) {
+      email_argument = usuarioServices.usuario.emailUser;
+    }
   }
 
   _alert_informe(context, message, colorNumber) {
