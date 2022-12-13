@@ -1,3 +1,5 @@
+import 'package:app_salud/models/medico_model.dart';
+import 'package:app_salud/services/medico_services.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => new UsuarioServices())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => new UsuarioServices()),
+        ChangeNotifierProvider(create: (_) => new MedicoServices()),
+      ],
       child: MaterialApp(
         theme: ThemeData(
           primaryColor: Colors.blue,

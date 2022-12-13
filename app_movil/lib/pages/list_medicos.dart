@@ -1,7 +1,10 @@
 import 'package:app_salud/models/medico_model.dart';
+import 'package:app_salud/services/medico_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/opciones_navbar.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -12,6 +15,7 @@ String apellido_medico;
 var especialidad;
 var matricula;
 var rela_medico;
+var medicoModel;
 
 class ListMedicos extends StatefulWidget {
   @override
@@ -30,6 +34,8 @@ class _ListMedicosState extends State<ListMedicos> {
 
   @override
   Widget build(BuildContext context) {
+    medicoModel = Provider.of<MedicoServices>(context);
+
     return Scaffold(
       appBar: AppBar(
         leading: new IconButton(

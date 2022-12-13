@@ -1,6 +1,5 @@
 import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 
 class UsuarioServices extends ChangeNotifier {
   UsuarioModel _usuarioModel;

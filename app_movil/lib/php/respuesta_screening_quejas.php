@@ -32,13 +32,22 @@ $id_leng2 = $_POST['id_leng2'];
 $id_leng3 = $_POST['id_leng3'];
 $id_leng4 = $_POST['id_leng4'];
 
-$id_paciente = $_POST['id_paciente'];
+$id_paciente = $_POST['id_paciente']; 
 $id_medico = $_POST['id_medico'];
 
 
 $tipo_screening = $_POST['tipo_screening'];
 $recordatorio_medico = $_POST['id_recordatorio'];
 $estado = 1;
+
+
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
 
 
 

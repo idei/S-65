@@ -9,7 +9,15 @@ $tipo_screening = $_POST['tipo_screening'];
 $recordatorio_medico = $_POST['id_recordatorio'];
 $estado = 1;
 
-$result_screening = $_POST['cantidad'];;
+$result_screening = $_POST['cantidad'];
+
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
 
 
 // Guardamos el resultado del screening

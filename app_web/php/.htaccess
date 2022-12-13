@@ -1,0 +1,12 @@
+RewriteEngine On    # Turn on the rewriting engine
+
+#PUT
+RewriteRule ^recordatorios$ read_recordatorios.php [NC,L]
+RewriteRule ^login$ user_login.php [NC,L]
+RewriteRule ^avisos$ read_avisos.php [NC,L]
+RewriteRule ^antecedentes_personales$ user_read_antc_personales.php [NC,L]
+RewriteRule ^antecedentes_familiares$ user_read_antc_familiares.php [NC,L]
+RewriteRule ^datos_clinicos$ user_read_datos_clinicos.php [NC,L]
+
+#GET
+#RewriteRule ^avisos/([0-9_-]*)$ read_avisos.php?email=$1 [NC,L]

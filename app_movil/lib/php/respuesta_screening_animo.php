@@ -11,6 +11,15 @@ $estado = 1;
 $result_screening = 0;
 
 
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
+
+
 if ($_POST['satisfecho'] == "true") {
     $satisfecho = 1;
     $result_screening += 0;

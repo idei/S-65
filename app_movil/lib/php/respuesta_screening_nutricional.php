@@ -13,6 +13,15 @@ $estado = 1;
 $result_screening = 0;
 
 
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
+
+
 if ($_POST['nutri1'] == "true") {
     $nutri1 = 1;
     $result_screening += 2;

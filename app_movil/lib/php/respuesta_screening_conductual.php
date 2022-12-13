@@ -32,6 +32,15 @@ $estado = 1;
 $result_screening = 0;
 
 
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
+
+
 // Guardamos el resultado del screening
 
 $insert_resultado = $db->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');

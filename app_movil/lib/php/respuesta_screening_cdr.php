@@ -14,6 +14,14 @@ $cuid_personal = $_POST['cuid_personal'];
 
 $estado = 1;
 
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
+
 
 $result_screening = 0;
 
