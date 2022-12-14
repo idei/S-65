@@ -8,7 +8,7 @@ require 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$email = $data["email"];
+$dni = $data["dni"];
 
 $retraso = 0;
 $desorden = 0;
@@ -71,16 +71,8 @@ $cod_event_hipertension = 'HIPER';
 $cod_event_colesterol = 'COL';
 
 
-// SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
-
-$select_id_users = $db->prepare("SELECT id FROM `users` WHERE users.email = '" . $email . "'");
-$select_id_users->execute();
-$id_users = $select_id_users->fetch();
-$id_users = $id_users["id"];
-
-
 // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
-$select_id_paciente = $db->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '" . $id_users . "'");
+$select_id_paciente = $db->prepare("SELECT id FROM `pacientes` WHERE dni = '" . $dni . "'");
 $select_id_paciente->execute();
 $id_paciente = $select_id_paciente->fetch();
 $id_paciente = $id_paciente["id"];

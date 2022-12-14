@@ -9,7 +9,7 @@ require 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$email = $data["email"];
+$dni = $data["dni"];
 
 
     try {
@@ -17,8 +17,7 @@ $email = $data["email"];
     rela_grupo_conviviente, rela_departamento, rela_genero, nombre, apellido, dni, 
     fecha_nacimiento, celular, contacto 
     FROM pacientes 
-    INNER JOIN users ON pacientes.rela_users = users.id
-    WHERE users.email = '".$email."'");
+    WHERE dni = '".$dni."'");
 
     $select_data->execute();
     $select_data= $select_data->fetch();
@@ -48,7 +47,7 @@ $email = $data["email"];
         "fecha_nacimiento" => $fecha_nacimiento,
         "celular" => $celular,
         "contacto" => $contacto,
-        "email" => $email,
+        //"email" => $email,
     );
 
     echo json_encode($lista);
