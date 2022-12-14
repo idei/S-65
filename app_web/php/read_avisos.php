@@ -9,11 +9,11 @@ require 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$email = $data["email"];
+//$email = $data["email"];
 
-//$email = $_GET["email"];
+$email = $_GET["email"];
 
-$response='';
+$response = '';
 
 try {
 
@@ -30,37 +30,34 @@ try {
     descripcion,url_imagen,fecha_limite,rela_estado,rela_creador, avisos_generales.rela_medico, estado_leido
     FROM avisos_generales
     JOIN usuarios_avisos ON avisos_generales.id=usuarios_avisos.rela_aviso
-    WHERE avisos_generales.rela_medico = '" . $id_medico . "'  ORDER BY fecha_limite ASC");
+    WHERE avisos_generales.rela_creador = '" . $id_medico . "'  ORDER BY fecha_limite ASC");
 
-    $stmt->execute();
-    $result = $stmt->fetchAll();
-    $lista = array();
-    if ($stmt->rowCount() > 0) {
-        foreach ($result as $results) {
-            $lista[] = $results;
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+
+            $response = array(
+                "request" => "Success",
+                "avisos" => $lista
+            );
+
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "request" => "Vacio",
+            );
+            echo json_encode($response);
         }
-        
-        $response = array(
-            "request"=>"Success",
-            "avisos"=>$lista
-        );
-
-        echo json_encode($response);
     } else {
         $response = array(
-            "request"=>"Vacio",
+            "request" => "No existe el usuario",
         );
         echo json_encode($response);
     }
-    }else{
-        $response = array(
-            "request"=>"No existe el usuario",
-        );
-        echo json_encode($response);
-    }
-    
-
-    
 } catch (PDOException $e) {
     $error = "Error conectando con la base de datos: " . $e->getMessage();
     echo json_encode($error);

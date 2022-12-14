@@ -21,7 +21,6 @@ include '../env.php';
     {
       var base_dir = "<?php echo $BASE_DIR ?>";
 
-
       var parametros = 
       {
         //"email" : document.getElementById("email").value,
