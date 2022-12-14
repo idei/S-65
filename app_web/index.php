@@ -61,7 +61,7 @@
         success: function(response)
         {        
             if(response['request']=='Success'){   
-                window.location.replace("pages/home.html");
+                window.location.replace("pages/index.php");
             }else{
                 console.log(response['request']);
                 $('#error').html(mensaje);
