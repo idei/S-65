@@ -7,17 +7,17 @@
         <meta name="author" content="" />
         <title>Home</title>
         <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="assets/logo1.png" />
+        <link rel="icon" type="image/x-icon" href="../assets/logo1.png" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <!-- CSS only -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link href="css/styles.css" rel="stylesheet" />
+        <link href="../css/styles.css" rel="stylesheet" />
     </head>
     <body>
         <div class="d-flex" id="wrapper">
             <!-- Sidebar-->
             <div class="border-end bg-white" id="sidebar-wrapper">
-                <div class="sidebar-heading border-bottom bg-light"><img class="img-fluid" width="150" heigth="100"src="assets/logo1.png" alt="Chania" height="100%"></div>
+                <div class="sidebar-heading border-bottom bg-light"><img class="img-fluid" width="150" heigth="100"src="../assets/logo1.png" alt="Chania" height="100%"></div>
                 <div class="list-group list-group-flush">
                     <div><i class="fa-solid fa-skating fa-fw"></i><a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Pacientes</a></div>
                     
