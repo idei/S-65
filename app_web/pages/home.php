@@ -44,8 +44,10 @@ include '../env.php';
         { 
             
             if (response['request']=='Success') {
+
                 response['recordatorios'].forEach(element => {
                 console.log(element['descripcion']);
+                
             });
             }else{
                 console.log(response['request']);

@@ -14,7 +14,9 @@
 
 	try {
 	
-		$stmt = $db->prepare("SELECT * FROM users WHERE email = '".$email."' AND password = '".$password."'");
+		$stmt = $db->prepare("SELECT * FROM users
+		join medicos on users.id = medicos.rela_users
+		WHERE email = '".$email."' AND password = '".$password."'");
 	    $stmt->execute();
 	    $result = $stmt->rowCount();
 
@@ -92,6 +94,3 @@
 		$lista = array ("request"=>$error->getMessage());
 	    echo json_encode($lista);
 	}
-
-	
-?>

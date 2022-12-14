@@ -1,9 +1,10 @@
 RewriteEngine On    # Turn on the rewriting engine
 
-#PUT
+#POST
 RewriteRule ^recordatorios$ read_recordatorios.php [NC,L]
 RewriteRule ^login$ user_login.php [NC,L]
 RewriteRule ^avisos$ read_avisos.php [NC,L]
+RewriteRule ^datos_personales$ user_read_datos_personales.php [NC,L]
 RewriteRule ^antecedentes_personales$ user_read_antc_personales.php [NC,L]
 RewriteRule ^antecedentes_familiares$ user_read_antc_familiares.php [NC,L]
 RewriteRule ^datos_clinicos$ user_read_datos_clinicos.php [NC,L]

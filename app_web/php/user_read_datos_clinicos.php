@@ -8,15 +8,14 @@
     
     $data = json_decode(file_get_contents("php://input"), true);
     
-    $email = $data["email"];
+    $dni = $data["dni"];
 
     try {
        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
 
      $select_id_users = $db->prepare("SELECT pacientes.id id
      FROM pacientes 
-     INNER JOIN users ON pacientes.rela_users = users.id
-     WHERE users.email = '".$email."'");
+     WHERE dni = '".$dni."'");
 
      $select_id_users->execute();
      $id_users= $select_id_users->fetch();
