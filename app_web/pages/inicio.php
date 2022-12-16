@@ -1,3 +1,8 @@
+<?php
+session_start();
+$email= $_SESSION['email'] ;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -10,6 +15,7 @@
         <link rel="icon" type="image/x-icon" href="../assets/logo1.png" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <!-- CSS only -->
+        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link href="../css/styles.css" rel="stylesheet" />
     </head>

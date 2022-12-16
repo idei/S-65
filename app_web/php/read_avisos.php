@@ -11,9 +11,15 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 //$email = $data["email"];
 
-$email = $_GET["email"];
+session_start();
+if (isset($_SESSION['email'])) {
+    $email= $_SESSION['email'] ;
 
-$response = '';
+}
+
+if (isset($data)) {
+    $email= $data['email'] ;
+}
 
 try {
 
@@ -27,7 +33,7 @@ try {
         $id_medico = $id_medico["id"];
 
         $stmt = $db->prepare("SELECT avisos_generales.id id,usuarios_avisos.rela_paciente rela_paciente,
-    descripcion,url_imagen,fecha_limite,rela_estado,rela_creador, avisos_generales.rela_medico, estado_leido
+    descripcion,url_imagen,fecha_creacion,fecha_limite,rela_estado,rela_creador, avisos_generales.rela_medico, estado_leido
     FROM avisos_generales
     JOIN usuarios_avisos ON avisos_generales.id=usuarios_avisos.rela_aviso
     WHERE avisos_generales.rela_creador = '" . $id_medico . "'  ORDER BY fecha_limite ASC");

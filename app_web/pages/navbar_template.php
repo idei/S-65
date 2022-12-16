@@ -1,3 +1,14 @@
+<?php
+if (isset($_SESSION['email'])) {
+   
+    $email= $_SESSION['email'] ;
+}else{
+    session_start();
+    $email= $_SESSION['email'] ;
+
+}
+
+?>
 <!-- Sidebar-->
 <div class="border-end bg-white" id="sidebar-wrapper">
                 <div class="sidebar-heading border-bottom bg-light"><img class="img-fluid" width="150" heigth="100"src="../assets/logo1.png" alt="Chania" height="100%"></div>
@@ -17,7 +28,7 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">User</a>
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $email ?></a>
                                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item" href="#!">Cerrar Sesión</a>
                                     </div>

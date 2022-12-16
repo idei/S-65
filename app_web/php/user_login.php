@@ -1,96 +1,68 @@
-<?php 
+<?php
 
-	header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: POST');
-    header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Authorization, X-Requested-With');
-    
-    require 'db.php';
-    
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    $email = $data["email"];
-	$password = $data['password'];
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Authorization, X-Requested-With');
 
-	try {
-	
-		$stmt = $db->prepare("SELECT * FROM users
+require 'db.php';
+
+session_start();
+//$data = json_decode(file_get_contents("php://input"), true);
+
+$email = $_POST["email"];
+$password = $_POST['password'];
+
+try {
+
+	$stmt = $db->prepare("SELECT * FROM users
 		join medicos on users.id = medicos.rela_users
-		WHERE email = '".$email."' AND password = '".$password."'");
-	    $stmt->execute();
-	    $result = $stmt->rowCount();
-
-		
-    
-	if ($result > 0) {
-		$result_select_users= $stmt->fetch();
-		$id_user = $result_select_users['id'];
-		$token_id = $result_select_users['token'];
-		
-		$result_paciente = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$id_user."'");
-
-	    $result_paciente->execute();
-
-		$result_paciente_count = $result_paciente->rowCount();
-
-		if ($result_paciente_count > 0) {
-			$result_paciente = $result_paciente->fetch();
-			
-			$id_paciente = $result_paciente['id'];
-			 
-
-			$rela_users = $result_paciente['rela_users'];
-			$rela_nivel_instruccion = $result_paciente['rela_nivel_instruccion'];
-			$rela_grupo_conviviente = $result_paciente['rela_grupo_conviviente'];
-			$rela_departamento = $result_paciente['rela_departamento'];
-			$rela_genero = $result_paciente['rela_genero'];
-			$nombre = $result_paciente['nombre'];
-			$apellido = $result_paciente['apellido'];
-			$dni = $result_paciente['dni'];
-			$fecha_nacimiento = $result_paciente['fecha_nacimiento'];
-			$celular = $result_paciente['celular'];
-			$contacto = $result_paciente['contacto'];
-			$estado_users = $result_paciente['estado_users'];
+		WHERE email = '" . $email . "' AND password = '" . $password . "'");
+	$stmt->execute();
 
 
-			$lista = array(
-				"request"=>"Success",
-				"token"=>$token_id,
-				"email" => $email,
-				//PacienteModel
-				"paciente"=>[
-				"rela_users" => $rela_users,
-				"rela_nivel_instruccion" => $rela_nivel_instruccion,
-				"rela_grupo_conviviente" => $rela_grupo_conviviente,
-				"rela_departamento" => $rela_departamento,
-				"rela_genero" => $rela_genero,
+	if ($stmt->rowCount() > 0) {
+		$result_medico = $stmt->fetch();
+
+		$id_paciente = $result_medico['id'];
+
+		$nombre = $result_medico['nombre'];
+		$apellido = $result_medico['apellido'];
+		$dni = $result_medico['dni'];
+		$matricula = $result_medico['matricula'];
+		$especialidad = $result_medico['especialidad'];
+		$telefono = $result_medico['telefono'];
+		$domicilio = $result_medico['domicilio'];
+
+
+		$lista = array(
+			"request" => "Success",
+			//"token" => $token_id,
+			"email" => $email,
+			//PacienteModel
+			"medico" => [
 				"nombre" => $nombre,
 				"apellido" => $apellido,
 				"dni" => $dni,
-				"fecha_nacimiento" => $fecha_nacimiento,
-				"celular" => $celular,
-				"contacto" => $contacto,
-				"estado_users"=>$estado_users
-				],
-			);
+				"matricula" => $matricula,
+				"especialidad" => $especialidad,
+				"telefono" => $telefono,
+				"domicilio" => $domicilio
+			],
+		);
 
-			
-			echo json_encode($lista);
-
-
-
-		}else{
-			$lista = array ("request"=>"Error al iniciar sesión");
-	        echo json_encode($lista);
-		}
+		 $_SESSION['email'] = $email;
+		 $_SESSION['password'] = $password;
+		 $_SESSION['id_medico'] = $result_medico['id'];
+        
+		
+		echo json_encode($lista);
+	} else {
+		$lista = array("request" => "Error al iniciar sesión");
+		echo json_encode($lista);
+	}
 	
-	}else{
-		
-		$lista = array ("request"=>"incorrect");
-	    echo json_encode($lista);
-		
-	}
-	} catch (PDOException $error) {
-		$lista = array ("request"=>$error->getMessage());
-	    echo json_encode($lista);
-	}
+} catch (PDOException $error) {
+	$lista = array("request" => $error->getMessage());
+	echo json_encode($lista);
+}
