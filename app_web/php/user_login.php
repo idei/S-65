@@ -8,10 +8,18 @@ header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Methods
 require 'db.php';
 
 session_start();
-//$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode(file_get_contents("php://input"), true);
 
-$email = $_POST["email"];
-$password = $_POST['password'];
+if (isset($_SESSION['email'])) {
+    $email = $_SESSION["email"];
+    $password = $_SESSION['password'];
+}
+
+if (isset($data)) {
+	$email = $data["email"];
+    $password = $data['password'];
+}
+
 
 try {
 

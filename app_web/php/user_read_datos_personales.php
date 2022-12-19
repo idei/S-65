@@ -11,7 +11,6 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $dni = $data["dni"];
 
-
     try {
         $select_data = $db->prepare("SELECT rela_users, rela_nivel_instruccion,
     rela_grupo_conviviente, rela_departamento, rela_genero, nombre, apellido, dni, 
