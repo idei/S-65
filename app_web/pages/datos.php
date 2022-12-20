@@ -8,14 +8,37 @@
         <title>Datos</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="../assets/logo1.png" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <!-- CSS only -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link href="../css/styles.css" rel="stylesheet" />
+        <link href="../css/styleP.css" rel="stylesheet" />
+
     </head>
     <body>
         <div class="d-flex" id="wrapper">
                 <?php include('navbar_template.php'); ?>
+                <h4>Datos de Paciente</h4>
+                <p>Nombre y Apellido:</p>
+                <p>Dni:</p>
+                <p>Contacto:</p>
+                <p>Departamento</p>
+                <h4>Datos Clínicos</h4>
+                <p>Fecha:</p>
+                <p>Presión Alta:</p>
+                <p>Pulso:</p>
+                <p>Circunferencia de la cintura</p>
+                <p>Fuma:</p>
+                <p>Consume Marihuana:</p>
+                <button type="button" class="btn btn-outline-primary">Ver más</button>
+                <h4>Antecedentes Médicos</h4>
+                <h4>Antecedentes Familiares</h4>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                        <button type="button" class="btn btn-primary text-uppercase">Enviar un Aviso personal</button>
+                        <button type="button" class="btn btn-primary text-uppercase">Enviar un chequeo</button>
+</div>
+</div>
+                </div>
                 
         </div>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

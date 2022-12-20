@@ -6,10 +6,11 @@ header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Authorization, X-Requested-With');
 
 require 'db.php';
-
 $data = json_decode(file_get_contents("php://input"), true);
 
-$dni = $data["dni"];
+if (isset($data)) {
+	$dni = $data["dni"];
+}
 
     try {
         $select_data = $db->prepare("SELECT rela_users, rela_nivel_instruccion,
