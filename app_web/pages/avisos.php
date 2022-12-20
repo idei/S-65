@@ -33,7 +33,7 @@ $email_doctor= $_SESSION['email'] ;
                 <div class="p-5">
                     <h2>Avisos</h2>
                     <button class="btn-danger float-right">Crear Anuncio Grupal</button>
-                    <button class="btn-primary float-right" onclick="nuevo_anuncio()">Crear Anuncio Individual</button>
+                    <button class="btn-primary float-right" onclick="$('#nuevoAvisoModal').modal('show')">Crear Anuncio Individual</button>
                     <br></br>
                     <table class="table">
                         <thead>
@@ -87,13 +87,20 @@ $email_doctor= $_SESSION['email'] ;
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div id="modal1" class="modal-body">
+                <div id="modal_nuevo_anuncio" class="modal-body">
                 <form action="" method="post">
-                    <input type="email" name="" id="">
+                <div class="form-group">
+            <label for="descripcion-text" class="col-form-label">Descripción:</label>
+            <textarea class="form-control" id="descripcion_anuncio_individual"></textarea>
+          </div>
+                    <div class="form-group">
+                    <label for="fecha-text" class="col-form-label">Fecha Límite:</label>
+                    <input type="date" name="" id="fecha_limite">
+                    </div>
                 </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="nuevo_anuncio()">OK</button>
                     <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
                 </div>
             </div>
@@ -110,7 +117,34 @@ $email_doctor= $_SESSION['email'] ;
 <script>
 
     function nuevo_anuncio(){
-        $('#nuevoAvisoModal').modal('show'); // abrir
+        //$('#nuevoAvisoModal').modal('show'); // abrir
+
+        var parametros = {
+            descripcion: document.getElementById("descripcion_anuncio_individual").value,
+            fecha_limite: document.getElementById("fecha_limite").value, 
+            email_medico: 'doc@gmail.com',
+            email_paciente: 'prueba@gmail.com'
+        };
+    
+        $.ajax({
+            data: JSON.stringify(parametros),
+            url: '../php/create_aviso.php',
+            type: 'POST',
+            dataType: "JSON",
+    
+            success: function(response) {
+
+                if (response['request'] == 'Success') {
+                    tabla.innerHTML = ``;
+                    read_avisos();
+    
+                } else {
+                    console.log(response['request']);
+                }
+                
+    
+            }
+        });
     }
 
 function ver_mas(id) {

@@ -10,9 +10,10 @@ require 'db.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 $descripcion_aviso = $data["descripcion"];
-$fecha_limite = $data["feha_limite"];
+$fecha_limite = $data["fecha_limite"];
 $email_paciente = $data["email_paciente"];
 $email_medico = $data["email_medico"];
+
 
 $rela_estado =  0; // Se define estado 0 por defecto
 
@@ -23,7 +24,6 @@ $rela_estado =  0; // Se define estado 0 por defecto
 // 2 Prestador de Salud
 // )
 $rela_creador = 0;
-
 
 // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
 
