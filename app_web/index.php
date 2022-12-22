@@ -19,11 +19,15 @@
     <div class="row">
       <div class="col-sm">
     <form class="form-signin" name="person" method="POST">
-      <img src="assets/logo1.png" alt="" width="300" height="200">
+      <img src="assets/logo1.png" alt="" width="500" height="300">
+      <div class="row justify-content-md-center">
+      <div class = "col-6">
       <input type="email" id="email" class="form-control" placeholder="Email" required autofocus>
 </br>
       <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
 </br>
+      </div>
+</div>
       <a href="pages/inicio.php"   class="btn btn-primary active" role="button" onclick="login()" aria-pressed="true">Iniciar Sesión</a>
       
     </form>
