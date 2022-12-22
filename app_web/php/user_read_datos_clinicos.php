@@ -38,7 +38,17 @@
     $pulso= $select_data_clinica["pulso"];
     $peso= $select_data_clinica["peso"];
     $circunferencia_cintura= $select_data_clinica["circunferencia_cintura"];
-    $consume_alcohol= $select_data_clinica["consume_alcohol"];
+    switch ($select_data_clinica["consume_alcohol"]) {
+        case 902:
+            $consume_alcohol= "A veces (una vez al mes)";
+            break;
+        case 903:
+            $consume_alcohol= "Con frecuencia (una vez por semana)";
+            break;
+        case 904:
+            $consume_alcohol= "Siempre (casi todos los días)";
+            break;
+    }
     $consume_marihuana= $select_data_clinica["consume_marihuana"];
     $otras_drogas= $select_data_clinica["otras_drogas"];
     $fuma_tabaco= $select_data_clinica["fuma_tabaco"];

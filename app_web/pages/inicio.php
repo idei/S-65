@@ -1,6 +1,6 @@
 <?php
-session_start();
-$email= $_SESSION['email'] ;
+//session_start();
+$email= "doc@gmail.com" ;
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +19,7 @@ $email= $_SESSION['email'] ;
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <link href="../css/styles.css" rel="stylesheet" />
     </head>
+    
     <body>
         <div class="d-flex" id="wrapper">
                 <?php include('navbar_template.php'); ?>
@@ -52,11 +53,9 @@ $email= $_SESSION['email'] ;
           </button>
         </div>
         <div class="modal-body">
-          Nombre: Manuel
+          <div id="nombre"> </div>
         </br>
-          Apellido: Olivares
-        </br>
-          Contacto: Sergio Albarado
+          <div id="apellido"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -69,27 +68,20 @@ $email= $_SESSION['email'] ;
         <script>
 	function buscar()
     {
-
-      var parametros = 
-      {
-        "dni" : document.getElementById("dni").value,
+      var settings = {
+      "url": "http://localhost/s-65/app_web/php/user_read_datos_personales.php",
+      "method": "POST",
+      "data": JSON.stringify({
+      "dni": document.getElementById("dni").value,
+      }),
       };
 
-      $.ajax({
-        data: parametros,
-        url: '../php/user_read_datos_personales.php',
-        type: 'POST',
-        dataType:"JSON",
-    
-        success: function(response)
-        {        
-            if(response['request']=='Success'){   
-              console.log("paso")
-            }else{
-                console.log("nop");
-            }
-        }
-      });
+$.ajax(settings).done(function (response) {
+  var nombre= "Nombre: " + response['nombre'] 
+  var apellido = "Apellido: " + response['apellido']
+  $("#nombre").html(nombre);
+  $("#apellido").html(apellido);
+});
 }
 
 
