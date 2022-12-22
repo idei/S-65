@@ -15,12 +15,15 @@
   </head>
 
   <body class="text-center">
+  <div class="container" >
+    <div class="row">
+      <div class="col-sm">
     <form class="form-signin" name="person" method="POST">
-      <img class="mb-4" src="assets/logo1.png" alt="" width="250" height="200">
-      <label for="inputEmail" class="sr-only">Email</label>
-      <input type="email" id="email" class="form-control" placeholder="Email address" required autofocus>
-      <label for="inputPassword" class="sr-only">Contraseña</label>
-      <input type="password" id="password" class="form-control" placeholder="Password" required>
+      <img src="assets/logo1.png" alt="" width="300" height="200">
+      <input type="email" id="email" class="form-control" placeholder="Email" required autofocus>
+</br>
+      <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
+</br>
       <a href="pages/inicio.php"   class="btn btn-primary active" role="button" onclick="login()" aria-pressed="true">Iniciar Sesión</a>
       
     </form>
@@ -28,7 +31,9 @@
     <div id='error'>
         
     </div>
-
+    </div>  
+  </div>  
+</div>
   </body>
 
   <script>

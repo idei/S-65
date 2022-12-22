@@ -71,9 +71,12 @@ $select_antecedentes->execute();
 $select_evento = $db->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos`");
 $select_evento->execute();
 $evento = $select_evento->fetchAll();
+$lista1 = array();
 
 //var_dump($select_antecedentes->rowCount());
 if ($select_antecedentes->rowCount() > 0) {
+    $stack = array("request" => "Success");
+    $lista1 = array_merge($lista1, $stack);
     $antecedente = $select_antecedentes->fetchAll();
 
     foreach ($antecedente as $antecedentes) {
@@ -81,115 +84,172 @@ if ($select_antecedentes->rowCount() > 0) {
         foreach ($evento as $eventos) {
 
             if ($antecedentes["rela_evento"] == $eventos["id"]) {
-
+            
                 if ($eventos["codigo_evento"] == $cod_event_retraso) {
-                    $retraso = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                    $retraso = "Retraso Mental";
+                    $stack = array("retraso" => $retraso);
+                    $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_desorden) {
-                    $desorden = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                   {     $desorden = "Desorden del habla";
+                    $stack = array("desorden" => $desorden);
+                     $lista1 = array_merge($lista1, $stack);                }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_deficit) {
-                    $deficit = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                    {
+                        $deficit = "Déficit de atención";
+                        $stack = array("deficit" => $deficit);
+                        $lista1 =  $lista1 = array_merge($lista1, $stack);
+                    }
+                    
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_lesiones_cabeza) {
-                    $lesiones_cabeza = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                    {$lesiones_cabeza = "Lesiones en la cabeza";
+                        $stack = array("lesiones_cabeza" => $lesiones_cabeza);
+                        $lista1 =  $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_perdidas) {
-                    $perdidas = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                    {$perdidas = "Pérdidas de conocimiento";
+                        $stack = array("perdidas" => $perdidas);
+                         $lista1 = array_merge($lista1, $stack);
+                    }   
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_accidentes_caidas) {
-                    $accidentes_caidas = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                   { $accidentes_caidas = "Accidentes, caídas, golpes"; 
+                    $stack = array("accidentes_caidas" => $accidentes_caidas);
+                     $lista1 = array_merge($lista1, $stack);
+                }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_lesiones_espalda) {
-                    $lesiones_espalda = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                    {
+                    $lesiones_espalda = "Lesiones en la espalda o cuello";
+                    $stack = array("lesiones_espalda" => $lesiones_espalda);
+                      $lista1 = array_merge($lista1, $stack);}
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_infecciones) {
-                    $infecciones = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1")
+                   { $infecciones = "Infecciones (meningitis, encefalitis) /privación de oxígeno";
+                    $stack = array("infecciones" => $infecciones);
+                      $lista1 = array_merge($lista1, $stack);   
+                }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_toxinas) {
-                    $toxinas = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $toxinas = "Exposición a toxinas (plomo, solventes, químicos, etc.)";
+                        $stack = array("toxinas" => $toxinas);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_acv) {
-                    $acv = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $acv = "Accidente Cerebrovascular (ACV)";
+                        $stack = array("acv" => $acv);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_demencia) {
-                    $demencia = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $demencia = "Demencias (ejemplo Alzheimer)";
+                        $stack = array("demencia" => $demencia);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_parkinson) {
-                    $parkinson = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $parkinson = "Parkinson";
+                        $stack = array("parkinson" => $parkinson);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_epilepsia) {
-                    $epilepsia = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $epilepsia = "Epilepsia";
+                        $stack = array("epilepsia" => $epilepsia);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_esclerosis) {
-                    $esclerosis = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $esclerosis = "Esclerosis Múltiple";
+                        $stack = array("esclerosis" => $esclerosis);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_huntington) {
-                    $huntington = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $huntington = "Huntington";
+                        $stack = array("huntington" => $huntington);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_depresion) {
-                    $depresion = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $depresion = "Depresion";
+                        $stack = array("depresion" => $depresion);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_trastorno) {
-                    $trastorno = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $trastorno = "Trastorno bipolar";
+                        $stack = array("trastorno" => $trastorno);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_esquizofrenia) {
-                    $esquizofrenia = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $esquizofrenia = "Esquizofrenia";
+                        $stack = array("esquizofrenia" => $esquizofrenia);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_enfermedad_desorden) {
-                    $enfermedad_desorden = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $enfermedad_desorden = "Enfermedad o desorden grave (inmunológico, parálisis cerebral, polio, pulmones, etc.)";
+                        $stack = array("enfermedad_desorden" => $enfermedad_desorden);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
 
                 if ($eventos["codigo_evento"] == $cod_event_intoxicaciones) {
-                    $intoxicaciones = $antecedentes["rela_tipo"];
+                    if($antecedentes["rela_tipo"]=="1"){
+                        $intoxicaciones = "Intoxicaciones";
+                        $stack = array("intoxicaciones" => $intoxicaciones);
+                          $lista1 = array_merge($lista1, $stack);
+                    }
                 }
             }
         }
     }
-
-    $lista = array(
-        "request" => "Success",
-        "retraso" => $retraso,
-        "desorden" => $desorden,
-        "deficit" => $deficit,
-        "lesiones_cabeza" => $lesiones_cabeza,
-        "perdidas" => $perdidas,
-        "accidentes_caidas" => $accidentes_caidas,
-        "lesiones_espalda" => $lesiones_espalda,
-        "infecciones" => $infecciones,
-        "toxinas" => $toxinas,
-        "acv" => $acv,
-        "demencia" => $demencia,
-        "parkinson" => $parkinson,
-        "epilepsia" => $epilepsia,
-        "esclerosis" => $esclerosis,
-        "huntington" => $huntington,
-        "depresion" => $depresion,
-        "trastorno" => $trastorno,
-        "esquizofrenia" => $esquizofrenia,
-        "enfermedad_desorden" => $enfermedad_desorden,
-        "intoxicaciones" => $intoxicaciones,
-    );
 } else {
-    $lista = array(
+    $lista1 = array(
         "request" => "Success",
         "retraso" => 0,
         "desorden" => 0,
@@ -214,5 +274,5 @@ if ($select_antecedentes->rowCount() > 0) {
     );
 }
 
-echo json_encode($lista);
+echo json_encode($lista1);
     //
