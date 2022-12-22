@@ -15,7 +15,7 @@ if (isset($_SESSION['email'])) {
         <div><i class="fa-solid fa-skating fa-fw"></i><a class="list-group-item list-group-item-action list-group-item-light p-3" href="inicio.php">Pacientes</a></div>
 
         <a class="list-group-item list-group-item-action list-group-item-light p-3" href="avisos.php">Avisos</a>
-        <a class="list-group-item list-group-item-action list-group-item-light p-3" href="chequeos.php">Chequeos</a>
+       <!-- <a class="list-group-item list-group-item-action list-group-item-light p-3" href="chequeos.php">Chequeos</a>-->
 
     </div>
 </div>
