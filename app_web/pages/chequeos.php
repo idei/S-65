@@ -38,11 +38,9 @@
           <!-- Date Picker -->
           </br>
           <div class="form-group mb-4">
-            <div class="datepicker date input-group">
-              <input type="text" placeholder="Elegir Fecha" class="form-control" id="fecha1">
-              <div class="input-group-append">
-                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-              </div>
+            <div class="form-group">
+              <input type="date" placeholder="Elegir Fecha" class="form-control" id="fecha1">
+             
             </div>
           </div>
         </div>
@@ -80,15 +78,7 @@
   </div>
 
 <script>
-  $(function() {
-    $('.datepicker').datepicker({
-      language: "es",
-      autoclose: true,
-      format: "dd/mm/yyyy"
-    });
-  });
-
-  function read_nombre_chequeos() {
+   function read_nombre_chequeos() {
     var parametros = {
     };
 
