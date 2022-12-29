@@ -38,3 +38,6 @@ if (isset($_SESSION['email'])) {
             </div>
         </div>
     </nav>
+    <div id="alert_component" class="alert" role="alert" style="display: none">
+  <div id="alert-msg"></div>
+</div>

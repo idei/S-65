@@ -39,15 +39,15 @@
       <hr>
       <div class="container" style="margin: 30px;">
         <div class="row">
-        <div class="col-sm">
-        <button type="button" onclick="antecedentesP()" class="btn btn-primary text-uppercase" data-toggle="modal" data-target="#modalMedico">Antecedentes Médicos</button>
-    </div>
-    <div class="col-sm">
-    <button type="button" onclick="antecedentesF()" class="btn btn-primary text-uppercase" data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
-    </div>
-    <div class="col-sm">
-    <a href="chequeos.php" class="btn btn-danger text-uppercase">Enviar Chequeo</a>
-    </div>
+          <div class="col-sm">
+            <button type="button" onclick="antecedentesP()" class="btn btn-primary text-uppercase" data-toggle="modal" data-target="#modalMedico">Antecedentes Médicos</button>
+          </div>
+          <div class="col-sm">
+            <button type="button" onclick="antecedentesF()" class="btn btn-primary text-uppercase" data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
+          </div>
+          <div class="col-sm">
+            <a href="chequeos.php" class="btn btn-danger text-uppercase">Enviar Chequeo</a>
+          </div>
         </div>
         <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -162,7 +162,7 @@
         var pulso = "Pulso: " + response['pulso']
         var circun = "Circunferencia de la cintura: " + response['circunferencia_cintura']
         var fuma = "Fuma: " + response['fuma_tabaco']
-        var marihuana = "Consume Marihuana:" + response['consume_marihuana']
+        var marihuana = "Consume Marihuana: " + response['consume_marihuana']
         var alcohol = "Consume Alcohol: " + response['consume_alcohol']
         var otras = "Otras drogas: " + response['otras_drogas']
         $("#peso").html(peso);

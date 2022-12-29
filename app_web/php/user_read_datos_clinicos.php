@@ -29,7 +29,6 @@
 
     $select_data_clinica->execute();
 
-
     if ($select_data_clinica->rowCount()>0) {
         $select_data_clinica= $select_data_clinica->fetch();
 
