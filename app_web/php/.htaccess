@@ -1,5 +1,8 @@
 RewriteEngine On    # Turn on the rewriting engine
 
+#   Home
+RewriteRule ^inicio$ index.php [L]
+
 #POST
 RewriteRule ^recordatorios$ read_recordatorios.php [NC,L]
 RewriteRule ^login$ user_login.php [NC,L]

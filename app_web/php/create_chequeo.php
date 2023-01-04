@@ -24,7 +24,7 @@ if (isset($data)) {
     $rela_medico = $data['rela_medico'];
 }
 
-$rela_estado_recordatorio = "2";
+$rela_estado_recordatorio = "1";
 $descripcion = "Te enviaron un recordatorio de chequeo";
 
 
