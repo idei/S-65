@@ -1,5 +1,8 @@
+<?php
+$id
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8" />
@@ -46,7 +49,10 @@
             <button type="button" onclick="antecedentesF()" class="btn btn-primary text-uppercase" data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
           </div>
           <div class="col-sm">
-            <a href="chequeos.php" class="btn btn-danger text-uppercase">Enviar Chequeo</a>
+            <a href="chequeos.php" class="btn btn-danger">Enviar Chequeo</a>
+          </div>
+          <div class="col-sm">
+            <button class="btn btn-danger text-uppercase" onclick="$('#nuevoAvisoModal').modal('show')" >Enviar Aviso</button>
           </div>
         </div>
         <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -137,6 +143,37 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal Nuevo Anuncio Individual-->
+  <div class="modal fade" id="nuevoAvisoModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAvisoModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal_nuevo_anuncio" class="modal-body">
+                    <form action="" method="post">
+                        <div class="form-group">
+                            <label for="descripcion-text" class="col-form-label">Descripción:</label>
+                            <textarea class="form-control" id="descripcion_anuncio_individual"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-text" class="col-form-label">Fecha Límite:</label>
+                            <input type="date" name="" id="fecha_limite">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="nuevo_anuncio()">Enviar</button>
+                    <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
   <script>
     function buscar() {
       var settings = {

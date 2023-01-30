@@ -32,22 +32,11 @@ $email_doctor = $_SESSION['email'];
             <!-- Stack the columns on mobile by making one full-width and the other half-width -->
             <div class="row" style="margin: 100; color: rgb(92, 90, 90);">
                 <div class="p-5">
-                    <h2>Avisos</h2>
+                    <h2>Chequeos</h2>
+                   
+                    <br></br>    
 
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <button class="btn btn-danger float-right" onclick="$('#nuevoAvisoGrupalModal').modal('show')"><i class="fa fa-users" aria-hidden="true"></i> Crear Aviso Grupal</button>
-                            </div>
-                            <div class="col-sm">
-                            </div>
-                            <div class="col-sm">
-
-                            </div>
-                        </div>
-                    </div>
-                    <br></br>
-                    <table class="table">
+                   <table class="table">
                         <thead>
                             <tr>
                                 <th scope="col"></th>
@@ -62,6 +51,7 @@ $email_doctor = $_SESSION['email'];
 
                         </tbody>
                     </table>
+                
                 </div>
             </div>
         </div>
@@ -88,12 +78,43 @@ $email_doctor = $_SESSION['email'];
         </div>
     </div>
 
+
+    <!-- Modal Nuevo Anuncio Individual-->
+    <div class="modal fade" id="nuevoAvisoModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAvisoModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal_nuevo_anuncio" class="modal-body">
+                    <form action="" method="post">
+                        <div class="form-group">
+                            <label for="descripcion-text" class="col-form-label">Descripción:</label>
+                            <textarea class="form-control" id="descripcion_anuncio_individual"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-text" class="col-form-label">Fecha Límite:</label>
+                            <input type="date" name="" id="fecha_limite">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="nuevo_anuncio()">Enviar</button>
+                    <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Nuevo Anuncio Grupal-->
     <div class="modal fade" id="nuevoAvisoGrupalModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAvisoGrupalModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Aviso Grupal</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio Grupal</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -136,6 +157,7 @@ $email_doctor = $_SESSION['email'];
 </body>
 
 <script>
+
     var arreglo_departamentos = [];
     var check_genero = "";
 
@@ -173,7 +195,7 @@ $email_doctor = $_SESSION['email'];
 
         $.ajax({
             data: JSON.stringify(parametros),
-            url: 'http://localhost/S-65/api/v1/deptos_generos',
+            url: 'http://localhost/S-65/api/v1/deptos_sexo.php',
             type: 'POST',
             dataType: "JSON",
 
@@ -287,7 +309,7 @@ $email_doctor = $_SESSION['email'];
 
         $.ajax({
             data: JSON.stringify(parametros),
-            url: '../php/read_aviso.php',
+            url: 'http://localhost/S-65/api/v1/read_aviso.php',
             type: 'POST',
             dataType: "JSON",
 
@@ -323,7 +345,7 @@ $email_doctor = $_SESSION['email'];
 
         $.ajax({
             data: JSON.stringify(parametros),
-            url: 'http://localhost/S-65/api/v1/avisos',
+            url: '../php/read_avisos.php',
             type: 'POST',
             dataType: "JSON",
 
@@ -331,7 +353,7 @@ $email_doctor = $_SESSION['email'];
 
                 if (response['status'] == 'Success') {
 
-                    response['data'].forEach(element => {
+                    response['avisos'].forEach(element => {
                         if (element['url_imagen'] == null || element['url_imagen'] == "") {
                             url_imagen = "Sin Imagen"
                         } else {
@@ -357,6 +379,7 @@ $email_doctor = $_SESSION['email'];
             }
         });
     }
+
 </script>
 
 <script src="../js/alerts_msg.js"></script>

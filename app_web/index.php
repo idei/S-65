@@ -52,13 +52,13 @@
 
     $.ajax({
       data: parametros,
-      url: 'php/user_login.php',
+      url: 'http://localhost/S-65/api/v1/login',
       type: 'POST',
       dataType: "JSON",
 
       success: function(response) {
         console.log(response);
-        if (response['request'] == 'Success') {
+        if (response['status'] == 'Success') {
           window.location.replace("pages/inicio.php");
         } else {
           mensaje.innerHTML = `<p style="color:red;">Usuario o Pass Incorrecto</p>`;

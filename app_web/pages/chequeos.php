@@ -84,7 +84,7 @@
 
     $.ajax({
       data: JSON.stringify(parametros),
-      url: '../php/retornar_chequeos.php',
+      url: 'http://localhost/S-65/api/v1/chequeos.php',
       type: 'POST',
       dataType: "JSON",
 
