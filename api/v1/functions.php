@@ -1384,7 +1384,7 @@ function chequeos_medico_paciente()
 
 
     // SELECCION DE ID DEL MEDICO A PARTIR DEL ID DEL LOGIN
-    $select_id_medico = Flight::db()->prepare("SELECT id FROM `medicos` WHERE medicos.rela_users = '" . $id_users . "'");
+    $select_id_medico = Flight::db()->prepare("SELECT id FROM medicos WHERE rela_users = '" . $id_users . "'");
     $select_id_medico->execute();
 
 
@@ -1409,10 +1409,11 @@ function chequeos_medico_paciente()
         nombre,
         result_screening resultado
         FROM recordatorios_medicos 
-        JOIN tipo_screening on recordatorios_medicos.rela_screening = tipo_screening.id 
+        JOIN tipo_screening ON recordatorios_medicos.rela_screening = tipo_screening.id 
         JOIN estado_recordatorio ON recordatorios_medicos.rela_estado_recordatorio = estado_recordatorio.id
         JOIN resultados_screenings ON recordatorios_medicos.rela_respuesta_screening = resultados_screenings.id
-        WHERE recordatorios_medicos.rela_medico = '" . $id_medico . '" and "recordatorios_medicos.rela_paciente ='.$id_paciente."'
+        WHERE recordatorios_medicos.rela_medico = '" . $id_medico . "'
+        AND recordatorios_medicos.rela_paciente = '" .$id_paciente. "'
         ORDER BY fecha_limite ASC");
 
         $stmt->execute();

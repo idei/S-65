@@ -1,72 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <link rel="icon" type="image/x-icon" href="assets/logo1.png" />
-  <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link href="../css/styles.css" rel="stylesheet" />
-  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema de Salud</title>
 
-
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
 
-<body class="text-center">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <form class="" name="person" method="POST">
-          <img src="assets/logo1.png" alt="" width="500" height="300">
-          <div class="row justify-content-md-center">
-            <div class="col-6">
-              <input type="email" id="email" class="form-control" placeholder="Email" required autofocus>
-              </br>
-              <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
-              </br>
+<body class="hold-transition login-page">
+  <div class="login-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline card-primary">
+      <div class="card-header text-center">
+        <a href="../index2.html" class="h1"><b>S +</b>65</a>
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg">Cuenta de Doctores</p>
+
+        <form action="../index3.html" method="post">
+          <div class="input-group mb-3">
+            <input id="email" type="email" class="form-control" placeholder="Correo Electrónico">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
             </div>
           </div>
-          <div id='mensaje'>
-        </div>
-          <a class="btn btn-primary active" role="button" onclick="login()">Iniciar Sesión</a>
+          <div class="input-group mb-3">
+            <input id="password" type="password" class="form-control" placeholder="Contraseña">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="icheck-primary">
+                <input type="checkbox" id="remember">
+                <label for="remember">
+                  Recordarme
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-6">
+              <a type="submit" class="btn btn-primary btn-block" onclick="login()">Iniciar Sesión</a>
+            </div>
+            <!-- /.col -->
+          </div>
         </form>
 
+        <p class="mb-1">
+          <a href="forgot-password.html">Olvidé mi contraseña</a>
+        </p>
+        <p class="mb-0">
+          <a href="register.php" class="text-center">Registrarme</a>
+        </p>
       </div>
+      <!-- /.card-body -->
     </div>
+    <!-- /.card -->
   </div>
-</body>
+  <!-- /.login-box -->
 
-<script>
+  <script>
+    function login() {
 
-  function login() {
+      var parametros = {
+        "email": document.getElementById("email").value,
+        "password": document.getElementById("password").value,
+      };
 
-    var parametros = {
-      "email": document.getElementById("email").value,
-      "password": document.getElementById("password").value,
-    };
+      $.ajax({
+        data: parametros,
+        //url: 'http://localhost/S-65/api/v1/login',
+        url: 'session.php',
+        type: 'POST',
+        dataType: "JSON",
 
-    console.log(document.getElementById("password").value);
+        success: function(response) {
+          if (response['status'] == 'Success') {
+            
+            window.location.replace("home.php");
+            
+          } else {
+            mensaje.innerHTML = `<p style="color:red;">Usuario o Contraseña Incorrecta</p>`;
 
-    $.ajax({
-      data: parametros,
-      url: 'http://localhost/S-65/api/v1/login',
-      type: 'POST',
-      dataType: "JSON",
-
-      success: function(response) {
-        console.log(response);
-        if (response['status'] == 'Success') {
-          window.location.replace("pages/inicio.php");
-        } else {
-          mensaje.innerHTML = `<p style="color:red;">Usuario o Pass Incorrecto</p>`;
-
+          }
         }
-      }
-    });
-  }
-</script>
+      });
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
+</body>
 
 </html>
