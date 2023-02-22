@@ -772,63 +772,66 @@ function read_datos_clinicos()
 
 
         $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
-    consume_marihuana, otras_drogas, fuma_tabaco 
+    consume_marihuana, otras_drogas, fuma_tabaco, fecha_alta, talla 
     FROM datos_clinicos 
-    WHERE rela_paciente = '" . $id_users . "' AND estado_clinico = 1");
+    WHERE rela_paciente = '" . $id_users . "'");
 
         $select_data_clinica->execute();
 
         if ($select_data_clinica->rowCount() > 0) {
-            $select_data_clinica = $select_data_clinica->fetch();
-
-            $presion_alta = $select_data_clinica["presion_alta"];
-            $presion_baja = $select_data_clinica["presion_baja"];
-            $pulso = $select_data_clinica["pulso"];
-            $peso = $select_data_clinica["peso"];
-            $circunferencia_cintura = $select_data_clinica["circunferencia_cintura"];
-            switch ($select_data_clinica["consume_alcohol"]) {
-                case 902:
-                    $consume_alcohol = "A veces (una vez al mes)";
-                    break;
-                case 903:
-                    $consume_alcohol = "Con frecuencia (una vez por semana)";
-                    break;
-                case 904:
-                    $consume_alcohol = "Siempre (casi todos los días)";
-                    break;
-            }
-            $consume_marihuana = $select_data_clinica["consume_marihuana"];
-            $otras_drogas = $select_data_clinica["otras_drogas"];
-            $fuma_tabaco = $select_data_clinica["fuma_tabaco"];
-
-
-            $data = array(
-                "presion_alta" => $presion_alta,
-                "presion_baja" => $presion_baja,
-                "pulso" => $pulso,
-                "peso" => $peso,
-                "circunferencia_cintura" => $circunferencia_cintura,
-                "consume_alcohol" => $consume_alcohol,
-                "consume_marihuana" => $consume_marihuana,
-                "otras_drogas" => $otras_drogas,
-                "fuma_tabaco" => $fuma_tabaco
-            );
-
+            $result = $select_data_clinica->fetchAll();
+            for ($i = 1; $i <= 10; $i++)
+            foreach ($result as $results) {
+               /* switch (results['consume_alcohol']) {
+                    case 902:
+                        results['consume_alcohol'] = "A veces (una vez al mes)";
+                        break;
+                    case 903:
+                        results['consume_alcohol'] = "Con frecuencia (una vez por semana)";
+                        break;
+                    case 904:
+                        results['consume_alcohol'] = "Siempre (casi todos los días)";
+                        break;
+                }
+                switch (results["consume_marihuana"]) {
+                    case 902:
+                        results["consume_marihuana"] = "A veces (una vez al mes)";
+                        break;
+                    case 903:
+                        results["consume_marihuana"] = "Con frecuencia (una vez por semana)";
+                        break;
+                    case 904:
+                        results["consume_marihuana"] = "Siempre (casi todos los días)";
+                        break;
+                }
+                switch (results["otras_drogas"]) {
+                    case 902:
+                        results["otras_drogas"] = "A veces (una vez al mes)";
+                        break;
+                    case 903:
+                        results["otras_drogas"] = "Con frecuencia (una vez por semana)";
+                        break;
+                    case 904:
+                        results["otras_drogas"] = "Siempre (casi todos los días)";
+                        break;
+                }
+                switch (results["fuma_tabaco"]) {
+                    case 902:
+                        results["fuma_tabaco"] = "A veces (una vez al mes)";
+                        break;
+                    case 903:
+                        results["fuma_tabaco"] = "Con frecuencia (una vez por semana)";
+                        break;
+                    case 904:
+                        results["fuma_tabaco"] = "Siempre (casi todos los días)";
+                        break;
+                }*/
+                $data[] = $results;
+                //$lenght = count($data)
             $returnData = msg("Success", $data);
+        }
         } else {
-            $data = array(
-                "presion_alta" => "",
-                "presion_baja" => "",
-                "pulso" => "",
-                "peso" => "",
-                "circunferencia_cintura" => "",
-                "consume_alcohol" => "",
-                "consume_marihuana" => "",
-                "otras_drogas" => "",
-                "fuma_tabaco" => "",
-                "estado_clinico" => ""
-            );
-
+            
             $returnData = msg("Vacio", $data);
         }
     } catch (PDOException $error) {
@@ -903,7 +906,7 @@ function read_datos_personales()
         WHERE rela_paciente = '" . $id_users . "' AND estado_clinico = 1");
 
         $select_data_clinica->execute();
-
+    
         if ($select_data_clinica->rowCount() > 0) {
             $select_data_clinica = $select_data_clinica->fetch();
 
@@ -1011,8 +1014,118 @@ function read_datos_personales()
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
     }
 
+
+    
+
     Flight::json($returnData);
 }
+/*
+function read_datos_clinicos_historicos()
+{
+    
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    //$dni = verificar($data_input, "dni");
+
+    $id_paciente = verificar($data_input, "id_paciente");
+    try {
+
+        $datos_clinicos_historicos = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
+        consume_marihuana, otras_drogas, fuma_tabaco 
+        FROM datos_clinicos 
+        WHERE rela_paciente = '" . $id_users . "' AND estado_clinico = 1");
+
+        $datos_clinicos_historicos->execute();
+
+        
+    
+        if ($datos_clinicos_historicos->rowCount() > 0) {
+            $datos_clinicos_historicos = $datos_clinicos_historicos->fetch();
+
+            $presion_alta = $datos_clinicos_historicos["presion_alta"];
+            $presion_baja = $datos_clinicos_historicos["presion_baja"];
+            $pulso = $datos_clinicos_historicos["pulso"];
+            $peso = $datos_clinicos_historicos["peso"];
+            $circunferencia_cintura = $datos_clinicos_historicos["circunferencia_cintura"];
+            switch ($datos_clinicos_historicos["consume_alcohol"]) {
+                case 902:
+                    $consume_alcohol = "A veces (una vez al mes)";
+                    break;
+                case 903:
+                    $consume_alcohol = "Con frecuencia (una vez por semana)";
+                    break;
+                case 904:
+                    $consume_alcohol = "Siempre (casi todos los días)";
+                    break;
+            }
+            switch ($datos_clinicos_historicos["consume_marihuana"]) {
+                case 902:
+                    $consume_marihuana = "A veces (una vez al mes)";
+                    break;
+                case 903:
+                    $consume_marihuana = "Con frecuencia (una vez por semana)";
+                    break;
+                case 904:
+                    $consume_marihuana = "Siempre (casi todos los días)";
+                    break;
+            }
+            switch ($datos_clinicos_historicos["otras_drogas"]) {
+                case 902:
+                    $otras_drogas = "A veces (una vez al mes)";
+                    break;
+                case 903:
+                    $otras_drogas = "Con frecuencia (una vez por semana)";
+                    break;
+                case 904:
+                    $otras_drogas = "Siempre (casi todos los días)";
+                    break;
+            }
+            switch ($datos_clinicos_historicos["fuma_tabaco"]) {
+                case 902:
+                    $fuma_tabaco = "A veces (una vez al mes)";
+                    break;
+                case 903:
+                    $fuma_tabaco = "Con frecuencia (una vez por semana)";
+                    break;
+                case 904:
+                    $fuma_tabaco = "Siempre (casi todos los días)";
+                    break;
+            }
+
+            $data = array(
+                "presion_alta" => $presion_alta,
+                "presion_baja" => $presion_baja,
+                "pulso" => $pulso,
+                "peso" => $peso,
+                "circunferencia_cintura" => $circunferencia_cintura,
+                "consume_alcohol" => $consume_alcohol,
+                "consume_marihuana" => $consume_marihuana,
+                "otras_drogas" => $otras_drogas,
+                "fuma_tabaco" => $fuma_tabaco
+            );
+
+            $returnData = msg("Success", $data);
+        } else {
+            $data = array(
+                "presion_alta" => "",
+                "presion_baja" => "",
+                "pulso" => "",
+                "peso" => "",
+                "circunferencia_cintura" => "",
+                "consume_alcohol" => "",
+                "consume_marihuana" => "",
+                "otras_drogas" => "",
+                "fuma_tabaco" => "",
+                "estado_clinico" => ""
+            );
+            $returnData = msg("Success", $data);
+        }
+    } catch (PDOException $error) {
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }   
+
+    Flight::json($returnData);
+}*/
 
 function read_tipos_chequeos()
 {
