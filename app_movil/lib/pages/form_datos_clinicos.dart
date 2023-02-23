@@ -19,8 +19,9 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   List dataRespuestas;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta.php";
+    // String URL_base = Env.URL_API;
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -459,7 +460,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
 guardar_datos(BuildContext context) async {
   print(email_prefer);
-  String URL_base = Env.URL_PREFIX;
+  String URL_base = Env.URL_API;
   var url = URL_base + "/user_datos_clinicos.php";
   var response = await http.post(url, body: {
     "presion_alta": presion_alta.text,
@@ -748,8 +749,8 @@ class Consume_AlcoholWidgetState extends State<Consume_Alcohol> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -808,8 +809,8 @@ class Consume_TabacoWidgetState extends State<Consume_Tabaco> {
   List data = List();
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -866,8 +867,8 @@ class Consume_MarihuanaWidgetState extends State<Consume_Marihuana> {
   List data = List();
 
   Future getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -923,8 +924,8 @@ class Otras_drogasWidgetState extends State<Otras_drogas> {
   List data = List();
 
   Future getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;

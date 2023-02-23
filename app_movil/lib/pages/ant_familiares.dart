@@ -6,13 +6,14 @@ import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AntecedenteModel {
+class AntecedenteFamiliaresModel {
   String antecedenteDescripcion;
 
-  AntecedenteModel({this.antecedenteDescripcion});
+  AntecedenteFamiliaresModel({this.antecedenteDescripcion});
 
-  factory AntecedenteModel.fromJson(Map<String, dynamic> json) {
-    return AntecedenteModel(antecedenteDescripcion: json['nombre_evento']);
+  factory AntecedenteFamiliaresModel.fromJson(Map<String, dynamic> json) {
+    return AntecedenteFamiliaresModel(
+        antecedenteDescripcion: json['nombre_evento']);
   }
 }
 
@@ -26,7 +27,7 @@ var usuarioModel;
 
 class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
   bool isLoading = false;
-  List<AntecedenteModel> listAntecFamiliares = [];
+  List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
 
   @override
   void initState() {
@@ -56,8 +57,8 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                 fontSize: 14.2),
           )),
       body: Container(
-        child: FutureBuilder<List<AntecedenteModel>>(
-          future: fetchStudents(),
+        child: FutureBuilder<List<AntecedenteFamiliaresModel>>(
+          future: fetchAntecedentesFamiliares(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(
@@ -159,16 +160,24 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     }
   }
 
-  Future<List<AntecedenteModel>> fetchStudents() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_antecedentes_familiares.php";
+  Future<List<AntecedenteFamiliaresModel>> fetchAntecedentesFamiliares() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/antecedentes_familiares_paciente";
     var response = await http.post(url, body: {"email": email});
-    if (response.body != "") {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
+    var responseDecode = jsonDecode(response.body);
 
-      listAntecFamiliares = items.map<AntecedenteModel>((json) {
-        return AntecedenteModel.fromJson(json);
-      }).toList();
+    if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+      final List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
+
+      for (var antecedentes in responseDecode['data']) {
+        listAntecFamiliares
+            .add(AntecedenteFamiliaresModel.fromJson(antecedentes));
+      }
+      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
+
+      // listAntecFamiliares = items.map<AntecedenteModel>((json) {
+      //   return AntecedenteModel.fromJson(json);
+      // }).toList();
       //isLoading = true;
       return listAntecFamiliares;
     } else {

@@ -3,16 +3,14 @@
 include __DIR__ . '/db.php';
 include __DIR__ . '/functions.php';
 
-
+// *** Rutas Sitio Web Doctor
 Flight::route('/', 'index' );
 
 // Login Doctor  ----------------------------------------------------------
 Flight::route('POST /login', 'login_doctor');
 
-// Login Paciente  ----------------------------------------------------------
-Flight::route('POST /login_paciente', 'login_paciente');
 
-// Login Doctor  ----------------------------------------------------------
+// Read Pacientes  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 
 // Read Antecedentes Familiares
@@ -53,5 +51,22 @@ Flight::route('POST /recordatorios', 'read_recordatorios');
 
 // Read Recordatorios relacionados con el medico
 Flight::route('POST /recordatorios_medicos', 'read_recordatorios_medico');
+
+
+// *** Rutas App Movil Paciente
+
+// Login Paciente  ----------------------------------------------------------
+Flight::route('POST /login_paciente', 'login_paciente');
+
+// Read Antecedentes Personales Paciente
+Flight::route('POST /antecedentes_personales_paciente', 'antecedentes_personales_paciente');
+
+// Read Antecedentes Familiares Paciente
+Flight::route('POST /antecedentes_familiares_paciente', 'antecedentes_familiares_paciente');
+
+// Read Respuestas Datos Clinicos
+Flight::route('POST /respuesta_datos_clinicos', 'respuesta_datos_clinicos');
+
+// --------------------------------------------------------------------------
 
 Flight::start();

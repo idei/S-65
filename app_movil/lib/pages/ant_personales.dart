@@ -162,17 +162,24 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
 
   Future<List<AntecedentesPersonalesModel>>
       fetchAntecedentesPersonales() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_antecedentes_personales.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/antecedentes_personales_paciente";
     var response = await http.post(url, body: {"email": email});
     var responseDecode = jsonDecode(response.body);
 
-    if (response.statusCode == 200 && responseDecode != "Vacio") {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
+    if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+      final List<AntecedentesPersonalesModel> listAntecPersonales = [];
 
-      listAntecPersonales = items.map<AntecedentesPersonalesModel>((json) {
-        return AntecedentesPersonalesModel.fromJson(json);
-      }).toList();
+      for (var antecedentes in responseDecode['data']) {
+        listAntecPersonales
+            .add(AntecedentesPersonalesModel.fromJson(antecedentes));
+      }
+
+      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
+
+      // listAntecPersonales = items.map<AntecedentesPersonalesModel>((json) {
+      //   return AntecedentesPersonalesModel.fromJson(json);
+      // }).toList();
 
       return listAntecPersonales;
     } else {

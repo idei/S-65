@@ -929,13 +929,41 @@ function read_datos_clinicos()
         }
         } else {
             
-            $returnData = msg("Vacio", $data);
+            $returnData = msg("Vacio", []);
         }
     } catch (PDOException $error) {
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
     }
 
     Flight::json($returnData);
+}
+
+function respuesta_datos_clinicos()
+{
+    try {
+        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES49','TRES50','TRES51')");
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            //echo json_encode($lista);
+            // $returnData = msg("Success", $lista);
+            $returnData = $lista;
+
+
+        }
+        else{
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+
 }
 
 function read_datos_personales()
@@ -1718,6 +1746,130 @@ function get_chequeos()
     }
 
     Flight::json($returnData);
+}
+
+
+function antecedentes_personales_paciente()
+{
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+        
+    } else {
+        $email = verificar($data_input, "email");
+
+    }
+    
+    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+    $select_id_users->execute();
+    $id_users= $select_id_users->fetch();
+    $id_users= $id_users["id"];
+
+
+    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+    $select_id_paciente->execute();
+    $id_paciente= $select_id_paciente->fetch();
+    $id_paciente= $id_paciente["id"];  
+
+
+    // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
+    $select_antecedentes = Flight::db()->prepare("SELECT rela_evento,nombre_evento FROM antecedentes_medicos_personales 
+    JOIN eventos ON antecedentes_medicos_personales.rela_evento = eventos.id
+    WHERE antecedentes_medicos_personales.rela_tipo = 1 AND rela_paciente = '".$id_paciente."'");
+    $select_antecedentes->execute();
+    
+    $lista = array();
+    try {
+        if ($select_antecedentes->rowCount() > 0) {
+            $antecedente= $select_antecedentes->fetchAll();
+            
+            foreach ($antecedente as $antecedentes) {
+                $lista[] = $antecedentes;
+            }
+            //echo json_encode($lista);
+            $returnData = msg("Success", $lista);
+            //$returnData = $lista;
+        }
+        else{
+            //echo json_encode("Vacio");
+            $returnData = msg("Vacio", []);
+        }
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+
+}
+
+function antecedentes_familiares_paciente()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+        
+    } else {
+        $email = verificar($data_input, "email");
+
+    }
+    
+    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+    $select_id_users->execute();
+    $id_users= $select_id_users->fetch();
+    $id_users= $id_users["id"];
+
+
+    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+    $select_id_paciente->execute();
+    $id_paciente= $select_id_paciente->fetch();
+    $id_paciente= $id_paciente["id"];  
+
+
+    // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_familiares
+    $select_antecedentes = Flight::db()->prepare("SELECT rela_evento,nombre_evento FROM antecedentes_medicos_familiares 
+    JOIN eventos ON antecedentes_medicos_familiares.rela_evento = eventos.id
+    WHERE antecedentes_medicos_familiares.rela_tipo = 1 AND rela_paciente = '".$id_paciente."'");
+    $select_antecedentes->execute();
+    
+    $lista = array();
+    try {
+        if ($select_antecedentes->rowCount() > 0) {
+            $antecedente= $select_antecedentes->fetchAll();
+            
+            foreach ($antecedente as $antecedentes) {
+                $lista[] = $antecedentes;
+            }
+            //echo json_encode($lista);
+            $returnData = msg("Success", $lista);
+            //$returnData = $lista;
+        }
+        else{
+            //echo json_encode("Vacio");
+            $returnData = msg("Vacio", []);
+        }
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+
 }
 
 function verificar($data_input, $tipo)
