@@ -320,7 +320,8 @@ class _FormpruebaState extends State<Formprueba> {
   }
 
   guardarDatos(UsuarioServices usuarioModel) async {
-    String URL_base = Env.URL_PREFIX;
+    //String URL_base = Env.URL_PREFIX;
+    String URL_base = Env.URL_API;
     var url = URL_base + "/user_datos_personales.php";
 
     var response = await http.post(url, body: {

@@ -70,9 +70,9 @@ class _LoginPage extends State<LoginPage> {
   }
 
   fetchLogin() async {
-    String URL_base = Env.URL_PREFIX;
+    String URL_base = Env.URL_API;
 
-    var url = URL_base + "/user_login.php";
+    var url = URL_base + "/login_paciente";
 
     var response = await http.post(url, body: {
       "email": email.text,
@@ -82,7 +82,7 @@ class _LoginPage extends State<LoginPage> {
     var responseBody = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      if (responseBody['request'] == "Success") {
+      if (responseBody['status'] == "Success") {
         Map userMap = responseBody;
         var usuarioModel = UsuarioModel.fromJsonLogin(userMap);
 
@@ -90,9 +90,9 @@ class _LoginPage extends State<LoginPage> {
             Provider.of<UsuarioServices>(context, listen: false);
         usuarioService.usuario = usuarioModel;
 
-        estado_users = userMap['paciente']['estado_users'];
+        estado_users = userMap['data']['paciente']['estado_users'];
 
-        if (estado_users == 2 && responseBody['request'] == "Success") {
+        if (estado_users == "2" && responseBody['status'] == "Success") {
           set_preference();
           Navigator.pushNamed(
             context,
@@ -108,7 +108,7 @@ class _LoginPage extends State<LoginPage> {
         }
         loginToast('Cargando información');
       }
-      if (responseBody['request'] == 'incorrect') {
+      if (responseBody['status'] == 'Fail Session') {
         _alert_informe(context, 'Usuario o contraseña incorrectos', 2);
       }
     } else {

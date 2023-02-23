@@ -9,6 +9,9 @@ Flight::route('/', 'index' );
 // Login Doctor  ----------------------------------------------------------
 Flight::route('POST /login', 'login_doctor');
 
+// Login Paciente  ----------------------------------------------------------
+Flight::route('POST /login_paciente', 'login_paciente');
+
 // Login Doctor  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 

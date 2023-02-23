@@ -24,7 +24,7 @@ function login_doctor()
 
         session_start();
         $_SESSION['email'] = $email;
-    }else{
+    } else {
         $email = verificar($data_input, "email");
 
         $password = verificar($data_input, "password");
@@ -92,9 +92,108 @@ function login_doctor()
 
 
     Flight::json($returnData);
+
 }
 
-function read_pacientes(){
+function login_paciente()
+{
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+        $password = $_POST['password'];
+        
+    } else {
+        $email = verificar($data_input, "email");
+
+        $password = verificar($data_input, "password");
+
+    }
+
+    try {
+
+        $stmt = Flight::db()->prepare("SELECT * FROM users WHERE email = '" . $email . "' AND password = '" . $password . "'");
+        $stmt->execute();
+        $result = $stmt->rowCount();
+
+        if ($result > 0) {
+            $result_select_users = $stmt->fetch();
+            $id_user = $result_select_users['id'];
+            $token_id = $result_select_users['token'];
+
+            $result_paciente = Flight::db()->prepare("SELECT * FROM pacientes WHERE rela_users = '" . $id_user . "'");
+
+            $result_paciente->execute();
+
+            $result_paciente_count = $result_paciente->rowCount();
+
+            if ($result_paciente_count > 0) {
+                $result_paciente = $result_paciente->fetch();
+
+                //$id_paciente = $result_paciente['id'];
+
+                $rela_users = $result_paciente['rela_users'];
+                $rela_nivel_instruccion = $result_paciente['rela_nivel_instruccion'];
+                $rela_grupo_conviviente = $result_paciente['rela_grupo_conviviente'];
+                $rela_departamento = $result_paciente['rela_departamento'];
+                $rela_genero = $result_paciente['rela_genero'];
+                $nombre = $result_paciente['nombre'];
+                $apellido = $result_paciente['apellido'];
+                $dni = $result_paciente['dni'];
+                $fecha_nacimiento = $result_paciente['fecha_nacimiento'];
+                $celular = $result_paciente['celular'];
+                $contacto = $result_paciente['contacto'];
+                $estado_users = $result_paciente['estado_users'];
+
+
+                $lista = array(      
+				"token"=>$token_id,
+				"email" => $email,
+				//PacienteModel
+				"paciente"=>[
+				"rela_users" => $rela_users,
+				"rela_nivel_instruccion" => $rela_nivel_instruccion,
+				"rela_grupo_conviviente" => $rela_grupo_conviviente,
+				"rela_departamento" => $rela_departamento,
+				"rela_genero" => $rela_genero,
+				"nombre" => $nombre,
+				"apellido" => $apellido,
+				"dni" => $dni,
+				"fecha_nacimiento" => $fecha_nacimiento,
+				"celular" => $celular,
+				"contacto" => $contacto,
+				"estado_users"=>$estado_users
+				],
+                );
+
+                //echo json_encode($lista);
+
+                $token = "";
+
+                $returnData = msg_login("Success", $lista, $token);
+            } else {
+                // $lista = array ("request"=>"Error al iniciar sesión");
+                // echo json_encode($lista);
+
+                $returnData = msg_error("Fail Session", "Error al iniciar sesión", "0");
+            }
+        } else {
+
+            $returnData = msg_error("Fail Session", "Error al iniciar sesión", "0");
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+
+    Flight::json($returnData);
+}
+
+function read_pacientes()
+{
 
     $data_input = json_decode(file_get_contents("php://input"), true);
 
@@ -113,16 +212,15 @@ function read_pacientes(){
         INNER JOIN medicos_pacientes WHERE rela_medico = '" . $id_medicos . "'");
         $smt->execute();
 
-    if ($smt->rowCount() > 0) {
-        $result = $smt->fetchAll();
+        if ($smt->rowCount() > 0) {
+            $result = $smt->fetchAll();
 
-        foreach ($result as $results) {
-            $data[] = $results;
-        }
+            foreach ($result as $results) {
+                $data[] = $results;
+            }
 
 
-        $returnData = msg("Success", $data);
-
+            $returnData = msg("Success", $data);
         } else {
 
             $returnData = msg("Vacio", []);
@@ -133,7 +231,6 @@ function read_pacientes(){
     }
 
     Flight::json($returnData);
-
 }
 
 function read_antecedentes_familiares()
@@ -476,7 +573,7 @@ function read_antecedentes_personales()
 
     $id_paciente = verificar($data_input, "id_paciente");
 
-    $data =[];
+    $data = [];
 
     $retraso = 0;
     $desorden = 0;
@@ -1101,7 +1198,7 @@ function read_avisos()
 
         $select_id_medico = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '" . $email . "'");
         $select_id_medico->execute();
-        
+
 
         if ($select_id_medico->rowCount() > 0) {
             $id_medico = $select_id_medico->fetch();
@@ -1139,12 +1236,13 @@ function read_avisos()
     Flight::json($returnData);
 }
 
-function get_criterios(){
+function get_criterios()
+{
     $data_input = json_decode(file_get_contents("php://input"), true);
 
     $id_aviso = verificar($data_input, "id_aviso");
     $criterio = verificar($data_input, "criterio");
-    
+
 
     // 1 es departamentos y 2 es genero
 
@@ -1153,7 +1251,7 @@ function get_criterios(){
         FROM avisos_departamentos 
         JOIN departamentos ON departamentos.id = avisos_departamentos.rela_departamento
         WHERE avisos_departamentos.rela_aviso = '" . $id_aviso . "'";
-    }else{
+    } else {
         $sql_consulta = "SELECT *
         FROM avisos_generos
         JOIN generos ON generos.id = avisos_generos.rela_genero
@@ -1165,15 +1263,14 @@ function get_criterios(){
 
         $select_criterios_avisos->execute();
         if ($select_criterios_avisos->rowCount() > 0) {
-        $result = $select_criterios_avisos->fetchAll();
+            $result = $select_criterios_avisos->fetchAll();
 
-        foreach ($result as $results) {
-            $data[] = $results;
-        }
+            foreach ($result as $results) {
+                $data[] = $results;
+            }
 
-        $returnData = msg("Success", $data);
-
-    }else {
+            $returnData = msg("Success", $data);
+        } else {
 
             $returnData = msg("No existen datos", []);
         }
@@ -1413,7 +1510,7 @@ function chequeos_medico_paciente()
         JOIN estado_recordatorio ON recordatorios_medicos.rela_estado_recordatorio = estado_recordatorio.id
         JOIN resultados_screenings ON recordatorios_medicos.rela_respuesta_screening = resultados_screenings.id
         WHERE recordatorios_medicos.rela_medico = '" . $id_medico . "'
-        AND recordatorios_medicos.rela_paciente = '" .$id_paciente. "'
+        AND recordatorios_medicos.rela_paciente = '" . $id_paciente . "'
         ORDER BY fecha_limite ASC");
 
         $stmt->execute();
@@ -1437,7 +1534,8 @@ function chequeos_medico_paciente()
     Flight::json($returnData);
 }
 
-function get_chequeos(){
+function get_chequeos()
+{
     $data_input = json_decode(file_get_contents("php://input"), true);
 
     $email = verificar($data_input, "email");
@@ -1516,13 +1614,13 @@ function verificar($data_input, $tipo)
         if ($data_input[$tipo] != "") {
             $tipo = $data_input[$tipo];
         } else {
-            $error_msg = msg_error("Error", "Input ".$tipo." vacio", 0);
+            $error_msg = msg_error("Error", "Input " . $tipo . " vacio", 0);
             Flight::json($error_msg);
             exit;
         }
     } else {
 
-        $error_msg = msg_error("Error", "Nombre de ".$tipo." ingresado incorrecto", 0);
+        $error_msg = msg_error("Error", "Nombre de " . $tipo . " ingresado incorrecto", 0);
         Flight::json($error_msg);
         exit;
     }
