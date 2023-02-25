@@ -470,16 +470,19 @@ function datos_historicos_clinicos(){
       };
       $.ajax(settings).done(function(response) {
         if (response['status'] == "Success") {
+         // console.log(response['data']);
           response['data'].forEach(element => {
-            console.log(count(element))
+            
+            console.log(element['consume_alcohol']);
             switch (element['consume_alcohol']) {
-                case 902:
+                case "902":
                     consume_alcohol = "A veces (una vez al mes)";
+        
                     break;
-                case 903:
+                case "903":
                     consume_alcohol = "Con frecuencia (una vez por semana)";
                     break;
-                case 904:
+                case "904":
                     consume_alcohol = "Siempre (casi todos los días)";
                     break;
             }
