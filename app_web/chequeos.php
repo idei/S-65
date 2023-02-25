@@ -48,8 +48,8 @@ if (isset($_POST['id_paciente'])) {
         <!-- Page content-->
 
 
-        <div class="card card-primary">
-          <div class="card-header">
+        <div class="card">
+          <div class="card-header" style="background-color: #17a2b8; color: white">
             <h3 class="card-title">Nuevo Chequeo</h3>
           </div>
           <!-- /.card-header -->
