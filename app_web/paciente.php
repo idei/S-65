@@ -93,7 +93,24 @@ $id_paciente = $_POST["id_paciente"];
 
             </div>
           </div>
-
+          </br>
+          <div class="row">
+              <h4>Chequeos del Paciente</h4>
+              <table class="table table-striped">
+              <thead>
+              <tr>
+              <th scope="col"></th>
+              <th scope="col">Tipo de Chequeo</th>
+              <th scope="col">Fecha de Envío</th>
+              <th scope="col">Fecha Límite</th>
+              <th scope="col">Estado</th>
+              <th scope="col"></th>
+              </tr>
+              </thead>
+              <tbody id="tabla">
+          </tbody>
+        </table>
+          </div>
           <hr>
           <div class="container" style="margin: 30px;">
 
@@ -182,22 +199,7 @@ $id_paciente = $_POST["id_paciente"];
 
         <br>
 
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col">Tipo de Chequeo</th>
-              <th scope="col">Fecha de Envío</th>
-              <th scope="col">Fecha Límite</th>
-              <th scope="col">Estado</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody id="tabla">
-
-          </tbody>
-        </table>
-
+        
       </section>
       <!-- /.content -->
 
@@ -623,7 +625,7 @@ function datos_historicos_clinicos(){
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Datos clinicos historicos</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">Datos Históricos Clínicos</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
