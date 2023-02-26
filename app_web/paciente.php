@@ -613,17 +613,17 @@ $id_paciente = $_POST["id_paciente"];
                 <table class="table table-striped mb-0">
                   <thead>
                     <tr>
-                      <th scope="col">Fecha</th>
-                      <th scope="col">Presión alta</th>
-                      <th scope="col">Presión baja</th>
-                      <th scope="col">Pulso</th>
-                      <th scope="col">Peso</th>
-                      <th scope="col">Circunferencia de cintura</th>
-                      <th scope="col">Talla</th>
-                      <th scope="col">Consume alcohol</th>
-                      <th scope="col">Consume marihuana</th>
-                      <th scope="col">Otras drogas</th>
-                      <th scope="col">Fuma tabaco</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fecha</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presión alta</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presión baja</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Pulso</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Peso</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Circunferencia de cintura</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Talla</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Consume alcohol</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Consume marihuana</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Otras drogas</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fuma tabaco</th>
                     </tr>
                   </thead>
                   <tbody id="tablaClinicos"></tbody>
