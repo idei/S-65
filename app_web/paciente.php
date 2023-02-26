@@ -14,7 +14,8 @@ $id_paciente = $_POST["id_paciente"];
   <title>S-65 | Médico</title>
 
   <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <!-- <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
@@ -25,8 +26,11 @@ $id_paciente = $_POST["id_paciente"];
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
 <style>
-  .modal-lg { max-width: 80%; }
+  .modal-lg {
+    max-width: 80%;
+  }
 </style>
+
 <body class="hold-transition sidebar-mini layout-fixed" onload="buscar()">
   <div class="wrapper">
 
@@ -45,7 +49,6 @@ $id_paciente = $_POST["id_paciente"];
       <section class="content">
         <!-- <div class="d-flex" id="wrapper"> -->
         <!-- Page content-->
-
         <div class="callout callout-info">
           <div class="row">
             <div class="col-6">
@@ -69,52 +72,59 @@ $id_paciente = $_POST["id_paciente"];
             <div class="col-6 text-center">
 
               <div class="col align-self-center">
-                <button type="button" onclick="antecedentesP()" class="btn btn-block btn-info btn-flat text-uppercase" data-toggle="modal" data-target="#modalMedico">Antecedentes Médicos</button>
+                <button type="button" onclick="antecedentesP()" class="btn btn-block btn-info btn-flat text-uppercase"
+                  data-toggle="modal" data-target="#modalMedico">Antecedentes Médicos</button>
               </div>
               <br>
               <div class="col align-self-center">
-                <button type="button" onclick="antecedentesF()" class="btn btn-block btn-info btn-flat text-uppercase" data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
+                <button type="button" onclick="antecedentesF()" class="btn btn-block btn-info btn-flat text-uppercase"
+                  data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
               </div>
               <br>
               <div class="col align-self-center">
                 <form action="chequeos.php" method="post">
-                <input name="id_paciente" type="hidden" value="<?php echo $id_paciente; ?>"></input>
-                <button href="chequeos.php" class="btn btn-block btn-info btn-flat text-uppercase" type="submit">Enviar Chequeo</button>
+                  <input name="id_paciente" type="hidden" value="<?php echo $id_paciente; ?>"></input>
+                  <button href="chequeos.php" class="btn btn-block btn-info btn-flat text-uppercase"
+                    type="submit">Enviar Chequeo</button>
                 </form>
               </div>
               <br>
               <div class="col align-self-center">
-                <button class="btn btn-block btn-info btn-flat text-uppercase" onclick="$('#nuevoAvisoModal').modal('show')">Enviar Aviso</button>
+                <button class="btn btn-block btn-info btn-flat text-uppercase"
+                  onclick="$('#nuevoAvisoModal').modal('show')">Enviar Aviso</button>
               </div>
               <br>
               <div class="col align-self-center">
-                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button"  data-toggle="modal" onclick="datos_historicos_clinicos()"  data-target="#clinicoHistorico">Datos clinicos historicos</button>
+                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
+                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos clinicos
+                  historicos</button>
               </div>
 
             </div>
           </div>
           </br>
           <div class="row">
-              <h4>Chequeos del Paciente</h4>
-              <table class="table table-striped">
+            <h4>Chequeos del Paciente</h4>
+            <table class="table table-striped">
               <thead>
-              <tr>
-              <th scope="col"></th>
-              <th scope="col">Tipo de Chequeo</th>
-              <th scope="col">Fecha de Envío</th>
-              <th scope="col">Fecha Límite</th>
-              <th scope="col">Estado</th>
-              <th scope="col"></th>
-              </tr>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Tipo de Chequeo</th>
+                  <th scope="col">Fecha de Envío</th>
+                  <th scope="col">Fecha Límite</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col"></th>
+                </tr>
               </thead>
               <tbody id="tabla">
-          </tbody>
-        </table>
+              </tbody>
+            </table>
           </div>
           <hr>
           <div class="container" style="margin: 30px;">
 
-            <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -124,7 +134,7 @@ $id_paciente = $_POST["id_paciente"];
                     </button>
                   </div>
                   <div class="modal-body">
-                  <div id="resultado_personales"></div>
+                    <div id="resultado_personales"></div>
                     <div id="retraso"></div>
                     <div id="desorden"></div>
                     <div id="deficit"></div>
@@ -150,7 +160,8 @@ $id_paciente = $_POST["id_paciente"];
                 </div>
               </div>
             </div>
-            <div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -160,7 +171,7 @@ $id_paciente = $_POST["id_paciente"];
                     </button>
                   </div>
                   <div class="modal-body">
-                  <div id="resultado_familiares"></div>
+                    <div id="resultado_familiares"></div>
                     <div id="retraso"></div>
                     <div id="desorden"></div>
                     <div id="deficit"></div>
@@ -199,7 +210,7 @@ $id_paciente = $_POST["id_paciente"];
 
         <br>
 
-        
+
       </section>
       <!-- /.content -->
 
@@ -224,7 +235,7 @@ $id_paciente = $_POST["id_paciente"];
         }),
       };
 
-      $.ajax(settings).done(function(response) {
+      $.ajax(settings).done(function (response) {
 
         if (response['status'] == "Success") {
           var response = response['data'];
@@ -257,7 +268,7 @@ $id_paciente = $_POST["id_paciente"];
 
         } else {
           if (response['status'] == "Vacio") {
-            
+
             $("#nombre").html('No hay datos personales registrados');
           }
         }
@@ -279,8 +290,8 @@ $id_paciente = $_POST["id_paciente"];
         }),
       };
 
-      $.ajax(settings).done(function(response) {
-        
+      $.ajax(settings).done(function (response) {
+
         if (response['status'] == "Success") {
           response['data'].forEach(element => {
             console.log(element['nombre_estado']);
@@ -306,7 +317,7 @@ $id_paciente = $_POST["id_paciente"];
           //read_avisos();
         } else {
           if (response['status'] == "Vacio") {
-          
+
             tabla.innerHTML = `<tr>
                 <th scope="row"></th>
                 <td>Sin</td>
@@ -348,7 +359,7 @@ $id_paciente = $_POST["id_paciente"];
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function(response) {
+      $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
           var response = response['data'];
 
@@ -387,7 +398,7 @@ $id_paciente = $_POST["id_paciente"];
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function(response) {
+      $.ajax(settings).done(function (response) {
         console.log(response['status']);
         if (response['status'] == "Success") {
           var response = response['data'];
@@ -429,38 +440,38 @@ $id_paciente = $_POST["id_paciente"];
 
     function nuevo_anuncio() {
 
-var parametros = {
-    descripcion: document.getElementById("descripcion_anuncio_individual").value,
-    fecha_limite: document.getElementById("fecha_limite").value,
-    email_medico: 'doc@gmail.com',
-    email_paciente: 'prueba@gmail.com'
-};
+      var parametros = {
+        descripcion: document.getElementById("descripcion_anuncio_individual").value,
+        fecha_limite: document.getElementById("fecha_limite").value,
+        email_medico: 'doc@gmail.com',
+        email_paciente: 'prueba@gmail.com'
+      };
 
-$.ajax({
-    data: JSON.stringify(parametros),
-    url: '../php/create_aviso.php',
-    type: 'POST',
-    dataType: "JSON",
+      $.ajax({
+        data: JSON.stringify(parametros),
+        url: '../php/create_aviso.php',
+        type: 'POST',
+        dataType: "JSON",
 
-    success: function(response) {
+        success: function (response) {
 
-        if (response['status'] == 'Success') {
+          if (response['status'] == 'Success') {
             tabla.innerHTML = ``;
             read_avisos();
             alert_success("Aviso creado");
 
-        } else {
+          } else {
             alert_danger("Error");
             console.log(response['status']);
+          }
+
+
         }
-
-
+      });
     }
-});
-}
 
-function datos_historicos_clinicos(){
-  console.log("entre datos clinicos");
+    function datos_historicos_clinicos() {
+      console.log("entre datos clinicos");
       var estado;
 
       var settings = {
@@ -470,60 +481,14 @@ function datos_historicos_clinicos(){
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function(response) {
+      $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
-         // console.log(response['data']);
+          // console.log(response['data']);
           response['data'].forEach(element => {
-            
-            console.log(element['consume_alcohol']);
-            switch (element['consume_alcohol']) {
-                case "902":
-                    consume_alcohol = "A veces (una vez al mes)";
-        
-                    break;
-                case "903":
-                    consume_alcohol = "Con frecuencia (una vez por semana)";
-                    break;
-                case "904":
-                    consume_alcohol = "Siempre (casi todos los días)";
-                    break;
-            }
-            switch (element["consume_marihuana"]) {
-                case 902:
-                    $consume_marihuana = "A veces (una vez al mes)";
-                    break;
-                case 903:
-                    $consume_marihuana = "Con frecuencia (una vez por semana)";
-                    break;
-                case 904:
-                    $consume_marihuana = "Siempre (casi todos los días)";
-                    break;
-            }
-            switch (element["otras_drogas"]) {
-                case 902:
-                    $otras_drogas = "A veces (una vez al mes)";
-                    break;
-                case 903:
-                    $otras_drogas = "Con frecuencia (una vez por semana)";
-                    break;
-                case 904:
-                    $otras_drogas = "Siempre (casi todos los días)";
-                    break;
-            }
-            switch (element["fuma_tabaco"]) {
-                case 902:
-                    $fuma_tabaco = "A veces (una vez al mes)";
-                    console.log($fuma_tabaco);
-                    break;
-                case 903:
-                    $fuma_tabaco = "Con frecuencia (una vez por semana)";
-                    console.log($fuma_tabaco);
-                    break;
-                case 904:
-                    $fuma_tabaco = "Siempre (casi todos los días)";
-                    console.log($fuma_tabaco);
-                    break;
-            }
+            consume_alcohol = consumos(element['consume_alcohol']);
+            consume_marihuana = consumos(element['consume_marihuana']);
+            otras_drogas = consumos(element['otras_drogas']);
+            fuma_tabaco = consumos(element['fuma_tabaco']);
             tablaClinicos.innerHTML = `<tr>
                 <td>${element['fecha_alta']}</td>
                 <td>${element['presion_alta']}</td>
@@ -532,32 +497,44 @@ function datos_historicos_clinicos(){
                 <td>${element['peso']}</td>
                 <td>${element['circunferencia_cintura']}</td>
                 <td>${element['talla']}</td>
-                <td>${element['consume_alcohol']}</td>
-                <td>${element['consume_marihuana']}</td>
-                <td>${element['otras_drogas']}</td>
-                <td>${element['fuma_tabaco']}</td>
+                <td>${consume_alcohol}</td>
+                <td>${consume_marihuana}</td>
+                <td>${otras_drogas}</td>
+                <td>${fuma_tabaco}</td>
                 </tr>
                 `;
           });
-          //read_avisos();
         } else {
           if (response['status'] == "Vacio") {
-          
+
             tablaClinicos.innerHTML = `<tr>
-                <th scope="row"></th>
                 <td>Sin</td>
-                <td>chequeos</td>
+                <td>datos</td>
+                <td>clínicos</td>
+                <td>históricos</td>
                 <td>cargados</td>
                 <td></td>
-                <td></button>
-                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 </tr>
                 `;
 
           }
         }
       });
-}
+    }
+    function consumos(frecuencia){
+      if (frecuencia == 902) {
+                return consume = "A veces (una vez al mes)";
+            } else if(frecuencia == 903){
+              return consume = "Con frecuencia (una vez por semana)";
+            } else {
+              return consume = "Siempre (casi todos los días)";
+            }
+    }
   </script>
   <!-- jQuery -->
   <script src="plugins/jquery/jquery.min.js"></script>
@@ -600,9 +577,9 @@ function datos_historicos_clinicos(){
   </div>
 </div>
 
-
 <!-- Modal Ver Resultado Chequeo-->
-<div class="modal fade" id="modal_resultado_chequeo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modal_resultado_chequeo" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -612,54 +589,55 @@ function datos_historicos_clinicos(){
         </button>
       </div>
       <div id="modal_resultado" class="modal-body">
-
       </div>
-
-
     </div>
   </div>
 </div>
 
 <!--Modal datos clinicos historicos-->
-<div class="modal fade bd-example-modal-lg" id="clinicoHistorico" tabindex="-1" role="dialog" aria-labelledby="clinicoHistoricoTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Datos Históricos Clínicos</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="modal fade bd-example-modal-lg" id="clinicoHistorico" tabindex="-1" role="dialog"
+        aria-labelledby="clinicoHistoricoTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Datos Históricos Clínicos</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div id="modal_nuevo_anuncio" class="modal-body">
+              <div class="table-responsive-xl">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col">Fecha</th>
+                      <th scope="col">Presión alta</th>
+                      <th scope="col">Presión baja</th>
+                      <th scope="col">Pulso</th>
+                      <th scope="col">Peso</th>
+                      <th scope="col">Circunferencia de cintura</th>
+                      <th scope="col">Talla</th>
+                      <th scope="col">Consume alcohol</th>
+                      <th scope="col">Consume marihuana</th>
+                      <th scope="col">Otras drogas</th>
+                      <th scope="col">Fuma tabaco</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaClinicos"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="modal_nuevo_anuncio" class="modal-body">
-      <div class="table-responsive">
-      <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">Fecha</th>
-              <th scope="col">Presión alta</th>
-              <th scope="col">Presión baja</th>
-              <th scope="col">Pulso</th>
-              <th scope="col">Peso</th>
-              <th scope="col">Circunferencia de cintura</th>
-              <th scope="col">Talla</th>
-              <th scope="col">Consume alcohol</th>
-              <th scope="col">Consume marihuana</th>
-              <th scope="col">Otras drogas</th>
-              <th scope="col">Fuma tabaco</th>
-            </tr>
-          </thead>
-          <tbody id="tablaClinicos">
-
-          </tbody>
-        </table>
-</div>
-      </div>
-      <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
-                  </div>
     </div>
   </div>
-</div>
 </div>
 
 </html>
