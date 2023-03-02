@@ -302,7 +302,7 @@ $id_paciente = $_POST["id_paciente"];
                 estado = 'disabled';
               }
             }
-            tabla.innerHTML = `<tr>
+            tabla.innerHTML += `<tr>
                 <th scope="row"></th>
                 <td>${element['nombre']}</td>
                 <td>${element['fecha_creacion']}</td>
@@ -489,7 +489,7 @@ $id_paciente = $_POST["id_paciente"];
             consume_marihuana = consumos(element['consume_marihuana']);
             otras_drogas = consumos(element['otras_drogas']);
             fuma_tabaco = consumos(element['fuma_tabaco']);
-            tablaClinicos.innerHTML = `<tr>
+            tablaClinicos.innerHTML += `<tr>
                 <td>${element['fecha_alta']}</td>
                 <td>${element['presion_alta']}</td>
                 <td>${element['presion_baja']}</td>
