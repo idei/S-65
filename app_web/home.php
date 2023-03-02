@@ -1,4 +1,8 @@
-<?php session_start()?>
+<?php 
+session_start();
+include (__DIR__."/env.php");
+echo Env::$_URL_API;
+?>
 
 <!DOCTYPE html>
 <html lang="en">
