@@ -877,7 +877,6 @@ function read_datos_clinicos()
 
         if ($select_data_clinica->rowCount() > 0) {
             $result = $select_data_clinica->fetchAll();
-            for ($i = 1; $i <= 10; $i++)
             foreach ($result as $results) {
                /* switch (results['consume_alcohol']) {
                     case 902:
@@ -926,7 +925,7 @@ function read_datos_clinicos()
                 $data[] = $results;
                 //$lenght = count($data)
             $returnData = msg("Success", $data);
-        }
+            }
         } else {
             
             $returnData = msg("Vacio", []);
