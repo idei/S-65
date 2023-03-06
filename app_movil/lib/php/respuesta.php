@@ -1,6 +1,6 @@
 <?php 
     require 'db.php';
-    
+     
     try {
         //$stmt = $db->prepare("SELECT * FROM tipos_respuestas WHERE respuesta IN ('Nunca','Una vez por mes','Una vez por semana','Casi todos los días')");
         $stmt = $db->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES49','TRES50','TRES51')");

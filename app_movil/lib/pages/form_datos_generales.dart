@@ -320,9 +320,8 @@ class _FormpruebaState extends State<Formprueba> {
   }
 
   guardarDatos(UsuarioServices usuarioModel) async {
-    //String URL_base = Env.URL_PREFIX;
     String URL_base = Env.URL_API;
-    var url = URL_base + "/user_datos_personales.php";
+    var url = URL_base + "/save_datos_personales";
 
     var response = await http.post(url, body: {
       "nombre": nombre.text,
@@ -413,44 +412,64 @@ List dataGrupoConviviente;
 bool isGrupoConviviente = false;
 
 getAllDepartamentos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/departamentos.php";
-  var response = await http.post(url, body: {});
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/deptos_generos";
+  var response = await http.post(url, body: {"tipo": "1"});
+  var responseBody = json.decode(response.body);
 
   if (response.statusCode == 200) {
-    dataDepartamento = json.decode(response.body);
-    isDepto = true;
+    if (responseBody['status'] == "Success") {
+      dataDepartamento = responseBody['data'];
+      isDepto = true;
+    } else {
+      print(responseBody['status']);
+    }
   }
 }
 
 getAllGeneros() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/generos.php";
-  var response = await http.post(url, body: {});
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/deptos_generos";
+  var response = await http.post(url, body: {"tipo": "2"});
+  var responseBody = json.decode(response.body);
 
   if (response.statusCode == 200) {
-    dataGenero = json.decode(response.body);
-    isGenero = true;
+    if (responseBody['status'] == "Success") {
+      dataGenero = responseBody['data'];
+      isGenero = true;
+    } else {
+      print(responseBody['status']);
+    }
   }
 }
 
 getAllNivelesEducativos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/niveles_educ.php";
-  var response = await http.post(url, body: {});
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/deptos_generos";
+  var response = await http.post(url, body: {"tipo": "3"});
+  var responseBody = json.decode(response.body);
   if (response.statusCode == 200) {
-    dataNivelEducativo = json.decode(response.body);
-    isNiveleducativo = true;
+    if (responseBody['status'] == "Success") {
+      dataNivelEducativo = responseBody['data'];
+      isNiveleducativo = true;
+    } else {
+      print(responseBody['status']);
+    }
   }
 }
 
 getAllGrupoConviviente() async {
   String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/grupo_conviviente.php";
-  var response = await http.post(url, body: {});
+  var url = URL_base + "/deptos_generos";
+  var response = await http.post(url, body: {"tipo": "4"});
+  var responseBody = json.decode(response.body);
   if (response.statusCode == 200) {
-    dataGrupoConviviente = json.decode(response.body);
-    isGrupoConviviente = true;
+    if (responseBody['status'] == "Success") {
+      dataGrupoConviviente = responseBody['data'];
+      isGrupoConviviente = true;
+    } else {
+      print(responseBody['status']);
+    }
   }
 }
 

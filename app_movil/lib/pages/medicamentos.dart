@@ -168,8 +168,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
 
   guardarFrecuenciaMedicamento(
       int id_medicamento, String dosis_frecuencia) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/save_dosis_frecuencia.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/save_dosis_frecuencia";
     var response = await http.post(url, body: {
       "dosis_frecuencia": dosis_frecuencia,
       "id_medicamento": id_medicamento.toString(),
@@ -248,8 +248,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 
   delete_medicamento(BuildContext context, var id_medicamento) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/delete_medicamento.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/delete_medicamento";
     var response = await http.post(url, body: {
       "id_medicamento": id_medicamento.toString(),
     });

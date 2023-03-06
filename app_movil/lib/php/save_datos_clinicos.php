@@ -13,7 +13,7 @@
     $id_otras = $_POST['id_otras'];
     $id_paciente = $_POST['id_paciente'];
 
-
+ 
     $lista = array();
     
         try {

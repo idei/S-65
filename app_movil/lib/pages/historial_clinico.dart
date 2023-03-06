@@ -123,8 +123,8 @@ getStringValuesSF() async {
 var data_respuesta;
 
 read_respuesta() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/respuesta.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta";
   var response = await http.post(url, body: {});
   data_respuesta = json.decode(response.body);
   print(response.body);
@@ -133,15 +133,22 @@ read_respuesta() async {
 var data;
 
 read_datos_clinicos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/read_datos_clinicos.php";
-  print("id_paciente");
-  print(id_paciente);
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/datos_clinicos";
+
   var response = await http.post(url, body: {
     "id_paciente": id_paciente.toString(),
   });
-  data = json.decode(response.body);
-  print(response.body);
+
+  var responseDecoder = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    if (responseDecoder['status'] == "Success") {
+      data = responseDecoder['data'];
+    }
+  } else {
+    data = responseDecoder['status'];
+  }
 }
 
 pdf_table() async {

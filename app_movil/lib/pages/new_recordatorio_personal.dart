@@ -126,8 +126,8 @@ getStringValuesSF() async {
 
 guardar_datos(context) async {
   await getStringValuesSF();
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/new_recordatorio_personal.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/new_recordatorio_personal";
   var response = await http.post(url, body: {
     "email": email,
     "titulo": titulo.text,
@@ -136,12 +136,11 @@ guardar_datos(context) async {
 
   var responseDecode = jsonDecode(response.body);
 
-  if (response.statusCode == 200 && responseDecode['request'] == "Success") {
+  if (response.statusCode == 200 && responseDecode['status'] == "Success") {
     _alert_informe(context, "Recordatorio creado correctamente", 1);
     Navigator.of(context).pushReplacementNamed('/recordatorio');
   } else {
-    _alert_informe(
-        context, "Error al guardar: ${responseDecode['request']}", 2);
+    _alert_informe(context, "Error al guardar: ${responseDecode['status']}", 2);
     Navigator.of(context).pushReplacementNamed('/recordatorio');
   }
 }

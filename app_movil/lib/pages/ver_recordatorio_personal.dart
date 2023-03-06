@@ -122,8 +122,8 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
   }
 
   update_estado_recordartorio() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/update_recordatorio_personal.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/update_recordatorio_personal";
     var response = await http.post(url, body: {
       "id_recordatorio": id_recordatorio.toString(),
     });

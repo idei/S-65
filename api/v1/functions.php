@@ -850,7 +850,12 @@ function read_datos_clinicos()
 
     $data_input = json_decode(file_get_contents("php://input"), true);
 
-    $id_paciente = verificar($data_input, "id_paciente");
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
 
 
     try {
@@ -874,55 +879,60 @@ function read_datos_clinicos()
 
         if ($select_data_clinica->rowCount() > 0) {
             $result = $select_data_clinica->fetchAll();
+                        
+
             foreach ($result as $results) {
-                /* switch (results['consume_alcohol']) {
-                    case 902:
-                        results['consume_alcohol'] = "A veces (una vez al mes)";
-                        break;
-                    case 903:
-                        results['consume_alcohol'] = "Con frecuencia (una vez por semana)";
-                        break;
-                    case 904:
-                        results['consume_alcohol'] = "Siempre (casi todos los días)";
-                        break;
-                }
-                switch (results["consume_marihuana"]) {
-                    case 902:
-                        results["consume_marihuana"] = "A veces (una vez al mes)";
-                        break;
-                    case 903:
-                        results["consume_marihuana"] = "Con frecuencia (una vez por semana)";
-                        break;
-                    case 904:
-                        results["consume_marihuana"] = "Siempre (casi todos los días)";
-                        break;
-                }
-                switch (results["otras_drogas"]) {
-                    case 902:
-                        results["otras_drogas"] = "A veces (una vez al mes)";
-                        break;
-                    case 903:
-                        results["otras_drogas"] = "Con frecuencia (una vez por semana)";
-                        break;
-                    case 904:
-                        results["otras_drogas"] = "Siempre (casi todos los días)";
-                        break;
-                }
-                switch (results["fuma_tabaco"]) {
-                    case 902:
-                        results["fuma_tabaco"] = "A veces (una vez al mes)";
-                        break;
-                    case 903:
-                        results["fuma_tabaco"] = "Con frecuencia (una vez por semana)";
-                        break;
-                    case 904:
-                        results["fuma_tabaco"] = "Siempre (casi todos los días)";
-                        break;
-                }*/
-                $data[] = $results;
-                //$lenght = count($data)
-                $returnData = msg("Success", $data);
+                switch ($results['consume_alcohol']) {
+                   case "902":
+                       $results['consume_alcohol'] = "A veces (una vez al mes)";
+                       break;
+                   case "903":
+                       $results['consume_alcohol'] = "Con frecuencia (una vez por semana)";
+                       break;
+                   case "904":
+                       $results['consume_alcohol'] = "Siempre (casi todos los días)";
+                       break;
+               }
+               switch ($results["consume_marihuana"]) {
+                case "902":
+                    $results["consume_marihuana"] = "A veces (una vez al mes)";
+                    break;
+                case "903":
+                    $results["consume_marihuana"] = "Con frecuencia (una vez por semana)";
+                    break;
+                case "904":
+                    $results["consume_marihuana"] = "Siempre (casi todos los días)";
+                    break;
             }
+            switch ($results["otras_drogas"]) {
+                case "902":
+                    $results["otras_drogas"] = "A veces (una vez al mes)";
+                    break;
+                case "903":
+                    $results["otras_drogas"] = "Con frecuencia (una vez por semana)";
+                    break;
+                case "904":
+                    $results["otras_drogas"] = "Siempre (casi todos los días)";
+                    break;
+            }
+
+            switch ($results["fuma_tabaco"]) {
+                case 902:
+                    $results["fuma_tabaco"] = "A veces (una vez al mes)";
+                    break;
+                case 903:
+                    $results["fuma_tabaco"] = "Con frecuencia (una vez por semana)";
+                    break;
+                case 904:
+                    $results["fuma_tabaco"] = "Siempre (casi todos los días)";
+                    break;
+            }
+
+               
+            }
+
+            $returnData = msg("Success", $results);
+
         } else {
 
             $returnData = msg("Vacio", []);
@@ -1284,19 +1294,44 @@ function read_deptos_generos()
 
     $data_input = json_decode(file_get_contents("php://input"), true);
 
-    $tipo = verificar($data_input, "tipo");
+    if (isset($_POST['tipo'])) {
+        $tipo = $_POST["tipo"];
+    } else {
+        $tipo = verificar($data_input, "tipo");
+    }
 
     try {
-        if ($tipo == 2) {
-            $stmt = Flight::db()->prepare("SELECT id, nombre FROM generos");
-            $stmt->execute();
-            $result = $stmt->fetchAll();
-        } elseif ($tipo == 1) {
-            $stmt = Flight::db()->prepare("SELECT id, nombre FROM departamentos");
-            $stmt->execute();
-            $result = $stmt->fetchAll();
-        }
+        switch ($tipo) {
+            case '1':
+                $stmt = Flight::db()->prepare("SELECT id, nombre FROM departamentos");
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                break;
+            case '2':
+                $stmt = Flight::db()->prepare("SELECT id, nombre FROM generos");
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                break;
+            case '3':
+                $stmt = Flight::db()->prepare("SELECT * FROM nivel_instruccion");
+                $stmt->execute();
+                $result = $stmt->fetchAll();        
+            break;
 
+            case '4':
+                $stmt = Flight::db()->prepare("SELECT * FROM grupos_convivientes");
+                $stmt->execute();
+                $result = $stmt->fetchAll();        
+            break;
+
+            default:
+            $returnData = msg("Vacio", []);
+            Flight::json($returnData);
+            exit;
+                break;
+        }
+       
+       
         $data = array();
         if ($stmt->rowCount() > 0) {
             foreach ($result as $results) {
@@ -1304,6 +1339,8 @@ function read_deptos_generos()
             }
 
             $returnData = msg("Success", $data);
+        }else{
+            $returnData = msg("Vacio", []);
         }
     } catch (PDOException $error) {
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
@@ -1937,6 +1974,117 @@ function medicamentos_paciente_vademecum()
     Flight::json($returnData);
 }
 
+function save_dosis_frecuencia(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['id_medicamento'])) {
+        $id_medicamento = $_POST["id_medicamento"];
+    } else {
+        $id_medicamento = verificar($data_input, "id_medicamento");
+    }
+
+    if (isset($_POST['dosis_frecuencia'])) {
+        $dosis_frecuencia = $_POST["dosis_frecuencia"];
+    } else {
+        $dosis_frecuencia = verificar($data_input, "dosis_frecuencia");
+    }
+    
+
+    try {
+        $data = [
+            'dosis_frecuencia' => $dosis_frecuencia,
+            'id_paciente' => $id_paciente,
+            'id_medicamento' => $id_medicamento,
+        ];
+        $update_pass = Flight::db()->prepare("UPDATE medicamento_paciente
+                    SET dosis_frecuencia=:dosis_frecuencia
+                    WHERE rela_paciente=:id_paciente and rela_medicamento=:id_medicamento");
+
+        $update_pass->execute($data);
+
+        $returnData = msg("Success", []);
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+    
+        Flight::json($returnData);
+}
+
+function delete_medicamento(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_medicamento'])) {
+        $id_medicamento = $_POST["id_medicamento"];
+    } else {
+        $id_medicamento = verificar($data_input, "id_medicamento");
+    }
+
+
+    try {
+    
+        $stmt = Flight::db()->prepare('DELETE FROM medicamentos WHERE id_medicamento = :id_medicamento');
+        $stmt->bindValue(':id_medicamento', $id_medicamento);
+        $stmt->execute();
+        $returnData = msg("Success", []);
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function save_medicamento(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['id_medicamento'])) {
+        $id_medicamento = $_POST["id_medicamento"];
+    } else {
+        $id_medicamento = verificar($data_input, "id_medicamento");
+    }
+
+    $dosis_frecuencia =  0 ; // Se define una frecuencia por defecto de valor 0
+
+ try {
+    $stmt = Flight::db()->prepare('INSERT INTO medicamento_paciente(dosis_frecuencia,rela_paciente,rela_medicamento) VALUES(?, ?, ?)');
+    $stmt->bindParam(1, $dosis_frecuencia);
+    $stmt->bindParam(2, $id_paciente);
+    $stmt->bindParam(3, $id_medicamento);
+
+	$stmt->execute();
+ 
+    $returnData = msg("Success", []);
+
+ } catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+ }
+
+    Flight::json($returnData);
+}
+
 function avisos_paciente(){
    
     $data_input = json_decode(file_get_contents("php://input"), true);
@@ -1970,10 +2118,135 @@ function avisos_paciente(){
         $returnData = msg("Vacio", []);
     }
     
-} catch (PDOException $error) {
+ } catch (PDOException $error) {
 
     $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+ }
+
+    Flight::json($returnData);
 }
+
+function modificar_email(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+
+    if (isset($_POST['email'])) {
+        $email_actual = $_POST["email"];
+    } else {
+        $email_actual = verificar($data_input, "email");
+    }
+
+    if (isset($_POST['email_nuevo'])) {
+        $email_nuevo = $_POST["email_nuevo"];
+    } else {
+        $email_nuevo = verificar($data_input, "email_nuevo");
+    }
+
+    
+    try {
+        
+            $stmt = Flight::db()->prepare("SELECT email FROM users WHERE email = '".$email_actual."'");
+            $stmt->execute();
+            
+            
+        if ($stmt->rowCount() > 0) {
+            $result = $stmt->fetch();
+            if ($result["email"] == $email_nuevo) {
+                
+                $error = "Error: El correo electrónico nuevo no puede ser igual al actual"; 
+                $lista = array(
+                "estado" => $error
+                );
+                echo json_encode($lista);
+
+            }else {
+               
+                $update_pass = Flight::db()->prepare("UPDATE users
+                SET email=:email_nuevo
+                WHERE email=:email");
+                
+                $update_pass->execute([$email_nuevo,$email_actual]);
+                
+                $returnData = msg("Success", []);
+
+            }
+        }else {
+            
+            $returnData = msg("Vacio", "No se encontró el usuario para cambiar el correo electrónico");
+        }
+            
+       
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function modificar_pass(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+
+    if (isset($_POST['email'])) {
+        $password_actual = $_POST["password"];
+    } else {
+        $password_actual = verificar($data_input, "password");
+    }
+
+    if (isset($_POST['password_nuevo'])) {
+        $password_nuevo = $_POST["password_nuevo"];
+    } else {
+        $password_nuevo = verificar($data_input, "password_nuevo");
+    }
+    
+    try {
+        
+            $stmt = Flight::db()->prepare("SELECT password FROM users WHERE email = '".$email."'");
+            $stmt->execute();
+            
+            
+        if ($stmt->rowCount() > 0) {
+            $result = $stmt->fetch();
+            if ($result["password"] == $password_actual) {
+                
+                $error = "Error: La clave nueva no puede ser igual a la clave actual"; 
+                $lista = array(
+                "estado" => $error
+                );
+                echo json_encode($lista);
+
+            }else {
+               
+                $update_pass = Flight::db()->prepare("UPDATE users
+                SET password=:password_nuevo
+                WHERE email=:email");
+                
+                $update_pass->execute([$password_nuevo,$email]);
+                
+                $returnData = msg("Success", "No se encontró el usuario para cambiar la contraseña");
+
+            }
+        }else {
+            $error = "No se encontró el usuario para cambiar la contraseña"; 
+            $returnData = msg("Success", []);
+        }
+            
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
 
     Flight::json($returnData);
 }
@@ -2063,6 +2336,79 @@ function update_recordatorio_personal(){
      }
 
      Flight::json($returnData);
+}
+
+function new_recordatorio_personal(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+
+    if (isset($_POST['titulo'])) {
+        $titulo = $_POST["titulo"];
+    } else {
+        $titulo = verificar($data_input, "titulo");
+    }
+
+    if (isset($_POST['fecha_limite'])) {
+        $fecha_limite = $_POST["fecha_limite"];
+    } else {
+        $fecha_limite = verificar($data_input, "fecha_limite");
+    }
+
+	$estado_recordatorio = 0;
+
+
+    try {
+        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+    $select_id_users->execute();
+    $id_users= $select_id_users->fetch();
+    $id_users= $id_users["id"];
+
+    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+    $select_id_paciente->execute();
+
+
+    $result_paciente = $select_id_paciente->rowCount();
+
+	if ($result_paciente == 0) {
+        $lista = array ("request"=>"Error al guardar recoradtorio");
+	    echo json_encode($lista);
+	}else{
+		
+    $id_paciente= $select_id_paciente->fetch();
+    $id_paciente= $id_paciente["id"]; 
+	
+    $stmt = Flight::db()->prepare('INSERT INTO recordatorios_pacientes(descripcion,fecha_limite,rela_paciente,rela_estado_recordatorio) VALUES(?, ?, ?, ?)');
+    $stmt->bindParam(1,$titulo);
+    $stmt->bindParam(2,$fecha_limite);
+    $stmt->bindParam(3,$id_paciente);
+    $stmt->bindParam(4,$estado_recordatorio);
+
+	$stmt->execute();
+
+    $insert_recordatorio = $stmt->rowCount();
+	
+    if ($insert_recordatorio) {
+        $returnData = msg("Success", []);
+	}
+
+	}
+
+} catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+}
+
+    Flight::json($returnData);
 }
 
 function read_tipo_screening(){
@@ -4549,6 +4895,63 @@ function tipo_respuesta_quejas(){
     Flight::json($returnData);
 }
 
+function tipo_respuesta_cdr(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['estado'])) {
+        $estado = $_POST["estado"];
+    } else {
+        $estado = verificar($data_input, "estado");
+    }
+
+    try {
+        if ($estado == "M") {
+            $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES11','TRES12', 'TRES13', 'TRES14', 'TRES15', 'TRES16', 'TRES17')");
+        }else{
+            if ($estado == "O") {
+                $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES18', 'TRES19', 'TRES20', 'TRES21')");
+            } else {
+                if ($estado == "Q") {
+                    $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES22', 'TRES23', 'TRES24', 'TRES25', 'TRES26')");
+                } else {
+                    if ($estado == "V") {
+                        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES27', 'TRES28','TRES29','TRES30', 'TRES31')");
+                    } else {
+                        if ($estado == "H") {
+                            $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES32', 'TRES33', 'TRES34', 'TRES35', 'TRES36')");
+                        } else {
+                            if ($estado == "CP") {
+                                $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES37', 'TRES38', 'TRES39', 'TRES40')");
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        }else{
+            $returnData = msg("Vacio", []);
+        }
+    
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
+
 function user_register(){
 
     $data_input = json_decode(file_get_contents("php://input"), true);
@@ -4757,14 +5160,1792 @@ function read_screenings(){
         $returnData = msg("Vacio", []);
     }
     
-} catch (PDOException $error) {
+ } catch (PDOException $error) {
 
     $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
   }
 
-Flight::json($returnData);
+ Flight::json($returnData);
 }
 
+function user_read_antc_familiares(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+    
+    $retraso= "";
+    $desorden="";
+    $deficit="";
+    $lesiones_cabeza="";
+    $perdidas ="";
+    $accidentes_caidas ="";
+    $lesiones_espalda ="";
+    $infecciones="";
+    $toxinas="";
+    $acv="";
+    $demencia="";
+    $parkinson="";
+    $epilepsia="";
+    $esclerosis="";
+    $huntington="";
+    $depresion="";
+    $trastorno="";
+    $esquizofrenia="";
+    $enfermedad_desorden="";
+    $intoxicaciones="";
+    $cancer="";
+    $cirujia="";
+    $trasplante="";
+    $hipotiroidismo="";
+    $cardiologico="";
+    $diabetes="";
+    $hipertension="";
+    $colesterol="";
+    
+
+    $cod_event_retraso = $_POST['cod_event_retraso'];
+    $cod_event_desorden = $_POST['cod_event_desorden'];
+    $cod_event_deficit = $_POST['cod_event_deficit'];
+    $cod_event_lesiones_cabeza = $_POST['cod_event_lesiones_cabeza'];
+    $cod_event_perdidas = $_POST['cod_event_perdidas'];
+    $cod_event_accidentes_caidas = $_POST['cod_event_accidentes_caidas'];
+    $cod_event_lesiones_espalda = $_POST['cod_event_lesiones_espalda'];
+    $cod_event_infecciones = $_POST['cod_event_infecciones'];
+    $cod_event_toxinas = $_POST['cod_event_toxinas'];
+    $cod_event_acv = $_POST['cod_event_acv'];
+    $cod_event_demencia = $_POST['cod_event_demencia'];
+    $cod_event_parkinson = $_POST['cod_event_parkinson'];
+    $cod_event_epilepsia = $_POST['cod_event_epilepsia'];
+    $cod_event_esclerosis = $_POST['cod_event_esclerosis'];
+    $cod_event_huntington = $_POST['cod_event_huntington'];
+    $cod_event_depresion = $_POST['cod_event_depresion'];
+    $cod_event_trastorno = $_POST['cod_event_trastorno'];
+    $cod_event_esquizofrenia = $_POST['cod_event_esquizofrenia'];
+    $cod_event_enfermedad_desorden = $_POST['cod_event_enfermedad_desorden'];
+    $cod_event_intoxicaciones = $_POST['cod_event_intoxicaciones'];
+
+    $cod_event_cancer = $_POST['cod_event_cancer'];
+    $cod_event_cirujia = $_POST['cod_event_cirujia'];
+    $cod_event_trasplante = $_POST['cod_event_trasplante'];
+    $cod_event_hipotiroidismo = $_POST['cod_event_hipotiroidismo'];
+    $cod_event_cardiologico = $_POST['cod_event_cardiologico'];
+    $cod_event_diabetes = $_POST['cod_event_diabetes'];
+    $cod_event_hipertension = $_POST['cod_event_hipertension'];
+    $cod_event_colesterol = $_POST['cod_event_colesterol'];
+    
+
+    try {
+        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+    $select_id_users->execute();
+    $id_users= $select_id_users->fetch();
+    $id_users= $id_users["id"];
+
+
+    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+    $select_id_paciente->execute();
+    $id_paciente= $select_id_paciente->fetch();
+    $id_paciente= $id_paciente["id"];  
+
+
+    // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
+    $select_antecedentes = Flight::db()->prepare("SELECT * FROM antecedentes_medicos_familiares WHERE rela_paciente = '".$id_paciente."'");
+    $select_antecedentes->execute();
+   
+    // SELECCION DE EVENTOS
+    $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos`");
+    $select_evento->execute();
+    $evento= $select_evento->fetchAll();
+
+    //var_dump($antecedente);
+    if ($select_antecedentes->rowCount() > 0) {
+        $antecedente= $select_antecedentes->fetchAll();
+
+        foreach ($antecedente as $antecedentes) {
+
+            foreach ($evento as $eventos) {
+    
+                    if ($antecedentes["rela_evento"] == $eventos["id"]) {
+    
+                        if ($eventos["codigo_evento"] == $cod_event_retraso) {
+                            $retraso = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_desorden) {
+                            $desorden = $antecedentes["rela_tipo"];
+                        }
+                        
+                        if ($eventos["codigo_evento"] == $cod_event_deficit) {
+                            $deficit = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_lesiones_cabeza) {
+                            $lesiones_cabeza = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_perdidas) {
+                            $perdidas = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_accidentes_caidas) {
+                            $accidentes_caidas = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_lesiones_espalda) {
+                            $lesiones_espalda = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_infecciones) {
+                            $infecciones = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_toxinas) {
+                            $toxinas = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_acv) {
+                            $acv = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_demencia) {
+                            $demencia = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_parkinson) {
+                            $parkinson = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_epilepsia) {
+                            $epilepsia = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_esclerosis) {
+                            $esclerosis = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_huntington) {
+                            $huntington = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_depresion) {
+                            $depresion = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_trastorno) {
+                            $trastorno = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_esquizofrenia) {
+                            $esquizofrenia = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_enfermedad_desorden) {
+                            $enfermedad_desorden = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_intoxicaciones) {
+                            $intoxicaciones = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_cancer) {
+                            $cancer = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_cirujia) {
+                            $cirujia = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_trasplante) {
+                            $trasplante = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_hipotiroidismo) {
+                            $hipotiroidismo = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_cardiologico) {
+                            $cardiologico = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_diabetes) {
+                            $diabetes = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_hipertension) {
+                            $hipertension = $antecedentes["rela_tipo"];
+                        }
+    
+                        if ($eventos["codigo_evento"] == $cod_event_colesterol) {
+                            $colesterol = $antecedentes["rela_tipo"];
+                        }
+                        
+                        }
+    
+            }
+    }
+
+    $lista = array(
+        "estado" => "Success",
+        "retraso" => $retraso,
+        "desorden" => $desorden,
+        "deficit" => $deficit,
+        "lesiones_cabeza"=> $lesiones_cabeza,
+        "perdidas" => $perdidas,
+        "accidentes_caidas" => $accidentes_caidas,
+        "lesiones_espalda" => $lesiones_espalda,
+        "infecciones"=> $infecciones,
+        "toxinas"=> $toxinas,
+        "acv"=> $acv,
+        "demencia"=> $demencia,
+        "parkinson"=> $parkinson,
+        "epilepsia"=> $epilepsia,
+        "esclerosis"=> $esclerosis,
+        "huntington"=> $huntington,
+        "depresion"=> $depresion,
+        "trastorno"=> $trastorno,
+        "esquizofrenia"=> $esquizofrenia,
+        "enfermedad_desorden"=> $enfermedad_desorden,
+        "intoxicaciones"=> $intoxicaciones,
+        "cancer" => $cancer,
+        "cirujia" => $cirujia,
+        "trasplante" => $trasplante,
+        "hipotiroidismo" => $hipotiroidismo,
+        "cardiologico" => $cardiologico,
+        "diabetes" => $diabetes,
+        "hipertension" => $hipertension,
+        "colesterol" => $colesterol,
+        );
+    
+        $returnData = msg("Success", $lista);
+ }
+ else{
+
+    $returnData = msg("Vacio", []);
+
+ }
+   
+ } catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+  }
+
+ Flight::json($returnData);
+}
+
+function save_antec_familiares(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+
+    $retraso = $_POST['retraso'] == "true" ? 1 : 0 ;
+
+    $desorden = $_POST['desorden'] == "true" ? 1 : 0 ;
+    
+    $deficit = $_POST['deficit'] == "true" ? 1 : 0 ;
+
+    $lesiones_cabeza = $_POST['lesiones_cabeza'] == "true" ? 1 : 0 ;
+    
+    $perdidas = $_POST['perdidas'] == "true" ? 1 : 0 ;
+
+    $accidentes_caidas = $_POST['accidentes_caidas'] == "true" ? 1 : 0 ;
+
+    $lesiones_espalda = $_POST['lesiones_espalda'] == "true" ? 1 : 0 ;
+   
+    $infecciones = $_POST['infecciones'] == "true" ? 1 : 0 ;
+
+    $toxinas = $_POST['toxinas'] == "true" ? 1 : 0 ;
+    
+    $acv = $_POST['acv'] == "true" ? 1 : 0 ;
+
+    $demencia = $_POST['demencia'] == "true" ? 1 : 0 ;
+
+    $parkinson = $_POST['parkinson'] == "true" ? 1 : 0 ;
+
+    $epilepsia = $_POST['epilepsia'] == "true" ? 1 : 0 ;
+
+    $esclerosis = $_POST['esclerosis'] == "true" ? 1 : 0 ;
+
+    $huntington = $_POST['huntington'] == "true" ? 1 : 0 ;
+   
+    $depresion = $_POST['depresion'] == "true" ? 1 : 0 ;
+
+    $trastorno = $_POST['trastorno'] == "true" ? 1 : 0 ;
+    
+    $esquizofrenia = $_POST['esquizofrenia'] == "true" ? 1 : 0 ;
+
+    $enfermedad_desorden = $_POST['enfermedad_desorden'] == "true" ? 1 : 0 ;
+
+    $trastorno = $_POST['trastorno'] == "true" ? 1 : 0 ;
+
+    $intoxicaciones = $_POST['intoxicaciones'] == "true" ? 1 : 0 ;
+
+    $cancer = $_POST['cancer'] == "true" ? 1 : 0 ;
+
+    $cirujia = $_POST['cirujia'] == "true" ? 1 : 0 ;
+
+    $trasplante = $_POST['trasplante'] == "true" ? 1 : 0 ;
+    
+    $cardiologico = $_POST['cardiologico'] == "true" ? 1 : 0 ;
+
+    $diabetes = $_POST['diabetes'] == "true" ? 1 : 0 ;
+
+    $hipertension = $_POST['hipertension'] == "true" ? 1 : 0 ;
+
+    $colesterol = $_POST['colesterol'] == "true" ? 1 : 0 ;
+
+    $hipotiroidismo = $_POST['hipotiroidismo'] == "true" ? 1 : 0 ;
+
+        
+
+    $cod_event_retraso = $_POST['cod_event_retraso'];
+    $cod_event_desorden = $_POST['cod_event_desorden'];
+    $cod_event_deficit = $_POST['cod_event_deficit'];
+    $cod_event_lesiones_cabeza = $_POST['cod_event_lesiones_cabeza'];
+    $cod_event_perdidas = $_POST['cod_event_perdidas'];
+    $cod_event_accidentes_caidas = $_POST['cod_event_accidentes_caidas'];
+    $cod_event_lesiones_espalda = $_POST['cod_event_lesiones_espalda'];
+    $cod_event_infecciones = $_POST['cod_event_infecciones'];
+    $cod_event_toxinas = $_POST['cod_event_toxinas'];
+    $cod_event_acv = $_POST['cod_event_acv'];
+    $cod_event_demencia = $_POST['cod_event_demencia'];
+    $cod_event_parkinson = $_POST['cod_event_parkinson'];
+    $cod_event_epilepsia = $_POST['cod_event_epilepsia'];
+    $cod_event_esclerosis = $_POST['cod_event_esclerosis'];
+    $cod_event_huntington = $_POST['cod_event_huntington'];
+    $cod_event_depresion = $_POST['cod_event_depresion'];
+    $cod_event_trastorno = $_POST['cod_event_trastorno'];
+    $cod_event_esquizofrenia = $_POST['cod_event_esquizofrenia'];
+    $cod_event_enfermedad_desorden = $_POST['cod_event_enfermedad_desorden'];
+    $cod_event_intoxicaciones = $_POST['cod_event_intoxicaciones'];
+    $cod_event_cancer = $_POST['cod_event_cancer'];
+    $cod_event_cirujia = $_POST['cod_event_cirujia'];
+    $cod_event_trasplante = $_POST['cod_event_trasplante'];
+    $cod_event_hipotiroidismo = $_POST['cod_event_hipotiroidismo'];
+    $cod_event_cardiologico = $_POST['cod_event_cardiologico'];
+    $cod_event_diabetes = $_POST['cod_event_diabetes'];
+    $cod_event_hipertension = $_POST['cod_event_hipertension'];
+    $cod_event_colesterol = $_POST['cod_event_colesterol'];
+    
+    
+        try {
+                           
+                // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+                $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+                $select_id_users->execute();
+                $id_users= $select_id_users->fetch();
+                $id_users= $id_users["id"];
+
+
+                // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+                $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+                $select_id_paciente->execute();
+                $id_paciente= $select_id_paciente->fetch();
+                $id_paciente= $id_paciente["id"];
+                
+
+                // SELECCION DE EVENTOS
+                $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos`");
+                $select_evento->execute();
+                $evento= $select_evento->fetchAll();
+
+
+                // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
+                $select_id_paciente = Flight::db()->prepare("SELECT rela_paciente FROM antecedentes_medicos_familiares WHERE rela_paciente = '".$id_paciente."'");
+                $select_id_paciente->execute();
+                
+                // SI EXISTEN ENTONCES BORRO LAS FILAS COORESPONDIENTES A ESE USUARIO Y PROCEDO A CREAR NUEVOS REGISTROS
+                if ($select_id_paciente->rowCount() > 0) {
+
+                        $delete_antecedentes = Flight::db()->prepare("DELETE from antecedentes_medicos_familiares
+                        WHERE rela_paciente = '".$id_paciente."'");
+                        $delete_antecedentes->execute();
+                            
+                }
+
+                foreach ($evento as $eventos) {
+
+                    if ($eventos["codigo_evento"] == $cod_event_retraso) {
+
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $retraso,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_desorden) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $desorden,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_deficit) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $deficit,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_cabeza) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $lesiones_cabeza,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_perdidas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $perdidas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_accidentes_caidas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $accidentes_caidas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_espalda) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $lesiones_espalda,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_infecciones) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $infecciones,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_toxinas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $toxinas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_acv) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $acv,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_demencia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $demencia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_parkinson) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $parkinson,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_epilepsia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $epilepsia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+                  
+
+                    if ($eventos["codigo_evento"] == $cod_event_esclerosis) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $esclerosis,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_huntington) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $huntington,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_depresion) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $depresion,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_trastorno) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $trastorno,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_esquizofrenia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $esquizofrenia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_enfermedad_desorden) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $enfermedad_desorden,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_intoxicaciones) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $intoxicaciones,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+                    
+                    if ($eventos["codigo_evento"] == $cod_event_cancer) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $cancer,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_cirujia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $cirujia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_trasplante) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $trasplante,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_hipotiroidismo) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $hipotiroidismo,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_cardiologico) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $cardiologico,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_diabetes) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $diabetes,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_hipertension) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $hipertension,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_colesterol) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $colesterol,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+                }
+                         
+                //Call our custom function.
+                pdoMultiInsert('antecedentes_medicos_familiares', $rowsToInsert, Flight::db());
+
+                
+                $returnData = msg("Success", []);
+                
+            } catch (PDOException $error) {
+
+                $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+              }
+            
+            Flight::json($returnData);
+}
+
+function user_read_antc_personales(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+    
+    
+    $retraso = "";
+    $desorden = "";
+    $deficit = "";
+    $lesiones_cabeza= "";
+    $perdidas = "";
+    $accidentes_caidas = "";
+    $lesiones_espalda = "";
+    $infecciones= "";
+    $toxinas= "";
+    $acv= "";
+    $demencia= "";
+    $parkinson= "";
+    $epilepsia= "";
+    $esclerosis= "";
+    $huntington= "";
+    $depresion= "";
+    $trastorno= "";
+    $esquizofrenia= "";
+    $enfermedad_desorden= "";
+    $intoxicaciones= "";
+    
+    
+
+    $cod_event_retraso = $_POST['cod_event_retraso'];
+    $cod_event_desorden = $_POST['cod_event_desorden'];
+    $cod_event_deficit = $_POST['cod_event_deficit'];
+    $cod_event_lesiones_cabeza = $_POST['cod_event_lesiones_cabeza'];
+    $cod_event_perdidas = $_POST['cod_event_perdidas'];
+    $cod_event_accidentes_caidas = $_POST['cod_event_accidentes_caidas'];
+    $cod_event_lesiones_espalda = $_POST['cod_event_lesiones_espalda'];
+    $cod_event_infecciones = $_POST['cod_event_infecciones'];
+    $cod_event_toxinas = $_POST['cod_event_toxinas'];
+    $cod_event_acv = $_POST['cod_event_acv'];
+    $cod_event_demencia = $_POST['cod_event_demencia'];
+    $cod_event_parkinson = $_POST['cod_event_parkinson'];
+    $cod_event_epilepsia = $_POST['cod_event_epilepsia'];
+    $cod_event_esclerosis = $_POST['cod_event_esclerosis'];
+    $cod_event_huntington = $_POST['cod_event_huntington'];
+    $cod_event_depresion = $_POST['cod_event_depresion'];
+    $cod_event_trastorno = $_POST['cod_event_trastorno'];
+    $cod_event_esquizofrenia = $_POST['cod_event_esquizofrenia'];
+    $cod_event_enfermedad_desorden = $_POST['cod_event_enfermedad_desorden'];
+    $cod_event_intoxicaciones = $_POST['cod_event_intoxicaciones'];
+    
+    try {
+        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+    $select_id_users->execute();
+    $id_users= $select_id_users->fetch();
+    $id_users= $id_users["id"];
+
+
+    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+    $select_id_paciente->execute();
+    $id_paciente= $select_id_paciente->fetch();
+    $id_paciente= $id_paciente["id"];  
+
+
+    // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
+    $select_antecedentes = Flight::db()->prepare("SELECT * FROM antecedentes_medicos_personales WHERE rela_paciente = '".$id_paciente."'");
+    $select_antecedentes->execute();
+    
+
+    // SELECCION DE EVENTOS
+    $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos`");
+    $select_evento->execute();
+    $evento= $select_evento->fetchAll();
+
+    //var_dump($select_antecedentes->rowCount());
+    if ($select_antecedentes->rowCount() > 0) {
+        $antecedente= $select_antecedentes->fetchAll();
+
+    foreach ($antecedente as $antecedentes) {
+
+        foreach ($evento as $eventos) {
+
+                if ($antecedentes["rela_evento"] == $eventos["id"]) {
+
+                    if ($eventos["codigo_evento"] == $cod_event_retraso) {
+                        $retraso = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_desorden) {
+                        $desorden = $antecedentes["rela_tipo"];
+                    }
+                    
+                    if ($eventos["codigo_evento"] == $cod_event_deficit) {
+                        $deficit = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_cabeza) {
+                        $lesiones_cabeza = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_perdidas) {
+                        $perdidas = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_accidentes_caidas) {
+                        $accidentes_caidas = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_espalda) {
+                        $lesiones_espalda = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_infecciones) {
+                        $infecciones = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_toxinas) {
+                        $toxinas = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_acv) {
+                        $acv = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_demencia) {
+                        $demencia = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_parkinson) {
+                        $parkinson = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_epilepsia) {
+                        $epilepsia = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_esclerosis) {
+                        $esclerosis = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_huntington) {
+                        $huntington = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_depresion) {
+                        $depresion = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_trastorno) {
+                        $trastorno = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_esquizofrenia) {
+                        $esquizofrenia = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_enfermedad_desorden) {
+                        $enfermedad_desorden = $antecedentes["rela_tipo"];
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_intoxicaciones) {
+                        $intoxicaciones = $antecedentes["rela_tipo"];
+                    }
+                    
+                    }
+
+        }
+
+        
+    }
+
+        $lista = array(
+        "estado" => "Success",
+        "retraso" => $retraso,
+        "desorden" => $desorden,
+        "deficit" => $deficit,
+        "lesiones_cabeza"=> $lesiones_cabeza,
+        "perdidas" => $perdidas,
+        "accidentes_caidas" => $accidentes_caidas,
+        "lesiones_espalda" => $lesiones_espalda,
+        "infecciones"=> $infecciones,
+        "toxinas"=> $toxinas,
+        "acv"=> $acv,
+        "demencia"=> $demencia,
+        "parkinson"=> $parkinson,
+        "epilepsia"=> $epilepsia,
+        "esclerosis"=> $esclerosis,
+        "huntington"=> $huntington,
+        "depresion"=> $depresion,
+        "trastorno"=> $trastorno,
+        "esquizofrenia"=> $esquizofrenia,
+        "enfermedad_desorden"=> $enfermedad_desorden,
+        "intoxicaciones"=> $intoxicaciones,
+        );
+
+    }else{
+        $lista = array(
+            "estado" => "Success",
+            "retraso" => 0,
+            "desorden" => 0,
+            "deficit" => 0,
+            "lesiones_cabeza"=> 0,
+            "perdidas" => 0,
+            "accidentes_caidas" => 0,
+            "lesiones_espalda" => 0,
+            "infecciones"=> 0,
+            "toxinas"=> 0,
+            "acv"=> 0,
+            "demencia"=> 0,
+            "parkinson"=> 0,
+            "epilepsia"=> 0,
+            "esclerosis"=> 0,
+            "huntington"=> 0,
+            "depresion"=> 0,
+            "trastorno"=> 0,
+            "esquizofrenia"=> 0,
+            "enfermedad_desorden"=> 0,
+            "intoxicaciones"=> 0,
+            );
+            
+    }
+
+    $returnData = msg("Success", $lista);
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+    
+    Flight::json($returnData);
+   
+}
+
+function save_antec_personales(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+    
+
+    if ($_POST['retraso'] == "true") {
+        $retraso = 1;
+    }
+    else{
+        $retraso = 0;
+    }
+
+    if ($_POST['desorden'] == "true") {
+        $desorden = 1;
+    }
+    else{
+        $desorden = 0;
+    }
+
+    if ($_POST['deficit'] == "true") {
+        $deficit = 1;
+    }
+    else{
+        $deficit = 0;
+    }
+
+    if ($_POST['lesiones_cabeza'] == "true") {
+        $lesiones_cabeza = 1;
+    }
+    else{
+        $lesiones_cabeza = 0;
+    }
+    
+    if ($_POST['perdidas'] == "true") {
+        $perdidas = 1;
+    }
+    else{
+        $perdidas = 0;
+    }
+
+
+    if ($_POST['accidentes_caidas'] == "true") {
+        $accidentes_caidas = 1;
+    }
+    else{
+        $accidentes_caidas = 0;
+    }
+
+    if ($_POST['lesiones_espalda'] == "true") {
+        $lesiones_espalda = 1;
+    }
+    else{
+        $lesiones_espalda = 0;
+    }
+    
+    if ($_POST['infecciones'] == "true") {
+        $infecciones = 1;
+    }
+    else{
+        $infecciones = 0;
+    }
+    
+    if ($_POST['toxinas'] == "true") {
+        $toxinas = 1;
+    }
+    else{
+        $toxinas = 0;
+    }
+
+    if ($_POST['acv'] == "true") {
+        $acv = 1;
+    }
+    else{
+        $acv = 0;
+    }
+
+    if ($_POST['demencia'] == "true") {
+        $demencia = 1;
+    }
+    else{
+        $demencia = 0;
+    }
+
+
+    if ($_POST['parkinson'] == "true") {
+        $parkinson = 1;
+    }
+    else{
+        $parkinson = 0;
+    }
+
+    if ($_POST['epilepsia'] == "true") {
+        $epilepsia = 1;
+    }
+    else{
+        $epilepsia = 0;
+    }
+    
+    if ($_POST['esclerosis'] == "true") {
+        $esclerosis = 1;
+    }
+    else{
+        $esclerosis = 0;
+    }
+    
+    if ($_POST['huntington'] == "true") {
+        $huntington = 1;
+    }
+    else{
+        $huntington = 0;
+    }
+
+    if ($_POST['depresion'] == "true") {
+        $depresion = 1;
+    }
+    else{
+        $depresion = 0;
+    }
+
+    if ($_POST['trastorno'] == "true") {
+        $trastorno = 1;
+    }
+    else{
+        $trastorno = 0;
+    }
+    
+    if ($_POST['esquizofrenia'] == "true") {
+        $esquizofrenia = 1;
+    }
+    else{
+        $esquizofrenia = 0;
+    }
+
+    if ($_POST['enfermedad_desorden'] == "true") {
+        $enfermedad_desorden = 1;
+    }
+    else{
+        $enfermedad_desorden = 0;
+    }
+   
+    if ($_POST['intoxicaciones'] == "true") {
+        $intoxicaciones = 1;
+    }
+    else{
+        $intoxicaciones = 0;
+    }
+        
+
+    $cod_event_retraso = $_POST['cod_event_retraso'];
+    $cod_event_desorden = $_POST['cod_event_desorden'];
+    $cod_event_deficit = $_POST['cod_event_deficit'];
+    $cod_event_lesiones_cabeza = $_POST['cod_event_lesiones_cabeza'];
+    $cod_event_perdidas = $_POST['cod_event_perdidas'];
+    $cod_event_accidentes_caidas = $_POST['cod_event_accidentes_caidas'];
+    $cod_event_lesiones_espalda = $_POST['cod_event_lesiones_espalda'];
+    $cod_event_infecciones = $_POST['cod_event_infecciones'];
+    $cod_event_toxinas = $_POST['cod_event_toxinas'];
+    $cod_event_acv = $_POST['cod_event_acv'];
+    $cod_event_demencia = $_POST['cod_event_demencia'];
+    $cod_event_parkinson = $_POST['cod_event_parkinson'];
+    $cod_event_epilepsia = $_POST['cod_event_epilepsia'];
+    $cod_event_esclerosis = $_POST['cod_event_esclerosis'];
+    $cod_event_huntington = $_POST['cod_event_huntington'];
+    $cod_event_depresion = $_POST['cod_event_depresion'];
+    $cod_event_trastorno = $_POST['cod_event_trastorno'];
+    $cod_event_esquizofrenia = $_POST['cod_event_esquizofrenia'];
+    $cod_event_enfermedad_desorden = $_POST['cod_event_enfermedad_desorden'];
+    $cod_event_intoxicaciones = $_POST['cod_event_intoxicaciones'];
+    
+    
+        try {
+                //$select_id_paciente = $db->prepare("SELECT pacientes.id FROM `pacientes` INNER JOIN users ON pacientes.rela_users = users.id WHERE users.email = '".$email."'");
+                //$select_id_paciente->execute();
+                //$id_paciente= $select_id_paciente->fetch();
+                //$id_paciente= $id_paciente["pacientes.id"];
+                
+                // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+
+                $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
+                $select_id_users->execute();
+                $id_users= $select_id_users->fetch();
+                $id_users= $id_users["id"];
+
+
+                // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
+                $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '".$id_users."'");
+                $select_id_paciente->execute();
+                $id_paciente= $select_id_paciente->fetch();
+                $id_paciente= $id_paciente["id"];
+                
+
+                // SELECCION DE EVENTOS
+                $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos`");
+                $select_evento->execute();
+                $evento= $select_evento->fetchAll();
+
+
+                // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
+                $select_id_paciente = Flight::db()->prepare("SELECT rela_paciente FROM antecedentes_medicos_personales WHERE rela_paciente = '".$id_paciente."'");
+                $select_id_paciente->execute();
+                
+                // SI EXISTEN ENTONCES BORRO LAS FILAS COORESPONDIENTES A ESE USUARIO Y PROCEDO A CREAR NUEVOS REGISTROS
+                if ($select_id_paciente->rowCount() > 0) {
+
+                        $delete_antecedentes = Flight::db()->prepare("DELETE from antecedentes_medicos_personales
+                        WHERE rela_paciente = '".$id_paciente."'");
+                        $delete_antecedentes->execute();
+                            
+                }
+
+                foreach ($evento as $eventos) {
+
+                    if ($eventos["codigo_evento"] == $cod_event_retraso) {
+
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $retraso,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_desorden) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $desorden,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_deficit) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $deficit,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_cabeza) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $lesiones_cabeza,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_perdidas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $perdidas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_accidentes_caidas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $accidentes_caidas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_lesiones_espalda) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $lesiones_espalda,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_infecciones) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $infecciones,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_toxinas) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $toxinas,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_acv) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $acv,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_demencia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $demencia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_parkinson) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $parkinson,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_epilepsia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $epilepsia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+                  
+
+                    if ($eventos["codigo_evento"] == $cod_event_esclerosis) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $esclerosis,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_huntington) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $huntington,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_depresion) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $depresion,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_trastorno) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $trastorno,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_esquizofrenia) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $esquizofrenia,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_enfermedad_desorden) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $enfermedad_desorden,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+
+                    if ($eventos["codigo_evento"] == $cod_event_intoxicaciones) {
+                        $rowsToInsert[] = array(
+                            'rela_tipo' => $intoxicaciones,
+                                'rela_evento' => $eventos["id"],
+                                'rela_paciente' => $id_paciente,
+                        );
+                    }
+                    
+                }
+                         
+                //Call our custom function.
+                pdoMultiInsert('antecedentes_medicos_personales', $rowsToInsert, Flight::db());
+
+                
+                $returnData = msg("Success", []);
+                
+            } catch (PDOException $error) {
+
+                $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+              }
+            
+            Flight::json($returnData);
+}
+
+
+function save_datos_clinicos(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['pulso'])) {
+        $pulso = $_POST["pulso"];
+    } else {
+        $pulso = verificar($data_input, "pulso");
+    }
+
+    if (isset($_POST['presion_alta'])) {
+        $presion_alta = $_POST["presion_alta"];
+    } else {
+        $presion_alta = verificar($data_input, "presion_alta");
+    }
+
+    if (isset($_POST['presion_baja'])) {
+        $presion_baja = $_POST["presion_baja"];
+    } else {
+        $presion_baja = verificar($data_input, "presion_baja");
+    }
+
+    if (isset($_POST['presion_alta'])) {
+        $presion_alta = $_POST["presion_alta"];
+    } else {
+        $presion_alta = verificar($data_input, "presion_alta");
+    }
+
+    if (isset($_POST['circunfer_cintura'])) {
+        $circunfer_cintura = $_POST["circunfer_cintura"];
+    } else {
+        $circunfer_cintura = verificar($data_input, "circunfer_cintura");
+    }
+    
+
+    if (isset($_POST['peso_corporal'])) {
+        $peso_corporal = $_POST["peso_corporal"];
+    } else {
+        $peso_corporal = verificar($data_input, "peso_corporal");
+    }
+
+    if (isset($_POST['talla'])) {
+        $talla = $_POST["talla"];
+    } else {
+        $talla = verificar($data_input, "talla");
+    }
+  
+    if (isset($_POST['id_alcohol'])) {
+        $id_alcohol = $_POST["id_alcohol"];
+    } else {
+        $id_alcohol = verificar($data_input, "id_alcohol");
+    }
+
+    if (isset($_POST['id_tabaco'])) {
+        $id_tabaco = $_POST["id_tabaco"];
+    } else {
+        $id_tabaco = verificar($data_input, "id_tabaco");
+    }
+
+    if (isset($_POST['id_marihuana'])) {
+        $id_marihuana = $_POST["id_marihuana"];
+    } else {
+        $id_marihuana = verificar($data_input, "id_marihuana");
+    }
+
+    if (isset($_POST['id_otras'])) {
+        $id_otras = $_POST["id_otras"];
+    } else {
+        $id_otras = verificar($data_input, "id_otras");
+    }
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }   
+
+    
+        try {
+
+                $estado_clinico = 1;
+                $consult_estado = Flight::db()->prepare("SELECT estado_clinico FROM datos_clinicos WHERE estado_clinico = '".$estado_clinico."' AND rela_paciente = '".$id_paciente."'");
+                $consult_estado->execute();
+                
+                $consult_estado = $consult_estado->rowCount();
+               
+
+                if ($consult_estado > 0) {
+
+                    $estado_clinico = 0;
+                    $estado_clinico1 = 1;
+
+                    $update_datos_clinicos= Flight::db()->prepare("UPDATE datos_clinicos
+                    SET estado_clinico=?
+                    WHERE rela_paciente=? AND estado_clinico=?");
+                    $update_datos_clinicos->execute([$estado_clinico,$id_paciente,$estado_clinico1]);
+
+
+                    $estado_clinico = 1;
+                    $insert_dato_clinico = Flight::db()->prepare('INSERT INTO datos_clinicos(rela_paciente,presion_alta,presion_baja,pulso,peso,
+                    circunferencia_cintura,talla,consume_alcohol,consume_marihuana,otras_drogas,fuma_tabaco,estado_clinico)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
+                    $insert_dato_clinico->bindParam(1,$id_paciente);
+                    $insert_dato_clinico->bindParam(2,$presion_alta);
+                    $insert_dato_clinico->bindParam(3,$presion_baja);
+                    $insert_dato_clinico->bindParam(4,$pulso);
+                    $insert_dato_clinico->bindParam(5,$peso_corporal);
+                    $insert_dato_clinico->bindParam(6,$circunfer_cintura); 
+                    $insert_dato_clinico->bindParam(7,$talla);
+                    $insert_dato_clinico->bindParam(8,$id_alcohol);
+                    $insert_dato_clinico->bindParam(9,$id_marihuana);
+                    $insert_dato_clinico->bindParam(10,$id_otras);
+                    $insert_dato_clinico->bindParam(11,$id_tabaco);
+                    $insert_dato_clinico->bindParam(12,$estado_clinico);
+                    $insert_dato_clinico->execute();
+
+                    $insert_dato_clinico = $insert_dato_clinico->rowCount();
+                if ($insert_dato_clinico) {
+                    $returnData = msg("Success", []);
+                }
+                
+                }else {
+
+                    $estado_clinico = 1;
+                    $insert_dato_clinico = Flight::db()->prepare('INSERT INTO datos_clinicos(id_paciente,presion_alta,presion_baja,pulso,peso,
+                    circunferencia_cintura,talla,consume_alcohol,consume_marihuana,otras_drogas,fuma_tabaco,estado_clinico)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
+                    $insert_dato_clinico->bindParam(1,$id_paciente);
+                    $insert_dato_clinico->bindParam(2,$presion_alta);
+                    $insert_dato_clinico->bindParam(3,$presion_baja);
+                    $insert_dato_clinico->bindParam(4,$pulso);
+                    $insert_dato_clinico->bindParam(5,$peso_corporal);
+                    $insert_dato_clinico->bindParam(6,$circunfer_cintura); 
+                    $insert_dato_clinico->bindParam(7,$talla);
+                    $insert_dato_clinico->bindParam(8,$id_alcohol);
+                    $insert_dato_clinico->bindParam(9,$id_marihuana);
+                    $insert_dato_clinico->bindParam(10,$id_otras);
+                    $insert_dato_clinico->bindParam(11,$id_tabaco);
+                    $insert_dato_clinico->bindParam(12,$estado_clinico);
+                    $insert_dato_clinico->execute();
+                
+                $insert_dato_clinico = $insert_dato_clinico->rowCount();
+                if ($insert_dato_clinico) {
+                    $returnData = msg("Success", []);
+                }
+                }
+
+            } catch (PDOException $error) {
+
+                $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+              }
+            
+            Flight::json($returnData);
+}
+
+function save_datos_personales(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+
+    if (isset($_POST['nombre'])) {
+        $nombre = $_POST["nombre"];
+    } else {
+        $nombre = verificar($data_input, "nombre");
+    }
+
+    if (isset($_POST['apellido'])) {
+        $apellido = $_POST["apellido"];
+    } else {
+        $apellido = verificar($data_input, "apellido");
+    }
+
+    if (isset($_POST['dni'])) {
+        $dni = $_POST["dni"];
+    } else {
+        $dni = verificar($data_input, "dni");
+    }
+
+    if (isset($_POST['fecha_nacimiento'])) {
+        $fecha_nacimiento = $_POST["fecha_nacimiento"];
+    } else {
+        $fecha_nacimiento = verificar($data_input, "fecha_nacimiento");
+    }
+
+    if (isset($_POST['rela_genero'])) {
+        $rela_genero = $_POST["rela_genero"];
+    } else {
+        $rela_genero = verificar($data_input, "rela_genero");
+    }
+
+    if (isset($_POST['rela_departamento'])) {
+        $rela_departamento = $_POST["rela_departamento"];
+    } else {
+        $rela_departamento = verificar($data_input, "rela_departamento");
+    }
+
+    if (isset($_POST['rela_nivel_instruccion'])) {
+        $rela_nivel_instruccion = $_POST["rela_nivel_instruccion"];
+    } else {
+        $rela_nivel_instruccion = verificar($data_input, "rela_nivel_instruccion");
+    }
+
+    if (isset($_POST['rela_grupo_conviviente'])) {
+        $rela_grupo_conviviente = $_POST["rela_grupo_conviviente"];
+    } else {
+        $rela_grupo_conviviente = verificar($data_input, "rela_grupo_conviviente");
+    }
+    
+    if (isset($_POST['celular'])) {
+        $celular = $_POST["celular"];
+    } else {
+        $celular = verificar($data_input, "celular");
+    }
+
+    if (isset($_POST['contacto'])) {
+        $contacto = $_POST["contacto"];
+    } else {
+        $contacto = verificar($data_input, "contacto");
+    }
+
+    if (isset($_POST['estado_users'])) {
+        $estado_users = $_POST["estado_users"];
+    } else {
+        $estado_users = verificar($data_input, "estado_users");
+    }
+    
+    
+        try {            
+                $select_email = Flight::db()->prepare("SELECT id FROM users WHERE email = '".$email."'");
+                $select_email->execute();
+                $rela_users= $select_email->fetch();
+                $rela_users= $rela_users["id"];
+
+                
+                $insert_paciente = Flight::db()->prepare("UPDATE pacientes
+                SET nombre=:nombre, 
+                apellido=:apellido,
+                dni=:dni, 
+                fecha_nacimiento=:fecha_nacimiento, 
+                rela_genero=:rela_genero,
+                rela_nivel_instruccion=:rela_nivel_instruccion,
+                rela_grupo_conviviente=:rela_grupo_conviviente,
+                celular=:celular, 
+                contacto=:contacto,
+                rela_departamento=:rela_departamento,
+                estado_users=:estado_users
+                WHERE rela_users=:rela_users");
+                
+
+                $insert_paciente->execute([$nombre,$apellido,$dni,$fecha_nacimiento,$rela_genero,$rela_nivel_instruccion,$rela_grupo_conviviente,$celular,$contacto,$rela_departamento,$estado_users,$rela_users]);
+                
+                $listaRequest = array(
+					"request"=>"Success",
+                    "rela_users"=>$rela_users,
+					"fecha_nacimiento"=>$fecha_nacimiento,
+					"rela_genero"=>$rela_genero,
+					"rela_nivel_instruccion"=>$rela_nivel_instruccion,
+					"rela_grupo_conviviente"=> $rela_grupo_conviviente,
+                    "celular"=> $celular,
+					"contacto"=> $contacto,
+					"rela_departamento"=> $rela_departamento,
+					"estado_users"=> $estado_users,
+
+				);
+
+    $returnData = msg("Success", $listaRequest);
+
+ } catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+  }
+
+ Flight::json($returnData);
+
+}
+
+function respuesta(){
+    try {
+        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES49','TRES50','TRES51')");
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        }else{
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
+
+function read_list_medicos(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $rela_paciente = $_POST["id_paciente"];
+    } else {
+        $rela_paciente = verificar($data_input, "id_paciente");
+    }
+
+    try {
+    $stmt = Flight::db()->prepare("SELECT medicos.id, nombre, apellido, especialidad, matricula  
+    FROM medicos_pacientes 
+    INNER JOIN medicos 
+    ON medicos_pacientes.rela_medico = medicos.id
+    WHERE rela_paciente = '".$rela_paciente."'");
+
+	$stmt->execute();
+    $result = $stmt->fetchAll();
+
+    $lista = array();
+
+	if ($stmt->rowCount() > 0) {
+        foreach ($result as $results) {
+            $lista[] = $results;
+        }
+        $returnData = msg("Success", $lista);
+	}
+    else{
+        $returnData = msg("Vacio", []);
+    }
+ } catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+ }
+
+ Flight::json($returnData);
+}
+
+function consult_preference(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+    
+    try {
+
+        $stmt = Flight::db()->prepare("SELECT id FROM users WHERE email = '".$email."'");
+        $stmt->execute();
+        if ($stmt->rowCount()) {
+            $rela_users= $stmt->fetch();
+            $rela_users= $rela_users["id"];
+        
+        
+            $stmt_paciente = Flight::db()->prepare("SELECT * FROM pacientes WHERE rela_users = '".$rela_users."'");
+            
+            $stmt_paciente->execute();
+            
+    
+            if ($stmt_paciente->rowCount()) {
+                $result = $stmt_paciente->fetch();
+                $lista = array(
+                    "estado_users" => $result["estado_users"],
+                    "id_paciente" => $result["id"],
+                );
+            }else{
+                $returnData = msg("Vacio", "No exite paciente con email ingresado");
+                Flight::json($returnData);
+                exit;
+            }
+    
+            $returnData = msg("Success", $lista);
+        }else{
+            $returnData = msg("Vacio", "Email no encontrado");
+                Flight::json($returnData);
+                exit;
+        }
+
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
+
+function generate_vinculation(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['rela_medico'])) {
+        $rela_medico = $_POST["rela_medico"];
+    } else {
+        $rela_medico = verificar($data_input, "rela_medico");
+    }
+    
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['rela_medico'])) {
+        $rela_medico = $_POST["rela_medico"];
+    } else {
+        $rela_medico = verificar($data_input, "rela_medico");
+    }
+   
+ $estadohabilitacion = 0;
+
+ try {
+ // insertar en la tabla usuarios_avisos 
+    $stmt = Flight::db()->prepare("INSERT INTO medicos_pacientes (rela_medico, rela_paciente, estado_habilitacion) VALUES (:rela_medico, :rela_paciente, :estadohabilitacion)");
+    $stmt->bindParam(':rela_medico', $rela_medico);
+    $stmt->bindParam(':rela_paciente', $id_paciente);
+    $stmt->bindParam(':estadohabilitacion', $estadohabilitacion);
+    $stmt->execute();
+        
+    $insert_usuarios_avisos = $stmt->rowCount();
+    if ($insert_usuarios_avisos) {
+        
+        $returnData = msg("Success", []);
+    }
+   } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
+
+function read_medico(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['rela_paciente'])) {
+        $id_paciente = $_POST["rela_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "rela_paciente");
+    }
+ 
+    try {
+
+        
+        $stmt = Flight::db()->prepare("SELECT * FROM usuarios_avisos
+        JOIN avisos_generales ON avisos_generales.id = usuarios_avisos.rela_aviso
+        JOIN medicos ON medicos.id = avisos_generales.rela_medico
+        WHERE rela_paciente = '".$id_paciente."' ");
+    
+        $stmt->execute();
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $lista = array();
+        
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista = $results;
+            }
+           
+            $returnData = msg("Success", $lista);
+        }else {
+            $returnData = msg("Vacio", []);
+        }
+        
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
 function pdoMultiInsert($tableName, $data, $pdoObject)
 {
 

@@ -72,8 +72,8 @@ class _RecuperarState extends State<RecuperarPage> {
 var mensajeRetornado;
 
 Future get_pass() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/recuperar_pass.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/recuperar_pass";
   var response = await http.post(url, body: {
     "dni": dni.text,
   });

@@ -193,8 +193,8 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   var id_paciente;
 
   guardar_medicamento(int data_id) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/save_medicamento.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/save_medicamento";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medicamento": data_id.toString(),

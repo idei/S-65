@@ -64,7 +64,8 @@
     $cod_event_colesterol = $_POST['cod_event_colesterol'];
     
 
-    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
+    try {
+        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
 
     $select_id_users = $db->prepare("SELECT id FROM `users` WHERE users.email = '".$email."'");
     $select_id_users->execute();
@@ -255,6 +256,10 @@ else{
         );
 
 }
+    } catch (\Throwable $th) {
+        //throw $th;
+    }
+    
 
    
     

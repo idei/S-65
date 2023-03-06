@@ -92,8 +92,8 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   }
 
   read_medico() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_medico.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_medico";
     var response = await http.post(url, body: {
       "rela_paciente": id_paciente.toString(),
     });
@@ -349,10 +349,11 @@ update_estado_aviso(var id_aviso, BuildContext context) async {
   await generate_vinculation(context);
 
   String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/update_estado_aviso.php";
+  var url = URL_base + "/update_estado_aviso";
   var response = await http.post(url, body: {
-    "id_aviso": id_aviso.toString(),
-    "id_paciente": id_paciente.toString(),
+    "rela_aviso": id_aviso.toString(),
+    "rela_paciente": id_paciente.toString(),
+    "estado_leido": "1",
   });
 
   print(response.body);
@@ -363,8 +364,8 @@ update_estado_aviso(var id_aviso, BuildContext context) async {
 var data_vinculation;
 
 generate_vinculation(BuildContext context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/generate_vinculation.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/generate_vinculation";
   var response = await http.post(url, body: {
     "rela_medico": rela_medico.toString(),
     "id_paciente": id_paciente.toString(),

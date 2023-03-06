@@ -461,7 +461,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 guardar_datos(BuildContext context) async {
   print(email_prefer);
   String URL_base = Env.URL_API;
-  var url = URL_base + "/user_datos_clinicos.php";
+  var url = URL_base + "/save_datos_clinicos";
   var response = await http.post(url, body: {
     "presion_alta": presion_alta.text,
     "presion_baja": presion_baja.text,

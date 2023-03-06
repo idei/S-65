@@ -5,32 +5,30 @@
     
     try {
 
-        $select_email = $db->prepare("SELECT id FROM users WHERE email = '".$email."'");
-        $select_email->execute();
-        $rela_users= $select_email->fetch();
+        $stmt = $db->prepare("SELECT id FROM users WHERE email = '".$email."'");
+        $stmt->execute();
+        $rela_users= $stmt->fetch();
         $rela_users= $rela_users["id"];
     
     
-        $consult_estado = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$rela_users."'");
+        $stmt_paciente = $db->prepare("SELECT * FROM pacientes WHERE rela_users = '".$rela_users."'");
         
-        $consult_estado->execute();
+        $stmt_paciente->execute();
         
-        $result = $consult_estado->fetch();
+        $result = $stmt_paciente->fetch();
         
     
         
-        if ($consult_estado->rowCount()) {
-            $result_estado = $result["estado_users"];
-            $result_id_paciente = $result["id"];
+        if ($stmt_paciente->rowCount() > 0) {
+            
+            $lista = array(
+                "estado_users" => $result["estado_users"],
+                "id_paciente" => $result["id"],
+            );
+
         }else{
             $result_estado = 0;
         }
-
-        $lista = array(
-            "estado_users" => $result_estado,
-            "id_paciente" => $result_id_paciente,
-            "request" => "Success"
-        );
 
         echo json_encode($lista);
         

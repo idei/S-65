@@ -4,15 +4,11 @@
  
     try {
 
-        //$stmt = $db->prepare("SELECT nombre, apellido FROM usuarios_avisos
-        //JOIN avisos_generales ON avisos_generales.id = usuarios_avisos.rela_aviso
-        //JOIN medicos ON medicos.id = avisos_generales.rela_medico
-        //WHERE rela_paciente = '".$id_paciente."' ");
-
-$stmt = $db->prepare("SELECT * FROM usuarios_avisos
-JOIN avisos_generales ON avisos_generales.id = usuarios_avisos.rela_aviso
-JOIN medicos ON medicos.id = avisos_generales.rela_medico
-WHERE rela_paciente = '".$id_paciente."' ");
+        
+        $stmt = $db->prepare("SELECT * FROM usuarios_avisos
+        JOIN avisos_generales ON avisos_generales.id = usuarios_avisos.rela_aviso
+        JOIN medicos ON medicos.id = avisos_generales.rela_medico
+        WHERE rela_paciente = '".$id_paciente."' ");
     
         $stmt->execute();
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -33,3 +29,5 @@ WHERE rela_paciente = '".$id_paciente."' ");
             $error = "Error conectando con la base de datos: ".$e->getMessage(); 
             echo json_encode($error);
         }
+
+?>

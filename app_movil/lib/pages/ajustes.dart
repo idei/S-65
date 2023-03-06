@@ -254,8 +254,8 @@ class _AjustesState extends State<AjustesPage> {
 var data;
 
 modificar_pass(context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/modificar_pass.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/modificar_pass";
   var response = await http.post(url, body: {
     "email": email.text,
     "password": password.text,
@@ -275,8 +275,8 @@ modificar_pass(context) async {
 }
 
 modificar_email(context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/modificar_email.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/modificar_email";
   var response = await http.post(url, body: {
     "email": email.text,
     "email_nuevo": email_nuevo.text,

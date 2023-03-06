@@ -53,19 +53,16 @@ class _LoginPage extends State<LoginPage> {
   }
 
   consult_preference() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/consult_preference.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/consult_preference";
     var response = await http.post(url, body: {"email": email.text});
+    var responseDecoder = json.decode(response.body);
 
-    var data = json.decode(response.body);
-
-    estado_read_date = data['request'];
-
-    if (estado_read_date == "Success") {
-      estado_clinico = data['estado_users'];
-      id_paciente = data['id_paciente'];
+    if (responseDecoder['status'] == "Success") {
+      estado_clinico = responseDecoder['data']['estado_users'];
+      id_paciente = responseDecoder['data']['id_paciente'];
     } else {
-      loginToast("Error en counsult preference");
+      loginToast(responseDecoder['data']);
     }
   }
 

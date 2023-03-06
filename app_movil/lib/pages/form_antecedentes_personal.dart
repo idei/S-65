@@ -91,8 +91,8 @@ getStringValuesSF() async {
 }
 
 guardar_datos(BuildContext context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/user_antec_personales.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/save_antec_personales";
   var response = await http.post(url, body: {
     "email": email,
     "retraso": retraso.toString(),
@@ -159,8 +159,8 @@ _alert_informe(context, message, colorNumber) {
 read_datos_paciente() async {
   await getStringValuesSF();
 
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/user_read_antc_personales.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/user_read_antc_personales";
   var response = await http.post(url, body: {
     "email": email,
     "cod_event_retraso": cod_event_retraso,
@@ -453,17 +453,6 @@ String cod_event_trastorno = 'TB';
 String cod_event_esquizofrenia = 'ESQ';
 String cod_event_enfermedad_desorden = 'EDG';
 String cod_event_intoxicaciones = 'INTOX';
-
-//--------------------------------------Consultar eventos -----------------------------------------
-
-getAllEventos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/eventos.php";
-  var response = await http.post(url, body: {});
-  print(response);
-  var jsonBody = response.body;
-  var data_evento = json.decode(jsonBody);
-}
 
 //-------------------------------------- RETRASO MENTAL -----------------------------------------------------
 

@@ -426,8 +426,8 @@ loginToast(String toast) {
 
 List itemsRadioList;
 Future<List> getAllRespuesta(var estado) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/tipo_respuesta_cdr.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_respuesta_cdr";
   var response = await http.post(url, body: {
     "estado": "${estado}",
   });
@@ -435,7 +435,7 @@ Future<List> getAllRespuesta(var estado) async {
   var jsonBody = response.body;
   var jsonDate = json.decode(jsonBody);
   if (response.statusCode == 200) {
-    return itemsRadioList = jsonDate;
+    return itemsRadioList = jsonDate['data'];
   } else {
     return null;
   }
@@ -467,8 +467,8 @@ guardar_datos(BuildContext context) async {
       cuid_personal != null) {
     showDialogMessage(context);
 
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta_screening_cdr.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_cdr";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),

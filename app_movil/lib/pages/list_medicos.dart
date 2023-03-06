@@ -171,8 +171,8 @@ get_preference() async {
 Future<List<MedicoModel>> fetchMedicos() async {
   await get_preference();
 
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/read_list_medicos.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/read_list_medicos";
   var response = await http.post(
     url,
     body: {
@@ -182,13 +182,12 @@ Future<List<MedicoModel>> fetchMedicos() async {
 
   var responseDecode = jsonDecode(response.body);
 
-  if (response.statusCode == 200 && responseDecode != 'Vacio') {
-    final items = json.decode(response.body).cast<Map<String, dynamic>>();
+  if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
+    final List<MedicoModel> medicos_items = [];
 
-    medicos_items = items.map<MedicoModel>((json) {
-      return MedicoModel.fromJson(json);
-    }).toList();
-
+    for (var medicamentos in responseDecode['data']) {
+      medicos_items.add(MedicoModel.fromJson(medicamentos));
+    }
     return medicos_items;
   } else {
     _isLoading = true;
