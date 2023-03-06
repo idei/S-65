@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
-import 'package:app_salud/pages/ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -68,8 +67,8 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -122,8 +121,8 @@ readRecordatorios() async {
 }
 
 guardarDatos(BuildContext context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/respuesta_screening_nutricional.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta_screening_nutricional";
   var response = await http.post(url, body: {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
@@ -310,17 +309,6 @@ String cod_event_nutri7 = 'NUTRI7';
 String cod_event_nutri8 = 'NUTRI8';
 String cod_event_nutri9 = "NUTRI9";
 String cod_event_nutri10 = 'NUTRI10';
-
-//--------------------------------------Consultar eventos -----------------------------------------
-
-getAllEventos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/eventos.php";
-  var response = await http.post(url, body: {});
-  print(response);
-  var jsonBody = response.body;
-  var data_evento = json.decode(jsonBody);
-}
 
 //-------------------------------------- NUTRICIONAL 1 -----------------------------------------------------
 

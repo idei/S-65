@@ -5,14 +5,12 @@ import 'package:provider/provider.dart';
 import '../models/recordatorio_model.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RecordatorioPage extends StatefulWidget {
   @override
   _RecordatorioState createState() => _RecordatorioState();
 }
 
-final _formKey_recordatorios = GlobalKey<_RecordatorioState>();
 List<RecordatoriosModel> recordatorios_items;
 bool _isLoading = false;
 var email_argument;
@@ -189,19 +187,27 @@ class _RecordatorioState extends State<RecordatorioPage> {
 
   Future<List<RecordatoriosModel>> read_recordatorios() async {
     var responseDecode;
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_recordatorios.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/recordatorios";
     var response = await http.post(url, body: {
       "email": email_argument,
     });
     responseDecode = json.decode(response.body);
 
-    if (response.statusCode == 200 && responseDecode != "Vacio") {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<RecordatoriosModel>((json) {
-        return RecordatoriosModel.fromJson(json);
-      }).toList();
-      return recordatorios_items;
+    if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
+      // recordatorios_items = items.map<RecordatoriosModel>((json) {
+      //   return RecordatoriosModel.fromJson(json);
+      // }).toList();
+      // return recordatorios_items;
+
+      final List<RecordatoriosModel> recordatorios_item = [];
+
+      for (var recordatorio in responseDecode['data']) {
+        recordatorios_item.add(RecordatoriosModel.fromJson(recordatorio));
+      }
+
+      return recordatorios_item;
     } else {
       _isLoading = true;
       return null;

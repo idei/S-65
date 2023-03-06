@@ -14,7 +14,7 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-List<MedicamentoModel> medicamentos_items;
+List<MedicamentoModel> listMedicamentos;
 
 TextEditingController dosis_frecuencia = TextEditingController();
 
@@ -140,19 +140,23 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 
   Future<List<MedicamentoModel>> read_medicamentos() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_medicamentos.php";
+    //String URL_base = Env.URL_PREFIX;
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/medicamentos";
     var response = await http.post(url, body: {
       "email": email_argument,
     });
 
+    var responseDecode = jsonDecode(response.body);
+
     if (response.statusCode == 200) {
-      if (response.body != '') {
-        final items = json.decode(response.body).cast<Map<String, dynamic>>();
-        medicamentos_items = items.map<MedicamentoModel>((json) {
-          return MedicamentoModel.fromJson(json);
-        }).toList();
-        return medicamentos_items;
+      if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+        final List<MedicamentoModel> listMedicamentos = [];
+
+        for (var medicamentos in responseDecode['data']) {
+          listMedicamentos.add(MedicamentoModel.fromJson(medicamentos));
+        }
+        return listMedicamentos;
       } else {
         isLoading = true;
         return null;

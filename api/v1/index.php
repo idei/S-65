@@ -67,6 +67,55 @@ Flight::route('POST /antecedentes_familiares_paciente', 'antecedentes_familiares
 // Read Respuestas Datos Clinicos
 Flight::route('POST /respuesta_datos_clinicos', 'respuesta_datos_clinicos');
 
+// Read Medicamentos
+Flight::route('POST /medicamentos','medicamentos_paciente');
+
+// Read Medicamentos Vademecum
+
+Flight::route('POST /medicamentos_vademecum','medicamentos_paciente_vademecum');
+
+// Read Avisos Pacientes
+ Flight::route('POST /avisos_paciente','avisos_paciente');
+
+ // Update Aviso
+ Flight::route('POST /update_estado_aviso','update_estado_aviso');
+
+ // Update Recordatorio Personal
+ Flight::route('POST /update_recordatorio_personal','update_recordatorio_personal');
+ 
+// Read Tipo de Screening
+Flight::route('POST /read_tipo_screening','read_tipo_screening');
+
+// Respuesta Screening Fisico
+Flight::route('POST /respuesta_screening_fisico','respuesta_screening_fisico');
+
+// Respuesta Screening Animo
+Flight::route('POST /respuesta_screening_animo','respuesta_screening_animo');
+
+// Respuesta Screening CDR
+Flight::route('POST /respuesta_screening_cdr','respuesta_screening_cdr');
+
+// Save Screening CDR
+Flight::route('POST /tipo_respuesta_conductual','tipo_respuesta_conductual');
+
+// Save Screening Nutricional
+Flight::route('POST /respuesta_screening_nutricional','respuesta_screening_nutricional');
+
+// Read tipo de respuesta
+Flight::route('POST /tipo_respuesta_quejas','tipo_respuesta_quejas');
+
+// Register User
+Flight::route('POST /user_register','user_register');
+
+// Read All Screenings
+Flight::route('POST /screenings','screenings');
+
+// read_code_screening
+Flight::route('POST /read_code_screening','read_code_screening');
+
+// Read Screenings
+Flight::route('POST /read_screenings','read_screenings');
+
 // --------------------------------------------------------------------------
 
 Flight::start();

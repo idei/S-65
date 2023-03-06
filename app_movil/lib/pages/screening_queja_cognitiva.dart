@@ -54,8 +54,8 @@ class _ScreeningBState extends State<ScreeningBPage> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -1387,10 +1387,9 @@ guardarDatos(BuildContext context) async {
                                                   loginToast(
                                                       "Debe responder si los item de Lenguajes");
                                                 } else {
-                                                  String URL_base =
-                                                      Env.URL_PREFIX;
+                                                  String URL_base = Env.URL_API;
                                                   var url = URL_base +
-                                                      "/respuesta_screening_quejas.php";
+                                                      "/respuesta_screening_quejas";
                                                   var response = await http
                                                       .post(url, body: {
                                                     "id_paciente":
@@ -1499,8 +1498,8 @@ class Atencion1WidgetState extends State<Atencion1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1554,8 +1553,8 @@ class Atencion2WidgetState extends State<Atencion2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1609,8 +1608,8 @@ class Atencion3WidgetState extends State<Atencion3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1664,8 +1663,8 @@ class Atencion4WidgetState extends State<Atencion4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1726,8 +1725,8 @@ class Orientacion1WidgetState extends State<Orientacion1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1781,8 +1780,8 @@ class Orientacion2WidgetState extends State<Orientacion2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1836,8 +1835,8 @@ class Orientacion3WidgetState extends State<Orientacion3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1891,8 +1890,8 @@ class Orientacion4WidgetState extends State<Orientacion4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -1954,8 +1953,8 @@ class FunEjec1WidgetState extends State<FunEjec1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2009,8 +2008,8 @@ class FunEjec2WidgetState extends State<FunEjec2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2064,8 +2063,8 @@ class FunEjec3WidgetState extends State<FunEjec3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2119,8 +2118,8 @@ class FunEjec4WidgetState extends State<FunEjec4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2182,8 +2181,8 @@ class Memoria1WidgetState extends State<Memoria1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2237,8 +2236,8 @@ class Memoria2WidgetState extends State<Memoria2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2292,8 +2291,8 @@ class Memoria3WidgetState extends State<Memoria3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2347,8 +2346,8 @@ class Memoria4WidgetState extends State<Memoria4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2409,8 +2408,8 @@ class PraxiaGnosia1WidgetState extends State<PraxiaGnosia1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2464,8 +2463,8 @@ class PraxiaGnosia2WidgetState extends State<PraxiaGnosia2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2519,8 +2518,8 @@ class PraxiaGnosia3WidgetState extends State<PraxiaGnosia3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2574,8 +2573,8 @@ class PraxiaGnosia4WidgetState extends State<PraxiaGnosia4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2636,8 +2635,8 @@ class Lenguaje1WidgetState extends State<Lenguaje1> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2691,8 +2690,8 @@ class Lenguaje2WidgetState extends State<Lenguaje2> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2746,8 +2745,8 @@ class Lenguaje3WidgetState extends State<Lenguaje3> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;
@@ -2801,8 +2800,8 @@ class Lenguaje4WidgetState extends State<Lenguaje4> {
   var list_view_alcohol;
 
   getAllRespuesta() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/tipo_respuesta_quejas.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
     var response = await http.post(url, body: {});
     print(response);
     var jsonBody = response.body;

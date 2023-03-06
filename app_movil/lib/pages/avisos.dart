@@ -11,7 +11,7 @@ class Avisos extends StatefulWidget {
   _AvisosState createState() => _AvisosState();
 }
 
-List<AvisosModel> recordatorios_items;
+List<AvisosModel> avisos_items;
 bool _isLoading = false;
 
 class _AvisosState extends State<Avisos> {
@@ -192,19 +192,21 @@ class _AvisosState extends State<Avisos> {
 
   Future<List<AvisosModel>> read_avisos() async {
     await getStringValuesSF();
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_avisos.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/avisos_paciente";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente_argument.toString(),
     });
     responseDecode = json.decode(response.body);
 
-    if (response.statusCode == 200 && responseDecode != 'Vacio') {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<AvisosModel>((json) {
-        return AvisosModel.fromJson(json);
-      }).toList();
-      return recordatorios_items;
+    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
+      final List<AvisosModel> avisos_items = [];
+
+      for (var avisos in responseDecode['data']) {
+        avisos_items.add(AvisosModel.fromJson(avisos));
+      }
+
+      return avisos_items;
     } else {
       _isLoading = true;
       return null;

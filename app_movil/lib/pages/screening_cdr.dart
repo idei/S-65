@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -54,8 +52,8 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });

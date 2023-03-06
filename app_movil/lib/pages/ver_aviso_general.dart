@@ -171,7 +171,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                         //primary: Color.fromRGBO(157, 19, 34, 1),
                         ),
                     onPressed: () {
-                      update_estado_recordartorio();
+                      update_aviso_paciente();
                       Navigator.of(context).pushReplacementNamed('/avisos');
                     },
                   ),
@@ -279,11 +279,13 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
     }
   }
 
-  update_estado_recordartorio() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/update_recordatorio_personal.php";
+  update_aviso_paciente() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/update_estado_aviso";
     var response = await http.post(url, body: {
-      "id_recordatorio": id_recordatorio.toString(),
+      "rela_aviso": id_aviso.toString(),
+      "rela_paciente": id_paciente.toString(),
+      "estado_leido": estado_aviso.toString(),
     });
 
     print(response.body);

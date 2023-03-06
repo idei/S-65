@@ -67,8 +67,8 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -122,11 +122,11 @@ delayScreeningAnimo() async {
   return true;
 }
 
-var resultadoScreening;
+var responseDecoder;
 
 guardar_datos(context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/respuesta_screening_animo.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta_screening_animo";
   var response = await http.post(url, body: {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
@@ -165,23 +165,25 @@ guardar_datos(context) async {
   });
 
   if (response.statusCode == 200) {
-    resultadoScreening = json.decode(response.body);
+    responseDecoder = json.decode(response.body);
 
-    _resetChecksFalse();
+    if (responseDecoder['status'] == "Success") {
+      _resetChecksFalse();
 
-    if (int.parse(resultadoScreening[1]) > 9) {
-      _alert_informe(
-        context,
-        "Para tener en cuenta",
-        "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
-      );
-    } else {
-      if (screening_recordatorio == true) {
-        Navigator.pushNamed(context, '/recordatorio');
+      if (int.parse(responseDecoder['data']) > 9) {
+        _alert_informe(
+          context,
+          "Para tener en cuenta",
+          "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
+        );
       } else {
-        Navigator.pushNamed(context, '/screening', arguments: {
-          "select_screening": "ÁNIMO",
-        });
+        if (screening_recordatorio == true) {
+          Navigator.pushNamed(context, '/recordatorio');
+        } else {
+          Navigator.pushNamed(context, '/screening', arguments: {
+            "select_screening": "ÁNIMO",
+          });
+        }
       }
     }
   } else {
@@ -478,17 +480,6 @@ String cod_event_inutil = 'ANI12';
 String cod_event_energia = 'ANI13';
 String cod_event_situacion = 'ANI14';
 String cod_event_situacion_mejor = 'ANI15';
-
-//--------------------------------------Consultar eventos -----------------------------------------
-
-getAllEventos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/eventos.php";
-  var response = await http.post(url, body: {});
-  print(response);
-  var jsonBody = response.body;
-  var data_evento = json.decode(jsonBody);
-}
 
 //-------------------------------------- ÄNIMO 1 -----------------------------------------------------
 

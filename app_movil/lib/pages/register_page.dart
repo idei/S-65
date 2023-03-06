@@ -72,7 +72,7 @@ class _FormRegisterState extends State<RegisterPage> {
 
   registerPaciente() async {
     String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/user_register.php";
+    var url = URL_base + "/user_register";
     var response = await http.post(url, body: {
       "email": emailPaciente.text,
       "password": passwordNuevo.text,
@@ -83,7 +83,7 @@ class _FormRegisterState extends State<RegisterPage> {
 
     var responseDecoder = json.decode(response.body);
 
-    if (responseDecoder['request'] == "Success" && response.statusCode == 200) {
+    if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
       Map userMap = json.decode(response.body);
       var newUsuarioModel = UsuarioModel.fromJson(userMap);
 
@@ -100,7 +100,7 @@ class _FormRegisterState extends State<RegisterPage> {
         "bandera": 1,
       });
     } else {
-      var error = response.statusCode + responseDecoder['request'];
+      var error = response.statusCode + responseDecoder['data'];
       loginToast(error.toString());
     }
   }

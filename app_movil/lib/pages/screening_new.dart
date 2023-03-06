@@ -83,59 +83,65 @@ class _NewScreeningState extends State<NewScreening> {
 }
 
 consult_code(BuildContext context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/read_code_screening.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/read_code_screening";
   var response = await http.post(url, body: {
     "id_screening": tipo_screening.toString(),
   });
   result_code = json.decode(response.body);
-  print(result_code);
 
-  if (result_code == "SFMS") {
-    Navigator.of(context).pushReplacementNamed('/screening_fisico', arguments: {
-      "tipo_screening": tipo_screening,
-      "bandera": "screening_nuevo"
-    });
-  } else {
-    if (result_code == "QCQ") {
-      Navigator.of(context).pushReplacementNamed('/screening_queja_cognitiva',
+  if (result_code['status'] == 'Success') {
+    result_code = result_code['data'];
+
+    if (result_code == "SFMS") {
+      Navigator.of(context).pushReplacementNamed('/screening_fisico',
           arguments: {
             "tipo_screening": tipo_screening,
             "bandera": "screening_nuevo"
           });
     } else {
-      if (result_code == "ANIMO") {
-        Navigator.of(context).pushReplacementNamed('/screening_animo',
+      if (result_code == "QCQ") {
+        Navigator.of(context).pushReplacementNamed('/screening_queja_cognitiva',
             arguments: {
               "tipo_screening": tipo_screening,
               "bandera": "screening_nuevo"
             });
       } else {
-        if (result_code == "CONDUC") {
-          Navigator.of(context).pushReplacementNamed('/screening_conductual',
+        if (result_code == "ANIMO") {
+          Navigator.of(context).pushReplacementNamed('/screening_animo',
               arguments: {
                 "tipo_screening": tipo_screening,
                 "bandera": "screening_nuevo"
               });
         } else {
-          if (result_code == "CDR") {
-            Navigator.of(context).pushReplacementNamed('/screening_cdr',
+          if (result_code == "CONDUC") {
+            Navigator.of(context).pushReplacementNamed('/screening_conductual',
                 arguments: {
                   "tipo_screening": tipo_screening,
                   "bandera": "screening_nuevo"
                 });
           } else {
-            if (result_code == "RNUTRI") {
-              Navigator.of(context)
-                  .pushReplacementNamed('/screening_nutricional', arguments: {
-                "tipo_screening": tipo_screening,
-                "bandera": "screening_nuevo"
-              });
+            if (result_code == "CDR") {
+              Navigator.of(context).pushReplacementNamed('/screening_cdr',
+                  arguments: {
+                    "tipo_screening": tipo_screening,
+                    "bandera": "screening_nuevo"
+                  });
+            } else {
+              if (result_code == "RNUTRI") {
+                Navigator.of(context)
+                    .pushReplacementNamed('/screening_nutricional', arguments: {
+                  "tipo_screening": tipo_screening,
+                  "bandera": "screening_nuevo"
+                });
+              }
             }
           }
         }
       }
     }
+  } else {
+    print(result_code['data']);
   }
 }
 
@@ -152,12 +158,11 @@ class _MyStatefulWidgetState extends State<FormScrinnings> {
   List data = List();
 
   Future getAllName() async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/screenings.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/screenings";
     var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     setState(() {
       data = jsonDate;
     });

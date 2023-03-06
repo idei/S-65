@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -70,8 +69,8 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   }
 
   getTipoScreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -193,8 +192,8 @@ readRecordatorios() async {
 var email;
 
 guardarDatosFisicos(var cant_check, BuildContext context) async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/respuesta_screening_fisico.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta_screening_fisico";
   var response = await http.post(url, body: {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
@@ -276,7 +275,7 @@ guardarDatosFisicos(var cant_check, BuildContext context) async {
 
   var responseDecoder = json.decode(response.body);
 
-  if (responseDecoder == "Success" && response.statusCode == 200) {
+  if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
     _resetChecksFalse();
     if (cant_check > 3) {
       guardarDatosFisicos(cant_check, context);
@@ -682,17 +681,6 @@ String cod_event_dificultad_calor_frio = 'DIFFR';
 String cod_event_problemas_gusto = 'PROGU';
 String cod_event_problemas_olfato = 'PROOL';
 String cod_event_dolor = 'DOLOR';
-
-//--------------------------------------Consultar eventos -----------------------------------------
-
-getAllEventos() async {
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/eventos.php";
-  var response = await http.post(url, body: {});
-  print(response);
-  var jsonBody = response.body;
-  var data_evento = json.decode(jsonBody);
-}
 
 //-------------------------------------- DOLOR DE CABEZA -----------------------------------------------------
 

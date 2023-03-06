@@ -56,8 +56,8 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -712,12 +712,14 @@ showDialogMessage(context) async {
       });
 }
 
-Future<List> getAllRespuesta({bool otro = false}) async {
+Future<List> getAllRespuesta({
+  bool otro = false,
+}) async {
   var response;
   var responseOtro;
 
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/tipo_respuesta_conductual.php";
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_respuesta_conductual";
 
   responseOtro = await http.post(url, body: {"otro": "otro"});
 
@@ -802,8 +804,8 @@ guardarDatosConductual(BuildContext context) async {
       id_conductual12 != null &&
       id_conductual13 != null) {
     showDialogMessage(context);
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/respuesta_screening_conductual.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_conductual";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),

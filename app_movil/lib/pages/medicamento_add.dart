@@ -22,46 +22,56 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   GlobalKey<AutoCompleteTextFieldState<Medicamentos_database>> key =
       GlobalKey();
 
-  static List<Medicamentos_database> users;
+  static List<Medicamentos_database> list_medicamentos_vademecum;
 
   bool loading = true;
 
   var usuarioModel;
 
-  void getUsers() async {
-    usuarioModel = Provider.of<UsuarioServices>(context);
+  void read_vademecum() async {
+    //usuarioModel = Provider.of<UsuarioServices>(context);
 
-    await getStringValuesSF(usuarioModel);
+    //await getStringValuesSF(usuarioModel);
     try {
-      String URL_base = Env.URL_PREFIX;
-      var url = URL_base + "/read_medicamentos_vademecum.php";
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/medicamentos_vademecum";
       var response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        users = loadMedicamento(response.body);
-        print('Users: ${users.length}');
+      var responseDecode = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+        list_medicamentos_vademecum = loadMedicamento(responseDecode);
         setState(() {
           loading = false;
         });
       } else {
-        print("Error getting medicamentos.");
+        if (responseDecode['status'] != "Vacio") {
+          print(responseDecode['status']);
+        }
       }
     } catch (e) {
       print("Error getting medicamentos.");
     }
   }
 
-  static List<Medicamentos_database> loadMedicamento(String jsonString) {
-    final parsed = json.decode(jsonString).cast<Map<String, dynamic>>();
-    return parsed
-        .map<Medicamentos_database>(
-            (json) => Medicamentos_database.fromJson(json))
-        .toList();
+  static List<Medicamentos_database> loadMedicamento(var jsonString) {
+    final List<Medicamentos_database> listMedicamentos = [];
+
+    for (var medicamentos in jsonString['data']) {
+      listMedicamentos.add(Medicamentos_database.fromJson(medicamentos));
+    }
+    return listMedicamentos;
+
+    // final parsed = json.decode(jsonString).cast<Map<String, dynamic>>();
+    // return parsed
+    //     .map<Medicamentos_database>(
+    //         (json) => Medicamentos_database.fromJson(json))
+    //     .toList();
   }
 
   @override
   void initState() {
-    getUsers();
+    read_vademecum();
     super.initState();
   }
 
@@ -124,7 +134,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                     AutoCompleteTextField<Medicamentos_database>(
                     key: key,
                     clearOnSubmit: false,
-                    suggestions: users,
+                    suggestions: list_medicamentos_vademecum,
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16.0,
