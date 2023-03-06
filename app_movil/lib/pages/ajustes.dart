@@ -261,17 +261,14 @@ modificar_pass(context) async {
     "password": password.text,
     "password_nuevo": password_nuevo.text,
   });
-  print(response);
-  var jsonBody = response.body;
-  var jsonDate = json.decode(jsonBody);
 
-  data = jsonDate;
-  if (data["estado"] == "Success") {
+  var jsonDate = json.decode(response.body);
+
+  if (jsonDate["status"] == "Success") {
     Navigator.pushNamed(context, '/ajustes');
   } else {
-    print(data["estado"]);
+    print(data["status"]);
   }
-  print(jsonDate);
 }
 
 modificar_email(context) async {
@@ -285,13 +282,12 @@ modificar_email(context) async {
   var jsonBody = response.body;
   var jsonDate = json.decode(jsonBody);
 
-  data = jsonDate;
-  if (data["estado"] == "Success") {
+  if (jsonDate["status"] == "Success") {
     update_email();
 
     Navigator.pushNamed(context, '/ajustes');
   } else {
-    print(data["estado"]);
+    print(jsonDate["status"]);
   }
   print(jsonDate);
 }

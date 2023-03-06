@@ -170,6 +170,10 @@ Flight::route('POST /modificar_email','modificar_email');
 // Modificar Pass
 Flight::route('POST /modificar_pass','modificar_pass');
 
+// Recuperar Pass
+Flight::route('POST /recuperar_pass','recuperar_pass');
+
+
 // --------------------------------------------------------------------------
 
 Flight::start();

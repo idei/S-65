@@ -80,11 +80,11 @@ Future get_pass() async {
 
   mensajeRetornado = json.decode(response.body);
 
-  if (mensajeRetornado['estado'] == "Success") {
+  if (mensajeRetornado['status'] == "Success") {
     print("Se ha recuperado la contraseña");
   } else {
     loginToast(
-        "No se ha recuperado la contraseña : " + mensajeRetornado['estado']);
+        "No se ha recuperado la contraseña : " + mensajeRetornado['status']);
   }
 
   return true;

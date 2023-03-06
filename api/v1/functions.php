@@ -2251,6 +2251,44 @@ function modificar_pass(){
     Flight::json($returnData);
 }
 
+function recuperar_pass(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+
+    if (isset($_POST['dni'])) {
+        $dni = $_POST["dni"];
+    } else {
+        $dni = verificar($data_input, "dni");
+    }
+    
+    try {
+        
+            $stmt = Flight::db()->prepare("SELECT users.password FROM `users` 
+            INNER JOIN  `pacientes` ON users.id = pacientes.rela_users WHERE pacientes.dni = '".$dni."'");
+            
+            $stmt->execute();
+            $result = $stmt->fetch();
+            
+            if ($stmt->rowCount() > 0) {
+                $lista = [
+                    "estado" => "Success",
+                    "password" => $result["password"]
+                ];
+                $returnData = msg("Success", $lista);
+            } else {
+                $returnData = msg("Vacio", []);
+            }
+       
+        } catch (PDOException $error) {
+
+            $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+        }
+    
+        Flight::json($returnData);
+}
+
 
 function update_estado_aviso(){
 
