@@ -210,32 +210,32 @@ class _ScreeningState extends State<ScreeningPage> {
   }
 
   List<ScreeningModel> recordatorios_items;
-  var data_error;
+  var data;
   var email_argument;
   var id_paciente;
 
   Future<List<ScreeningModel>> read_screenings() async {
     await getStringValuesSF();
+    List<ScreeningModel> list_sreenings = [];
 
-    String URL_base = Env.URL_PREFIX;
+    String URL_base = Env.URL_API;
     var url = URL_base + "/read_screenings";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "select_screening": select_screening,
     });
-    data_error = json.decode(response.body);
-    print(response.body);
+    data = json.decode(response.body);
 
-    if (data_error.toString() != 'Vacio') {
-      final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      recordatorios_items = items.map<ScreeningModel>((json) {
-        return ScreeningModel.fromJson(json);
-      }).toList();
-      return recordatorios_items;
+    if (data['status'] != 'Vacio') {
+      for (var recordatorio in data['data']) {
+        list_sreenings.add(ScreeningModel.fromJson(recordatorio));
+      }
+
+      return list_sreenings;
+    } else {
+      list_sreenings = [];
+      return list_sreenings;
     }
-
-    recordatorios_items = [];
-    return recordatorios_items;
   }
 
   void choiceAction(String choice) {

@@ -61,8 +61,8 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
       if (parametros["bandera"] == "screening_nuevo") {
         screening_recordatorio = false;
         id_paciente = id_paciente;
-        id_recordatorio = null;
-        id_medico = null;
+        id_recordatorio = "";
+        id_medico = "";
         //tipo_screening = parametros["tipo_screening"];
       }
     }
@@ -198,7 +198,7 @@ guardarDatosFisicos(var cant_check, BuildContext context) async {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
     "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening.toString(),
+    "tipo_screening": tipo_screening['data'].toString(),
     "cantidad": cant_check.toString(),
     "dolor_cabeza": dolor_cabeza.toString().toString(),
     "mareos": mareos.toString(),

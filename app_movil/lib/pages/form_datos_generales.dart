@@ -459,7 +459,7 @@ getAllNivelesEducativos() async {
 }
 
 getAllGrupoConviviente() async {
-  String URL_base = Env.URL_PREFIX;
+  String URL_base = Env.URL_API;
   var url = URL_base + "/deptos_generos";
   var response = await http.post(url, body: {"tipo": "4"});
   var responseBody = json.decode(response.body);

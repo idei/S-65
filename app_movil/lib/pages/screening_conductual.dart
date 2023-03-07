@@ -71,8 +71,8 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        _alert_clinicos(context, "Cuestionario NPI", " npiiiiiiiiiiiiii"));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
+        context, "Cuestionario Conductual", " Texto Introductivo "));
   }
 
   @override
@@ -729,8 +729,8 @@ Future<List> getAllRespuesta({
   var jsonDataOtro = json.decode(responseOtro.body);
 
   if (response.statusCode == 200 && (responseOtro.statusCode == 200)) {
-    itemsConductualOtro = jsonDataOtro;
-    return itemsConductual = jsonData;
+    itemsConductualOtro = jsonDataOtro['data'];
+    return itemsConductual = jsonData['data'];
   } else {
     return null;
   }
@@ -810,7 +810,7 @@ guardarDatosConductual(BuildContext context) async {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
       "id_conductual1": id_conductual1,
       "observaciones": otro.text,
       "id_conductual2": id_conductual2,
@@ -829,20 +829,22 @@ guardarDatosConductual(BuildContext context) async {
 
     var data = json.decode(response.body);
 
-    if (data == "alert") {
-      _alert_informe(
-        context,
-        "Para tener en cuenta",
-        "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-      );
-    } else {
-      if (data == "Success") {
-        if (screening_recordatorio == true) {
-          Navigator.pushNamed(context, '/recordatorio');
-        } else {
-          Navigator.pushNamed(context, '/screening', arguments: {
-            "select_screening": "CONDUC",
-          });
+    if (response.statusCode == 200) {
+      if (data['data'] == "alert") {
+        _alert_informe(
+          context,
+          "Para tener en cuenta",
+          "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+        );
+      } else {
+        if (data['status'] == "Success") {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "CONDUC",
+            });
+          }
         }
       }
     }

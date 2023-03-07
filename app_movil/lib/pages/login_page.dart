@@ -49,7 +49,8 @@ class _LoginPage extends State<LoginPage> {
     await consult_preference();
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    prefs.setInt("id_paciente", id_paciente);
+    prefs.setInt("id_paciente", int.parse(id_paciente));
+    prefs.setString("email", email.text);
   }
 
   consult_preference() async {

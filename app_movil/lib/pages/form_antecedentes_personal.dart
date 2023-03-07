@@ -85,7 +85,7 @@ var email;
 
 getStringValuesSF() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email_prefer");
+  String email_prefer = prefs.getString("email");
   email = email_prefer;
   print(email);
 }
@@ -186,128 +186,50 @@ read_datos_paciente() async {
   });
 
   //print(response.body);
-  var data = json.decode(response.body);
+  var responseData = json.decode(response.body);
 
-  if (data["estado"] == "Success") {
-    if (data["retraso"] == 1) {
-      retraso = true;
-    } else {
-      retraso = false;
-    }
+  if (responseData["status"] == "Success") {
+    var data = responseData['data'];
 
-    if (data["desorden"] == 1) {
-      desorden = true;
-    } else {
-      desorden = false;
-    }
+    retraso = data["retraso"] == "1" ? true : false;
 
-    if (data["deficit"] == 1) {
-      deficit = true;
-    } else {
-      deficit = false;
-    }
+    desorden = data["desorden"] == "1" ? true : false;
 
-    if (data["lesiones_cabeza"] == 1) {
-      lesiones_cabeza = true;
-    } else {
-      lesiones_cabeza = false;
-    }
+    deficit = data["deficit"] == "1" ? true : false;
 
-    if (data["perdidas"] == 1) {
-      perdidas = true;
-    } else {
-      perdidas = false;
-    }
+    lesiones_cabeza = data["lesiones_cabeza"] == "1" ? true : false;
 
-    if (data["accidentes_caidas"] == 1) {
-      accidentes_caidas = true;
-    } else {
-      accidentes_caidas = false;
-    }
+    perdidas = data["perdidas"] == "1" ? true : false;
 
-    if (data["lesiones_espalda"] == 1) {
-      lesiones_espalda = true;
-    } else {
-      lesiones_espalda = false;
-    }
+    accidentes_caidas = data["accidentes_caidas"] == "1" ? true : false;
 
-    if (data["infecciones"] == 1) {
-      infecciones = true;
-    } else {
-      infecciones = false;
-    }
+    lesiones_espalda = data["lesiones_espalda"] == "1" ? true : false;
 
-    if (data["toxinas"] == 1) {
-      toxinas = true;
-    } else {
-      toxinas = false;
-    }
+    infecciones = data["infecciones"] == "1" ? true : false;
 
-    if (data["acv"] == 1) {
-      acv = true;
-    } else {
-      acv = false;
-    }
+    toxinas = data["toxinas"] == "1" ? true : false;
 
-    if (data["demencia"] == 1) {
-      demencia = true;
-    } else {
-      demencia = false;
-    }
+    acv = data["acv"] == "1" ? true : false;
 
-    if (data["parkinson"] == 1) {
-      parkinson = true;
-    } else {
-      parkinson = false;
-    }
+    demencia = data["demencia"] == "1" ? true : false;
 
-    if (data["epilepsia"] == 1) {
-      epilepsia = true;
-    } else {
-      epilepsia = false;
-    }
+    parkinson = data["parkinson"] == "1" ? true : false;
 
-    if (data["esclerosis"] == 1) {
-      esclerosis = true;
-    } else {
-      esclerosis = false;
-    }
+    epilepsia = data["epilepsia"] == "1" ? true : false;
 
-    if (data["huntington"] == 1) {
-      huntington = true;
-    } else {
-      huntington = false;
-    }
+    esclerosis = data["esclerosis"] == "1" ? true : false;
 
-    if (data["depresion"] == 1) {
-      depresion = true;
-    } else {
-      depresion = false;
-    }
+    huntington = data["huntington"] == "1" ? true : false;
 
-    if (data["trastorno"] == 1) {
-      trastorno = true;
-    } else {
-      trastorno = false;
-    }
+    depresion = data["depresion"] == "1" ? true : false;
 
-    if (data["esquizofrenia"] == 1) {
-      esquizofrenia = true;
-    } else {
-      esquizofrenia = false;
-    }
+    trastorno = data["trastorno"] == "1" ? true : false;
 
-    if (data["enfermedad_desorden"] == 1) {
-      enfermedad_desorden = true;
-    } else {
-      enfermedad_desorden = false;
-    }
+    esquizofrenia = data["esquizofrenia"] == "1" ? true : false;
 
-    if (data["intoxicaciones"] == 1) {
-      intoxicaciones = true;
-    } else {
-      intoxicaciones = false;
-    }
+    enfermedad_desorden = data["enfermedad_desorden"] == "1" ? true : false;
+
+    intoxicaciones = data["intoxicaciones"] == "1" ? true : false;
   } else {
     //loginToast(data);
   }

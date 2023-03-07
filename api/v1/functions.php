@@ -129,7 +129,7 @@ function login_paciente()
             if ($result_paciente_count > 0) {
                 $result_paciente = $result_paciente->fetch();
 
-                //$id_paciente = $result_paciente['id'];
+                $id_paciente = $result_paciente['id'];
 
                 $rela_users = $result_paciente['rela_users'];
                 $rela_nivel_instruccion = $result_paciente['rela_nivel_instruccion'];
@@ -155,6 +155,7 @@ function login_paciente()
                         "rela_grupo_conviviente" => $rela_grupo_conviviente,
                         "rela_departamento" => $rela_departamento,
                         "rela_genero" => $rela_genero,
+                        "id_paciente" => $id_paciente,
                         "nombre" => $nombre,
                         "apellido" => $apellido,
                         "dni" => $dni,
@@ -174,11 +175,11 @@ function login_paciente()
                 // $lista = array ("request"=>"Error al iniciar sesión");
                 // echo json_encode($lista);
 
-                $returnData = msg_error("Fail Session", "Error al iniciar sesión", "0");
+                $returnData = msg_error("Fail Session", "El Email ingresado no corresponde a un paciente", "0");
             }
         } else {
 
-            $returnData = msg_error("Fail Session", "Error al iniciar sesión", "0");
+            $returnData = msg_error("Fail Session", "Email o Contraseña incorrectos", "0");
         }
     } catch (PDOException $error) {
 
@@ -1288,6 +1289,41 @@ function read_deptos_generos()
             }
 
             $returnData = msg("Success", $data);
+        }else{
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function read_recordatorio_medicos()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    if (isset($_POST['id_recordatorio'])) {
+        $id_recordatorio = $_POST["id_recordatorio"];
+    } else {
+        $id_recordatorio = verificar($data_input, "id_recordatorio");
+    }
+
+    try {
+    
+        $stmt = Flight::db()->prepare("SELECT medicos.id id_medico, medicos.nombre, medicos.apellido, medicos.dni, medicos.matricula, tipo_screening.nombre nombre_screening, tipo_screening.codigo codigo_screening
+        FROM recordatorios_medicos 
+        JOIN medicos ON medicos.id = recordatorios_medicos.rela_medico 
+        JOIN tipo_screening ON tipo_screening.id = recordatorios_medicos.rela_screening 
+        WHERE recordatorios_medicos.id = '" . $id_recordatorio . "'" );
+
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $result = $stmt->fetch();
+
+            $returnData = msg("Success", $result);
         }else{
             $returnData = msg("Vacio", []);
         }
@@ -2466,9 +2502,12 @@ function respuesta_screening_fisico(){
         $id_paciente = verificar($data_input, "id_paciente");
     }
 
+    $id_medico = "";
     if (isset($_POST['id_medico'])) {
         $id_medico = $_POST["id_medico"];
+        $id_medico = $id_medico == "" ? "null" : $id_medico;
     } else {
+        $id_medico = $id_medico == "" ? "null" : $id_medico;
         $id_medico = verificar($data_input, "id_medico");
     }
 
@@ -2478,9 +2517,12 @@ function respuesta_screening_fisico(){
         $tipo_screening = verificar($data_input, "tipo_screening");
     }
 
+    $id_recordatorio = "";
     if (isset($_POST['id_recordatorio'])) {
         $recordatorio_medico = $_POST["id_recordatorio"];
+        $recordatorio_medico = $recordatorio_medico == "" ? null : $recordatorio_medico;
     } else {
+        $recordatorio_medico = $id_recordatorio == "" ? null : $id_recordatorio;
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
 
@@ -2503,7 +2545,7 @@ if ($recordatorio_medico == "null") {
     $recordatorio_medico = null;
 }
 
-
+$id_medico = null;
 // Guardamos el resultado del screening
 
 $insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
@@ -2515,11 +2557,13 @@ $insert_resultado->bindParam(3, $id_medico);
 $insert_resultado->bindParam(4, $result_screening);
 
 $insert_resultado->execute();
+
 $last->execute();
 
 $id_respuesta = $insert_resultado->fetch();
 $last = $last->fetch();
 $id_respuesta = $last["id"];
+
 
 //--------------------------------------------------
 $dolor_cabeza = $_POST['dolor_cabeza']== "true" ? 1 : 0;
@@ -2642,7 +2686,7 @@ try {
 
     $select_evento->execute();
     $evento = $select_evento->fetchAll();
-
+    
 
     foreach ($evento as $eventos) {
 
@@ -3092,13 +3136,16 @@ try {
     pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
     $rela_estado_recordatorio = 2;
+    $data = [
+        'rela_estado_recordatorio' => $rela_estado_recordatorio,
+        'recordatorio_medico' => $recordatorio_medico,
+    ];
     $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                 SET rela_estado_recordatorio=:rela_estado_recordatorio
                 WHERE id=:recordatorio_medico");
 
-    $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]);
-
-    //echo json_encode("Success");
+    $update_estado_recordatorio->execute($data);
+   
     $returnData = msg("Success", []);
  } catch (PDOException $error) {
 
@@ -3527,11 +3574,15 @@ try {
 
     if ($recordatorio_medico <> null) {
         $rela_estado_recordatorio = 2;
+        $data = [
+            'rela_estado_recordatorio' => $rela_estado_recordatorio,
+            'recordatorio_medico' => $recordatorio_medico,
+        ];
         $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                     SET rela_estado_recordatorio=:rela_estado_recordatorio
                     WHERE id=:recordatorio_medico");
     
-        $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+        $update_estado_recordatorio->execute($data); 
     }
 
     
@@ -3554,9 +3605,11 @@ Flight::json($returnData);
 
 function respuesta_screening_cdr(){
 
+    
     $data_input = json_decode(file_get_contents("php://input"), true);
 
     $returnData = [];
+
 
     if (isset($_POST['id_paciente'])) {
         $id_paciente = $_POST["id_paciente"];
@@ -3946,22 +3999,31 @@ try {
         }
     }
     
+    $data = [
+        'result_screening' => $result_screening,
+        'id_respuesta' => $id_respuesta,
+    ];
+
     $update_resultado = Flight::db()->prepare("UPDATE resultados_screenings
                     SET result_screening=:result_screening
                     WHERE id=:id_respuesta");
     
-        $update_resultado->execute([$result_screening, $id_respuesta]); 
+        $update_resultado->execute($data); 
 
     //Call our custom function.
     pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
     if ($recordatorio_medico <> null) {
         $rela_estado_recordatorio = 2;
+        $data = [
+            'rela_estado_recordatorio' => $rela_estado_recordatorio,
+            'recordatorio_medico' => $recordatorio_medico,
+        ];
         $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                     SET rela_estado_recordatorio=:rela_estado_recordatorio
                     WHERE id=:recordatorio_medico");
     
-        $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+        $update_estado_recordatorio->execute($data); 
     }
 
     if ($result_screening > 1) {
@@ -4011,11 +4073,11 @@ function tipo_respuesta_conductual(){
 }
 
 function respuesta_screening_conductual(){
-
+   
     $data_input = json_decode(file_get_contents("php://input"), true);
 
     $returnData = [];
-
+    
     if (isset($_POST['id_conductual1'])) {
         $id_conductual1 = $_POST["id_conductual1"];
     } else {
@@ -4093,10 +4155,12 @@ function respuesta_screening_conductual(){
     } else {
         $id_conductual13 = verificar($data_input, "id_conductual13");
     }
-
+    $otro_observaciones = "";
     if (isset($_POST['observaciones'])) {
-        $otro_observaciones = $_POST["observaciones"];
+         $otro_observaciones = $_POST["observaciones"];
+         $otro_observaciones = $otro_observaciones == "" ? null : $otro_observaciones;
     } else {
+        $otro_observaciones = $otro_observaciones == "" ? null : $otro_observaciones;
         $otro_observaciones = verificar($data_input, "observaciones");
     }
 
@@ -4138,7 +4202,7 @@ function respuesta_screening_conductual(){
         $recordatorio_medico = null;
     }
 
-
+    
     // Guardamos el resultado del screening
 
     $insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
@@ -4156,13 +4220,12 @@ function respuesta_screening_conductual(){
     $id_respuesta = $last["id"];
 
     //--------------------------------------------------
-
+    
 
 
     // SELECCION DE EVENTOS-------------------------------
     $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos` WHERE codigo_evento
-    IN ('COND1','COND2','COND3','COND4','COND5','COND6','COND7','COND8','COND9','COND10','COND11','COND12',
-    'COND13')");
+    IN ('COND1','COND2','COND3','COND4','COND5','COND6','COND7','COND8','COND9','COND10','COND11','COND12','COND13')");
 
     $select_evento->execute();
     $evento = $select_evento->fetchAll();
@@ -4181,7 +4244,7 @@ function respuesta_screening_conductual(){
     $resp_no_code->execute();
     $resp_no_code = $resp_no_code->fetch();
 
-
+    
 
  try {
     $fecha = date('Y/m/d');
@@ -4452,23 +4515,36 @@ function respuesta_screening_conductual(){
         }
 
     }
+    
+    $data_resultados_screenings = [
+        'result_screening' => $result_screening,
+        'id_respuesta' => $id_respuesta,
+    ];
 
     $update_resultado = Flight::db()->prepare("UPDATE resultados_screenings
                     SET result_screening=:result_screening
                     WHERE id=:id_respuesta");
     
-        $update_resultado->execute([$result_screening, $id_respuesta]); 
-
+        $update_resultado->execute($data_resultados_screenings); 
+       
     //Call our custom function.
     pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
+    
+    
 
     if ($recordatorio_medico <> null) {
         $rela_estado_recordatorio = 2;
+
+        $data_recordatorios_medicos = [
+            'rela_estado_recordatorio' => $rela_estado_recordatorio,
+            'recordatorio_medico' => $recordatorio_medico,
+        ];
+
         $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                     SET rela_estado_recordatorio=:rela_estado_recordatorio
                     WHERE id=:recordatorio_medico");
     
-        $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+        $update_estado_recordatorio->execute($data_recordatorios_medicos); 
     }
     
     if ($result_screening > 4) {
@@ -4880,6 +4956,598 @@ function tipo_respuesta_quejas(){
       }
     
     Flight::json($returnData);
+}
+
+function respuesta_screening_quejas(){
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    $id_ate1 = $_POST['id_ate1'];
+$id_ate2 = $_POST['id_ate2'];
+$id_ate3 = $_POST['id_ate3'];
+$id_ate4 = $_POST['id_ate4'];
+
+$id_ori1 = $_POST['id_ori1'];
+$id_ori2 = $_POST['id_ori2'];
+$id_ori3 = $_POST['id_ori3'];
+$id_ori4 = $_POST['id_ori4'];
+
+$id_funejec1 = $_POST['id_funejec1'];
+$id_funejec2 = $_POST['id_funejec2'];
+$id_funejec3 = $_POST['id_funejec3'];
+$id_funejec4 = $_POST['id_funejec4'];
+
+$id_memoria1 = $_POST['id_memoria1'];
+$id_memoria2 = $_POST['id_memoria2'];
+$id_memoria3 = $_POST['id_memoria3'];
+$id_memoria4 = $_POST['id_memoria4'];
+
+$id_prexgnosia1 = $_POST['id_prexgnosia1'];
+$id_prexgnosia2 = $_POST['id_prexgnosia2'];
+$id_prexgnosia3 = $_POST['id_prexgnosia3'];
+$id_prexgnosia4 = $_POST['id_prexgnosia4'];
+
+$id_leng1 = $_POST['id_leng1'];
+$id_leng2 = $_POST['id_leng2'];
+$id_leng3 = $_POST['id_leng3'];
+$id_leng4 = $_POST['id_leng4'];
+
+$id_paciente = $_POST['id_paciente']; 
+$id_medico = $_POST['id_medico'];
+
+
+$tipo_screening = $_POST['tipo_screening'];
+$recordatorio_medico = $_POST['id_recordatorio'];
+$estado = 1;
+
+
+if ($id_medico == "null") {
+    $id_medico = null;
+}
+
+if ($recordatorio_medico == "null") {
+    $recordatorio_medico = null;
+}
+
+
+
+// CALCULO DE RESULTADO
+
+$result_screening = 0;
+
+
+//--------------------------------------------------
+$stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES7','TRES8','TRES10','TRES9')");
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+        }
+
+foreach ($lista as $respuesta) {
+    if($id_ate1 == $respuesta['id']){
+       $result_screening +=$respuesta['ponderacion'];
+    }
+    if($id_ate2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+     if($id_ate3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+     if($id_ate4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_ori1 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_ori2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_ori3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_ori4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_funejec1 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_funejec2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_funejec3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_funejec4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_memoria1 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_memoria2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_memoria3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_memoria4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     
+     if($id_prexgnosia1 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_prexgnosia2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_prexgnosia3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_prexgnosia4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_leng1 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_leng2 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_leng3 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+     if($id_leng4 == $respuesta['id']){
+        $result_screening +=$respuesta['ponderacion'];
+     }
+
+}
+
+
+//--------------------------------------------------
+
+
+// Guardamos el resultado del screening
+
+$insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
+$last = Flight::db()->prepare('SELECT LAST_INSERT_ID() as id');
+
+$insert_resultado->bindParam(1, $tipo_screening);
+$insert_resultado->bindParam(2, $id_paciente);
+$insert_resultado->bindParam(3, $id_medico);
+$insert_resultado->bindParam(4, $result_screening);
+
+$insert_resultado->execute();
+$last->execute();
+
+$last = $last->fetch();
+$id_respuesta = $last["id"];
+
+
+// SELECCION DE EVENTOS
+$select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos` WHERE codigo_evento
+IN ('ATE1','ATE2','ATE3','ATE4','ARI1','ARI2','ARI3','ARI4','FUNE1','FUNE2','FUNE3','FUNE4',
+'MEM1','MEM2','MEM3','MEM4','PYG1','PYG2','PYG3','PYG4','LEN1','LEN2','LEN3','LEN4'
+)");
+
+$select_evento->execute();
+$evento = $select_evento->fetchAll();
+
+try {
+    $fecha = date('Y/m/d');
+
+    foreach ($evento as $eventos) {
+
+        if ($eventos["codigo_evento"] == "ATE1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ate1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ATE2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ate2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ATE3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ate3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ATE4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ate4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ARI1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ori1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ARI2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ori2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ARI3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ori3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "ARI4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_ori4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "FUNE1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_funejec1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "FUNE2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_funejec2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "FUNE3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_funejec3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "FUNE4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_funejec4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+
+        if ($eventos["codigo_evento"] == "MEM1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_memoria1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "MEM2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_memoria2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "MEM3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_memoria3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "MEM4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_memoria4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+
+        if ($eventos["codigo_evento"] == "PYG1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_prexgnosia1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "PYG2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_prexgnosia2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "PYG3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_prexgnosia3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "PYG4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_prexgnosia4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "LEN1") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_leng1,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "LEN2") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_leng2,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "LEN3") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_leng3,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+
+        if ($eventos["codigo_evento"] == "LEN4") {
+
+            $rowsToInsert[] = array(
+                'rela_tipo' => $id_leng4,
+                'rela_evento' => $eventos["id"],
+                'rela_tipo_screening' => $tipo_screening,
+                'rela_recordatorio_medico' => $recordatorio_medico,
+                'rela_paciente' => $id_paciente,
+                'estado' => $estado,
+                'fecha_alta' => $fecha,
+                'rela_resultado' => $id_respuesta,
+
+            );
+        }
+    }
+
+    //Call our custom function.
+    pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
+
+    if ($recordatorio_medico <> null) {
+        $rela_estado_recordatorio = 2;
+        $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
+                    SET rela_estado_recordatorio=:rela_estado_recordatorio
+                    WHERE id=:recordatorio_medico");
+    
+        $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+    }
+    
+    if ($result_screening > 20) {
+        $returnData = msg("Success", "alert");
+    }else{
+        $returnData = msg("Success", []);
+    }
+
+} catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+  }
+
+Flight::json($returnData);
 }
 
 function tipo_respuesta_cdr(){
@@ -6229,7 +6897,7 @@ function save_antec_personales(){
     
     
         try {
-                //$select_id_paciente = $db->prepare("SELECT pacientes.id FROM `pacientes` INNER JOIN users ON pacientes.rela_users = users.id WHERE users.email = '".$email."'");
+                //$select_id_paciente = Flight::db()->prepare("SELECT pacientes.id FROM `pacientes` INNER JOIN users ON pacientes.rela_users = users.id WHERE users.email = '".$email."'");
                 //$select_id_paciente->execute();
                 //$id_paciente= $select_id_paciente->fetch();
                 //$id_paciente= $id_paciente["pacientes.id"];
