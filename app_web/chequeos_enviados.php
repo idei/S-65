@@ -31,7 +31,7 @@ session_start();
             <!-- Content Header (Page header) -->
             <?php
             $titulo = "Chequeos";
-            include('./templates/content_header.php');
+            //include('./templates/content_header.php');
             ?>
 
             <!-- Main content -->

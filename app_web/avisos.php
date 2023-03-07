@@ -30,7 +30,7 @@
             <!-- Content Header (Page header) -->
             <?php
             $titulo = "Avisos";
-            include('./templates/content_header.php');
+            //include('./templates/content_header.php');
             ?>
 
             <!-- Main content -->

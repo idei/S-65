@@ -880,58 +880,7 @@ function read_datos_clinicos()
         if ($select_data_clinica->rowCount() > 0) {
             $result = $select_data_clinica->fetchAll();
                         
-
-            foreach ($result as $results) {
-                switch ($results['consume_alcohol']) {
-                   case "902":
-                       $results['consume_alcohol'] = "A veces (una vez al mes)";
-                       break;
-                   case "903":
-                       $results['consume_alcohol'] = "Con frecuencia (una vez por semana)";
-                       break;
-                   case "904":
-                       $results['consume_alcohol'] = "Siempre (casi todos los días)";
-                       break;
-               }
-               switch ($results["consume_marihuana"]) {
-                case "902":
-                    $results["consume_marihuana"] = "A veces (una vez al mes)";
-                    break;
-                case "903":
-                    $results["consume_marihuana"] = "Con frecuencia (una vez por semana)";
-                    break;
-                case "904":
-                    $results["consume_marihuana"] = "Siempre (casi todos los días)";
-                    break;
-            }
-            switch ($results["otras_drogas"]) {
-                case "902":
-                    $results["otras_drogas"] = "A veces (una vez al mes)";
-                    break;
-                case "903":
-                    $results["otras_drogas"] = "Con frecuencia (una vez por semana)";
-                    break;
-                case "904":
-                    $results["otras_drogas"] = "Siempre (casi todos los días)";
-                    break;
-            }
-
-            switch ($results["fuma_tabaco"]) {
-                case 902:
-                    $results["fuma_tabaco"] = "A veces (una vez al mes)";
-                    break;
-                case 903:
-                    $results["fuma_tabaco"] = "Con frecuencia (una vez por semana)";
-                    break;
-                case 904:
-                    $results["fuma_tabaco"] = "Siempre (casi todos los días)";
-                    break;
-            }
-
-               
-            }
-
-            $returnData = msg("Success", $results);
+            $returnData = msg("Success", $result);
 
         } else {
 

@@ -24,7 +24,7 @@
       <img src="dist/img/logo.png" class="img-fluid" alt="Responsive image">
       </div>
       <div class="card-body">
-        <p class="login-box-msg">Cuenta de Doctores</p>
+        <p class="login-box-msg">Acceso para Médicos</p>
 
         <form action="../index3.html" method="post">
           <div class="input-group mb-3">

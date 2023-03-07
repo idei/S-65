@@ -228,7 +228,7 @@ $id_paciente = $_POST["id_paciente"];
     function buscar() {
       chequeos_paciente();
       var settings = {
-        "url": "http://localhost/S-65/api/v1/datos_personales",
+        "url": "../api/v1/datos_personales",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -282,7 +282,7 @@ $id_paciente = $_POST["id_paciente"];
       var estado;
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/chequeos_medico_paciente",
+        "url": "../api/v1/chequeos_medico_paciente",
         "method": "POST",
         "data": JSON.stringify({
           "email": "<?php echo $_SESSION['email']; ?>",
@@ -353,7 +353,7 @@ $id_paciente = $_POST["id_paciente"];
     function antecedentesP() {
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/antecedentes_personales",
+        "url": "../api/v1/antecedentes_personales",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -392,7 +392,7 @@ $id_paciente = $_POST["id_paciente"];
 
     function antecedentesF() {
       var settings = {
-        "url": "http://localhost/S-65/api/v1/antecedentes_familiares",
+        "url": "../api/v1/antecedentes_familiares",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -475,7 +475,7 @@ $id_paciente = $_POST["id_paciente"];
       var estado;
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/datos_clinicos",
+        "url": "../api/v1/datos_clinicos",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",

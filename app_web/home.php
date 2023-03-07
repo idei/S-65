@@ -38,7 +38,7 @@ echo Env::$_URL_API;
 
       <?php
       $titulo = "Mis Pacientes";
-      include('./templates/content_header.php');
+      //include('./templates/content_header.php');
       ?>
 
       <!-- Main content -->
