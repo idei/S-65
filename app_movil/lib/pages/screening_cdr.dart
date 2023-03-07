@@ -473,7 +473,7 @@ guardar_datos(BuildContext context) async {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
       "memoria": memoria,
       "orientacion": orientacion,
       "juicio_res_problema": juicio_res_problema,

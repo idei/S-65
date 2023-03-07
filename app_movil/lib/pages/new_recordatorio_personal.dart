@@ -118,7 +118,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
 
 getStringValuesSF() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email_prefer");
+  String email_prefer = prefs.getString("email");
 
   email = email_prefer;
   print(email);

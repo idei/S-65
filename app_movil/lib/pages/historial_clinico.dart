@@ -185,7 +185,7 @@ pdf_table() async {
   header.cells[10].value = 'Fuma Tabaco';
 
   for (var datas in data) {
-    for (var data_respuestas in data_respuesta) {
+    for (var data_respuestas in data_respuesta['data']) {
       if (datas["consume_alcohol"] == data_respuestas["id"]) {
         consume_alcohol = data_respuestas["respuesta"];
       }

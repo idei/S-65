@@ -278,7 +278,7 @@ guardarDatosFisicos(var cant_check, BuildContext context) async {
   if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
     _resetChecksFalse();
     if (cant_check > 3) {
-      guardarDatosFisicos(cant_check, context);
+      //guardarDatosFisicos(cant_check, context);
       _alertInforme(
         context,
         "Para tener en cuenta",

@@ -150,10 +150,12 @@ guardar_datos(BuildContext context) async {
     "cod_event_colesterol": cod_event_colesterol,
   });
 
-  print(response.body);
-  if (response.body == '"Success"') {
-    _alert_informe(context, "Antecedentes Guardados", 1);
-    Navigator.pushNamed(context, '/antecedentes_familiares');
+  var responseDecoder = json.decode(response.body);
+  if (response.statusCode == 200) {
+    if (responseDecoder["status"] == "Success") {
+      _alert_informe(context, "Antecedentes Guardados", 1);
+      Navigator.pushNamed(context, '/antecedentes_familiares');
+    }
   }
 }
 

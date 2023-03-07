@@ -131,7 +131,7 @@ guardar_datos(context) async {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
     "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening.toString(),
+    "tipo_screening": tipo_screening["data"].toString(),
     "satisfecho": satisfecho.toString().toString(),
     "abandonado": abandonado.toString(),
     "vacia": vacia.toString(),

@@ -34,7 +34,7 @@ class PacienteModel {
       id_paciente: json['id_paciente'],
       nombre: json['nombre'],
       apellido: json['apellido'],
-      dni: json['dni'],
+      dni: json['dni'].toString(),
       estado_users: json['estado_users'],
       rela_users: json['rela_users'].toString(),
       rela_genero: json['rela_genero'].toString(),
@@ -69,6 +69,11 @@ class PacienteModel {
       celular: json['celular'],
       contacto: json['contacto'],
       estado_users: json['estado_users'],
+      //-----------
+      rela_users: json['rela_users'].toString(),
+      nombre: json['nombre'],
+      apellido: json['apellido'],
+      dni: json['dni'],
     );
   }
 }

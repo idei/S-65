@@ -137,10 +137,12 @@ guardar_datos(BuildContext context) async {
     "cod_event_intoxicaciones": cod_event_intoxicaciones,
   });
 
-  print(response.body);
-  if (response.body == '"Success"') {
-    _alert_informe(context, "Antecedentes Guardados", 1);
-    Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
+  var responseDecoder = json.decode(response.body);
+  if (response.statusCode == 200) {
+    if (responseDecoder["status"] == "Success") {
+      _alert_informe(context, "Antecedentes Guardados", 1);
+      Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
+    }
   }
 }
 

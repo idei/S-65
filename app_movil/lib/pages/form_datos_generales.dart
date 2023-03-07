@@ -327,7 +327,7 @@ class _FormpruebaState extends State<Formprueba> {
       "nombre": nombre.text,
       "apellido": apellido.text,
       "dni": dni.text,
-      "fecha_nacimiento": fecha_nacimiento.text,
+      "fecha_nacimiento": fecha_nacimiento.text.toString(),
       "email": email_argument.toString(),
       "rela_genero": rela_genero.toString(),
       "rela_departamento": rela_departamento.toString(),
@@ -341,11 +341,11 @@ class _FormpruebaState extends State<Formprueba> {
 
     var responseDecoder = json.decode(response.body);
 
-    if (response.statusCode == 200 && responseDecoder["request"] == 'Success') {
-      Map userMap = json.decode(response.body);
+    if (response.statusCode == 200 && responseDecoder["status"] == 'Success') {
+      var userMap = json.decode(response.body);
 
       usuarioModel.usuario.paciente =
-          PacienteModel.fromJsonFromRegisterComplete(userMap);
+          PacienteModel.fromJsonFromRegisterComplete(userMap['data']);
 
       _alert_informe(context, "Datos Guardados Exitosamente", 1);
 

@@ -1991,7 +1991,9 @@ function save_dosis_frecuencia(){
             'id_medicamento' => $id_medicamento,
         ];
         $update_pass = Flight::db()->prepare("UPDATE medicamento_paciente
-                    SET dosis_frecuencia=:dosis_frecuencia
+                    SET dosis_frecuencia=:dosis_frecuencia,
+                    rela_paciente=: id_paciente,
+                    rela_medicamento=: id_medicamento
                     WHERE rela_paciente=:id_paciente and rela_medicamento=:id_medicamento");
 
         $update_pass->execute($data);
@@ -2504,10 +2506,12 @@ function respuesta_screening_fisico(){
 
     $id_medico = "";
     if (isset($_POST['id_medico'])) {
-        $id_medico = $_POST["id_medico"];
-        $id_medico = $id_medico == "" ? "null" : $id_medico;
+        if ($_POST["id_medico"] === "null") {
+            $id_medico = null;
+        }else{
+            $id_medico = $_POST["id_medico"];
+        }
     } else {
-        $id_medico = $id_medico == "" ? "null" : $id_medico;
         $id_medico = verificar($data_input, "id_medico");
     }
 
@@ -2517,12 +2521,14 @@ function respuesta_screening_fisico(){
         $tipo_screening = verificar($data_input, "tipo_screening");
     }
 
-    $id_recordatorio = "";
     if (isset($_POST['id_recordatorio'])) {
-        $recordatorio_medico = $_POST["id_recordatorio"];
-        $recordatorio_medico = $recordatorio_medico == "" ? null : $recordatorio_medico;
+        if ($_POST["id_recordatorio"] === "null") {
+            $recordatorio_medico = null;
+        }else{
+            $recordatorio_medico = $_POST["id_medico"];
+        }
     } else {
-        $recordatorio_medico = $id_recordatorio == "" ? null : $id_recordatorio;
+       
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
 
@@ -2537,15 +2543,6 @@ function respuesta_screening_fisico(){
 $estado = 1;
 
 
-if ($id_medico == "null") {
-    $id_medico = null;
-}
-
-if ($recordatorio_medico == "null") {
-    $recordatorio_medico = null;
-}
-
-$id_medico = null;
 // Guardamos el resultado del screening
 
 $insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
@@ -3169,7 +3166,12 @@ function respuesta_screening_animo(){
     }
 
     if (isset($_POST['id_medico'])) {
-        $id_medico = $_POST["id_medico"];
+        
+        if ($_POST["id_medico"] === "null") {
+            $id_medico = null;
+        }else{
+            $id_medico = $_POST["id_medico"];
+        }
     } else {
         $id_medico = verificar($data_input, "id_medico");
     }
@@ -3181,7 +3183,13 @@ function respuesta_screening_animo(){
     }
 
     if (isset($_POST['id_recordatorio'])) {
-        $recordatorio_medico = $_POST["id_recordatorio"];
+        
+        if ($_POST["id_recordatorio"] === "null") {
+            $recordatorio_medico = null;
+        }else{
+            $recordatorio_medico = $_POST["id_recordatorio"];
+        }
+        //$recordatorio_medico = $recordatorio_medico == "null" ?: null;
     } else {
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
@@ -3191,9 +3199,10 @@ $estado = 1;
 
 $result_screening = 0;
 
-$id_medico = $id_medico == "null" ?: null;
 
-$recordatorio_medico = $recordatorio_medico == "null" ?: null;
+// Flight::json("salida". $id_medico . " ". $recordatorio_medico." ". $tipo_screening);
+// exit;
+
 
 if ($_POST['satisfecho'] == "true") {
     $satisfecho = 1;
@@ -3328,12 +3337,14 @@ $insert_resultado->bindParam(2, $id_paciente);
 $insert_resultado->bindParam(3, $id_medico);
 $insert_resultado->bindParam(4, $result_screening);
 
-$insert_resultado->execute();
+$respuestabool = $insert_resultado->execute();
 $last->execute();
 
 $last = $last->fetch();
 $id_respuesta = $last["id"];
 
+// Flight::json("salida". $respuestabool );
+// exit;
 //--------------------------------------------------
 
 
@@ -3618,13 +3629,23 @@ function respuesta_screening_cdr(){
     }
 
     if (isset($_POST['id_medico'])) {
-        $id_medico = $_POST["id_medico"];
+        if ($_POST["id_medico"]==="null") {
+            $id_medico = null;
+        } else {
+            $id_medico = $_POST["id_medico"];
+        }        
+        
     } else {
         $id_medico = verificar($data_input, "id_medico");
     }
 
     if (isset($_POST['id_recordatorio'])) {
-        $recordatorio_medico = $_POST["id_recordatorio"];
+        
+        if ($_POST["id_recordatorio"]==="null") {
+            $recordatorio_medico = null;
+        } else {
+            $recordatorio_medico = $_POST["id_recordatorio"];
+        }
     } else {
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
@@ -3673,14 +3694,6 @@ function respuesta_screening_cdr(){
 
 
     $estado = 1;
-
-if ($id_medico == "null") {
-    $id_medico = null;
-}
-
-if ($recordatorio_medico == "null") {
-    $recordatorio_medico = null;
-}
 
 
 $result_screening = 0;
@@ -4171,7 +4184,11 @@ function respuesta_screening_conductual(){
     }
 
     if (isset($_POST['id_medico'])) {
-        $id_medico = $_POST["id_medico"];
+        if ($_POST["id_medico"] === "null") {
+            $id_medico = null;
+        }else{
+            $id_medico = $_POST["id_medico"];
+        }
     } else {
         $id_medico = verificar($data_input, "id_medico");
     }
@@ -4183,7 +4200,12 @@ function respuesta_screening_conductual(){
     }
 
     if (isset($_POST['id_recordatorio'])) {
-        $recordatorio_medico = $_POST["id_recordatorio"];
+        if ($_POST["id_recordatorio"] === "null") {
+            $recordatorio_medico = null;
+        }else{
+            $recordatorio_medico = $_POST["id_medico"];
+        }
+        
     } else {
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
@@ -4192,15 +4214,6 @@ function respuesta_screening_conductual(){
     $estado = 1;
 
     $result_screening = 0;
-
-
-    if ($id_medico == "null") {
-        $id_medico = null;
-    }
-
-    if ($recordatorio_medico == "null") {
-        $recordatorio_medico = null;
-    }
 
     
     // Guardamos el resultado del screening
@@ -4578,7 +4591,11 @@ function respuesta_screening_nutricional(){
     }
 
     if (isset($_POST['id_medico'])) {
-        $id_medico = $_POST["id_medico"];
+        if ($_POST['id_medico']=== "null") {
+            $id_medico = null;
+        } else {
+            $id_medico = $_POST['id_medico'];
+        }
     } else {
         $id_medico = verificar($data_input, "id_medico");
     }
@@ -4590,26 +4607,20 @@ function respuesta_screening_nutricional(){
     }
 
     if (isset($_POST['id_recordatorio'])) {
-        $recordatorio_medico = $_POST["id_recordatorio"];
+        if ($_POST['id_recordatorio']=== "null") {
+            $recordatorio_medico = null;
+        } else {
+            $recordatorio_medico = $_POST['id_recordatorio'];
+        }
     } else {
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
 
-   
     $estado = 1;
     
     
     $result_screening = 0;
-    
-    
-    if ($id_medico == "null") {
-        $id_medico = null;
-    }
-    
-    if ($recordatorio_medico == "null") {
-        $recordatorio_medico = null;
-    }
-    
+      
     
     if ($_POST['nutri1'] == "true") {
         $nutri1 = 1;
@@ -4763,9 +4774,6 @@ function respuesta_screening_nutricional(){
         $select_evento->execute();
         $evento = $select_evento->fetchAll();
         
-        
-        echo($evento);
-        var_dump($cod_event_nutri1);
     
         foreach ($evento as $eventos) {
     
@@ -4907,12 +4915,19 @@ function respuesta_screening_nutricional(){
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
     
         if ($recordatorio_medico <> null) {
+            
             $rela_estado_recordatorio = 2;
+
+            $data = [
+                'rela_estado_recordatorio' => $rela_estado_recordatorio,
+                'recordatorio_medico' => $recordatorio_medico,
+            ];
+
             $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                         SET rela_estado_recordatorio=:rela_estado_recordatorio
                         WHERE id=:recordatorio_medico");
         
-            $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+            $update_estado_recordatorio->execute($data); 
         }
     
         if ($result_screening <=2) {
@@ -4995,22 +5010,22 @@ $id_leng3 = $_POST['id_leng3'];
 $id_leng4 = $_POST['id_leng4'];
 
 $id_paciente = $_POST['id_paciente']; 
-$id_medico = $_POST['id_medico'];
+
+if ($_POST['id_medico']=== "null") {
+    $id_medico = null;
+} else {
+    $id_medico = $_POST['id_medico'];
+}
+
+if ($_POST['id_recordatorio']=== "null") {
+    $recordatorio_medico = null;
+} else {
+    $recordatorio_medico = $_POST['id_recordatorio'];
+}
 
 
 $tipo_screening = $_POST['tipo_screening'];
-$recordatorio_medico = $_POST['id_recordatorio'];
 $estado = 1;
-
-
-if ($id_medico == "null") {
-    $id_medico = null;
-}
-
-if ($recordatorio_medico == "null") {
-    $recordatorio_medico = null;
-}
-
 
 
 // CALCULO DE RESULTADO
@@ -5529,11 +5544,17 @@ try {
 
     if ($recordatorio_medico <> null) {
         $rela_estado_recordatorio = 2;
+
+        $data = [
+            'rela_estado_recordatorio' => $rela_estado_recordatorio,
+            'recordatorio_medico' => $recordatorio_medico,
+        ];
+
         $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
                     SET rela_estado_recordatorio=:rela_estado_recordatorio
                     WHERE id=:recordatorio_medico");
     
-        $update_estado_recordatorio->execute([$rela_estado_recordatorio, $recordatorio_medico]); 
+        $update_estado_recordatorio->execute($data); 
     }
     
     if ($result_screening > 20) {
@@ -7348,15 +7369,35 @@ function save_datos_personales(){
     } else {
         $estado_users = verificar($data_input, "estado_users");
     }
+
+    if (isset($_POST['rela_users'])) {
+        $rela_users = $_POST["rela_users"];
+    } else {
+        $rela_users = verificar($data_input, "rela_users");
+    }
     
     
         try {            
-                $select_email = Flight::db()->prepare("SELECT id FROM users WHERE email = '".$email."'");
-                $select_email->execute();
-                $rela_users= $select_email->fetch();
-                $rela_users= $rela_users["id"];
-
+                // $select_email = Flight::db()->prepare("SELECT id FROM users WHERE email = '".$email."'");
+                // $select_email->execute();
+                // $rela_users= $select_email->fetch();
+                // $rela_users= $rela_users["id"];
                 
+                $data = [
+                    'nombre' => $nombre,
+                    'apellido' => $apellido,
+                    'dni' => $dni,
+                    'fecha_nacimiento' => $fecha_nacimiento, 
+                    'rela_genero' => $rela_genero,
+                    'rela_nivel_instruccion' => $rela_nivel_instruccion,
+                    'rela_grupo_conviviente' => $rela_grupo_conviviente,
+                    'celular' => $celular, 
+                    'contacto' => $contacto,
+                    'rela_departamento' => $rela_departamento,
+                    'estado_users' => $estado_users,
+                    'rela_users' => $rela_users
+                ];
+
                 $insert_paciente = Flight::db()->prepare("UPDATE pacientes
                 SET nombre=:nombre, 
                 apellido=:apellido,
@@ -7368,14 +7409,16 @@ function save_datos_personales(){
                 celular=:celular, 
                 contacto=:contacto,
                 rela_departamento=:rela_departamento,
-                estado_users=:estado_users
+                estado_users=:estado_users,
+                rela_users=:rela_users
                 WHERE rela_users=:rela_users");
                 
 
-                $insert_paciente->execute([$nombre,$apellido,$dni,$fecha_nacimiento,$rela_genero,$rela_nivel_instruccion,$rela_grupo_conviviente,$celular,$contacto,$rela_departamento,$estado_users,$rela_users]);
-                
-                $listaRequest = array(
-					"request"=>"Success",
+                $insert_paciente->execute($data);
+                                
+                $lista = array("nombre"=>$nombre, 
+                    "apellido"=>$apellido,
+                    "dni"=>$dni, 
                     "rela_users"=>$rela_users,
 					"fecha_nacimiento"=>$fecha_nacimiento,
 					"rela_genero"=>$rela_genero,
@@ -7388,7 +7431,7 @@ function save_datos_personales(){
 
 				);
 
-    $returnData = msg("Success", $listaRequest);
+    $returnData = msg("Success", $lista);
 
  } catch (PDOException $error) {
 

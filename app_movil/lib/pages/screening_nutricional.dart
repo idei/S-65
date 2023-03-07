@@ -127,7 +127,7 @@ guardarDatos(BuildContext context) async {
     "id_paciente": id_paciente.toString(),
     "id_medico": id_medico.toString(),
     "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening.toString(),
+    "tipo_screening": tipo_screening['data'].toString(),
     "nutri1": nutri1.toString().toString(),
     "nutri2": nutri2.toString(),
     "nutri3": nutri3.toString(),
@@ -152,13 +152,13 @@ guardarDatos(BuildContext context) async {
 
   print(response.statusCode);
 
-  var data = json.decode(response.body);
+  var responseDecode = json.decode(response.body);
 
-  if (data != "Error") {
+  if (responseDecode != "Vacio") {
     _alert_informe(
       context,
       "Para tener en cuenta",
-      data,
+      responseDecode['data'],
     );
   } else {
     if (screening_recordatorio == true) {
@@ -170,7 +170,7 @@ guardarDatos(BuildContext context) async {
     }
   }
 
-  print(data);
+  print(responseDecode);
 }
 
 Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
