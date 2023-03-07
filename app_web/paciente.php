@@ -39,10 +39,11 @@ $id_paciente = $_POST["id_paciente"];
     <?php include('./templates/sidebar_template.php'); ?>
 
     <div class="content-wrapper">
+</br>
       <!-- Content Header (Page header) -->
       <?php
       $titulo = "";
-      include('./templates/content_header.php');
+     // include('./templates/content_header.php');
       ?>
 
       <!-- Main content -->
