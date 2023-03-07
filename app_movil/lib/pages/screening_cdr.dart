@@ -487,7 +487,7 @@ guardar_datos(BuildContext context) async {
     if (response.statusCode == 200) {
       _resetChecksNull();
 
-      if (responseDecoder == "Alert") {
+      if (responseDecoder['data'] == "Alert") {
         _alert_informe(
           context,
           "Para tener en cuenta",

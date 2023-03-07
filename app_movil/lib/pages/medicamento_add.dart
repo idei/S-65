@@ -29,13 +29,11 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   var usuarioModel;
 
   void read_vademecum() async {
-    //usuarioModel = Provider.of<UsuarioServices>(context);
-
     //await getStringValuesSF(usuarioModel);
     try {
       String URL_base = Env.URL_API;
-      var url = URL_base + "/medicamentos_vademecum";
-      var response = await http.get(url);
+      var url = URL_base + "/vademecum";
+      var response = await http.post(url, body: {});
 
       var responseDecode = jsonDecode(response.body);
 
@@ -98,7 +96,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
-
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
     return Scaffold(
       appBar: AppBar(
         title: Text("Buscador",
@@ -173,7 +171,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(),
               onPressed: () {
-                guardar_medicamento(data_id);
+                guardar_medicamento(int.parse(data_id));
               },
               child: Text('Guardar Datos',
                   style: TextStyle(

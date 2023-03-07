@@ -71,7 +71,7 @@ Flight::route('POST /respuesta_datos_clinicos', 'respuesta_datos_clinicos');
 Flight::route('POST /medicamentos','medicamentos_paciente');
 
 // Read Medicamentos Vademecum
-Flight::route('POST /medicamentos_vademecum','medicamentos_paciente_vademecum');
+Flight::route('POST /vademecum','medicamentos_paciente_vademecum');
 
 // Save Dosis de Medicamento
 Flight::route('POST /save_dosis_frecuencia','save_dosis_frecuencia');
@@ -107,6 +107,9 @@ Flight::route('POST /respuesta_screening_animo','respuesta_screening_animo');
 // Respuesta Screening CDR
 Flight::route('POST /respuesta_screening_cdr','respuesta_screening_cdr');
 
+// Respuesta Screening CDR
+Flight::route('POST /respuesta_screening_conductual','respuesta_screening_conductual');
+
 // Save Screening CDR
 Flight::route('POST /tipo_respuesta_conductual','tipo_respuesta_conductual');
 
@@ -115,6 +118,9 @@ Flight::route('POST /respuesta_screening_nutricional','respuesta_screening_nutri
 
 // Read tipo de respuesta quejas
 Flight::route('POST /tipo_respuesta_quejas','tipo_respuesta_quejas');
+
+// Read tipo de respuesta quejas
+Flight::route('POST /respuesta_screening_quejas','respuesta_screening_quejas');
 
 // Read tipo de respuesta CDR
 Flight::route('POST /tipo_respuesta_cdr','tipo_respuesta_cdr');
@@ -172,6 +178,10 @@ Flight::route('POST /modificar_pass','modificar_pass');
 
 // Recuperar Pass
 Flight::route('POST /recuperar_pass','recuperar_pass');
+
+// Read Recordatorios Medicos
+Flight::route('POST /read_recordatorio_medicos','read_recordatorio_medicos');
+
 
 
 // --------------------------------------------------------------------------

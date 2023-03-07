@@ -62,7 +62,7 @@ class _ScreeningBState extends State<ScreeningBPage> {
     print(response);
     var jsonDate = json.decode(response.body);
     print(jsonDate);
-    tipo_screening = jsonDate;
+    tipo_screening = jsonDate['data'];
   }
 
   @override
@@ -1431,11 +1431,11 @@ guardarDatos(BuildContext context) async {
                                                     "id_leng3": id_leng3,
                                                     "id_leng4": id_leng4,
                                                   });
-                                                  print(response.body);
+
                                                   var data = json
                                                       .decode(response.body);
-                                                  print(data);
-                                                  if (data == "alert") {
+
+                                                  if (data['data'] == "alert") {
                                                     _alert_informe(
                                                       context,
                                                       "Para tener en cuenta",
@@ -1505,7 +1505,7 @@ class Atencion1WidgetState extends State<Atencion1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1560,7 +1560,7 @@ class Atencion2WidgetState extends State<Atencion2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1615,7 +1615,7 @@ class Atencion3WidgetState extends State<Atencion3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1670,7 +1670,7 @@ class Atencion4WidgetState extends State<Atencion4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1732,7 +1732,7 @@ class Orientacion1WidgetState extends State<Orientacion1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1787,7 +1787,7 @@ class Orientacion2WidgetState extends State<Orientacion2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1842,7 +1842,7 @@ class Orientacion3WidgetState extends State<Orientacion3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1897,7 +1897,7 @@ class Orientacion4WidgetState extends State<Orientacion4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -1960,7 +1960,7 @@ class FunEjec1WidgetState extends State<FunEjec1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2015,7 +2015,7 @@ class FunEjec2WidgetState extends State<FunEjec2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2070,7 +2070,7 @@ class FunEjec3WidgetState extends State<FunEjec3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2125,7 +2125,7 @@ class FunEjec4WidgetState extends State<FunEjec4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2188,7 +2188,7 @@ class Memoria1WidgetState extends State<Memoria1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2243,7 +2243,7 @@ class Memoria2WidgetState extends State<Memoria2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2298,7 +2298,7 @@ class Memoria3WidgetState extends State<Memoria3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2353,7 +2353,7 @@ class Memoria4WidgetState extends State<Memoria4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2415,7 +2415,7 @@ class PraxiaGnosia1WidgetState extends State<PraxiaGnosia1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2470,7 +2470,7 @@ class PraxiaGnosia2WidgetState extends State<PraxiaGnosia2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2525,7 +2525,7 @@ class PraxiaGnosia3WidgetState extends State<PraxiaGnosia3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2580,7 +2580,7 @@ class PraxiaGnosia4WidgetState extends State<PraxiaGnosia4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2642,7 +2642,7 @@ class Lenguaje1WidgetState extends State<Lenguaje1> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2697,7 +2697,7 @@ class Lenguaje2WidgetState extends State<Lenguaje2> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2752,7 +2752,7 @@ class Lenguaje3WidgetState extends State<Lenguaje3> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }
@@ -2807,7 +2807,7 @@ class Lenguaje4WidgetState extends State<Lenguaje4> {
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     setState(() {
-      data = jsonDate;
+      data = jsonDate['data'];
     });
     print(jsonDate);
   }

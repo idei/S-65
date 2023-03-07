@@ -23,13 +23,14 @@ class _MedicamentoState extends State<MedicamentoPage> {
   bool isLoading = false;
   var email_argument;
   var usuarioModel;
+  var id_paciente;
 
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
 
     email_argument = usuarioModel.usuario.emailUser;
-
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -77,14 +78,16 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     icon: Icon(Icons.edit),
                                     color: Colors.green,
                                     onPressed: () {
-                                      _showAlertDialog(data.id_medicamento, 1);
+                                      _showAlertDialog(
+                                          int.parse(data.id_medicamento), 1);
                                     },
                                   ), // icon-1
                                   IconButton(
                                     icon: Icon(Icons.delete),
                                     color: Colors.red,
                                     onPressed: () {
-                                      _showAlertDialog(data.id_medicamento, 2);
+                                      _showAlertDialog(
+                                          int.parse(data.id_medicamento), 2);
                                     },
                                   ),
                                 ]),
@@ -150,7 +153,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
     var responseDecode = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
+      if (responseDecode['status'] != "Vacio") {
         final List<MedicamentoModel> listMedicamentos = [];
 
         for (var medicamentos in responseDecode['data']) {
@@ -206,7 +209,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
                 ElevatedButton(
                   //color: Colors.blue,
                   child: Text(
-                    "OK",
+                    "Guardar",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily:

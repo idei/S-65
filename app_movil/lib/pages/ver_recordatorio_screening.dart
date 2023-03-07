@@ -1,5 +1,12 @@
+import 'package:app_salud/models/recordatorio_model.dart';
+import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
+import 'package:provider/provider.dart';
+
+import 'env.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -17,7 +24,10 @@ var id_paciente;
 var id_medico;
 var rela_estado_recordatorio;
 var tipo_screening;
+var nombre_screening;
 var id_recordatorio;
+var recordatorioModel;
+var descripcion;
 
 class _VerRecordatorioState extends State<VerRecordatorio> {
   @override
@@ -25,15 +35,15 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     Map parametros = ModalRoute.of(context).settings.arguments;
     id_recordatorio = parametros["id_recordatorio"];
     id_paciente = parametros["id_paciente"];
-    id_medico = parametros["id_medico"];
     rela_estado_recordatorio = parametros["estado_recordatorio"];
     tipo_screening = parametros["tipo_screening"];
+    descripcion = parametros["descripcion"];
+
+    getRecordatorioMedico(id_recordatorio);
 
     return FutureBuilder(
         future: timer(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
           if (snapshot.hasData) {
             return Recordatorios(context);
           } else {
@@ -78,7 +88,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView(children: <Widget>[
-                  Text("El Doctor/a Kaiser" +
+                  Text("El Doctor/a $nombre_medico $apellido_medico" +
                       " le ha enviado el siguiente mensaje:"),
                   // Text("El Doctor/a $id_medico" +
                   //" le ha enviado el siguiente mensaje:"),
@@ -87,29 +97,63 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                   ),
                   //Text("Screening $tipo_screening: "),
                   Text(
-                      "Estimado paciente le envio para que complete el siguiente Screening de Síntomas Físicos: "),
+                      "Estimado paciente le envio para que complete el siguiente Screening de $nombre_screening : "),
 
                   SizedBox(
                     height: 20,
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      //if (tipo_screening == "SFMS") {
-                      Navigator.of(context).pushReplacementNamed(
-                          '/screening_fisico',
-                          arguments: {
-                            "id_recordatorio": id_recordatorio,
-                            "id_paciente": id_paciente,
-                            "estado_recordatorio": rela_estado_recordatorio,
-                            "id_medico": id_medico,
-                            "tipo_screening": tipo_screening,
-                            "bandera": "recordatorio"
-                          });
-                      //}
+                      if (tipo_screening == "SFMS") {
+                        Navigator.of(context).pushReplacementNamed(
+                            '/screening_fisico',
+                            arguments: {
+                              "id_recordatorio": id_recordatorio,
+                              "id_paciente": id_paciente,
+                              "estado_recordatorio": rela_estado_recordatorio,
+                              "id_medico": id_medico,
+                              "tipo_screening": tipo_screening,
+                              "bandera": "recordatorio"
+                            });
+                      }
+                      if (tipo_screening == "CONDUC") {
+                        Navigator.of(context).pushReplacementNamed(
+                            '/screening_conductual',
+                            arguments: {
+                              "id_recordatorio": id_recordatorio,
+                              "id_paciente": id_paciente,
+                              "estado_recordatorio": rela_estado_recordatorio,
+                              "id_medico": id_medico,
+                              "tipo_screening": tipo_screening,
+                              "bandera": "recordatorio"
+                            });
+                      }
                     },
                     child: Text('Ir a Screening'),
                   ),
                 ]))));
+  }
+
+  getRecordatorioMedico(var codigo_screening) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_recordatorio_medicos";
+    var response = await http.post(url, body: {
+      "id_recordatorio": id_recordatorio,
+    });
+
+    var jsonDate = json.decode(response.body);
+    if (response.statusCode == 200) {
+      if (jsonDate['status'] == 'Success') {
+        id_medico = jsonDate['data']['id_medico'];
+        nombre_medico = jsonDate['data']['nombre'];
+        apellido_medico = jsonDate['data']['apellido'];
+        nombre_screening = jsonDate['data']['nombre_screening'];
+        tipo_screening = jsonDate['data']['codigo_screening'];
+      } else {
+        print(jsonDate['status']);
+        id_medico = "";
+      }
+    }
   }
 
   void choiceAction(String choice) {
