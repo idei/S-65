@@ -111,7 +111,7 @@ echo Env::$_URL_API;
 
       $.ajax({
         data: JSON.stringify(parametros),
-        url: 'http://localhost/S-65/api/v1/pacientes',
+        url: 'http://localhost/S-65/api/v1/pacientes', 
         type: 'POST',
         dataType: "JSON",
 

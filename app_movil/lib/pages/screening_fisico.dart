@@ -61,8 +61,8 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
       if (parametros["bandera"] == "screening_nuevo") {
         screening_recordatorio = false;
         id_paciente = id_paciente;
-        id_recordatorio = "";
-        id_medico = "";
+        id_recordatorio = null;
+        id_medico = null;
         //tipo_screening = parametros["tipo_screening"];
       }
     }
