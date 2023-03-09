@@ -1,7 +1,6 @@
 <?php 
 session_start();
 include (__DIR__."/env.php");
-echo Env::$_URL_API;
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +117,7 @@ echo Env::$_URL_API;
         success: function(response) {
           console.log(response);
           if (response['status'] == 'Success') {
-
+            console.log(response['status']);
             response['data'].forEach(element => {
 
               tabla.innerHTML += `

@@ -3,6 +3,7 @@ session_start();
 
 if (isset($_POST['id_paciente'])) {
 $id_paciente = $_POST["id_paciente"];
+
 }
 ?>
 <!DOCTYPE html>
@@ -237,8 +238,8 @@ $id_paciente = $_POST["id_paciente"];
       };
 
       $.ajax(settings).done(function (response) {
-
-        if (response['status'] == "Success") {
+      console.log(response["data"]);
+              if (response['status'] == "Success") {
           var response = response['data'];
           console.log(response);
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']

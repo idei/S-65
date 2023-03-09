@@ -984,9 +984,10 @@ function read_datos_personales()
 
         $select_data_clinica->execute();
 
+        
         if ($select_data_clinica->rowCount() > 0) {
             $select_data_clinica = $select_data_clinica->fetch();
-
+    
             $presion_alta = $select_data_clinica["presion_alta"];
             $presion_baja = $select_data_clinica["presion_baja"];
             $pulso = $select_data_clinica["pulso"];
