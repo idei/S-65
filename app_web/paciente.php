@@ -60,7 +60,7 @@ $id_paciente = $_POST["id_paciente"];
               <div id="contacto"></div>
               <div id="depto"></div>
               </br>
-              <h4>Datos Clínicos</h4>
+              <h4>Últimos Datos Clínicos</h4>
               <div id="peso"></div>
               <div id="presionA"></div>
               <div id="presionB"></div>
@@ -100,6 +100,12 @@ $id_paciente = $_POST["id_paciente"];
                 <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
                   onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos clinicos
                   historicos</button>
+              </div>
+
+              <br>
+              <div class="col align-self-center">
+                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
+                  onclick="read_medicamentos_paciente()" data-target="#planfarmacologico">Plan Farmacológico</button>
               </div>
 
             </div>
@@ -238,10 +244,10 @@ $id_paciente = $_POST["id_paciente"];
       };
 
       $.ajax(settings).done(function (response) {
-      console.log(response["data"]);
+        console.log(response);
               if (response['status'] == "Success") {
           var response = response['data'];
-          console.log(response);
+          console.log(response['data']);
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']
           var dni = "DNI: " + response['dni']
           var contacto = "Contacto: " + response['contacto']
@@ -528,6 +534,49 @@ $id_paciente = $_POST["id_paciente"];
         }
       });
     }
+
+    function read_medicamentos_paciente() {
+      console.log("entre datos clinicos");
+      var estado;
+
+      var settings = {
+        "url": "http://localhost/S-65/api/v1/read_medicamentos",
+        "method": "POST",
+        "data": JSON.stringify({
+          "id_paciente": "<?php echo $id_paciente; ?>",
+        }),
+      };
+      $.ajax(settings).done(function (response) {
+        if (response['status'] == "Success") {
+          // console.log(response['data']);
+          response['data'].forEach(element => {
+            tablaMedicamentos.innerHTML += `<tr>
+                <td>${element['nombre_comercial']}</td>
+                <td>${element['forma_farmaceutica']}</td>
+                <td>${element['presentacion']}</td>
+                <td>${element['dosis_frecuencia']}</td>
+                <td>${element['fecha_alta']}</td>
+                </tr>
+                `;
+          });
+        } else {
+          if (response['status'] == "Vacio") {
+
+            tablaClinicos.innerHTML = `<tr>
+                <td>Sin</td>
+                <td>datos</td>
+                <td>clínicos</td>
+                <td>históricos</td>
+                <td>cargados</td>
+                </tr>
+                `;
+
+          }
+        }
+      });
+    }
+
+
     function consumos(frecuencia){
       if (frecuencia == 902) {
                 return consume = "A veces (una vez al mes)";
@@ -641,5 +690,46 @@ $id_paciente = $_POST["id_paciente"];
     </div>
   </div>
 </div>
+
+<!--Modal de plan farmacologico-->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="modal fade bd-example-modal-lg" id="planfarmacologico" tabindex="-1" role="dialog"
+        aria-labelledby="planfarmacologicoTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Plan Farmacologico</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div id="modal_medicamentos" class="modal-body">
+              <div class="table-responsive-xl">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Nombre Comercial</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Forma Farmaceutica</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presentación</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Dosis o Frecuencia</th>
+                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaMedicamentos"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </html>

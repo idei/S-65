@@ -206,7 +206,7 @@ function read_pacientes()
         $id_medicos = $select_medicos->fetch();
         $id_medicos = $id_medicos["id"];
 
-        $smt = Flight::db()->prepare("select pacientes.id, dni, nombre, apellido FROM `pacientes` 
+        $smt = Flight::db()->prepare("select pacientes.id, dni, nombre, apellido, fecha_nacimiento FROM `pacientes` 
         INNER JOIN medicos_pacientes WHERE rela_medico = '" . $id_medicos . "'");
         $smt->execute();
 
@@ -959,28 +959,28 @@ function read_datos_personales()
         }
 
 
-        $select_id_users = Flight::db()->prepare("SELECT pacientes.id id
-        FROM pacientes 
-        WHERE dni = '" . $dni . "'");
+        // $select_id_users = Flight::db()->prepare("SELECT pacientes.id id
+        // FROM pacientes 
+        // WHERE dni = '" . $dni . "'");
 
-        $select_id_users->execute();
+        // $select_id_users->execute();
 
 
-        if ($select_id_users->rowCount() > 0) {
-            $id_users = $select_id_users->fetch();
-            $id_users = $id_users["id"];
-        } else {
-            $error_msg = msg_error("Error: ", "No se encuetra usuario con el DNI ingresado", 0);
-            Flight::json($error_msg);
-            exit;
-        }
+        // if ($select_id_users->rowCount() > 0) {
+        //     $id_users = $select_id_users->fetch();
+        //     $id_users = $id_users["id"];
+        // } else {
+        //     $error_msg = msg_error("Error: ", "No se encuetra usuario con el DNI ingresado", 0);
+        //     Flight::json($error_msg);
+        //     exit;
+        // }
 
 
 
         $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
         consume_marihuana, otras_drogas, fuma_tabaco 
         FROM datos_clinicos 
-        WHERE rela_paciente = '" . $id_users . "' AND estado_clinico = 1");
+        WHERE rela_paciente = '" . $id_paciente . "' AND estado_clinico = 1");
 
         $select_data_clinica->execute();
 
@@ -7645,6 +7645,47 @@ function read_medico(){
     
     Flight::json($returnData);
 }
+
+function read_medicamentos()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    try {
+        $stmt = Flight::db()->prepare("SELECT * FROM medicamento_paciente
+        JOIN medicamentos on medicamentos.id_medicamento = medicamento_paciente.rela_medicamento
+        WHERE rela_paciente = '".$id_paciente."' ");
+    
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+           
+            $returnData = msg("Success", $lista);
+        }else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+      }
+    
+    Flight::json($returnData);
+}
+
+
 function pdoMultiInsert($tableName, $data, $pdoObject)
 {
 

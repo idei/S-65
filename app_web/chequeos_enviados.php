@@ -47,6 +47,7 @@ session_start();
                                     <th scope="col">Tipo de Chequeo</th>
                                     <th scope="col">Fecha de Envío</th>
                                     <th scope="col">Fecha Límite</th>
+                                    <th scope="col">Paciente</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col"></th>
                                 </tr>
@@ -415,6 +416,7 @@ session_start();
           <td>${element['nombre']}</td>
           <td>${element['fecha_creacion']}</td>
           <td>${element['fecha_limite']}</td>
+          <td>2</td>
           <td>${element['nombre_estado']}</td>
           <td><button class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre']}','${element['resultado']}')"><i class="fa-solid fa-file-lines"></i></button>
           </td>

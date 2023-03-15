@@ -38,11 +38,8 @@ $apellido=$_SESSION['apellido'];
     <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+    
         <li class="nav-item">
-
-
           <a href="home.php" class="nav-link">
             <i class="nav-icon  fas fa-solid fa-house"></i>
             <p>
@@ -50,9 +47,8 @@ $apellido=$_SESSION['apellido'];
             </p>
           </a>
         </li>
+
         <li class="nav-item">
-
-
           <a href="avisos.php" class="nav-link">
             <i class="nav-icon fas fa-regular fa-calendar-plus"></i>
             <p>
@@ -61,9 +57,8 @@ $apellido=$_SESSION['apellido'];
             </p>
           </a>
         </li>
+
         <li class="nav-item">
-
-
           <a href="chequeos_enviados.php" class="nav-link">
             <i class="nav-icon fas fa-square-check"></i>
             <p>
@@ -71,7 +66,6 @@ $apellido=$_SESSION['apellido'];
               <!-- <span class="right badge badge-danger">New</span> -->
             </p>
           </a>
-
         </li>
 
       </ul>

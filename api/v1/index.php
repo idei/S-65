@@ -182,6 +182,9 @@ Flight::route('POST /recuperar_pass','recuperar_pass');
 // Read Recordatorios Medicos
 Flight::route('POST /read_recordatorio_medicos','read_recordatorio_medicos');
 
+// Read Medicamentos de Paciente
+Flight::route('POST /read_medicamentos','read_medicamentos');
+
 
 
 // --------------------------------------------------------------------------

@@ -66,6 +66,7 @@ include (__DIR__."/env.php");
                     <th>Dni</th>
                     <th>Apellido</th>
                     <th>Nombre</th>
+                    <th>Edad</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -104,6 +105,10 @@ include (__DIR__."/env.php");
 
       var url_imagen = "";
 
+      var edadPaciente = 0;
+
+      var fechaActual = new Date();
+      
       var parametros = {
         dni: "<?php echo $_SESSION['dni']; ?>"
       };
@@ -118,7 +123,13 @@ include (__DIR__."/env.php");
           console.log(response);
           if (response['status'] == 'Success') {
             console.log(response['status']);
+
             response['data'].forEach(element => {
+              var fechaPaciente = element['fecha_nacimiento'];
+              
+              console.log(element['fecha_nacimiento']);
+              edadPaciente = parseInt(fechaActual.getFullYear()) - parseInt(fechaPaciente.substr(-4));
+              
 
               tabla.innerHTML += `
               <tr>
@@ -126,6 +137,7 @@ include (__DIR__."/env.php");
               <td>${element['dni']}</td>
               <td>${element['apellido']}</td>
               <td>${element['nombre']}</td>
+              <td>${edadPaciente}</td>
               <td>
               <form action="paciente.php" method="post">
               <input name="id_paciente" type="hidden" value="${element['id']}">
