@@ -548,6 +548,7 @@ $id_paciente = $_POST["id_paciente"];
       };
       $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
+          tablaMedicamentos.innerHTML = ``;
           // console.log(response['data']);
           response['data'].forEach(element => {
             tablaMedicamentos.innerHTML += `<tr>

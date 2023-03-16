@@ -1738,12 +1738,15 @@ function get_chequeos()
         rela_estado_recordatorio, 
         nombre_estado,
         recordatorios_medicos.rela_paciente rela_paciente, 
-        nombre,
-        result_screening resultado
+        tipo_screening.nombre,
+        result_screening resultado,
+        P.nombre nombre_paciente,
+        P.apellido apellido_paciente
         FROM recordatorios_medicos 
         JOIN tipo_screening on recordatorios_medicos.rela_screening = tipo_screening.id 
         JOIN estado_recordatorio ON recordatorios_medicos.rela_estado_recordatorio = estado_recordatorio.id
         JOIN resultados_screenings ON recordatorios_medicos.rela_respuesta_screening = resultados_screenings.id
+        JOIN pacientes AS P ON P.id = recordatorios_medicos.rela_paciente
         WHERE recordatorios_medicos.rela_medico = '" . $id_medico . "' ORDER BY fecha_creacion ASC");
 
         $stmt->execute();

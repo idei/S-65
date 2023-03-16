@@ -400,10 +400,10 @@ session_start();
             };
 
             $.ajax(settings).done(function(response) {
-
+console.log(response);
                 if (response['status'] == "Success") {
                     response['data'].forEach(element => {
-                        console.log(element['nombre_estado']);
+                        console.log(element['nombre']);
                         if (element['nombre_estado'] == "Respondido") {
                             estado = '';
                         } else {
@@ -416,7 +416,7 @@ session_start();
           <td>${element['nombre']}</td>
           <td>${element['fecha_creacion']}</td>
           <td>${element['fecha_limite']}</td>
-          <td>2</td>
+          <td>${element['apellido_paciente']} ${element['nombre_paciente']}</td>
           <td>${element['nombre_estado']}</td>
           <td><button class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre']}','${element['resultado']}')"><i class="fa-solid fa-file-lines"></i></button>
           </td>

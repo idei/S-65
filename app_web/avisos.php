@@ -339,6 +339,7 @@
                 success: function(response) {
 
                     if (response['status'] == 'Success') {
+                        console.log(response);
                         var response = response['data'];
 
                         modal1.innerHTML += `
