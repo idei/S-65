@@ -35,7 +35,7 @@ Flight::route('POST /chequeos_medico_paciente', 'chequeos_medico_paciente');
 Flight::route('POST /chequeos_medico', 'get_chequeos');
 
 // Read Departamentos o Generos
-Flight::route('POST /deptos_generos', 'read_deptos_generos');
+Flight::route('POST /deptos_generos_patologias', 'read_deptos_generos_patologias');
 
 // Read Avisos
 Flight::route('POST /avisos', 'read_avisos');
@@ -52,6 +52,8 @@ Flight::route('POST /recordatorios', 'read_recordatorios');
 // Read Recordatorios relacionados con el medico
 Flight::route('POST /recordatorios_medicos', 'read_recordatorios_medico');
 
+// Create Avisos Generales
+Flight::route('POST /create_aviso_grupal', 'create_aviso_grupal');
 
 // *** Rutas App Movil Paciente
 

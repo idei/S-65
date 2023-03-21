@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php session_start(); 
+  $id_medico = $_SESSION["id_medico"];
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -124,6 +127,7 @@
                             <select name="select_tipo" id="select_tipo" onchange="return_options_selected()">
                                 <option selected value="1">Departamento</option>
                                 <option value="2">Género</option>
+                                <option value="5">Patologías</option>
                             </select>
                         </div>
                         <br>
@@ -179,7 +183,7 @@
 
 
     <script>
-        var arreglo_departamentos = [];
+        var arreglo_opcion_select = [];
         var check_genero = "";
 
         function checkear(id) {
@@ -188,13 +192,13 @@
 
             if (check.checked) {
                 console.log("si");
-                arreglo_departamentos.push(id);
+                arreglo_opcion_select.push(id);
             } else {
-                arreglo_departamentos = arreglo_departamentos.filter((item) => item !== id)
+                arreglo_opcion_select = arreglo_opcion_select.filter((item) => item !== id)
                 console.log("no");
 
             }
-            console.log(arreglo_departamentos);
+            console.log(arreglo_opcion_select);
         }
 
         function checkear_genero(id) {
@@ -216,12 +220,12 @@
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/deptos_generos',
+                url: 'http://localhost/S-65/api/v1/deptos_generos_patologias',
                 type: 'POST',
                 dataType: "JSON",
 
                 success: function(response) {
-
+                console.log(response);
                     if (response['status'] == 'Success' && option_value == 2) {
                         options_selected.innerHTML = ``;
 
@@ -235,15 +239,28 @@
                         `;
                         });
 
-                    } else
+                    }
+
                     if (response['status'] == 'Success' && option_value == 1) {
                         options_selected.innerHTML = ``;
-
                         response['data'].forEach(element => {
                             options_selected.innerHTML += `<div class="form-check">
                     <input class="form-check-input" type="checkbox" name="prueba" value="${element["id"]}" id="${element["id"]}" onclick="checkear(${element["id"]})" ">
                     <label class="form-check-label" for="defaultCheck1">
                     ${element["nombre"]}
+                    </label>
+                    </div>
+                   `;
+                        });
+                    }
+
+                    if (response['status'] == 'Success' && option_value == 5) {
+                        options_selected.innerHTML = ``;
+                        response['data'].forEach(element => {
+                            options_selected.innerHTML += `<div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="eventos" value="${element["id"]}" id="${element["id"]}" onclick="checkear(${element["id"]})" ">
+                    <label class="form-check-label" for="defaultCheck1">
+                    ${element["nombre_evento"]}
                     </label>
                     </div>
                    `;
@@ -288,18 +305,19 @@
         }
 
         function nuevo_anuncio_grupal() {
-
+            
             var parametros = {
+                criterio: document.getElementById("select_tipo").value,
                 descripcion: document.getElementById("descripcion_anuncio_grupal").value,
                 fecha_limite: document.getElementById("fecha_limite").value,
-                email_medico: 'doc@gmail.com',
-                arreglo: arreglo_departamentos,
-                genero: check_genero
+                id_medico: <?php echo $id_medico; ?>,
+                arreglo_opcion_select: arreglo_opcion_select,
+                opcion_check: check_genero.toString()
             };
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: '../php/create_aviso_grupal.php',
+                url: 'http://localhost/S-65/api/v1/create_aviso_grupal',
                 type: 'POST',
                 dataType: "JSON",
 

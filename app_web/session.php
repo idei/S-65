@@ -42,7 +42,8 @@ if (isset($_POST['email'])) {
 
 try {
     
-    $sentencia = $db->prepare("SELECT * FROM users
+    $sentencia = $db->prepare("SELECT nombre,apellido,especialidad,telefono,domicilio,dni,matricula, users.id, token, rela_rol 
+    FROM users
     join medicos on users.id = medicos.rela_users
     WHERE email = '" . $email . "' AND password = '" . $password . "'");
     $sentencia->execute();

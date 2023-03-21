@@ -1240,7 +1240,7 @@ function read_tipos_chequeos()
     Flight::json($returnData);
 }
 
-function read_deptos_generos()
+function read_deptos_generos_patologias()
 {
 
     $data_input = json_decode(file_get_contents("php://input"), true);
@@ -1271,6 +1271,15 @@ function read_deptos_generos()
 
             case '4':
                 $stmt = Flight::db()->prepare("SELECT * FROM grupos_convivientes");
+                $stmt->execute();
+                $result = $stmt->fetchAll();        
+            break;
+
+            case '5':
+                $stmt = Flight::db()->prepare("SELECT * FROM eventos where codigo_evento in ('RM','DH','DA','LC',
+                'PC','ACG','LEC','IPO','ACV','ETOX','DEM','PARK','EPIL','EM','HUNG','DEPRE',
+                'TB','ESQ','EDG','INTOX','CAN','CIR','TRAS','HIPO','CARD','DIAB','HIPER',
+                'COL')");
                 $stmt->execute();
                 $result = $stmt->fetchAll();        
             break;
@@ -7685,6 +7694,143 @@ function read_medicamentos()
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
       }
     
+    Flight::json($returnData);
+}
+
+function create_aviso_grupal()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['criterio'])) {
+        $criterio = $_POST["criterio"];
+    } else {
+        $criterio = verificar($data_input, "criterio");
+    }
+
+    if (isset($_POST['id_medico'])) {
+        $id_medico = $_POST["id_medico"];
+    } else {
+        $id_medico = verificar($data_input, "id_medico");
+    }
+
+    if (isset($_POST['descripcion'])) {
+        $descripcion = $_POST["descripcion"];
+    } else {
+        $descripcion = verificar($data_input, "descripcion");
+    }
+
+    if (isset($_POST['fecha_limite'])) {
+        $fecha_limite = $_POST["fecha_limite"];
+    } else {
+        $fecha_limite = verificar($data_input, "fecha_limite");
+    }
+
+    if (isset($_POST['arreglo_opcion_select'])) {
+        $arreglo_opcion_select = $_POST["arreglo_opcion_select"];
+    } else {
+        $arreglo_opcion_select = verificar($data_input, "arreglo_opcion_select");
+        
+    }
+    
+    $opcion_check = "";
+
+    if (isset($_POST['opcion_check'])) {
+        if ($_POST["opcion_check"] === "") {
+            $opcion_check = null;
+        }else{
+            $opcion_check = $_POST["opcion_check"];
+        }
+    } else {
+        $opcion_check = "";
+    }
+
+    $criterio = (int)$criterio;
+    // Flight::json($arreglo_opcion_select);
+    // exit;
+    // if ($criterio == 1) {
+        
+    //     Flight::json($arreglo_opcion_select);
+    //     exit;
+    // }
+
+    try {
+
+        $data = [
+            'descripcion' => $descripcion,
+            'fecha_limite' => $fecha_limite,
+            'aviso_criterio' => $criterio,
+            'rela_estado' => 0, 
+            'rela_creador' => $id_medico
+        ];
+
+        $rela_creador = 0;
+
+        $stmt = Flight::db()->prepare('INSERT INTO avisos_generales(descripcion,fecha_limite,aviso_criterio,rela_estado,rela_creador) 
+        VALUES(?, ?, ?, ?, ?)');
+        $stmt->bindParam(1, $descripcion);
+        $stmt->bindParam(2, $fecha_limite);
+        $stmt->bindParam(3, $criterio);
+        $stmt->bindParam(4, $rela_creador);
+        $stmt->bindParam(5, $id_medico);
+
+         $stmt->execute();
+
+         $id_aviso = Flight::db()->lastInsertId();
+        
+       
+        switch ($criterio) {
+
+            case 1:
+                # Departamentos
+                
+                foreach ($arreglo_opcion_select as $departamentos) {
+                    $stmt = Flight::db()->prepare('INSERT INTO avisos_departamentos(rela_aviso,rela_departamento) 
+                    VALUES(?, ?)');
+                    $stmt->bindParam(1, $id_aviso);
+                    $stmt->bindParam(2, $departamentos);
+
+                    $stmt->execute();
+
+                    $returnData = msg("Success", []);
+
+                }
+                break;
+
+                case "2":
+                    # Géneros
+                    
+                        $stmt = Flight::db()->prepare('INSERT INTO avisos_generos(rela_aviso,rela_genero) 
+                        VALUES(?, ?)');
+                        $stmt->bindParam(1, $id_aviso);
+                        $stmt->bindParam(2, $opcion_check);
+    
+                        $stmt->execute();
+
+                        $returnData = msg("Success", []);
+
+                    
+                    break;
+
+                    case "5":
+                        # Patologias
+
+                        $returnData = msg("Success", []);
+
+                        break;
+            
+            default:
+                # code...
+                break;
+        }
+       
+    } catch (PDOException $error) {
+
+    $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
     Flight::json($returnData);
 }
 
