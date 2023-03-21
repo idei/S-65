@@ -1410,17 +1410,31 @@ function get_criterios()
 
 
     // 1 es departamentos y 2 es genero
+    switch ($criterio) {
+        case 1:
+            $sql_consulta = "SELECT *
+            FROM avisos_departamentos 
+            JOIN departamentos ON departamentos.id = avisos_departamentos.rela_departamento
+            WHERE avisos_departamentos.rela_aviso = '" . $id_aviso . "'";
+            break;
 
-    if ($criterio == 1) {
-        $sql_consulta = "SELECT *
-        FROM avisos_departamentos 
-        JOIN departamentos ON departamentos.id = avisos_departamentos.rela_departamento
-        WHERE avisos_departamentos.rela_aviso = '" . $id_aviso . "'";
-    } else {
-        $sql_consulta = "SELECT *
-        FROM avisos_generos
-        JOIN generos ON generos.id = avisos_generos.rela_genero
-        WHERE avisos_generos.rela_aviso = '" . $id_aviso . "'";
+            case 2:
+                $sql_consulta = "SELECT *
+                FROM avisos_generos
+                JOIN generos ON generos.id = avisos_generos.rela_genero
+                WHERE avisos_generos.rela_aviso = '" . $id_aviso . "'";
+                break;
+
+                case 5:
+                    $sql_consulta = "SELECT *
+                    FROM avisos_patologias
+                    JOIN eventos ON eventos.id = avisos_patologias.rela_patologia
+                    WHERE avisos_patologias.rela_aviso = '" . $id_aviso . "'";
+                    break;
+        
+        default:
+            # code...
+            break;
     }
 
     try {
@@ -7728,33 +7742,7 @@ function create_aviso_grupal()
         $fecha_limite = verificar($data_input, "fecha_limite");
     }
 
-    if (isset($_POST['arreglo_opcion_select'])) {
-        $arreglo_opcion_select = $_POST["arreglo_opcion_select"];
-    } else {
-        $arreglo_opcion_select = verificar($data_input, "arreglo_opcion_select");
-        
-    }
-    
-    $opcion_check = "";
-
-    if (isset($_POST['opcion_check'])) {
-        if ($_POST["opcion_check"] === "") {
-            $opcion_check = null;
-        }else{
-            $opcion_check = $_POST["opcion_check"];
-        }
-    } else {
-        $opcion_check = "";
-    }
-
     $criterio = (int)$criterio;
-    // Flight::json($arreglo_opcion_select);
-    // exit;
-    // if ($criterio == 1) {
-        
-    //     Flight::json($arreglo_opcion_select);
-    //     exit;
-    // }
 
     try {
 
@@ -7785,6 +7773,12 @@ function create_aviso_grupal()
 
             case 1:
                 # Departamentos
+
+                if (isset($_POST['arreglo_opcion_select'])) {
+                    $arreglo_opcion_select = $_POST["arreglo_opcion_select"];
+                } else {
+                    $arreglo_opcion_select = verificar($data_input, "arreglo_opcion_select"); 
+                }
                 
                 foreach ($arreglo_opcion_select as $departamentos) {
                     $stmt = Flight::db()->prepare('INSERT INTO avisos_departamentos(rela_aviso,rela_departamento) 
@@ -7799,8 +7793,14 @@ function create_aviso_grupal()
                 }
                 break;
 
-                case "2":
+                case 2:
                     # Géneros
+
+                    if (isset($_POST['opcion_check'])) {
+                            $opcion_check = $_POST["opcion_check"]; 
+                    }else {
+                        $opcion_check = verificar($data_input, "opcion_check"); 
+                    }
                     
                         $stmt = Flight::db()->prepare('INSERT INTO avisos_generos(rela_aviso,rela_genero) 
                         VALUES(?, ?)');
@@ -7814,15 +7814,32 @@ function create_aviso_grupal()
                     
                     break;
 
-                    case "5":
+                    case 5:
                         # Patologias
 
-                        $returnData = msg("Success", []);
-
+                        if (isset($_POST['arreglo_opcion_select'])) {
+                            $arreglo_opcion_select = $_POST["arreglo_opcion_select"];
+                        } else {
+                            $arreglo_opcion_select = verificar($data_input, "arreglo_opcion_select"); 
+                        }
+                        
+                        foreach ($arreglo_opcion_select as $patologias) {
+                            $stmt = Flight::db()->prepare('INSERT INTO avisos_patologias(rela_aviso,rela_patologia) 
+                            VALUES(?, ?)');
+                            $stmt->bindParam(1, $id_aviso);
+                            $stmt->bindParam(2, $patologias);
+        
+                            $stmt->execute();
+        
+                            $returnData = msg("Success", []);
+        
+                        }
                         break;
             
             default:
-                # code...
+            $returnData = msg("Error", "Criterio Invalido");
+            Flight::json($returnData);
+            exit;
                 break;
         }
        

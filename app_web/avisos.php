@@ -408,9 +408,14 @@
 
                             if (element['aviso_criterio'] == 1) {
                                 criterio = "Departamentos"
-                            } else {
-                                criterio = "Género";
                             }
+                            if (element['aviso_criterio'] == 2) {
+                                criterio = "Géneros"
+                            }
+                            if (element['aviso_criterio'] == 5) {
+                                criterio = "Patologias"
+                            }
+                        
 
                             tabla.innerHTML += `
                 <tr>
@@ -451,9 +456,17 @@
                         response.forEach(element => {
                             modal1.innerHTML += `<p >${element['nombre']}</p>`;
                         });
-                    } else {
+                    }  
+                    
+                    if (criterio == 2) {
                         response.forEach(element => {
                             modal1.innerHTML += `<p >${element['nombre']}</p>`;
+                        });
+                    }
+
+                    if (criterio == 5) {
+                        response.forEach(element => {
+                            modal1.innerHTML += `<p >${element['nombre_evento']}</p>`;
                         });
                     }
 
