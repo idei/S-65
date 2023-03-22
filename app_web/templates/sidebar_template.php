@@ -1,6 +1,7 @@
 <?php
 $nombre=$_SESSION['nombre'];
 $apellido=$_SESSION['apellido'];
+
 ?>
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar main-sidebar-custom sidebar-dark-primary elevation-4">

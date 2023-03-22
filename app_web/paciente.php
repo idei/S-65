@@ -1,10 +1,14 @@
 <?php
+include (__DIR__."/env.php");
+
 session_start();
 
 if (isset($_POST['id_paciente'])) {
 $id_paciente = $_POST["id_paciente"];
-
 }
+
+$rutaRaiz = Env::$_URL_API;
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,7 +36,7 @@ $id_paciente = $_POST["id_paciente"];
   }
 </style>
 
-<body class="hold-transition sidebar-mini layout-fixed" onload="buscar()">
+<body class="hold-transition sidebar-mini layout-fixed" onload="leerInformacionPaciente()">
   <div class="wrapper">
 
     <?php include('./templates/navbar_template.php'); ?>
@@ -233,10 +237,12 @@ $id_paciente = $_POST["id_paciente"];
   <?php include('./templates/footer_template.php'); ?>
 
   <script>
-    function buscar() {
-      chequeos_paciente();
+    function leerInformacionPaciente() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
+      leerChequeosPacientes();
       var settings = {
-        "url": "http://localhost/S-65/api/v1/datos_personales",
+        "url": rootRaiz + "/datos_personales",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -247,7 +253,7 @@ $id_paciente = $_POST["id_paciente"];
         console.log(response);
               if (response['status'] == "Success") {
           var response = response['data'];
-          console.log(response['data']);
+          console.log(response);
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']
           var dni = "DNI: " + response['dni']
           var contacto = "Contacto: " + response['contacto']
@@ -282,15 +288,14 @@ $id_paciente = $_POST["id_paciente"];
         }
       });
 
-
     }
 
-    function chequeos_paciente() {
-      console.log("entre");
+    function leerChequeosPacientes() {
       var estado;
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/chequeos_medico_paciente",
+        "url": rootRaiz + "/chequeos_medico_paciente",
         "method": "POST",
         "data": JSON.stringify({
           "email": "<?php echo $_SESSION['email']; ?>",
@@ -322,7 +327,6 @@ $id_paciente = $_POST["id_paciente"];
                 </tr>
                 `;
           });
-          //read_avisos();
         } else {
           if (response['status'] == "Vacio") {
 
@@ -359,9 +363,10 @@ $id_paciente = $_POST["id_paciente"];
     }
 
     function antecedentesP() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/antecedentes_personales",
+        "url": rootRaiz + "/antecedentes_personales",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -399,8 +404,10 @@ $id_paciente = $_POST["id_paciente"];
     }
 
     function antecedentesF() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
       var settings = {
-        "url": "http://localhost/S-65/api/v1/antecedentes_familiares",
+        "url": rootRaiz + "/antecedentes_familiares",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -447,17 +454,23 @@ $id_paciente = $_POST["id_paciente"];
     }
 
     function nuevo_anuncio() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+      var id_paciente = "<?php echo $id_paciente; ?>";
+      var id_medico = "<?php echo $_SESSION["id_medico"]; ?>";
+
+      console.log(id_paciente + " " +id_medico);
 
       var parametros = {
         descripcion: document.getElementById("descripcion_anuncio_individual").value,
         fecha_limite: document.getElementById("fecha_limite").value,
-        email_medico: 'doc@gmail.com',
-        email_paciente: 'prueba@gmail.com'
+        id_medico: id_medico.toString(),
+        id_paciente: id_paciente.toString(),
+        criterio: "4"
       };
 
       $.ajax({
         data: JSON.stringify(parametros),
-        url: '../php/create_aviso.php',
+        url: rootRaiz + '/create_aviso_grupal',
         type: 'POST',
         dataType: "JSON",
 
@@ -465,11 +478,10 @@ $id_paciente = $_POST["id_paciente"];
 
           if (response['status'] == 'Success') {
             tabla.innerHTML = ``;
-            read_avisos();
             alert_success("Aviso creado");
 
           } else {
-            alert_danger("Error");
+            //alert_danger("Error");
             console.log(response['status']);
           }
 
@@ -479,11 +491,12 @@ $id_paciente = $_POST["id_paciente"];
     }
 
     function datos_historicos_clinicos() {
-      console.log("entre datos clinicos");
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
       var estado;
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/datos_clinicos",
+        "url": rootRaiz + "/datos_clinicos",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",
@@ -536,11 +549,12 @@ $id_paciente = $_POST["id_paciente"];
     }
 
     function read_medicamentos_paciente() {
-      console.log("entre datos clinicos");
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
       var estado;
 
       var settings = {
-        "url": "http://localhost/S-65/api/v1/read_medicamentos",
+        "url": rootRaiz + "/read_medicamentos",
         "method": "POST",
         "data": JSON.stringify({
           "id_paciente": "<?php echo $id_paciente; ?>",

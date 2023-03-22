@@ -75,7 +75,7 @@
 
   <script>
     function login() {
-
+      
       var parametros = {
         "email": document.getElementById("email").value,
         "password": document.getElementById("password").value,
@@ -83,7 +83,6 @@
 
       $.ajax({
         data: parametros,
-        //url: 'http://localhost/S-65/api/v1/login',
         url: 'session.php',
         type: 'POST',
         dataType: "JSON",

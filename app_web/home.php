@@ -1,6 +1,10 @@
 <?php 
+
 session_start();
 include (__DIR__."/env.php");
+
+$rutaRaiz = Env::$_URL_API;
+
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +16,8 @@ include (__DIR__."/env.php");
   <title>S-65 | Médico</title>
 
   <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <!-- <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
@@ -50,7 +55,8 @@ include (__DIR__."/env.php");
           <div class="card-tools">
             <div class="card-header">
               <form method="POST">
-                <input id="buscar" type="search" class="form-control rounded" placeholder="Dni / Apellido / Nombre" onkeyup="doSearch()" />
+                <input id="buscar" type="search" class="form-control rounded" placeholder="Dni / Apellido / Nombre"
+                  onkeyup="doSearch()" />
               </form>
               <div id="mensaje">
               </div>
@@ -99,8 +105,9 @@ include (__DIR__."/env.php");
   <!-- ./wrapper -->
 
   <script>
-    function read_pacientes() {
 
+    function read_pacientes() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
       const tabla = document.querySelector('#tabla');
 
       var url_imagen = "";
@@ -108,28 +115,29 @@ include (__DIR__."/env.php");
       var edadPaciente = 0;
 
       var fechaActual = new Date();
-      
+
       var parametros = {
         dni: "<?php echo $_SESSION['dni']; ?>"
       };
 
+      console.log("<?php echo $_SESSION['dni']; ?>");
+
       $.ajax({
         data: JSON.stringify(parametros),
-        url: 'http://localhost/S-65/api/v1/pacientes', 
+        url: rootRaiz + "/pacientes",
         type: 'POST',
         dataType: "JSON",
 
-        success: function(response) {
+        success: function (response) {
           console.log(response);
           if (response['status'] == 'Success') {
             console.log(response['status']);
 
             response['data'].forEach(element => {
               var fechaPaciente = element['fecha_nacimiento'];
-              
+
               console.log(element['fecha_nacimiento']);
               edadPaciente = parseInt(fechaActual.getFullYear()) - parseInt(fechaPaciente.substr(-4));
-              
 
               tabla.innerHTML += `
               <tr>
@@ -158,40 +166,6 @@ include (__DIR__."/env.php");
       });
     }
 
-
-
-    function ver_mas(id) {
-
-      $('#avisoModal').modal('show'); // abrir
-
-      var parametros = {
-        id: id,
-      };
-
-      $.ajax({
-        data: JSON.stringify(parametros),
-        url: '../php/read_aviso.php',
-        type: 'POST',
-        dataType: "JSON",
-
-        success: function(response) {
-
-          if (response['status'] == 'Success') {
-
-            modal1.innerHTML += `
-              <p> Descripcion: ` + response['aviso']['descripcion'] + ` </p>
-              <p> Fecha Creación: ` + response['aviso']['fecha_creacion'] + ` </p>
-              <p> Fecha Límite: ` + response['aviso']['fecha_limite'] + ` </p>
-              `;
-
-          } else {
-            console.log(response['status']);
-          }
-
-
-        }
-      });
-    }
 
     function doSearch() {
 
