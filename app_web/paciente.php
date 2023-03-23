@@ -7,6 +7,8 @@ if (isset($_POST['id_paciente'])) {
 $id_paciente = $_POST["id_paciente"];
 }
 
+$id_medico = $_SESSION["id_medico"];
+
 $rutaRaiz = Env::$_URL_API;
 
 ?>
@@ -88,11 +90,8 @@ $rutaRaiz = Env::$_URL_API;
               </div>
               <br>
               <div class="col align-self-center">
-                <form action="chequeos.php" method="post">
-                  <input name="id_paciente" type="hidden" value="<?php echo $id_paciente; ?>"></input>
-                  <button href="chequeos.php" class="btn btn-block btn-info btn-flat text-uppercase"
-                    type="submit">Enviar Chequeo</button>
-                </form>
+                  <button onclick="read_nombre_chequeos();" class="btn btn-block btn-info btn-flat text-uppercase"
+                  data-toggle="modal" data-target="#nuevochequeoModal">Enviar Chequeo</button>
               </div>
               <br>
               <div class="col align-self-center">
@@ -298,7 +297,7 @@ $rutaRaiz = Env::$_URL_API;
         "url": rootRaiz + "/chequeos_medico_paciente",
         "method": "POST",
         "data": JSON.stringify({
-          "email": "<?php echo $_SESSION['email']; ?>",
+          "id_medico": "<?php echo $id_medico; ?>",
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
@@ -601,6 +600,75 @@ $rutaRaiz = Env::$_URL_API;
               return consume = "Siempre (casi todos los días)";
             }
     }
+
+    function read_nombre_chequeos() {
+    var parametros = {};
+    var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
+    $.ajax({
+      data: JSON.stringify(parametros),
+      url: rootRaiz + '/chequeos',
+      type: 'POST',
+      dataType: "JSON",
+
+      success: function(response) {
+
+        if (response['status'] == 'Success') {
+          var response = response['data'];
+
+          response['chequeos'][0].forEach(element => {
+            select_chequeos.innerHTML += `
+              <option value="${element["id"]}" title="${element["nombre"]}">${element["nombre"]}</option>
+              `;
+          });
+
+        } else {
+          modal_body.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
+        }
+
+      }
+    });
+
+  }
+
+
+    function guardar_chequeo() {
+    var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
+    var parametros = {
+      tipo_chequeo: document.getElementById("select_chequeos").value,
+      fecha_chequeo: document.getElementById("fecha1").value,
+      id_paciente: "<?php echo $id_paciente; ?>",
+      id_medico: "<?php echo $id_medico; ?>",
+      descripcion: "Estimado paciente le envio para que complete el siguiente "+ document.getElementById("select_chequeos").title +":"
+    };
+
+    $.ajax({
+      data: JSON.stringify(parametros),
+      url: rootRaiz + '/crear_recordatorio_chequeo',
+      type: 'POST',
+      dataType: "JSON",
+
+      success: function(response) {
+
+        if (response['request'] == 'Success') {
+
+          $('#modal_chequeo').modal('show'); // abrir
+
+          titulo_modal.innerHTML = `Chequeo creado correctamente`;
+
+        } else {
+          titulo_modal.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
+          //$("#mensaje").html("");
+        }
+
+
+      }
+    });
+  }
+
+    
+
   </script>
   <!-- jQuery -->
   <script src="plugins/jquery/jquery.min.js"></script>
@@ -639,6 +707,43 @@ $rutaRaiz = Env::$_URL_API;
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="nuevo_anuncio()">Enviar</button>
         <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Chequeo-->
+<div class="modal fade" id="nuevochequeoModal" tabindex="-1" role="dialog" aria-labelledby="nuevochequeoModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Envio de Chequeo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="modal_nuevo_anuncio" class="modal-body">
+      <form>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Chequeos</label>
+                <select id="select_chequeos" class="form-control" aria-label="Default select example">
+
+                </select>
+              </div>
+              <div class="form-group mb-4">
+                <div class="form-group">
+                  <label for="">Elegir Fecha</label>
+                  <input type="date" placeholder="Elegir Fecha" class="form-control" id="fecha1">
+
+                </div>
+              </div>
+            </div>
+            
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="guardar_chequeo()">Enviar Chequeo</button>
       </div>
     </div>
   </div>

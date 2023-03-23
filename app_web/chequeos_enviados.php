@@ -395,12 +395,11 @@ session_start();
                 "url": "http://localhost/S-65/api/v1/chequeos_medico",
                 "method": "POST",
                 "data": JSON.stringify({
-                    "email": "<?php echo $_SESSION['email']; ?>"
+                    "id_medico": "<?php echo $_SESSION['id_medico']; ?>"
                 }),
             };
 
             $.ajax(settings).done(function(response) {
-console.log(response);
                 if (response['status'] == "Success") {
                     response['data'].forEach(element => {
                         console.log(element['nombre']);
@@ -411,7 +410,7 @@ console.log(response);
                                 estado = 'disabled';
                             }
                         }
-                        tabla.innerHTML = `<tr>
+                        tabla.innerHTML += `<tr>
           <th scope="row"></th>
           <td>${element['nombre']}</td>
           <td>${element['fecha_creacion']}</td>

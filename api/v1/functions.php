@@ -1639,42 +1639,77 @@ function read_recordatorios_medico()
     Flight::json($returnData);
 }
 
+function crear_recordatorio_chequeo(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['tipo_chequeo'])) {
+        $tipo_chequeo = $_POST["tipo_chequeo"];
+    } else {
+        $tipo_chequeo = verificar($data_input, "tipo_chequeo");
+    }
+
+    if (isset($_POST['fecha_chequeo'])) {
+        $fecha_chequeo = $_POST["fecha_chequeo"];
+    } else {
+        $fecha_chequeo = verificar($data_input, "fecha_chequeo");
+    }
+
+    if (isset($_POST['id_medico'])) {
+        $id_medico = $_POST["id_medico"];
+    } else {
+        $id_medico = verificar($data_input, "id_medico");
+    }
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['descripcion'])) {
+        $descripcion = $_POST["descripcion"];
+    } else {
+        $descripcion = verificar($data_input, "descripcion");
+    }
+
+    try {
+
+        $rela_respuesta_screening = 1;
+        $rela_estado_recordatorio = 2;
+
+        $stmt = Flight::db()->prepare('INSERT INTO recordatorios_medicos(rela_paciente,rela_medico,rela_respuesta_screening,rela_estado_recordatorio, rela_screening,descripcion,fecha_limite) 
+        VALUES(?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bindParam(1, $id_paciente);
+        $stmt->bindParam(2, $id_medico);
+        $stmt->bindParam(3, $rela_respuesta_screening);
+        $stmt->bindParam(4, $rela_estado_recordatorio);
+        $stmt->bindParam(5, $tipo_chequeo);
+        $stmt->bindParam(6, $descripcion);
+        $stmt->bindParam(7, $fecha_chequeo);
+
+        $stmt->execute();
+
+        // Flight::json($returnData);
+        // exit;
+
+        $returnData = msg("Success", []);
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function chequeos_medico_paciente()
 {
 
     $data_input = json_decode(file_get_contents("php://input"), true);
 
-    $email = verificar($data_input, "email");
+    $id_medico = verificar($data_input, "id_medico");
     $id_paciente = verificar($data_input, "id_paciente");
-
-    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
-
-    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '" . $email . "'");
-    $select_id_users->execute();
-
-    if ($select_id_users->rowCount() > 0) {
-        $id_users = $select_id_users->fetch();
-        $id_users = $id_users["id"];
-    } else {
-        $error_msg = msg_error("Error: ", "No se encuetra usuario con el Email ingresado", 0);
-        Flight::json($error_msg);
-        exit;
-    }
-
-
-    // SELECCION DE ID DEL MEDICO A PARTIR DEL ID DEL LOGIN
-    $select_id_medico = Flight::db()->prepare("SELECT id FROM medicos WHERE rela_users = '" . $id_users . "'");
-    $select_id_medico->execute();
-
-
-    if ($select_id_medico->rowCount() > 0) {
-        $id_medico = $select_id_medico->fetch();
-        $id_medico = $id_medico["id"];
-    } else {
-        $error_msg = msg_error("Error: ", "No se encuntra el medico", 0);
-        Flight::json($error_msg);
-        exit;
-    }
 
     try {
 
@@ -1720,35 +1755,10 @@ function get_chequeos()
 {
     $data_input = json_decode(file_get_contents("php://input"), true);
 
-    $email = verificar($data_input, "email");
-
-    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
-
-    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '" . $email . "'");
-    $select_id_users->execute();
-
-    if ($select_id_users->rowCount() > 0) {
-        $id_users = $select_id_users->fetch();
-        $id_users = $id_users["id"];
+    if (isset($_POST['id_medico'])) {
+        $id_medico = $_POST["id_medico"];
     } else {
-        $error_msg = msg_error("Error: ", "No se encuetra usuario con el Email ingresado", 0);
-        Flight::json($error_msg);
-        exit;
-    }
-
-
-    // SELECCION DE ID DEL MEDICO A PARTIR DEL ID DEL LOGIN
-    $select_id_medico = Flight::db()->prepare("SELECT id FROM `medicos` WHERE medicos.rela_users = '" . $id_users . "'");
-    $select_id_medico->execute();
-
-
-    if ($select_id_medico->rowCount() > 0) {
-        $id_medico = $select_id_medico->fetch();
-        $id_medico = $id_medico["id"];
-    } else {
-        $error_msg = msg_error("Error: ", "No se encuntra el medico", 0);
-        Flight::json($error_msg);
-        exit;
+        $id_medico = verificar($data_input, "id_medico");
     }
 
     try {
@@ -1791,7 +1801,6 @@ function get_chequeos()
 
     Flight::json($returnData);
 }
-
 
 function antecedentes_personales_paciente()
 {

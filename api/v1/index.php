@@ -28,6 +28,8 @@ Flight::route('POST /datos_personales', 'read_datos_personales');
 // Read Chequeos
 Flight::route('POST /chequeos', 'read_tipos_chequeos');
 
+Flight::route('POST /crear_recordatorio_chequeo', 'crear_recordatorio_chequeo');
+
 // Read Chequeos Medico Paciente
 Flight::route('POST /chequeos_medico_paciente', 'chequeos_medico_paciente');
 
