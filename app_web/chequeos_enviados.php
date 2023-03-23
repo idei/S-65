@@ -294,7 +294,7 @@ session_start();
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: '../php/create_aviso_grupal.php',
+                url: '../php/create_avisos.php',
                 type: 'POST',
                 dataType: "JSON",
 

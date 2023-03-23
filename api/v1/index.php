@@ -53,7 +53,7 @@ Flight::route('POST /recordatorios', 'read_recordatorios');
 Flight::route('POST /recordatorios_medicos', 'read_recordatorios_medico');
 
 // Create Avisos Generales
-Flight::route('POST /create_aviso_grupal', 'create_aviso_grupal');
+Flight::route('POST /create_avisos', 'create_avisos');
 
 // *** Rutas App Movil Paciente
 

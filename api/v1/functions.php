@@ -7618,7 +7618,7 @@ function read_medicamentos()
     Flight::json($returnData);
 }
 
-function create_aviso_grupal()
+function create_avisos()
 {
 
     $data_input = json_decode(file_get_contents("php://input"), true);
@@ -7685,7 +7685,7 @@ function create_aviso_grupal()
         switch ($criterio) {
 
             case 1:
-                # Departamentos
+                # Aviso general por Departamentos
 
                 if (isset($_POST['arreglo_opcion_select'])) {
                     $arreglo_opcion_select = $_POST["arreglo_opcion_select"];
@@ -7706,7 +7706,7 @@ function create_aviso_grupal()
                 break;
 
             case 2:
-                # Géneros
+                # Aviso general por Géneros
 
                 if (isset($_POST['opcion_check'])) {
                     $opcion_check = $_POST["opcion_check"];
@@ -7723,10 +7723,9 @@ function create_aviso_grupal()
 
                 $returnData = msg("Success", []);
 
-
                 break;
             case 4:
-                //Anuncio Individual
+                //Aviso Individual
                 $estado_aviso = 1;
                 $estado_leido = 1;
 
@@ -7746,7 +7745,7 @@ function create_aviso_grupal()
                 break;
 
             case 5:
-                # Patologias
+                # Aviso general por Patologias
 
                 if (isset($_POST['arreglo_opcion_select'])) {
                     $arreglo_opcion_select = $_POST["arreglo_opcion_select"];

@@ -136,3 +136,6 @@
     </ul>
   </nav>
   <!-- /.navbar -->
+  <div id="alert_placeholder" class="alert_placeholder">
+</div>
+  

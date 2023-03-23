@@ -179,7 +179,7 @@
     <script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
-    <script src="../js/alerts_msg.js"></script>
+    <script src="dist/js/alert-msg.js"></script>
 
 
     <script>
@@ -292,10 +292,11 @@
                     if (response['status'] == 'Success') {
                         tabla.innerHTML = ``;
                         read_avisos();
-                        alert_success("Aviso creado");
+                        showalert("Aviso creado","alert-primary");
+
 
                     } else {
-                        alert_danger("Error");
+                        showalert("Error al crear aviso","alert-danger");
                         console.log(response['status']);
                     }
 
@@ -317,7 +318,7 @@
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/create_aviso_grupal',
+                url: 'http://localhost/S-65/api/v1/create_avisos',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -326,10 +327,12 @@
                     if (response['status'] == 'Success') {
                         tabla.innerHTML = ``;
                         read_avisos();
-                        alert_success("Avisos enviados");
+                        showalert("Aviso enviados","alert-primary");
+
 
                     } else {
                         alert_danger("Error");
+                        showalert("Error","alert-danger");
                         console.log(response['status']);
                     }
 

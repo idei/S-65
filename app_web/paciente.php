@@ -470,7 +470,7 @@ $rutaRaiz = Env::$_URL_API;
 
       $.ajax({
         data: JSON.stringify(parametros),
-        url: rootRaiz + '/create_aviso_grupal',
+        url: rootRaiz + '/create_avisos',
         type: 'POST',
         dataType: "JSON",
 
@@ -478,10 +478,10 @@ $rutaRaiz = Env::$_URL_API;
 
           if (response['status'] == 'Success') {
             tabla.innerHTML = ``;
-            alert_success("Aviso creado");
-
+            showalert("Aviso creado","alert-primary");
+            
           } else {
-            //alert_danger("Error");
+            showalert("Error","alert-danger");
             console.log(response['status']);
           }
 
@@ -610,6 +610,7 @@ $rutaRaiz = Env::$_URL_API;
   <script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
   <!-- AdminLTE App -->
   <script src="dist/js/adminlte.min.js"></script>
+  <script src="dist/js/alert-msg.js"></script>
 
 </body>
 
