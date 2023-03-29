@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/datosCli_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,7 @@ List<RecordatoriosModel> recordatorios_items;
 bool _isLoading = false;
 var email_argument;
 var usuarioModel;
+var id_paciente;
 
 class _RecordatorioState extends State<RecordatorioPage> {
   var data_error;
@@ -22,6 +24,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
     email_argument = usuarioModel.usuario.emailUser;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
       appBar: AppBar(
@@ -190,17 +193,11 @@ class _RecordatorioState extends State<RecordatorioPage> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/recordatorios";
     var response = await http.post(url, body: {
-      "email": email_argument,
+      "id_paciente": id_paciente,
     });
     responseDecode = json.decode(response.body);
 
     if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
-      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
-      // recordatorios_items = items.map<RecordatoriosModel>((json) {
-      //   return RecordatoriosModel.fromJson(json);
-      // }).toList();
-      // return recordatorios_items;
-
       final List<RecordatoriosModel> recordatorios_item = [];
 
       for (var recordatorio in responseDecode['data']) {

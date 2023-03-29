@@ -1323,9 +1323,10 @@ function read_recordatorio_medicos()
 
         $stmt = Flight::db()->prepare("SELECT medicos.id id_medico, medicos.nombre, medicos.apellido, medicos.dni, medicos.matricula, tipo_screening.nombre nombre_screening, tipo_screening.codigo codigo_screening
         FROM recordatorios_medicos 
-        JOIN medicos ON medicos.id = recordatorios_medicos.rela_medico 
+        JOIN users ON users.id = recordatorios_medicos.rela_medico 
+        JOIN medicos ON medicos.rela_users = users.id
         JOIN tipo_screening ON tipo_screening.id = recordatorios_medicos.rela_screening 
-        WHERE recordatorios_medicos.id = '" . $id_recordatorio . "'");
+        WHERE recordatorios_medicos.id ='" . $id_recordatorio . "'");
 
         $stmt->execute();
 
@@ -1513,48 +1514,19 @@ function read_recordatorios()
 
     $data_input = json_decode(file_get_contents("php://input"), true);
 
-    if (isset($_POST['email'])) {
-        $email = $_POST["email"];
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
     } else {
-        $email = verificar($data_input, "email");
-    }
-
-    // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
-
-    $select_id_users = Flight::db()->prepare("SELECT id FROM `users` WHERE users.email = '" . $email . "'");
-    $select_id_users->execute();
-
-    if ($select_id_users->rowCount() > 0) {
-        $id_users = $select_id_users->fetch();
-        $id_users = $id_users["id"];
-    } else {
-        $error_msg = msg_error("Error: ", "No se encuetra usuario con el Email ingresado", 0);
-        Flight::json($error_msg);
-        exit;
-    }
-
-
-    // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
-    $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE pacientes.rela_users = '" . $id_users . "'");
-    $select_id_paciente->execute();
-
-
-    if ($select_id_paciente->rowCount() > 0) {
-        $id_paciente = $select_id_paciente->fetch();
-        $id_paciente = $id_paciente["id"];
-    } else {
-        $error_msg = msg_error("Error: ", "No se encuntra el paciente", 0);
-        Flight::json($error_msg);
-        exit;
+        $id_paciente = verificar($data_input, "id_paciente");
     }
 
     try {
 
         $stmt = Flight::db()->prepare("SELECT id,descripcion,fecha_limite,rela_estado_recordatorio,rela_paciente FROM recordatorios_pacientes
-        WHERE rela_estado_recordatorio <> 2 AND rela_paciente = '" . $id_paciente . "'
+        WHERE rela_estado_recordatorio = 2 AND rela_paciente = '" . $id_paciente . "'
         UNION ALL
         SELECT id,descripcion,fecha_limite,rela_estado_recordatorio,rela_paciente FROM recordatorios_medicos
-        WHERE rela_estado_recordatorio <> 2 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite ASC");
+        WHERE rela_estado_recordatorio = 2 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite ASC");
 
         $stmt->execute();
 

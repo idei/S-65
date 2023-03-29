@@ -413,7 +413,7 @@ bool isGrupoConviviente = false;
 
 getAllDepartamentos() async {
   String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos";
+  var url = URL_base + "/deptos_generos_patologias";
   var response = await http.post(url, body: {"tipo": "1"});
   var responseBody = json.decode(response.body);
 
@@ -429,7 +429,7 @@ getAllDepartamentos() async {
 
 getAllGeneros() async {
   String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos";
+  var url = URL_base + "/deptos_generos_patologias";
   var response = await http.post(url, body: {"tipo": "2"});
   var responseBody = json.decode(response.body);
 
@@ -445,7 +445,7 @@ getAllGeneros() async {
 
 getAllNivelesEducativos() async {
   String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos";
+  var url = URL_base + "/deptos_generos_patologias";
   var response = await http.post(url, body: {"tipo": "3"});
   var responseBody = json.decode(response.body);
   if (response.statusCode == 200) {
@@ -460,7 +460,7 @@ getAllNivelesEducativos() async {
 
 getAllGrupoConviviente() async {
   String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos";
+  var url = URL_base + "/deptos_generos_patologias";
   var response = await http.post(url, body: {"tipo": "4"});
   var responseBody = json.decode(response.body);
   if (response.statusCode == 200) {
