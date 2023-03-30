@@ -1,6 +1,3 @@
-<?php session_start(); 
-  $id_medico = $_SESSION["id_medico"];
-?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -18,6 +15,7 @@
 
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
@@ -111,7 +109,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Aviso Grupal</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Aviso Grupal <abbr title="Envia un aviso grupal a los pacientes de distintos departamentos, sexo o edad para cumplir con indicaciones en una determinada fecha."><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

@@ -726,7 +726,7 @@ $rutaRaiz = Env::$_URL_API;
       <form>
             <div class="card-body">
               <div class="form-group">
-                <label>Chequeos</label>
+                <label>Chequeos <abbr title="Envia un determinado chequeo al paciente para que complete hasta una fecha limite"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></label>
                 <select id="select_chequeos" class="form-control" aria-label="Default select example">
 
                 </select>
