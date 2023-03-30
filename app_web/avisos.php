@@ -1,4 +1,6 @@
-
+<?php session_start(); 
+  $id_medico = $_SESSION["id_medico"];
+?>
 <!DOCTYPE html>
 <html lang="es">
 
