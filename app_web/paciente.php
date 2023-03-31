@@ -355,7 +355,7 @@ $rutaRaiz = Env::$_URL_API;
           console.log(nombre_estado);
           $('#modal_resultado_chequeo').modal('show'); // abrir
           modal_resultado.innerHTML = `
-    <p style="color:red;">${resultado}</p>`;
+          <p style="color:red;">${resultado}</p>`;
 
         }
       }

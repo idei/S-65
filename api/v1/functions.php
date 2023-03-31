@@ -1425,6 +1425,15 @@ function get_criterios()
                 WHERE avisos_generos.rela_aviso = '" . $id_aviso . "'";
             break;
 
+        case 4: 
+            $lista = array(
+                "nombre" => "Anuncio Personal"
+            );
+                $returnData = msg("Success", $lista);
+                Flight::json($returnData);
+                exit;
+            break;
+
         case 5:
             $sql_consulta = "SELECT *
                     FROM avisos_patologias

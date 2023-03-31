@@ -1,4 +1,8 @@
 <?php 
+include (__DIR__."/env.php");
+
+$rutaRaiz = Env::$_URL_API;
+
 session_start();
 ?>
 <!DOCTYPE html>
@@ -92,77 +96,6 @@ session_start();
         </div>
     </div>
 
-    <!-- Modal Nuevo Anuncio Individual-->
-    <div class="modal fade" id="nuevoAvisoModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAvisoModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="modal_nuevo_anuncio" class="modal-body">
-                    <form action="" method="post">
-                        <div class="form-group">
-                            <label for="descripcion-text" class="col-form-label">Descripción:</label>
-                            <textarea class="form-control" id="descripcion_anuncio_individual"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="fecha-text" class="col-form-label">Fecha Límite:</label>
-                            <input type="date" name="" id="fecha_limite">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="nuevo_anuncio()">Enviar</button>
-                    <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nuevo Anuncio Grupal-->
-    <div class="modal fade" id="nuevoAvisoGrupalModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAvisoGrupalModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio Grupal</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="modal_nuevo_anuncio_grupal" class="modal-body">
-                    <form action="" method="post">
-                        <div class="form-group">
-                            <label for="descripcion-text" class="col-form-label">Descripción:</label>
-                            <textarea class="form-control" id="descripcion_anuncio_grupal"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcion-text" class="col-form-label">Seleccionar tipo:</label>
-                            <select name="select_tipo" id="select_tipo" onchange="return_options_selected()">
-                                <option selected value="1">Departamento</option>
-                                <option value="2">Género</option>
-                            </select>
-                        </div>
-                        <br>
-                        <div id="options_selected"></div>
-                        <br>
-                        <div class="form-group">
-                            <label for="fecha-text" class="col-form-label">Fecha Límite:</label>
-                            <input type="date" name="" id="fecha_limite">
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="nuevo_anuncio_grupal()">Enviar Aviso</button>
-                    <!--<a href="datos.html" class="btn btn-primary active" role="button" aria-pressed="true">Aceptar</a> -->
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- jQuery -->
     <script src="plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -206,11 +139,11 @@ session_start();
                 tipo: document.getElementById("select_tipo").value,
             };
 
-            console.log(document.getElementById("select_tipo").value);
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/deptos_sexo.php',
+                url: rootRaiz + '/deptos_generos_patologias',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -243,73 +176,6 @@ session_start();
                    `;
                         });
                     }
-
-                }
-            });
-        }
-
-
-        function nuevo_anuncio() {
-
-            var parametros = {
-                descripcion: document.getElementById("descripcion_anuncio_individual").value,
-                fecha_limite: document.getElementById("fecha_limite").value,
-                email_medico: "<?php echo $_SESSION['email'] ?>",
-                email_paciente: 'prueba@gmail.com'
-                
-            };
-
-            $.ajax({
-                data: JSON.stringify(parametros),
-                url: '../php/create_aviso.php',
-                type: 'POST',
-                dataType: "JSON",
-
-                success: function(response) {
-
-                    if (response['status'] == 'Success') {
-                        tabla.innerHTML = ``;
-                        read_recordatorio();
-                        alert_success("Aviso creado");
-
-                    } else {
-                        alert_danger("Error");
-                        console.log(response['status']);
-                    }
-
-
-                }
-            });
-        }
-
-        function nuevo_anuncio_grupal() {
-
-            var parametros = {
-                descripcion: document.getElementById("descripcion_anuncio_grupal").value,
-                fecha_limite: document.getElementById("fecha_limite").value,
-                email_medico: 'doc@gmail.com',
-                arreglo: arreglo_departamentos,
-                genero: check_genero
-            };
-
-            $.ajax({
-                data: JSON.stringify(parametros),
-                url: '../php/create_avisos.php',
-                type: 'POST',
-                dataType: "JSON",
-
-                success: function(response) {
-
-                    if (response['status'] == 'Success') {
-                        tabla.innerHTML = ``;
-                        read_recordatorio();
-                        alert_success("Avisos enviados");
-
-                    } else {
-                        alert_danger("Error");
-                        console.log(response['status']);
-                    }
-
 
                 }
             });
@@ -357,9 +223,11 @@ session_start();
 
             var parametros = {};
 
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/recordatorios_medicos',
+                url: rootRaiz + '/recordatorios_medicos',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -390,9 +258,10 @@ session_start();
         function chequeos_pacientes(email) {
 
             var estado;
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
             var settings = {
-                "url": "http://localhost/S-65/api/v1/chequeos_medico",
+                "url": rootRaiz + "/chequeos_medico",
                 "method": "POST",
                 "data": JSON.stringify({
                     "id_medico": "<?php echo $_SESSION['id_medico']; ?>"

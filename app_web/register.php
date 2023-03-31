@@ -1,9 +1,15 @@
+<?php
+include (__DIR__."/env.php");
+
+$rutaRaiz = Env::$_URL_API;
+
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | Registration Page (v2)</title>
+  <title>S+65 - Registro de Profesionales</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -18,7 +24,7 @@
 <div class="register-box">
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
-      <a href="../index2.html" class="h1"><b>S +</b>65</a>
+      <a href="../index.php" class="h1"><b>S +</b>65</a>
     </div>
     <div class="card-body">
       <p class="login-box-msg">Registrar Nuevo Médico</p>
