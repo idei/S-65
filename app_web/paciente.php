@@ -687,7 +687,7 @@ $rutaRaiz = Env::$_URL_API;
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Anuncio <abbr title="Envia un aviso con indicaciones específicas al paciente para que complete hasta una fecha limite"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -717,7 +717,7 @@ $rutaRaiz = Env::$_URL_API;
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Envio de Chequeo</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">Envio de Chequeo <abbr title="Envia un determinado chequeo al paciente para que complete hasta una fecha limite"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -726,7 +726,7 @@ $rutaRaiz = Env::$_URL_API;
       <form>
             <div class="card-body">
               <div class="form-group">
-                <label>Chequeos <abbr title="Envia un determinado chequeo al paciente para que complete hasta una fecha limite"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></label>
+                <label>Chequeos </label>
                 <select id="select_chequeos" class="form-control" aria-label="Default select example">
 
                 </select>
