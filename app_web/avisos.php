@@ -1,5 +1,11 @@
-<?php session_start(); 
-  $id_medico = $_SESSION["id_medico"];
+<?php 
+include (__DIR__."/env.php");
+
+$rutaRaiz = Env::$_URL_API;
+
+session_start(); 
+$id_medico = $_SESSION["id_medico"];
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,7 +67,7 @@
                                     <th scope="col">Fecha de Creación</th>
                                     <th scope="col">Fecha Límite</th>
                                     <th scope="col">Criterio</th>
-                                    <th scope="col">Acción</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="tabla">
@@ -209,6 +215,7 @@
         }
 
         function return_options_selected() {
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
             var option_value = document.getElementById("select_tipo").value;
 
@@ -216,11 +223,10 @@
                 tipo: document.getElementById("select_tipo").value,
             };
 
-            console.log(document.getElementById("select_tipo").value);
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/deptos_generos_patologias',
+                url: rootRaiz + '/deptos_generos_patologias',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -231,12 +237,11 @@
 
                         response['data'].forEach(element => {
                             options_selected.innerHTML += `<div class="form-check">
-                    <input class="form-check-input" type="radio" name="exampleRadios" id="${element["id"]}" value="${element["id"]}" onclick="checkear_genero(${element["id"]})" checked>
-                    <label class="form-check-label" for="exampleRadios1">
-                        ${element["nombre"]}
-                    </label>
-                    </div>                    
-                        `;
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="${element["id"]}" value="${element["id"]}" onclick="checkear_genero(${element["id"]})" checked>
+                            <label class="form-check-label" for="exampleRadios1">
+                                ${element["nombre"]}
+                            </label>
+                            </div>`;
                         });
 
                     }
@@ -271,41 +276,9 @@
             });
         }
 
-
-        function nuevo_anuncio() {
-
-            var parametros = {
-                descripcion: document.getElementById("descripcion_anuncio_individual").value,
-                fecha_limite: document.getElementById("fecha_limite").value,
-                email_medico: 'doc@gmail.com',
-                email_paciente: 'prueba@gmail.com'
-            };
-
-            $.ajax({
-                data: JSON.stringify(parametros),
-                url: '../php/create_aviso.php',
-                type: 'POST',
-                dataType: "JSON",
-
-                success: function(response) {
-
-                    if (response['status'] == 'Success') {
-                        tabla.innerHTML = ``;
-                        read_avisos();
-                        showalert("Aviso creado","alert-primary");
-
-
-                    } else {
-                        showalert("Error al crear aviso","alert-danger");
-                        console.log(response['status']);
-                    }
-
-
-                }
-            });
-        }
-
         function nuevo_anuncio_grupal() {
+
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
             
             var parametros = {
                 criterio: document.getElementById("select_tipo").value,
@@ -318,7 +291,7 @@
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/create_avisos',
+                url: rootRaiz + '/create_avisos',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -343,6 +316,8 @@
 
         function ver_mas(id_aviso) {
 
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
             $('#avisoModal').modal('show'); // abrir
 
             modal1.innerHTML = ``;
@@ -353,7 +328,7 @@
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/aviso',
+                url: rootRaiz + '/aviso',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -364,12 +339,14 @@
                         var response = response['data'];
 
                         modal1.innerHTML += `
-                        <p> Descripcion: ` + response['descripcion'] + ` </p>
-                        <p> Fecha Creación: ` + response['fecha_creacion'] + ` </p>
-                        <p> Fecha Límite: ` + response['fecha_limite'] + ` </p>
-                        <p><b>Criterio del aviso enviado:</b></p>
+                        <p><b> Descripcion: </b>` + response['descripcion'] + ` </p>
+                        <p><b> Fecha Creación: </b>` + response['fecha_creacion'] + `</p>
+                        <p><b> Fecha Límite: </b>` + response['fecha_limite'] + `</p>
+                        <p><b> Criterio del aviso enviado:</b></p>
+                        <ul class="list-group">
                         `;
                         avisos_criterios(response['id'], response['aviso_criterio']);
+                        modal1.innerHTML += `</ul>`;
 
                     } else {
                         console.log(response['status']);
@@ -385,16 +362,18 @@
 
             const tabla = document.querySelector('#tabla');
 
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
             var url_imagen = "";
 
 
             var parametros = {
-                email: "doc@gmail.com",
+                email: "<?php echo $_SESSION['email']; ?>",
             };
 
             $.ajax({
                 data: JSON.stringify(parametros),
-                url: 'http://localhost/S-65/api/v1/avisos',
+                url: rootRaiz + '/avisos',
                 type: 'POST',
                 dataType: "JSON",
 
@@ -417,6 +396,9 @@
                             }
                             if (element['aviso_criterio'] == 5) {
                                 criterio = "Patologias"
+                            }
+                            if (element['aviso_criterio'] == 4) {
+                                criterio = "Personal"
                             }
                         
 
@@ -442,9 +424,10 @@
         }
 
         function avisos_criterios(id_aviso, criterio) {
-            console.log(id_aviso);
+            var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
             var settings = {
-                "url": "http://localhost/S-65/api/v1/avisos_criterios",
+                "url": rootRaiz + "/avisos_criterios",
                 "method": "POST",
                 "data": JSON.stringify({
                     "id_aviso": id_aviso,
@@ -457,20 +440,47 @@
 
                     if (criterio == 1) {
                         response.forEach(element => {
-                            modal1.innerHTML += `<p >${element['nombre']}</p>`;
+                            modal1.innerHTML +=`
+                    <li class="list-group-item">
+                    <div class="d-inline-flex align-items-center justify-content-center text-white m-1 me-2" style="background-color: green; width: 26px; height: 26px;">
+                            <i class="fas fa-check-square fa-lg"></i>
+                        </div>
+                    ${element['nombre']}
+                    </li>`
+                             ;
                         });
                     }  
-                    
+
                     if (criterio == 2) {
                         response.forEach(element => {
-                            modal1.innerHTML += `<p >${element['nombre']}</p>`;
+                            modal1.innerHTML += `<li class="list-group-item">
+                    <div class="d-inline-flex align-items-center justify-content-center text-white m-1 me-2" style="background-color: green; width: 26px; height: 26px;">
+                            <i class="fas fa-check-square fa-lg"></i>
+                        </div>
+                    ${element['nombre']}
+                    </li>`;
                         });
                     }
 
                     if (criterio == 5) {
                         response.forEach(element => {
-                            modal1.innerHTML += `<p >${element['nombre_evento']}</p>`;
+                            modal1.innerHTML += `<li class="list-group-item">
+                    <div class="d-inline-flex align-items-center justify-content-center text-white m-1 me-2" style="background-color: green; width: 26px; height: 26px;">
+                            <i class="fas fa-check-square fa-lg"></i>
+                        </div>
+                    ${element['nombre_evento']}
+                    </li>`;
                         });
+                    }
+
+                    if (criterio == 4) {
+                            modal1.innerHTML += `<li class="list-group-item">
+                    <div class="d-inline-flex align-items-center justify-content-center text-white m-1 me-2" style="background-color: green; width: 26px; height: 26px;">
+                            <i class="fas fa-check-square fa-lg"></i>
+                        </div>
+                    ${response['nombre']}
+                    </li>`;
+
                     }
 
 
