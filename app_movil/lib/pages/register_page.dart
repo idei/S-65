@@ -71,7 +71,7 @@ class _FormRegisterState extends State<RegisterPage> {
   }
 
   registerPaciente() async {
-    String URL_base = Env.URL_PREFIX;
+    String URL_base = Env.URL_API;
     var url = URL_base + "/user_register";
     var response = await http.post(url, body: {
       "email": emailPaciente.text,

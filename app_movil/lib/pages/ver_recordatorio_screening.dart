@@ -1,8 +1,6 @@
-import 'package:app_salud/models/recordatorio_model.dart';
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
-import 'package:provider/provider.dart';
 
 import 'env.dart';
 import 'package:http/http.dart' as http;

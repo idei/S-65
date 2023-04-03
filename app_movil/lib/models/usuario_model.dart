@@ -24,10 +24,11 @@ class UsuarioModel extends InheritedWidget {
 
   factory UsuarioModel.fromJson(Map<String, dynamic> json) {
     return UsuarioModel(
-        emailUser: json['email'].toString(),
-        tokenId: json['token'].toString(),
-        password: json['token'].toString(),
-        paciente: PacienteModel.fromJsonFromRegisterInitial(json['paciente']));
+        emailUser: json['data']['email'].toString(),
+        tokenId: json['data']['token'].toString(),
+        password: json['data']['token'].toString(),
+        paciente: PacienteModel.fromJsonFromRegisterInitial(
+            json['data']['paciente']));
   }
 
   factory UsuarioModel.fromJsonLogin(Map<String, dynamic> json) {

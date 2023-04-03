@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
-import 'login_page.dart';
 import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:intl/intl.dart';

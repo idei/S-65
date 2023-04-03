@@ -43,7 +43,6 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
     String email_prefer = prefs.getString("email_prefer");
     email = email_prefer;
     id_paciente = prefs.getInt("id_paciente");
-    print(email);
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

@@ -1,4 +1,3 @@
-import 'package:app_salud/models/medico_model.dart';
 import 'package:app_salud/services/medico_services.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
