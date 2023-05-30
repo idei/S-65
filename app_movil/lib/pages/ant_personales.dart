@@ -61,29 +61,32 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
           future: fetchAntecedentesPersonales(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView(
-                children: ListTile.divideTiles(
-                  color: Colors.black26,
-                  tiles: snapshot.data
-                      .map((data) => ListTile(
-                            title: GestureDetector(
-                              onTap: () {},
-                              child: ListTile(
-                                leading: Icon(
-                                  Icons.arrow_right_rounded,
-                                  color: Colors.blue,
+              return Hero(
+                tag: "icono",
+                child: ListView(
+                  children: ListTile.divideTiles(
+                    color: Colors.black26,
+                    tiles: snapshot.data
+                        .map((data) => ListTile(
+                              title: GestureDetector(
+                                onTap: () {},
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.arrow_right_rounded,
+                                    color: Colors.blue,
+                                  ),
+                                  title: Text(data.antecedenteDescripcion,
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
                                 ),
-                                title: Text(data.antecedenteDescripcion,
-                                    style: TextStyle(
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily)),
                               ),
-                            ),
-                          ))
-                      .toList(),
-                ).toList(),
+                            ))
+                        .toList(),
+                  ).toList(),
+                ),
               );
             } else {
               if (!isLoading) {

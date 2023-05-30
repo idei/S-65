@@ -15,6 +15,7 @@ import 'package:app_salud/pages/medicamento_add.dart';
 import 'package:app_salud/pages/medicamentos.dart';
 import 'package:app_salud/pages/medico_perfil.dart';
 import 'package:app_salud/pages/menu.dart';
+import 'package:app_salud/pages/menuPrueba.dart';
 import 'package:app_salud/pages/menu_chequeo.dart';
 import 'package:app_salud/pages/new_recordatorio_personal.dart';
 import 'package:app_salud/pages/recordatorios.dart';
@@ -42,6 +43,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/': (context) => HomePage(),
     'ingresar': (context) => LoginPage(),
     'registrar': (context) => RegisterPage(),
+    //'/menu': (context) => MenuPrueba(),
     '/menu': (context) => MenuPage(),
     '/form_datos_generales': (context) => Formprueba(),
     '/form_datos_clinicos': (context) => FormDatosClinicos(),

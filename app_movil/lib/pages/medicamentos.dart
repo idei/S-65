@@ -252,6 +252,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
     var url = URL_base + "/delete_medicamento";
     var response = await http.post(url, body: {
       "id_medicamento": id_medicamento.toString(),
+      "id_paciente": id_paciente.toString(),
     });
 
     if (response.statusCode == 200) {

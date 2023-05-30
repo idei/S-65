@@ -54,12 +54,12 @@ $rutaRaiz = Env::$_URL_API;
       ?>
 
       <!-- Main content -->
-      <section class="content">
+      <section class="content" >
         <!-- <div class="d-flex" id="wrapper"> -->
         <!-- Page content-->
         <div class="callout callout-info">
           <div class="row">
-            <div class="col-6">
+            <div id="content_paciente" class="col-6">
               <h4>Datos de Paciente</h4>
               <div id="nombre"></div>
               <div id="dni"></div>
@@ -248,11 +248,13 @@ $rutaRaiz = Env::$_URL_API;
         }),
       };
 
+      $('#content_paciente').html('<div class="loading"><img src="dist/img/loading.gif" alt="loading" /><br/>Un momento, por favor...</div>');
+
       $.ajax(settings).done(function (response) {
-        console.log(response);
-              if (response['status'] == "Success") {
+            if (response['status'] == "Success") {
+          $('#content_paciente').fadeIn(4000).html('<h4>Datos de Paciente</h4><div id="nombre"></div><div id="dni"></div><div id="contacto"></div> <div id="depto"></div> </br> <h4>Últimos Datos Clínicos</h4> <div id="peso"></div> <div id="presionA"></div> <div id="presionB"></div> <div id="pulso"></div> <div id="circun"></div> <div id="alcohol"></div> <div id="fuma"></div> <div id="mari"></div> <div id="otras"></div> </div>');
+
           var response = response['data'];
-          console.log(response);
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']
           var dni = "DNI: " + response['dni']
           var contacto = "Contacto: " + response['contacto']
@@ -501,9 +503,10 @@ $rutaRaiz = Env::$_URL_API;
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function (response) {
+
+
+      $.ajax(settings).success(function (response) {
         if (response['status'] == "Success") {
-          // console.log(response['data']);
           response['data'].forEach(element => {
             consume_alcohol = consumos(element['consume_alcohol']);
             consume_marihuana = consumos(element['consume_marihuana']);

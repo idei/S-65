@@ -12,10 +12,10 @@ header('Content-Type: application/json; charset=utf8');
 // $certificado = 'https://alanalizador.000webhostapp.com/php/certificado.pem';
 
 //Base de datos de Hosting UNSJ
-// $db_name = "s65";
-// $db_server = "localhost";
-// $db_user = "user_s65";
-// $db_pass = "A8smFW7#";
+//  $db_name = "s65";
+//  $db_server = "localhost";
+//  $db_user = "user_s65";
+//  $db_pass = "A8smFW7#";
 //$certificado = 'https://190.124.224.143/php/certificado.pem';
 
 //-------------- LOCAL -----------------------

@@ -2008,9 +2008,7 @@ function save_dosis_frecuencia()
             'id_medicamento' => $id_medicamento,
         ];
         $update_pass = Flight::db()->prepare("UPDATE medicamento_paciente
-                    SET dosis_frecuencia=:dosis_frecuencia,
-                    rela_paciente=: id_paciente,
-                    rela_medicamento=: id_medicamento
+                    SET dosis_frecuencia=:dosis_frecuencia
                     WHERE rela_paciente=:id_paciente and rela_medicamento=:id_medicamento");
 
         $update_pass->execute($data);
@@ -2036,11 +2034,19 @@ function delete_medicamento()
         $id_medicamento = verificar($data_input, "id_medicamento");
     }
 
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
 
     try {
 
-        $stmt = Flight::db()->prepare('DELETE FROM medicamentos WHERE id_medicamento = :id_medicamento');
+        $stmt = Flight::db()->prepare('DELETE FROM medicamento_paciente 
+        WHERE rela_medicamento =:id_medicamento AND rela_paciente =:id_paciente');
         $stmt->bindValue(':id_medicamento', $id_medicamento);
+        $stmt->bindValue(':id_paciente', $id_paciente);
         $stmt->execute();
         $returnData = msg("Success", []);
     } catch (PDOException $error) {
