@@ -107,7 +107,13 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
                       Navigator.of(context)
                           .pushReplacementNamed('/recordatorio');
                     },
-                    child: Text('Hecho'),
+                    child: Text(
+                      'Hecho',
+                      style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
+                    ),
                   ),
                 ]))));
   }

@@ -52,7 +52,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/antecedentes_personales': (context) => AntecedentesPerPage(),
     '/antecedentes_familiares': (context) => AntecedentesFamiliarPage(),
     '/form_antecedentes_familiares': (context) => FormAntecedentesFamiliares(),
-    '/datoscli': (context) => DatosCli(),
+    '/datoscli': (context) => DatosClinicos(),
     '/medicamentos': (context) => MedicamentoPage(),
     '/medicamentosAdd': (context) => MedicamentoAddPage(),
     '/ajustes': (context) => AjustesPage(),

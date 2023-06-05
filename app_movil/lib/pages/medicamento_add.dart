@@ -99,7 +99,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buscador",
+        title: Text("Buscador de Medicamentos",
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
         actions: <Widget>[
@@ -173,7 +173,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
               onPressed: () {
                 guardar_medicamento(int.parse(data_id));
               },
-              child: Text('Guardar Datos',
+              child: Text('Agregar Medicamento',
                   style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily)),

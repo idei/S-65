@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -37,10 +38,19 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
+    final isTablet = Device.get().isTablet;
 
     email = usuarioModel.usuario.emailUser;
 
     final size = MediaQuery.of(context).size;
+
+    var sizeCircle;
+
+    if (isTablet) {
+      sizeCircle = MediaQuery.of(context).size.width / 13.3;
+    } else {
+      sizeCircle = MediaQuery.of(context).size.width / 8.3;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -51,10 +61,10 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
             },
           ),
           title: Text(
-            'Antecedentes Personales Registrados ',
+            'Mis Antecedentes Personales',
             style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 14.2),
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            ),
           )),
       body: Container(
         child: FutureBuilder<List<AntecedentesPersonalesModel>>(
@@ -133,15 +143,14 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                     });
               },
               child: CircleAvatar(
-                radius: MediaQuery.of(context).size.width / 8.3,
+                radius: sizeCircle,
                 child: new Column(children: <Widget>[
                   SizedBox(height: 10.0),
-                  Icon(Icons.edit, color: Colors.white, size: 40.0),
-                  SizedBox(height: 10.0),
+                  Icon(Icons.edit, color: Colors.white, size: 30.0),
+                  SizedBox(height: 6.0),
                   Text(
-                    'Modificar',
-                    style: new TextStyle(
-                      fontSize: 14.0,
+                    'Agregar',
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                       fontFamily:

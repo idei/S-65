@@ -26,7 +26,7 @@ class _AvisosState extends State<Avisos> {
             Navigator.pushNamed(context, '/menu');
           },
         ),
-        title: Text('Avisos',
+        title: Text('Mis Avisos',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),

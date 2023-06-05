@@ -37,7 +37,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
               },
             ),
             title: Text(
-              'Medicamentos ',
+              'Mis Medicamentos',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               ),
@@ -76,7 +76,10 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     color: Colors.green,
                                     onPressed: () {
                                       _showAlertDialog(
-                                          int.parse(data.id_medicamento), 1);
+                                        int.parse(data.id_medicamento),
+                                        data.dosis_frecuencia,
+                                        1,
+                                      );
                                     },
                                   ), // icon-1
                                   IconButton(
@@ -84,7 +87,10 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     color: Colors.red,
                                     onPressed: () {
                                       _showAlertDialog(
-                                          int.parse(data.id_medicamento), 2);
+                                        int.parse(data.id_medicamento),
+                                        data.dosis_frecuencia,
+                                        2,
+                                      );
                                     },
                                   ),
                                 ]),
@@ -99,8 +105,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
                     alignment: Alignment.center,
                     child: Positioned(
                       child: _isLoadingIcon(),
-                      //bottom: 40,
-                      //left: size.width * 0.5 - 30,
                     ),
                   );
                 } else {
@@ -179,8 +183,9 @@ class _MedicamentoState extends State<MedicamentoPage> {
     print(response.body);
   }
 
-  void _showAlertDialog(int id_medicamento, int button_pressed) {
-    dosis_frecuencia.text = "";
+  void _showAlertDialog(
+      int id_medicamento, String data_frecuencia, int button_pressed) {
+    dosis_frecuencia.text = data_frecuencia.toString();
     showDialog(
         context: context,
         builder: (buildcontext) {
@@ -203,24 +208,22 @@ class _MedicamentoState extends State<MedicamentoPage> {
                 },
               ),
               actions: <Widget>[
-                ElevatedButton(
-                  //color: Colors.blue,
-                  child: Text(
-                    "Guardar",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
+                Center(
+                  child: ElevatedButton(
+                    child: Text(
+                      "Guardar",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
                     ),
+                    onPressed: () {
+                      guardarFrecuenciaMedicamento(
+                          id_medicamento, dosis_frecuencia.text);
+                      Navigator.popAndPushNamed(context, "/medicamentos");
+                    },
                   ),
-                  onPressed: () {
-                    guardarFrecuenciaMedicamento(
-                        id_medicamento, dosis_frecuencia.text);
-                    Navigator.popAndPushNamed(
-                        context, "/medicamentos"); // push it back in
-
-                    //Navigator.pop(context, true);
-                  },
                 )
               ],
             );

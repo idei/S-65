@@ -14,6 +14,7 @@ class ScreeningPage extends StatefulWidget {
 final _formKey_screening = GlobalKey<_ScreeningState>();
 var select_screening;
 var titulo;
+bool isLoading = false;
 
 class _ScreeningState extends State<ScreeningPage> {
   @override
@@ -31,7 +32,7 @@ class _ScreeningState extends State<ScreeningPage> {
               Navigator.pushNamed(context, '/menu_chequeo');
             },
           ),
-          title: Text('Chequeos ' + titulo,
+          title: Text('Mis Chequeos ' + titulo,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
@@ -88,11 +89,32 @@ class _ScreeningState extends State<ScreeningPage> {
                   ).toList(),
                 );
               } else {
-                return Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: "Cargando",
-                  ),
-                );
+                if (!isLoading) {
+                  return Container(
+                    alignment: Alignment.center,
+                    child: Positioned(
+                      child: _isLoadingIcon(),
+                    ),
+                  );
+                } else {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'No tiene chequeos ' + titulo + ' registrados',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      )),
+                    ],
+                  ));
+                }
               }
             }),
         floatingActionButton: FloatingActionButton(
@@ -233,8 +255,8 @@ class _ScreeningState extends State<ScreeningPage> {
 
       return list_sreenings;
     } else {
-      list_sreenings = [];
-      return list_sreenings;
+      isLoading = true;
+      return null;
     }
   }
 
@@ -252,5 +274,23 @@ class _ScreeningState extends State<ScreeningPage> {
     email_argument = email_prefer;
     id_paciente = await prefs.getInt("id_paciente");
     print(email_argument);
+  }
+}
+
+class _isLoadingIcon extends StatelessWidget {
+  const _isLoadingIcon({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+      child: const CircularProgressIndicator(color: Colors.blue),
+    );
   }
 }

@@ -49,14 +49,16 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text(
-                  'Antecedentes Personales',
-                  style: TextStyle(
+                title: Center(
+                  child: Text(
+                    'Agregar \nAntecedentes Personales',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 19.0),
+                    ),
+                  ),
                 ),
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 backgroundColor: Theme.of(context).primaryColor,
               ),
               body: Center(
@@ -258,13 +260,15 @@ class AntecedentesWidgetState extends State<Antecedentes> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           backgroundColor: Theme.of(context).primaryColor,
-          title: Text(
-            'Antecedentes Personales',
-            style: TextStyle(
+          title: Center(
+            child: Text(
+              'Agregar \nAntecedentes Personales',
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 19.0),
+              ),
+            ),
           ),
           actions: <Widget>[
             PopupMenuButton<String>(

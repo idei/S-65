@@ -72,9 +72,7 @@ class _AjustesState extends State<AjustesPage> {
                     height: 20,
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
+                    style: ElevatedButton.styleFrom(),
                     onPressed: () {
                       Navigator.push(
                         context,

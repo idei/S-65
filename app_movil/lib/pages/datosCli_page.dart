@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 var email_argument;
 var id_paciente;
 
-class DatosCli extends StatefulWidget {
+class DatosClinicos extends StatefulWidget {
   @override
-  _DatosCliState createState() => _DatosCliState();
+  _DatosClinicosState createState() => _DatosClinicosState();
 }
 
 String email_prefer;
@@ -15,132 +16,178 @@ getStringValuesSF() async {
   email_prefer = prefs.getString("email_prefer");
   email_argument = email_prefer;
   id_paciente = prefs.getInt("id_paciente");
-  print("menu");
-  print(email_argument);
 }
 
-// Define a corresponding State class.
-// This class holds data related to the Form.
-class _DatosCliState extends State<DatosCli> {
+class _DatosClinicosState extends State<DatosClinicos> {
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
+    final isTablet = Device.get().isTablet;
+
     if (parametros != null) {
       email_argument = parametros['email'];
-      print("Datos Clinico");
     } else {
       getStringValuesSF();
     }
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/menu');
-          },
-        ),
-        title: Text('Datos Clinicos',
-            style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontWeight: FontWeight.bold)),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu');
             },
-          )
-        ],
-      ),
-
-      body: Container(
-        // ThemeData(
-        //   primarySwatch: Colors.blue,
-        //   primaryColor: const Color(0xFF2196f3),
-        //   accentColor: const Color(0xFF2196f3),
-        //   canvasColor: const Color(0xFF2949de),
-        // ),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/form_datos_clinicos',
-                            arguments: {
-                              "email": email_argument,
-                            });
-                        //do what you want here
-                      },
-                      child: CircleAvatar(
-                        radius: MediaQuery.of(context).size.width / 7.3,
-                        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                        child: Icon(Icons.sync_outlined,
-                            color: Colors.white, size: 70.0),
-                      ),
-                    ),
-                    SizedBox(height: 10.0),
-                    Text(
-                      "     REGISTRAR \n DATOS CLINICO",
-                      style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                    SizedBox(height: 20.0),
-                  ]),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-              ),
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/historial_clinico');
-                        //do what you want here
-                      },
-                      child: CircleAvatar(
-                          radius: MediaQuery.of(context).size.width / 7.3,
-                          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                          child: Icon(Icons.bar_chart,
-                              color: Colors.white, size: 70.0)),
-                    ),
-                    SizedBox(height: 10.0),
-                    Text(
-                      "         HISTORIAL\n           CLÍNICO",
-                      style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                    SizedBox(height: 20.0),
-                  ]),
-            ]),
-        padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 1.0),
-        alignment: Alignment.centerLeft,
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          ),
+          title: Text('Datos Clinicos',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            )
+          ],
+        ),
+        body: isTablet
+            ? LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                return Container(
+                    height: constraints.maxHeight * 0.8,
+                    width: constraints.maxWidth * 0.9,
+                    child: GridView.count(
+                        crossAxisCount:
+                            3, // Define el número de columnas de la grilla
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 20.0,
+                        mainAxisSpacing: 50.0,
+                        padding: EdgeInsets.all(20.0),
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/form_datos_clinicos',
+                                  arguments: {
+                                    "email": email_argument,
+                                  });
+                            },
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  radius:
+                                      MediaQuery.of(context).size.width / 9.3,
+                                  child: Icon(Icons.sync_outlined,
+                                      color: Colors.white, size: 100.0),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  "REGISTRAR \n DATOS CLÍNICO",
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/historial_clinico');
+                            },
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                    radius:
+                                        MediaQuery.of(context).size.width / 9.3,
+                                    child: Icon(Icons.bar_chart,
+                                        color: Colors.white, size: 100.0)),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  "HISTORIAL\nCLÍNICO",
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ]));
+              })
+            : LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                return Container(
+                    height: constraints.maxHeight * 0.8,
+                    width: constraints.maxWidth * 0.9,
+                    child: GridView.count(
+                        crossAxisCount:
+                            2, // Define el número de columnas de la grilla
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 1.0,
+                        mainAxisSpacing: 50.0,
+                        padding: EdgeInsets.all(20.0),
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/form_datos_clinicos',
+                                  arguments: {
+                                    "email": email_argument,
+                                  });
+                            },
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: MediaQuery.of(context).size.width / 8,
+                                  child: Icon(Icons.sync_outlined,
+                                      color: Colors.white, size: 80.0),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  "REGISTRAR \n DATOS CLÍNICO",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/historial_clinico');
+                            },
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                    radius:
+                                        MediaQuery.of(context).size.width / 8,
+                                    child: Icon(Icons.bar_chart,
+                                        color: Colors.white, size: 80.0)),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  "HISTORIAL\nCLÍNICO",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ]));
+              }));
   }
 
   void choiceAction(String choice) {

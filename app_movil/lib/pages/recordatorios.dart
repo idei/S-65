@@ -33,7 +33,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
             Navigator.pushNamed(context, '/menu');
           },
         ),
-        title: Text('Recordatorios',
+        title: Text('Mis Recordatorios',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),

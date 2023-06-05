@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AntecedenteFamiliaresModel {
   String antecedenteDescripcion;
@@ -28,6 +28,7 @@ var usuarioModel;
 class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
   bool isLoading = false;
   List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
+  final isTablet = Device.get().isTablet;
 
   @override
   void initState() {
@@ -41,20 +42,27 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     email = usuarioModel.usuario.emailUser;
 
     final size = MediaQuery.of(context).size;
+    var sizeCircle;
+
+    if (isTablet) {
+      sizeCircle = MediaQuery.of(context).size.width / 13.3;
+    } else {
+      sizeCircle = MediaQuery.of(context).size.width / 8.3;
+    }
 
     return Scaffold(
       appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushNamed(context, '/menu');
             },
           ),
           title: Text(
-            'Antecedentes Familiares Registrados ',
+            'Mis Antecedentes Familiares',
             style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 14.2),
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            ),
           )),
       body: Container(
         child: FutureBuilder<List<AntecedenteFamiliaresModel>>(
@@ -91,8 +99,6 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                   alignment: Alignment.center,
                   child: Positioned(
                     child: _isLoadingIcon(),
-                    //bottom: 40,
-                    //left: size.width * 0.5 - 30,
                   ),
                 );
               } else {
@@ -130,22 +136,23 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                     });
               },
               child: CircleAvatar(
-                radius: MediaQuery.of(context).size.width / 8.3,
-                child: new Column(children: <Widget>[
-                  SizedBox(height: 10.0),
-                  Icon(Icons.edit, color: Colors.white, size: 40.0),
-                  SizedBox(height: 10.0),
-                  Text(
-                    'Modificar',
-                    style: new TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  )
-                ]),
+                radius: sizeCircle,
+                child: Center(
+                  child: Column(children: <Widget>[
+                    SizedBox(height: 10.0),
+                    Icon(Icons.edit, color: Colors.white, size: 30.0),
+                    SizedBox(height: 6.0),
+                    Text(
+                      'Agregar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
+                    )
+                  ]),
+                ),
               ),
             )
           ]),
@@ -173,12 +180,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
         listAntecFamiliares
             .add(AntecedenteFamiliaresModel.fromJson(antecedentes));
       }
-      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
 
-      // listAntecFamiliares = items.map<AntecedenteModel>((json) {
-      //   return AntecedenteModel.fromJson(json);
-      // }).toList();
-      //isLoading = true;
       return listAntecFamiliares;
     } else {
       isLoading = true;

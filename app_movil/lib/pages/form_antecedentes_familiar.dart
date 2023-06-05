@@ -55,12 +55,15 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
             }
             return Scaffold(
               appBar: AppBar(
-                title: Text(
-                  'Antecedentes Familiares',
-                  style: TextStyle(
+                title: Center(
+                  child: Text(
+                    'Agregar \nAntecedentes Familiares',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 19.0),
+                    ),
+                  ),
                 ),
                 backgroundColor: Theme.of(context).primaryColor,
               ),
@@ -298,11 +301,14 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
     }
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Antecedentes Familiares',
-            style: TextStyle(
+          title: Center(
+            child: Text(
+              'Agregar \nAntecedentes Familiares',
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 19.0),
+              ),
+            ),
           ),
           backgroundColor: Theme.of(context).primaryColor,
           actions: <Widget>[

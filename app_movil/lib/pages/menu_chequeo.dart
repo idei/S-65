@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Define a custom Form widget.
 class MenuChequeoPage extends StatefulWidget {
   @override
   _MenuChequeoState createState() => _MenuChequeoState();
@@ -16,8 +15,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
     if (parametros != null) {
       email_argument = parametros['email'];
       id_paciente = parametros['id_paciente'];
-      print("menu");
-    } else {}
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +26,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
           },
         ),
         title: Text(
-          "Chequeos",
+          "Seleccionar Chequeo",
           style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
         ),

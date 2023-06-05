@@ -70,8 +70,8 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
           //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text('Datos Clínicos',
               style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontWeight: FontWeight.bold)),
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.help_outline),
@@ -96,6 +96,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
           child: Container(
             padding: EdgeInsets.all(20.0),
             child: ListView(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
               children: <Widget>[
                 Row(
                   children: [
@@ -104,7 +105,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         Text(
                           "Presión Alta ",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 17,
                             fontFamily: Theme.of(context)
                                 .textTheme
                                 .headline1
@@ -160,7 +161,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         Text(
                           "Presión Baja ",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontFamily: Theme.of(context)
                                   .textTheme
                                   .headline1
@@ -203,7 +204,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                       children: [
                         Text("Pulso ",
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontFamily: Theme.of(context)
                                     .textTheme
                                     .headline1
@@ -251,7 +252,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         Text(
                           "Peso(Kg) ",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontFamily: Theme.of(context)
                                   .textTheme
                                   .headline1
@@ -306,7 +307,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         Text(
                           "Altura (Metros)",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontFamily: Theme.of(context)
                                   .textTheme
                                   .headline1
@@ -353,7 +354,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         Text(
                           "Circunferencia de Cintura ",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontFamily: Theme.of(context)
                                   .textTheme
                                   .headline1
@@ -411,7 +412,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                         guardar_datos(context);
                       }
                       loginToast(
-                          "se guardaron correctamente sus datos clínicos");
+                          "Se guardaron correctamente sus datos clínicos");
                     }
                   },
                   child: Text(
@@ -445,7 +446,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                 child: Text(
                   pregunta,
                   style: new TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 17.0,
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
                       fontWeight: FontWeight.bold),
@@ -459,7 +460,6 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 }
 
 guardar_datos(BuildContext context) async {
-  print(email_prefer);
   String URL_base = Env.URL_API;
   var url = URL_base + "/save_datos_clinicos";
   var response = await http.post(url, body: {
@@ -478,14 +478,12 @@ guardar_datos(BuildContext context) async {
 
   var data = json.decode(response.body);
 
-  if (data['estado_users'] == "Success") {
-    loginToast("Datos Clínicos Guardados Correctamente");
-  } else {
-    loginToast(data['estado_users']);
+  if (response.statusCode == 200) {
+    if (data["status"] == "Success") {
+      _alert_clinicos(
+          context, "Informacion para tener en cuenta", descri_informe, 2);
+    }
   }
-
-  _alert_clinicos(
-      context, "Informacion para tener en cuenta", descri_informe, 2);
 }
 
 loginToast(String toast) {
@@ -493,8 +491,20 @@ loginToast(String toast) {
       msg: toast,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.green,
       textColor: Colors.white);
+}
+
+_alert_informe(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
 }
 
 var pulso_confirm = false;
@@ -554,7 +564,7 @@ verification(BuildContext context) async {
     descri_informe +=
         "\n\nSu presion se encuentra un poco elevada. Le sugerimos que consulte con su medico de cabecera o cardiologo.";
   }
-  if (int.parse(presion_alta.text) > 180) {
+  if (int.parse(presion_alta.text) > 170) {
     descri_informe +=
         "\n\nUsted esta en este momento con una Crisis Hipertensiva por lo cual debe consultar a una guardia médica para ser controlado a la brevedad posible.";
   }
@@ -603,11 +613,11 @@ verification(BuildContext context) async {
   var IMC;
   IMC = int.parse(peso_corporal.text) / double.parse(altura.text);
 
-  if (IMC < 18.4) {
+  if (IMC < 17.4) {
     descri_informe +=
         "\n\nIMC : Su IMC es de $IMC se encuentra dentro de los valores correspondientes a 'bajo peso'. Seria bueno que consulte a su clínico o a un especialista en  nutrición.";
   } else {
-    if (IMC >= 18.4) {
+    if (IMC >= 17.4) {
       if (IMC <= 24.9) {
         descri_informe +=
             "\n\nIMC : Su IMC es de $IMC se encuentra dentro de los valores normales o peso saludable.";
@@ -689,6 +699,7 @@ _alert_clinicos(context, title, descripcion, number) async {
             Navigator.pop(context);
           } else {
             Navigator.pushNamed(context, '/datoscli');
+            _alert_informe(context, "Datos Clínicos Guardados", 1);
           }
         },
         width: 120,

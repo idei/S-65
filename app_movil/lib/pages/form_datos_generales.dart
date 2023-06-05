@@ -54,7 +54,7 @@ class _FormpruebaState extends State<Formprueba> {
               Navigator.pushNamed(context, '/menu');
             },
           ),
-          title: Text('Datos Generales',
+          title: Text('Datos Personales',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
@@ -157,6 +157,7 @@ class _FormpruebaState extends State<Formprueba> {
                             format: format,
                             onShowPicker: (context, currentValue) {
                               return showDatePicker(
+                                  locale: const Locale("es", "ES"),
                                   context: context,
                                   firstDate: DateTime(1900),
                                   initialDate: currentValue ?? DateTime.now(),
@@ -250,6 +251,7 @@ class _FormpruebaState extends State<Formprueba> {
                                         .textTheme
                                         .headline1
                                         .fontFamily,
+                                    fontSize: 16.0,
                                   )),
                             ),
                           ),

@@ -58,7 +58,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text('Aviso General',
+                title: Text('Detalle de Aviso',
                     style: TextStyle(
                         fontFamily:
                             Theme.of(context).textTheme.headline1.fontFamily)),
@@ -126,9 +126,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
               Navigator.pushNamed(context, '/avisos');
             },
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-
-          title: Text('Avisos Generales',
+          title: Text('Detalle de Aviso',
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
@@ -167,9 +165,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                                 .textTheme
                                 .headline1
                                 .fontFamily)),
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
+                    style: ElevatedButton.styleFrom(),
                     onPressed: () {
                       update_aviso_paciente();
                       Navigator.of(context).pushReplacementNamed('/avisos');
