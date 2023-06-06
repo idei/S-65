@@ -874,7 +874,7 @@ function read_datos_clinicos()
         $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
     consume_marihuana, otras_drogas, fuma_tabaco, fecha_alta, talla 
     FROM datos_clinicos 
-    WHERE rela_paciente = '" . $id_users . "'");
+    WHERE rela_paciente = '" . $id_paciente . "'");
 
         $select_data_clinica->execute();
 
@@ -1532,10 +1532,10 @@ function read_recordatorios()
     try {
 
         $stmt = Flight::db()->prepare("SELECT id,descripcion,fecha_limite,rela_estado_recordatorio,rela_paciente FROM recordatorios_pacientes
-        WHERE rela_estado_recordatorio = 2 AND rela_paciente = '" . $id_paciente . "'
+        WHERE rela_estado_recordatorio != 1 AND rela_paciente = '" . $id_paciente . "'
         UNION ALL
         SELECT id,descripcion,fecha_limite,rela_estado_recordatorio,rela_paciente FROM recordatorios_medicos
-        WHERE rela_estado_recordatorio = 2 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite ASC");
+        WHERE rela_estado_recordatorio != 1 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite ASC");
 
         $stmt->execute();
 
@@ -2540,7 +2540,7 @@ function respuesta_screening_fisico()
         if ($_POST["id_recordatorio"] === "null") {
             $recordatorio_medico = null;
         } else {
-            $recordatorio_medico = $_POST["id_medico"];
+            $recordatorio_medico = $_POST["id_recordatorio"];
         }
     } else {
 
@@ -3143,11 +3143,14 @@ function respuesta_screening_fisico()
                 );
             }
         }
-
+   
         //Call our custom function.
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
+         
+        if ($recordatorio_medico <> null) {
 
-        $rela_estado_recordatorio = 2;
+        $rela_estado_recordatorio = 3;
+        
         $data = [
             'rela_estado_recordatorio' => $rela_estado_recordatorio,
             'recordatorio_medico' => $recordatorio_medico,
@@ -3157,7 +3160,8 @@ function respuesta_screening_fisico()
                 WHERE id=:recordatorio_medico");
 
         $update_estado_recordatorio->execute($data);
-
+        }
+        
         $returnData = msg("Success", []);
     } catch (PDOException $error) {
 
@@ -3204,20 +3208,16 @@ function respuesta_screening_animo()
         } else {
             $recordatorio_medico = $_POST["id_recordatorio"];
         }
-        //$recordatorio_medico = $recordatorio_medico == "null" ?: null;
     } else {
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
+
+   
 
 
     $estado = 1;
 
     $result_screening = 0;
-
-
-    // Flight::json("salida". $id_medico . " ". $recordatorio_medico." ". $tipo_screening);
-    // exit;
-
 
     if ($_POST['satisfecho'] == "true") {
         $satisfecho = 1;
@@ -3599,7 +3599,9 @@ function respuesta_screening_animo()
         $responseInsert = pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
         if ($recordatorio_medico <> null) {
-            $rela_estado_recordatorio = 2;
+                $rela_estado_recordatorio = 3;
+            
+            
             $data = [
                 'rela_estado_recordatorio' => $rela_estado_recordatorio,
                 'recordatorio_medico' => $recordatorio_medico,
@@ -3668,6 +3670,8 @@ function respuesta_screening_cdr()
         $tipo_screening = verificar($data_input, "tipo_screening");
     }
 
+   
+
     if (isset($_POST['memoria'])) {
         $memoria = $_POST["memoria"];
     } else {
@@ -3732,8 +3736,8 @@ function respuesta_screening_cdr()
 
     // SELECCION DE RESPUESTAS
     $select_respuesta = Flight::db()->prepare("SELECT * FROM `tipos_respuestas` WHERE code
-IN ('TRES11','TRES12', 'TRES13', 'TRES14', 'TRES15', 'TRES16', 'TRES17','TRES18', 'TRES19', 'TRES20', 'TRES21','TRES22', 'TRES23', 'TRES24', 'TRES25', 'TRES26',
-'TRES27', 'TRES28','TRES29','TRES30', 'TRES31','TRES32', 'TRES33', 'TRES34', 'TRES35', 'TRES36','TRES37', 'TRES38', 'TRES39', 'TRES40')");
+ IN ('TRES11','TRES12', 'TRES13', 'TRES14', 'TRES15', 'TRES16', 'TRES17','TRES18', 'TRES19', 'TRES20', 'TRES21','TRES22', 'TRES23', 'TRES24', 'TRES25', 'TRES26',
+ 'TRES27', 'TRES28','TRES29','TRES30', 'TRES31','TRES32', 'TRES33', 'TRES34', 'TRES35', 'TRES36','TRES37', 'TRES38', 'TRES39', 'TRES40')");
 
     $select_respuesta->execute();
     $respuesta = $select_respuesta->fetchAll();
@@ -3999,11 +4003,11 @@ IN ('TRES11','TRES12', 'TRES13', 'TRES14', 'TRES15', 'TRES16', 'TRES17','TRES18'
 
         $update_resultado->execute($data);
 
-        //Call our custom function.
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
         if ($recordatorio_medico <> null) {
-            $rela_estado_recordatorio = 2;
+            $rela_estado_recordatorio = 3 ;
+            
             $data = [
                 'rela_estado_recordatorio' => $rela_estado_recordatorio,
                 'recordatorio_medico' => $recordatorio_medico,
@@ -4516,10 +4520,9 @@ function respuesta_screening_conductual()
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
 
-
         if ($recordatorio_medico <> null) {
-            $rela_estado_recordatorio = 2;
-
+                $rela_estado_recordatorio = 3;
+            
             $data_recordatorios_medicos = [
                 'rela_estado_recordatorio' => $rela_estado_recordatorio,
                 'recordatorio_medico' => $recordatorio_medico,
@@ -4884,7 +4887,7 @@ function respuesta_screening_nutricional()
 
         if ($recordatorio_medico <> null) {
 
-            $rela_estado_recordatorio = 2;
+            $rela_estado_recordatorio = 3;
 
             $data = [
                 'rela_estado_recordatorio' => $rela_estado_recordatorio,
@@ -5510,7 +5513,7 @@ IN ('ATE1','ATE2','ATE3','ATE4','ARI1','ARI2','ARI3','ARI4','FUNE1','FUNE2','FUN
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
         if ($recordatorio_medico <> null) {
-            $rela_estado_recordatorio = 2;
+            $rela_estado_recordatorio = 3;
 
             $data = [
                 'rela_estado_recordatorio' => $rela_estado_recordatorio,
@@ -7193,7 +7196,7 @@ function save_datos_clinicos()
         } else {
 
             $estado_clinico = 1;
-            $insert_dato_clinico = Flight::db()->prepare('INSERT INTO datos_clinicos(id_paciente,presion_alta,presion_baja,pulso,peso,
+            $insert_dato_clinico = Flight::db()->prepare('INSERT INTO datos_clinicos(rela_paciente,presion_alta,presion_baja,pulso,peso,
                     circunferencia_cintura,talla,consume_alcohol,consume_marihuana,otras_drogas,fuma_tabaco,estado_clinico)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
             $insert_dato_clinico->bindParam(1, $id_paciente);
             $insert_dato_clinico->bindParam(2, $presion_alta);
@@ -7308,10 +7311,6 @@ function save_datos_personales()
 
 
     try {
-        // $select_email = Flight::db()->prepare("SELECT id FROM users WHERE email = '".$email."'");
-        // $select_email->execute();
-        // $rela_users= $select_email->fetch();
-        // $rela_users= $rela_users["id"];
 
         $data = [
             'nombre' => $nombre,
@@ -7346,7 +7345,13 @@ function save_datos_personales()
 
         $insert_paciente->execute($data);
 
+        $select_id_paciente = Flight::db()->prepare("SELECT id FROM pacientes WHERE email = '".$rela_users."'");
+        $select_id_paciente->execute();
+        $id_paciente= $select_id_paciente->fetch();
+        $id_paciente= $id_paciente["id"];
+
         $lista = array(
+            "id_paciente" => $id_paciente,
             "nombre" => $nombre,
             "apellido" => $apellido,
             "dni" => $dni,

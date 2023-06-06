@@ -143,7 +143,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                     Icon(Icons.edit, color: Colors.white, size: 30.0),
                     SizedBox(height: 6.0),
                     Text(
-                      'Agregar',
+                      '',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,

@@ -411,8 +411,6 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                       if (estado_verification == true) {
                         guardar_datos(context);
                       }
-                      loginToast(
-                          "Se guardaron correctamente sus datos clínicos");
                     }
                   },
                   child: Text(
@@ -482,6 +480,8 @@ guardar_datos(BuildContext context) async {
     if (data["status"] == "Success") {
       _alert_clinicos(
           context, "Informacion para tener en cuenta", descri_informe, 2);
+    } else {
+      loginToast("Error al guardar la información");
     }
   }
 }
@@ -491,7 +491,7 @@ loginToast(String toast) {
       msg: toast,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.red,
       textColor: Colors.white);
 }
 
@@ -823,7 +823,6 @@ class Consume_TabacoWidgetState extends State<Consume_Tabaco> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    print(response);
     var jsonBody = response.body;
     var jsonDate = json.decode(jsonBody);
     if (this.mounted) {
@@ -831,7 +830,6 @@ class Consume_TabacoWidgetState extends State<Consume_Tabaco> {
         data = jsonDate;
       });
     }
-    print(jsonDate);
   }
 
   @override
@@ -843,7 +841,6 @@ class Consume_TabacoWidgetState extends State<Consume_Tabaco> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 230,
-      // width: 450,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

@@ -496,10 +496,12 @@ guardar_datos(BuildContext context) async {
       } else {
         if (screening_recordatorio == true) {
           Navigator.pushNamed(context, '/recordatorio');
+          _alertInforme(context, "Screening Respondido", '');
         } else {
           Navigator.pushNamed(context, '/screening', arguments: {
             "select_screening": "CDR",
           });
+          _alertInforme(context, "Screening Respondido", '');
         }
       }
     } else {

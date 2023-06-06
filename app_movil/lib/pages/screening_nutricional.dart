@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/screening.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -113,6 +114,36 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
           }),
     );
   }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Datos",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
 }
 
 readRecordatorios() async {
@@ -150,8 +181,6 @@ guardarDatos(BuildContext context) async {
     "cod_event_nutri10": cod_event_nutri10,
   });
 
-  print(response.statusCode);
-
   var responseDecode = json.decode(response.body);
 
   if (responseDecode != "Vacio") {
@@ -169,8 +198,6 @@ guardarDatos(BuildContext context) async {
       });
     }
   }
-
-  print(responseDecode);
 }
 
 Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
@@ -266,9 +293,6 @@ Form FormNutricional(BuildContext context) {
           Nutri10(),
           Padding(padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 30.0)),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                //primary: Color.fromRGBO(157, 19, 34, 1),
-                ),
             onPressed: () {
               guardarDatos(context);
             },

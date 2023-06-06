@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/screening_animo.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -54,6 +55,7 @@ class _ScreeningState extends State<ScreeningPage> {
             future: read_screenings(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                // if (snapshot.connectionState == ConnectionState.done) {
                 return ListView(
                   children: ListTile.divideTiles(
                     color: Colors.black,
@@ -89,14 +91,15 @@ class _ScreeningState extends State<ScreeningPage> {
                   ).toList(),
                 );
               } else {
-                if (!isLoading) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: Positioned(
-                      child: _isLoadingIcon(),
-                    ),
-                  );
-                } else {
+                // if (!isLoading) {
+                //   return Container(
+                //     alignment: Alignment.center,
+                //     child: Positioned(
+                //       child: _isLoadingIcon(),
+                //     ),
+                //   );
+                // } else {
+                if (snapshot.connectionState == ConnectionState.done) {
                   return Container(
                       child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -115,7 +118,14 @@ class _ScreeningState extends State<ScreeningPage> {
                     ],
                   ));
                 }
+                return Container(
+                  alignment: Alignment.center,
+                  child: Positioned(
+                    child: _isLoadingIcon(),
+                  ),
+                );
               }
+              // }
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
@@ -193,6 +203,11 @@ class _ScreeningState extends State<ScreeningPage> {
             },
           ),
         ));
+  }
+
+  delayScreeningAnimo() async {
+    await Future.delayed(Duration(milliseconds: 1500));
+    return true;
   }
 
   String setTitulo(var select_screening) {

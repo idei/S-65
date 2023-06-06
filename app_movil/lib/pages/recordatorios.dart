@@ -94,13 +94,14 @@ class _RecordatorioState extends State<RecordatorioPage> {
                 ).toList(),
               );
             } else {
-              if (!_isLoading) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: "Cargando",
-                  ),
-                );
-              } else {
+              // if (!_isLoading) {
+              //   return Center(
+              //     child: CircularProgressIndicator(
+              //       semanticsLabel: "Cargando",
+              //     ),
+              //   );
+              // } else {
+              if (snapshot.connectionState == ConnectionState.done) {
                 return Container(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -118,8 +119,16 @@ class _RecordatorioState extends State<RecordatorioPage> {
                   ],
                 ));
               }
+
+              return Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: "Cargando",
+                ),
+              );
             }
-          }),
+          }
+          //}
+          ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: IconButton(

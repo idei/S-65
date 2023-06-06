@@ -504,8 +504,8 @@ $rutaRaiz = Env::$_URL_API;
         }),
       };
 
-
-      $.ajax(settings).success(function (response) {
+      //$.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
           response['data'].forEach(element => {
             consume_alcohol = consumos(element['consume_alcohol']);
@@ -526,6 +526,7 @@ $rutaRaiz = Env::$_URL_API;
                 <td>${fuma_tabaco}</td>
                 </tr>
                 `;
+                //console.log(tablaClinicos);
           });
         } else {
           if (response['status'] == "Vacio") {
@@ -562,6 +563,7 @@ $rutaRaiz = Env::$_URL_API;
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
+      
       $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
           tablaMedicamentos.innerHTML = ``;
@@ -579,12 +581,12 @@ $rutaRaiz = Env::$_URL_API;
         } else {
           if (response['status'] == "Vacio") {
 
-            tablaClinicos.innerHTML = `<tr>
+            tablaMedicamentos.innerHTML = `<tr>
+                <td></td>
                 <td>Sin</td>
-                <td>datos</td>
-                <td>clínicos</td>
-                <td>históricos</td>
-                <td>cargados</td>
+                <td>Medicamentos</td>
+                <td>Registrados</td>
+                <td></td>
                 </tr>
                 `;
 
@@ -618,8 +620,9 @@ $rutaRaiz = Env::$_URL_API;
 
         if (response['status'] == 'Success') {
           var response = response['data'];
-
+          select_chequeos.innerHTML = ``;
           response['chequeos'][0].forEach(element => {
+            
             select_chequeos.innerHTML += `
               <option value="${element["id"]}" title="${element["nombre"]}">${element["nombre"]}</option>
               `;

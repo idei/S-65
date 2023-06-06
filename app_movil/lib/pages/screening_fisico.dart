@@ -12,7 +12,6 @@ var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
 
-// Define a custom Form widget.
 class FormScreeningSintomas extends StatefulWidget {
   final pageName = 'screening_fisico';
 
@@ -113,7 +112,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
         ],
       ),
       body: FutureBuilder(
-          future: readRecordatorios(),
+          future: delayTimer(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             print(snapshot.connectionState);
 
@@ -184,7 +183,7 @@ _resetChecksFalse() {
   dolor = false;
 }
 
-readRecordatorios() async {
+delayTimer() async {
   await Future.delayed(Duration(milliseconds: 500));
   return true;
 }
@@ -288,6 +287,7 @@ guardarDatosFisicos(var cant_check, BuildContext context) async {
       Navigator.pushNamed(context, '/screening', arguments: {
         "select_screening": "SFMS",
       });
+      _scaffold_messenger(context, "Screening Registrado", 1);
     }
   } else {
     _alertInforme(context, "Error detectado", '${response.body}');
@@ -570,6 +570,18 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
   );
 }
 
+_scaffold_messenger(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
+}
+
 _alertInforme(context, title, descripcion) async {
   Alert(
     context: context,
@@ -585,10 +597,12 @@ _alertInforme(context, title, descripcion) async {
         onPressed: () {
           if (screening_recordatorio == true) {
             Navigator.pushNamed(context, '/recordatorio');
+            _scaffold_messenger(context, "Screening del Médico Respondido", 1);
           } else {
             Navigator.pushNamed(context, '/screening', arguments: {
               "select_screening": "SFMS",
             });
+            _scaffold_messenger(context, "Screening Registrado", 1);
           }
         },
         width: 120,
