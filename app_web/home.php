@@ -26,6 +26,8 @@ $rutaRaiz = Env::$_URL_API;
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!-- FIXES style -->
+  <link rel="stylesheet" href="dist/css/fixes.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed" onload="read_pacientes()">

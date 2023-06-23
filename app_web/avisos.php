@@ -26,6 +26,8 @@ $id_medico = $_SESSION["id_medico"];
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- FIXES style -->
+  <link rel="stylesheet" href="dist/css/fixes.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed" onload="read_avisos()">
@@ -51,7 +53,7 @@ $id_medico = $_SESSION["id_medico"];
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-3">
-                                    <button class="btn btn-danger float-left" onclick="$('#nuevoAvisoGrupalModal').modal('show')"><i class="fa fa-users" aria-hidden="true"></i> Crear Aviso Grupal</button>
+                                    <button class="btn btn-primary float-left" onclick="$('#nuevoAvisoGrupalModal').modal('show')"><i class="fa fa-users" aria-hidden="true"></i> Crear Aviso Grupal</button>
                                 </div>
                                 <div class="col-9">
                                 </div>
