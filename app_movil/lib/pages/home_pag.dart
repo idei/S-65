@@ -94,7 +94,7 @@ class Otras_drogasWidgetState extends State<HomeInicio> {
                 onPressed: () {
                   Navigator.pushNamed(context, 'ingresar');
                 },
-                color: Theme.of(context).primaryColor,
+                color: Color.fromRGBO(30, 20, 108, 1),
                 child: Text('INGRESAR',
                     style:
                         TextStyle(color: Colors.white, fontFamily: 'Nunito')),
@@ -108,7 +108,7 @@ class Otras_drogasWidgetState extends State<HomeInicio> {
                 onPressed: () {
                   Navigator.pushNamed(context, 'registrar');
                 },
-                color: Theme.of(context).primaryColor,
+                color: Color.fromRGBO(30, 20, 108, 1),
                 child: Text('REGISTRARME',
                     style:
                         TextStyle(color: Colors.white, fontFamily: 'Nunito')),

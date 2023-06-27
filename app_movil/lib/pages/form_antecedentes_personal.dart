@@ -260,6 +260,19 @@ class AntecedentesWidgetState extends State<Antecedentes> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu');
+            },
+          ),
           backgroundColor: Theme.of(context).primaryColor,
           title: Center(
             child: Text(

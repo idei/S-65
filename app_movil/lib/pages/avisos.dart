@@ -20,8 +20,16 @@ class _AvisosState extends State<Avisos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back),
+        backgroundColor: Color.fromRGBO(45, 175, 168, 1),
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Color.fromRGBO(45, 175, 168, 1),
+            ),
+          ),
           onPressed: () {
             Navigator.pushNamed(context, '/menu');
           },

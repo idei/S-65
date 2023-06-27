@@ -31,7 +31,14 @@ class _MedicamentoState extends State<MedicamentoPage> {
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: CircleAvatar(
+                radius: MediaQuery.of(context).size.width / 30,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.blue,
+                ),
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, '/menu');
               },
@@ -71,27 +78,46 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                             .headline1
                                             .fontFamily)),
                                 trailing: Wrap(children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    color: Colors.green,
-                                    onPressed: () {
-                                      _showAlertDialog(
-                                        int.parse(data.id_medicamento),
-                                        data.dosis_frecuencia,
-                                        1,
-                                      );
-                                    },
-                                  ), // icon-1
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    color: Colors.red,
-                                    onPressed: () {
-                                      _showAlertDialog(
-                                        int.parse(data.id_medicamento),
-                                        data.dosis_frecuencia,
-                                        2,
-                                      );
-                                    },
+                                  CircleAvatar(
+                                    radius:
+                                        MediaQuery.of(context).size.width / 22,
+                                    backgroundColor: Colors.blue,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      onPressed: () {
+                                        _showAlertDialog(
+                                          int.parse(data.id_medicamento),
+                                          data.dosis_frecuencia,
+                                          1,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 25,
+                                  ),
+                                  CircleAvatar(
+                                    radius:
+                                        MediaQuery.of(context).size.width / 22,
+                                    backgroundColor: Colors.red,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        size: 20,
+                                      ),
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        _showAlertDialog(
+                                          int.parse(data.id_medicamento),
+                                          data.dosis_frecuencia,
+                                          2,
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ]),
                               ),

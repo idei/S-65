@@ -122,7 +122,21 @@ class _VerScreeningState extends State<VerScreening> {
   Widget Screenings(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "CONDUC",
+              });
+            },
+          ),
           title: Text('Chequeo ' + titulo,
               style: TextStyle(
                   fontFamily:

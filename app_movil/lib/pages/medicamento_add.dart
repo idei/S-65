@@ -99,6 +99,19 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/menu');
+          },
+        ),
         title: Text("Buscador de Medicamentos",
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
@@ -173,7 +186,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
               onPressed: () {
                 guardar_medicamento(int.parse(data_id));
               },
-              child: Text('Agregar Medicamento',
+              child: Text('Aceptar',
                   style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily)),

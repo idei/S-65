@@ -126,6 +126,9 @@ class _FormRegisterState extends State<RegisterPage> {
       ),
       Text('Acepto términos y condiciones',
           style: TextStyle(
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+              fontSize: 15,
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily))
     ]);
   }
@@ -272,6 +275,10 @@ class _FormRegisterState extends State<RegisterPage> {
 
   Widget _crearBotonRegistrar(BuildContext context) {
     return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        primary: Color.fromRGBO(
+            30, 20, 108, 1), // Cambia el color de fondo del botón a verde
+      ),
       icon: _isLoading
           ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -320,6 +327,10 @@ class _FormRegisterState extends State<RegisterPage> {
 
   Widget _crearBotonRegresar(BuildContext context) {
     return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        primary: Color.fromRGBO(
+            30, 20, 108, 1), // Cambia el color de fondo del botón a verde
+      ),
       icon: Icon(Icons.arrow_back),
       label: Container(
         padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),

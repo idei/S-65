@@ -139,6 +139,9 @@ class _LoginPage extends State<LoginPage> {
         GestureDetector(
             child: Text("¿Olvido la contraseña?",
                 style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    fontSize: 15,
                     fontFamily:
                         Theme.of(context1).textTheme.headline1.fontFamily)),
             onTap: () {
@@ -198,6 +201,7 @@ class _LoginPage extends State<LoginPage> {
   Widget ButtonIniciarSesion(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
+        primary: Color.fromRGBO(30, 20, 108, 1),
         maximumSize: const Size(400, 50),
         minimumSize: const Size(250, 40),
       ),
@@ -245,6 +249,7 @@ class _LoginPage extends State<LoginPage> {
               color: Colors.white,
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       style: ElevatedButton.styleFrom(
+        primary: Color.fromRGBO(30, 20, 108, 1),
         maximumSize: const Size(400, 50),
         minimumSize: const Size(250, 40),
       ),

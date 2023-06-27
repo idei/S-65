@@ -18,32 +18,20 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/menu');
-          },
-        ),
-        title: Text(
-          "Seleccionar Chequeo",
-          style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
-        ),
-        actions: <Widget>[],
-      ),
-      body: Container(
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+      body: Center(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return Container(
+              height: constraints.maxHeight * 0.7,
+              width: constraints.maxWidth * 0.9,
+              child: GridView.count(
+                  crossAxisCount:
+                      3, // Define el número de columnas de la grilla
+                  childAspectRatio: 0.73,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 25.0,
+                  padding: EdgeInsets.all(1.0),
                   children: <Widget>[
-                    SizedBox(height: 70.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "CONDUC";
@@ -51,15 +39,25 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           "select_screening": select_screening,
                         });
                       },
-                      child: CircleAvatar(
-                        backgroundImage:
-                            AssetImage('assets/comportamiento.png'),
-                        radius: MediaQuery.of(context).size.width / 7.3,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage:
+                                AssetImage('assets/comportamiento.png'),
+                            radius: MediaQuery.of(context).size.width / 7.3,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "CONDUCTUAL",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('CONDUCTUAL'),
-                    SizedBox(height: 20.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "SFMS";
@@ -67,56 +65,49 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           "select_screening": select_screening,
                         });
                       },
-                      child: CircleAvatar(
-                          radius: MediaQuery.of(context).size.width / 7.3,
-                          //backgroundColor: Color.fromRGBO(100, 20, 28, 1),
-                          child: Icon(Icons.directions_walk,
-                              color: Colors.white, size: 70.0)),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                              radius: MediaQuery.of(context).size.width / 7.3,
+                              child: Icon(Icons.directions_run_rounded,
+                                  color: Colors.white, size: 70.0)),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "FÍSICO",
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('FÍSICO'),
-                    SizedBox(height: 20.0),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     select_screening = "DIAB";
-                    //     Navigator.pushNamed(context, '/screening', arguments: {
-                    //       "select_screening": select_screening,
-                    //     });
-                    //   },
-                    //   child: CircleAvatar(
-                    //       radius: MediaQuery.of(context).size.width / 7.3,
-                    //       //backgroundColor: Color.fromRGBO(100, 20, 28, 1),
-                    //       child: Icon(Icons.emoji_people_rounded,
-                    //           color: Colors.white, size: 70.0)),
-                    // ),
-                    // SizedBox(height: 10.0),
-                    // texto('DIABETES'),
-                  ]),
-              Padding(
-                padding: const EdgeInsets.all(3.0),
-              ),
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height: 70.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "QCQ";
                         Navigator.pushNamed(context, '/screening', arguments: {
                           "select_screening": select_screening,
                         });
-                        //do what you want here
                       },
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage('assets/cognicion.png'),
-                        radius: MediaQuery.of(context).size.width / 7.3,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage('assets/cognicion.png'),
+                            radius: MediaQuery.of(context).size.width / 7.3,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "COGNITIVO",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('COGNITIVO'),
-                    SizedBox(height: 20.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "ÁNIMO";
@@ -124,40 +115,24 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           "select_screening": select_screening,
                         });
                       },
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage('assets/animo.png'),
-                        radius: MediaQuery.of(context).size.width / 7.3,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage('assets/animo.png'),
+                            radius: MediaQuery.of(context).size.width / 7.3,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "ÁNIMO",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('ANIMO'),
-                    SizedBox(height: 20.0),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     select_screening = "ENCRO";
-                    //     Navigator.pushNamed(context, '/screening', arguments: {
-                    //       "select_screening": select_screening,
-                    //     });
-                    //   },
-                    //   child: CircleAvatar(
-                    //     //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                    //     backgroundImage: AssetImage('assets/animo.png'),
-                    //     radius: MediaQuery.of(context).size.width / 7.3,
-                    //   ),
-                    // ),
-                    // SizedBox(height: 10.0),
-                    // texto('ENFERMEDADES'),
-                    // texto('CRONICAS'),
-                  ]),
-              Padding(
-                padding: const EdgeInsets.all(3.0),
-              ),
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height: 70.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "CDR";
@@ -165,14 +140,24 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           "select_screening": select_screening,
                         });
                       },
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage('assets/cotidiana.png'),
-                        radius: MediaQuery.of(context).size.width / 7.3,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage('assets/cotidiana.png'),
+                            radius: MediaQuery.of(context).size.width / 7.3,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "CDR",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('CDR'),
-                    SizedBox(height: 20.0),
                     GestureDetector(
                       onTap: () {
                         select_screening = "RNUTRI";
@@ -180,17 +165,51 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           "select_screening": select_screening,
                         });
                       },
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage('assets/nutricion.png'),
-                        radius: MediaQuery.of(context).size.width / 7.3,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage('assets/nutricion.png'),
+                            radius: MediaQuery.of(context).size.width / 7.3,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "NUTRICIÓN",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    texto('NUTRICIÓN'),
-                  ])
-            ]),
-        padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 1.0),
-        alignment: Alignment.centerLeft,
+                    GestureDetector(),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/menu');
+                      },
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                              radius: MediaQuery.of(context).size.width / 7.3,
+                              child: Icon(Icons.arrow_circle_left_outlined,
+                                  color: Colors.white, size: 70.0)),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "VOLVER",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+            );
+          },
+        ),
       ),
     );
   }

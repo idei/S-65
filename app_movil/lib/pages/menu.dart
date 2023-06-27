@@ -49,6 +49,48 @@ class _FormMenuState extends State<MenuPage> {
                     padding: EdgeInsets.all(1.0),
                     children: <Widget>[
                       GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/recordatorio');
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius: MediaQuery.of(context).size.width / 9.5,
+                                child: Icon(Icons.event_note,
+                                    color: Colors.white, size: 90.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "RECORDATORIOS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/avisos');
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius: MediaQuery.of(context).size.width / 9.5,
+                                child: Icon(Icons.priority_high,
+                                    color: Colors.white, size: 90.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "AVISOS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(
                                 context, '/form_datos_generales');
@@ -158,27 +200,6 @@ class _FormMenuState extends State<MenuPage> {
                             SizedBox(height: 8.0),
                             Text(
                               "MEDICAMENTOS",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/avisos');
-                        },
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 9.5,
-                                child: Icon(Icons.priority_high,
-                                    color: Colors.white, size: 90.0)),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "AVISOS",
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                               ),
@@ -323,6 +344,54 @@ class _FormMenuState extends State<MenuPage> {
                     padding: EdgeInsets.all(1.0),
                     children: <Widget>[
                       GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/recordatorio');
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                backgroundColor:
+                                    Color.fromRGBO(45, 175, 168, 1),
+                                radius: MediaQuery.of(context).size.width / 7.3,
+                                child: Icon(Icons.event_note,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "RECORDATORIOS",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/avisos');
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                backgroundColor:
+                                    Color.fromRGBO(45, 175, 168, 1),
+                                radius: MediaQuery.of(context).size.width / 7.3,
+                                child: Icon(Icons.priority_high,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "AVISOS",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(
                                 context, '/form_datos_generales');
@@ -436,50 +505,6 @@ class _FormMenuState extends State<MenuPage> {
                             SizedBox(height: 8.0),
                             Text(
                               "MEDICAMENTOS",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/avisos');
-                        },
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 7.3,
-                                child: Icon(Icons.priority_high,
-                                    color: Colors.white, size: 70.0)),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "AVISOS",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/recordatorio');
-                        },
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 7.3,
-                                child: Icon(Icons.event_note,
-                                    color: Colors.white, size: 70.0)),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "RECORDATORIOS",
                               style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,

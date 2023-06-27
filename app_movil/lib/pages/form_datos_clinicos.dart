@@ -67,7 +67,19 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
     return Scaffold(
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu');
+            },
+          ),
           title: Text('Datos Clínicos',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -898,7 +910,6 @@ class Consume_MarihuanaWidgetState extends State<Consume_Marihuana> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 230,
-      // width: 450,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

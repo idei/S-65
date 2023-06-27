@@ -27,8 +27,16 @@ class _RecordatorioState extends State<RecordatorioPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromRGBO(45, 175, 168, 1),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Color.fromRGBO(45, 175, 168, 1),
+            ),
+          ),
           onPressed: () {
             Navigator.pushNamed(context, '/menu');
           },
@@ -130,6 +138,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
           //}
           ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromRGBO(45, 175, 168, 1),
         onPressed: () {},
         child: IconButton(
           icon: Icon(Icons.add, color: Colors.white),

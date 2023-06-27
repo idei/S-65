@@ -53,7 +53,14 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
             onPressed: () {
               Navigator.pushNamed(context, '/menu');
             },
@@ -139,11 +146,11 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                 radius: sizeCircle,
                 child: Center(
                   child: Column(children: <Widget>[
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 20.0),
                     Icon(Icons.edit, color: Colors.white, size: 30.0),
                     SizedBox(height: 6.0),
                     Text(
-                      '',
+                      'Editar',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,

@@ -58,6 +58,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
           } else {
             return Scaffold(
               appBar: AppBar(
+                backgroundColor: Color.fromRGBO(45, 175, 168, 1),
                 title: Text('Detalle de Aviso',
                     style: TextStyle(
                         fontFamily:
@@ -120,6 +121,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   Widget Avisos(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(45, 175, 168, 1),
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
@@ -144,34 +146,40 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
             ),
           ],
         ),
-        body: Form(
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  Text("$descripcion".toUpperCase(),
-                      style: TextStyle(fontFamily: 'NunitoR')),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Fecha: $fecha_limite ",
-                      style: TextStyle(fontFamily: 'NunitoR')),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                    child: Text('Leído',
-                        style: TextStyle(
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily)),
-                    style: ElevatedButton.styleFrom(),
-                    onPressed: () {
-                      update_aviso_paciente();
-                      Navigator.of(context).pushReplacementNamed('/avisos');
-                    },
-                  ),
-                ]))));
+        body: Card(
+          child: Form(
+              child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(children: <Widget>[
+                    Text("$descripcion".toUpperCase(),
+                        style: TextStyle(fontFamily: 'NunitoR')),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text("Fecha: $fecha_limite ",
+                        style: TextStyle(fontFamily: 'NunitoR')),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Center(
+                      child: ElevatedButton(
+                        child: Text('Leído',
+                            style: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromRGBO(45, 175, 168, 1),
+                        ),
+                        onPressed: () {
+                          update_aviso_paciente();
+                          Navigator.of(context).pushReplacementNamed('/avisos');
+                        },
+                      ),
+                    ),
+                  ]))),
+        ));
   }
 
   Widget AvisoMedicoAsignado(BuildContext context) {

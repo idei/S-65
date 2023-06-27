@@ -28,6 +28,13 @@ class _RecuperarState extends State<RecordatorioPersonal> {
 
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(45, 175, 168, 1),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/recordatorio');
+            },
+          ),
           title: Text('Nuevo Recordatorio Personal',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -93,21 +100,26 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                     SizedBox(
                       height: 30,
                     ),
-                    ElevatedButton(
-                      child: Container(
-                        child: Text('Guardar',
-                            style: TextStyle(
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily,
-                            )),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromRGBO(45, 175, 168, 1),
+                        ),
+                        child: Container(
+                          child: Text('Guardar',
+                              style: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily,
+                              )),
+                        ),
+                        onPressed: () {
+                          if (_formKey_recuperar.currentState.validate()) {
+                            guardar_datos(context);
+                          }
+                        },
                       ),
-                      onPressed: () {
-                        if (_formKey_recuperar.currentState.validate()) {
-                          guardar_datos(context);
-                        }
-                      },
                     )
                   ]))),
         ));

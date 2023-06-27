@@ -82,7 +82,14 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
           onPressed: () {
             Navigator.pushNamed(context, '/screening', arguments: {
               "select_screening": "CONDUC",
