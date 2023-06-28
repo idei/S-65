@@ -34,8 +34,10 @@
     border-color: #ffffff;
 }
 
-
-
+/*Sidebar button Ayuda */
+.layout-fixed.sidebar-collapse:hover .hide-on-collapse {
+    display:inline-block;
+   }
 
 /*Buttons paciente.php*/
 

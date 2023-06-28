@@ -26,7 +26,7 @@ $rutaRaiz = Env::$_URL_API;
 <div class="register-box">
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
-      <a href="../index.php" class="h1"><b>S +</b>65</a>
+      <a href="../index.php" class="h1"><img src="dist/img/logo.png" class="img-fluid" alt="Responsive image"></a>
     </div>
     <div class="card-body">
       <p class="login-box-msg">Registrar Nuevo Médico</p>
