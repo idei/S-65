@@ -29,15 +29,18 @@ class _FormMenuState extends State<MenuPage> {
     final usuarioModel = Provider.of<UsuarioServices>(context);
 
     if (usuarioModel.existeUsuarioModel) {
-      print(usuarioModel.usuario);
+      // print(usuarioModel.usuario);
     }
 
     return Scaffold(
+      key: UniqueKey(),
+      backgroundColor: Color.fromRGBO(30, 20, 108, 1),
       body: isTablet
           // Menu si es tablet
           ? Center(child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 return Container(
+                  color: Color.fromRGBO(30, 20, 108, 1),
                   height: constraints.maxHeight * 0.8,
                   width: constraints.maxWidth * 0.9,
                   child: GridView.count(
@@ -55,13 +58,15 @@ class _FormMenuState extends State<MenuPage> {
                         child: Column(
                           children: [
                             CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 9.5,
-                                child: Icon(Icons.event_note,
-                                    color: Colors.white, size: 90.0)),
+                              radius: MediaQuery.of(context).size.width / 9.5,
+                              child: Icon(Icons.event_note,
+                                  color: Colors.white, size: 90.0),
+                            ),
                             SizedBox(height: 8.0),
                             Text(
                               "RECORDATORIOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -83,6 +88,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "AVISOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -106,6 +112,7 @@ class _FormMenuState extends State<MenuPage> {
                               Text(
                                 "DATOS \nPERSONALES",
                                 style: TextStyle(
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
@@ -130,6 +137,7 @@ class _FormMenuState extends State<MenuPage> {
                               Text(
                                 "DATOS \nCLÍNICOS",
                                 style: TextStyle(
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
@@ -154,6 +162,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "ANTECEDENTES PERSONALES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -180,6 +189,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "ANTECEDENTES \nFAMILIARES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -201,6 +211,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "MEDICAMENTOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -222,6 +233,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "RECORDATORIOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -247,6 +259,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "CHEQUEOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -271,6 +284,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "MIS MÉDICOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -292,6 +306,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "AJUSTES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -317,6 +332,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "SALIR",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,
@@ -338,7 +354,7 @@ class _FormMenuState extends State<MenuPage> {
                   child: GridView.count(
                     crossAxisCount:
                         3, // Define el número de columnas de la grilla
-                    childAspectRatio: 0.73,
+                    childAspectRatio: 0.78,
                     crossAxisSpacing: 10.0,
                     mainAxisSpacing: 25.0,
                     padding: EdgeInsets.all(1.0),
@@ -359,6 +375,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "RECORDATORIOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -383,6 +400,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "AVISOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -407,6 +425,7 @@ class _FormMenuState extends State<MenuPage> {
                               Text(
                                 "DATOS \nPERSONALES",
                                 style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -432,6 +451,7 @@ class _FormMenuState extends State<MenuPage> {
                               Text(
                                 "DATOS \nCLÍNICOS",
                                 style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -457,6 +477,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "ANTECEDENTES PERSONALES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -484,6 +505,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "ANTECEDENTES \nFAMILIARES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -506,6 +528,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "MEDICAMENTOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -532,6 +555,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "CHEQUEOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -557,6 +581,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "MIS MÉDICOS",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -579,6 +604,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "AJUSTES",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -589,11 +615,9 @@ class _FormMenuState extends State<MenuPage> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          print(email_prefer);
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           prefs.remove('email_prefer');
-                          print(email_prefer);
 
                           Navigator.pushNamed(context, '/');
                         },
@@ -607,6 +631,7 @@ class _FormMenuState extends State<MenuPage> {
                             Text(
                               "SALIR",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w500,
                               ),

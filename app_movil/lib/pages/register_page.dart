@@ -28,6 +28,7 @@ class _FormRegisterState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: UniqueKey(),
         resizeToAvoidBottomInset: false,
         body: Form(
           key: _formKey_registrar,

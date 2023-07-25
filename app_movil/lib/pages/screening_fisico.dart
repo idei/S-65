@@ -93,7 +93,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
             });
           },
         ),
-        title: Text('Chequeo Fisico',
+        title: Text('Chequeo Físico',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),

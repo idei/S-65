@@ -44,25 +44,11 @@ class _ScreeningState extends State<ScreeningPage> {
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
         ),
         body: FutureBuilder<List<ScreeningModel>>(
             future: read_screenings(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                // if (snapshot.connectionState == ConnectionState.done) {
                 return ListView(
                   children: ListTile.divideTiles(
                     color: Colors.black,
@@ -81,9 +67,23 @@ class _ScreeningState extends State<ScreeningPage> {
                                 },
                                 child: Card(
                                   child: ListTile(
-                                    leading: Icon(
-                                      Icons.calendar_today,
-                                      color: Colors.blue,
+                                    leading: Container(
+                                      width: 90,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          data.fecha,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                     title: Text(data.nombre),
                                     subtitle: Text("Puntuación:  " +

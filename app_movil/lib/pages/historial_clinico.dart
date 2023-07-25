@@ -23,31 +23,30 @@ class HistorialClinico extends StatefulWidget {
 }
 
 final _formKey_historial_clinico = GlobalKey<FormState>();
-final _formKey_email = GlobalKey<FormState>();
-final _formKey_pass = GlobalKey<FormState>();
 
 class _AjustesState extends State<HistorialClinico> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/datoscli');
+            },
+          ),
           title: Text('Historial Clínico',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
                 fontWeight: FontWeight.bold,
               )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Form(
             key: _formKey_historial_clinico,

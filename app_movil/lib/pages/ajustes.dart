@@ -5,10 +5,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
 
-TextEditingController email = TextEditingController();
-TextEditingController email_nuevo = TextEditingController();
-TextEditingController password = TextEditingController();
-TextEditingController password_nuevo = TextEditingController();
+var email = TextEditingController();
+var email_nuevo = TextEditingController();
+var password = TextEditingController();
+var password_nuevo = TextEditingController();
 String email_set_shared;
 
 class AjustesPage extends StatefulWidget {
@@ -24,69 +24,81 @@ class _AjustesState extends State<AjustesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Ajustes',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
+      key: UniqueKey(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/menu');
+          },
         ),
-        body: Form(
-            key: _formKey_ajustes,
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ModificarEmail(context)),
-                      );
-                    },
-                    child: Text(
-                      'Modificar Correo Electrónico',
-                      style: (TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      )),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ModificarPass(context)),
-                      );
-                    },
-                    child: Text('Modificar Contraseña',
-                        style: (TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                        ))),
-                  ),
-                ]))));
+        title: Text('Ajustes',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          )
+        ],
+      ),
+      body: Form(
+        key: _formKey_ajustes,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ModificarEmail(context)),
+                );
+              },
+              child: Text(
+                'Modificar Correo Electrónico',
+                style: (TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                )),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ModificarPass(context)),
+                );
+              },
+              child: Text('Modificar Contraseña',
+                  style: (TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  ))),
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 
   void choiceAction(String choice) {
@@ -101,70 +113,73 @@ class _AjustesState extends State<AjustesPage> {
   Widget ModificarEmail(BuildContext context) {
     set_email();
     return Scaffold(
-        appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          title: Text('Ajustes',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
+      key: UniqueKey(),
+      appBar: AppBar(
+        leading: new IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/ajustes');
+          },
         ),
-        body: Form(
-            key: _formKey_email,
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  TextFormField(
-                    controller: email,
-                    decoration: InputDecoration(
-                        labelText: 'Ingrese Correo Electrónico actual'),
-                    validator: (val) => val.isEmpty || !val.contains("@")
-                        ? "Por favor ingresar un correo electrónico válido"
-                        : null,
-                    keyboardType: TextInputType.emailAddress,
+        title: Text('Ajustes',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+      ),
+      body: Form(
+        key: _formKey_email,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(children: <Widget>[
+            TextFormField(
+              controller: email,
+              decoration: InputDecoration(
+                  labelText: 'Ingrese Correo Electrónico actual'),
+              validator: (val) => val.isEmpty || !val.contains("@")
+                  ? "Por favor ingresar un correo electrónico válido"
+                  : null,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            TextFormField(
+                controller: email_nuevo,
+                decoration: InputDecoration(
+                    labelText: 'Ingrese Correo Electrónico nuevo'),
+                validator: (val) => val.isEmpty || !val.contains("@")
+                    ? "Por favor ingresar un correo electrónico válido"
+                    : null,
+                keyboardType: TextInputType.emailAddress),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  //primary: Color.fromRGBO(157, 19, 34, 1),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                      controller: email_nuevo,
-                      decoration: InputDecoration(
-                          labelText: 'Ingrese Correo Electrónico nuevo'),
-                      validator: (val) => val.isEmpty || !val.contains("@")
-                          ? "Por favor ingresar un correo electrónico válido"
-                          : null,
-                      keyboardType: TextInputType.emailAddress),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
-                    onPressed: () {
-                      if (_formKey_email.currentState.validate()) {
-                        modificar_email(context);
-                      }
-                    },
-                    child: Text('Modificar Correo',
-                        style: (TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                        ))),
-                  ),
-                ]))));
+              onPressed: () {
+                if (_formKey_email.currentState.validate()) {
+                  modificar_email(context);
+                }
+              },
+              child: Text('Modificar Correo',
+                  style: (TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  ))),
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 
   set_email() async {
@@ -175,8 +190,21 @@ class _AjustesState extends State<AjustesPage> {
 
   Widget ModificarPass(BuildContext context) {
     return Scaffold(
+        key: UniqueKey(),
         appBar: AppBar(
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/ajustes');
+            },
+          ),
           title: Text('Ajustes',
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
@@ -296,13 +324,6 @@ update_email() async {
   String salida = prefs.getString("email_prefer");
   print(salida);
 }
-
-//update_pass() async {
-//SharedPreferences prefs = await SharedPreferences.getInstance();
-//prefs.setString("email_prefer", password_nuevo.text);
-//String salida = prefs.getString("email_prefer");
-//print(salida);
-//}
 
 class Constants {
   static const String Ajustes = 'Ajustes';

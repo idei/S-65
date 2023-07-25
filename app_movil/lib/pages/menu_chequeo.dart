@@ -18,6 +18,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
     }
 
     return Scaffold(
+      backgroundColor: Color.fromRGBO(30, 20, 108, 1),
       body: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -50,6 +51,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "CONDUCTUAL",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -75,6 +77,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "FÍSICO",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 15.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -100,6 +103,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "COGNITIVO",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -125,6 +129,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "ÁNIMO",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -150,6 +155,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "CDR",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -175,6 +181,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "NUTRICIÓN",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -198,6 +205,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           Text(
                             "VOLVER",
                             style: TextStyle(
+                              color: Colors.white,
                               fontSize: 14.0,
                               fontWeight: FontWeight.w500,
                             ),

@@ -45,7 +45,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     'registrar': (context) => RegisterPage(),
     //'/menu': (context) => MenuPrueba(),
     '/menu': (context) => MenuPage(),
-    '/form_datos_generales': (context) => Formprueba(),
+    '/form_datos_generales': (context) => FormDatosGenerales(),
     '/form_datos_clinicos': (context) => FormDatosClinicos(),
     '/historial_clinico': (context) => HistorialClinico(),
     '/form_antecedentes_personales': (context) => FormAntecedentesPersonales(),

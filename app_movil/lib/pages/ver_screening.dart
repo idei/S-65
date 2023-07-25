@@ -91,14 +91,11 @@ class _VerScreeningState extends State<VerScreening> {
     return FutureBuilder(
         future: timer(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
           if (snapshot.hasData) {
             return Screenings(context);
           } else {
             return Scaffold(
               appBar: AppBar(
-                //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                 title: Text('Chequeo',
                     style: TextStyle(
                         fontFamily:
@@ -141,19 +138,6 @@ class _VerScreeningState extends State<VerScreening> {
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Form(
             key: _formKey_ver_screening,

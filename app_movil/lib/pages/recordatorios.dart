@@ -45,19 +45,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
       ),
       body: FutureBuilder<List<RecordatoriosModel>>(
           future: read_recordatorios(),
@@ -191,9 +178,23 @@ class _RecordatorioState extends State<RecordatorioPage> {
 
     return Card(
       child: ListTile(
-        leading: Icon(
-          Icons.today,
-          color: color,
+        leading: Container(
+          width: 90,
+          height: 30,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              data.fecha_limite,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
         title: Text(data.descripcion.toUpperCase(),
             style: TextStyle(

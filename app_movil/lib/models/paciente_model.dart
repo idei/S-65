@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class PacienteModel {
   var rela_users;
   var rela_genero;
@@ -6,10 +8,12 @@ class PacienteModel {
   var rela_grupo_conviviente;
   String nombre;
   String apellido;
-  String fecha_nacimiento;
+  DateTime fecha_nacimiento;
   var dni;
   String celular;
-  String contacto;
+  String nombre_contacto;
+  String apellido_contacto;
+  String celular_contacto;
   var estado_users;
   var id_paciente;
 
@@ -22,10 +26,12 @@ class PacienteModel {
     this.rela_grupo_conviviente = "",
     this.nombre,
     this.apellido,
-    this.fecha_nacimiento = "",
+    this.fecha_nacimiento,
     this.dni,
     this.celular = "",
-    this.contacto = "",
+    this.nombre_contacto,
+    this.apellido_contacto,
+    this.celular_contacto,
     this.estado_users,
   });
 
@@ -41,9 +47,13 @@ class PacienteModel {
       rela_departamento: json['rela_departamento'].toString(),
       rela_nivel_instruccion: json['rela_nivel_instruccion'].toString(),
       rela_grupo_conviviente: json['rela_grupo_conviviente'].toString(),
-      fecha_nacimiento: json['fecha_nacimiento'],
+      fecha_nacimiento: json['fecha_nacimiento'] != null
+          ? DateTime.parse(json['fecha_nacimiento'])
+          : null,
       celular: json['celular'],
-      contacto: json['contacto'],
+      nombre_contacto: json['nombre_contacto'],
+      apellido_contacto: json['apellido_contacto'],
+      celular_contacto: json['celular_contacto'],
     );
   }
 
@@ -65,9 +75,13 @@ class PacienteModel {
       rela_departamento: json['rela_departamento'].toString(),
       rela_nivel_instruccion: json['rela_nivel_instruccion'].toString(),
       rela_grupo_conviviente: json['rela_grupo_conviviente'].toString(),
-      fecha_nacimiento: json['fecha_nacimiento'],
+      fecha_nacimiento: json['fecha_nacimiento'] != null
+          ? DateTime.parse(json['fecha_nacimiento'])
+          : null,
       celular: json['celular'],
-      contacto: json['contacto'],
+      nombre_contacto: json['nombre_contacto'],
+      apellido_contacto: json['apellido_contacto'],
+      celular_contacto: json['celular_contacto'],
       estado_users: json['estado_users'],
       //-----------
       id_paciente: json['id_paciente'],

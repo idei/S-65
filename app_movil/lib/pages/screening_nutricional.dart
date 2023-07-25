@@ -73,9 +73,9 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
-    print(response);
+
     var jsonDate = json.decode(response.body);
-    print(jsonDate);
+
     tipo_screening = jsonDate;
   }
 
@@ -93,14 +93,13 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
             });
           },
         ),
-        //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
         title: Text('Riesgo Nutricional',
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
       ),
       body: FutureBuilder(
-          future: readRecordatorios(),
+          future: timer(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return FormNutricional(context);
@@ -146,7 +145,7 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   }
 }
 
-readRecordatorios() async {
+timer() async {
   await Future.delayed(Duration(milliseconds: 500));
   return true;
 }
@@ -167,7 +166,9 @@ guardarDatos(BuildContext context) async {
     "nutri6": nutri6.toString(),
     "nutri7": nutri7.toString(),
     "nutri8": nutri8.toString(),
+    "nutri81": nutri81.toString(),
     "nutri9": nutri9.toString(),
+    "nutri91": nutri91.toString(),
     "nutri10": nutri10.toString(),
     "cod_event_nutri1": cod_event_nutri1,
     "cod_event_nutri2": cod_event_nutri2,
@@ -177,7 +178,9 @@ guardarDatos(BuildContext context) async {
     "cod_event_nutri6": cod_event_nutri6,
     "cod_event_nutri7": cod_event_nutri7,
     "cod_event_nutri8": cod_event_nutri8,
+    "cod_event_nutri81": cod_event_nutri81,
     "cod_event_nutri9": cod_event_nutri9,
+    "cod_event_nutri91": cod_event_nutri91,
     "cod_event_nutri10": cod_event_nutri10,
   });
 
@@ -281,11 +284,15 @@ Form FormNutricional(BuildContext context) {
           ),
           Divider(height: 5.0, color: Colors.black),
           Nutri8(),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri81(),
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
           Divider(height: 5.0, color: Colors.black),
           Nutri9(),
+          Divider(height: 5.0, color: Colors.black),
+          Nutri91(),
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
@@ -320,7 +327,9 @@ bool nutri6 = false;
 bool nutri7 = false;
 
 bool nutri8 = false;
+bool nutri81 = false;
 bool nutri9 = false;
+bool nutri91 = false;
 bool nutri10 = false;
 
 String cod_event_nutri1 = "NUTRI1";
@@ -331,7 +340,9 @@ String cod_event_nutri5 = 'NUTRI5';
 String cod_event_nutri6 = 'NUTRI6';
 String cod_event_nutri7 = 'NUTRI7';
 String cod_event_nutri8 = 'NUTRI8';
-String cod_event_nutri9 = "NUTRI9";
+String cod_event_nutri81 = "NUTRI81";
+String cod_event_nutri9 = 'NUTRI9';
+String cod_event_nutri91 = "NUTRI91";
 String cod_event_nutri10 = 'NUTRI10';
 
 //-------------------------------------- NUTRICIONAL 1 -----------------------------------------------------
@@ -889,17 +900,85 @@ class Nutri8 extends StatefulWidget {
   Nutri8WidgetState createState() => Nutri8WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri8WidgetState extends State<Nutri8> {
   @override
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri8(
-      label: '¿Toma 2 vasos o menos de agua o líquido por día?',
+      label: '¿Toma más de 2 vasos de agua o líquido por día?',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       value: nutri8,
       onChanged: (bool newValue) {
         setState(() {
           nutri8 = newValue;
+        });
+      },
+    );
+  }
+}
+
+// -----------------------------------------NUTRI 8.1 -----------------------------------------------------
+class LabeledCheckboxNutri81 extends StatelessWidget {
+  const LabeledCheckboxNutri81({
+    this.label,
+    this.padding,
+    this.value,
+    this.onChanged,
+  });
+
+  final String label;
+  final EdgeInsets padding;
+  final bool value;
+  final Function onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        onChanged(!value);
+      },
+      child: Padding(
+        padding: padding,
+        child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            Checkbox(
+              value: value,
+              onChanged: (bool newValue) {
+                onChanged(newValue);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Nutri81 extends StatefulWidget {
+  Nutri81({Key key}) : super(key: key);
+
+  @override
+  Nutri81WidgetState createState() => Nutri81WidgetState();
+}
+
+class Nutri81WidgetState extends State<Nutri81> {
+  @override
+  Widget build(BuildContext context) {
+    return LabeledCheckboxNutri8(
+      label: '¿Toma menos 2 vasos de agua o líquido por día?',
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      value: nutri81,
+      onChanged: (bool newValue) {
+        setState(() {
+          nutri81 = newValue;
         });
       },
     );
@@ -960,18 +1039,87 @@ class Nutri9 extends StatefulWidget {
   Nutri9WidgetState createState() => Nutri9WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri9WidgetState extends State<Nutri9> {
   @override
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri9(
-      label:
-          '¿Ha perdido o ganado (sin querer)  5 kg de peso en los últimos  seis meses?',
+      label: '¿Ha ganado (sin querer) 5 kg de peso en los últimos  seis meses?',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       value: nutri9,
       onChanged: (bool newValue) {
         setState(() {
           nutri9 = newValue;
+        });
+      },
+    );
+  }
+}
+
+//-------------------------------------------- NUTRI 9.1 -----------------------------------------------------------
+
+class LabeledCheckboxNutri91 extends StatelessWidget {
+  const LabeledCheckboxNutri91({
+    this.label,
+    this.padding,
+    this.value,
+    this.onChanged,
+  });
+
+  final String label;
+  final EdgeInsets padding;
+  final bool value;
+  final Function onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        onChanged(!value);
+      },
+      child: Padding(
+        padding: padding,
+        child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            Checkbox(
+              value: value,
+              onChanged: (bool newValue) {
+                onChanged(newValue);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Nutri91 extends StatefulWidget {
+  Nutri91({Key key}) : super(key: key);
+
+  @override
+  Nutri91WidgetState createState() => Nutri91WidgetState();
+}
+
+class Nutri91WidgetState extends State<Nutri91> {
+  @override
+  Widget build(BuildContext context) {
+    return LabeledCheckboxNutri9(
+      label:
+          '¿Ha perdido (sin querer) 5 kg de peso en los últimos  seis meses?',
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      value: nutri91,
+      onChanged: (bool newValue) {
+        setState(() {
+          nutri91 = newValue;
         });
       },
     );
@@ -1037,7 +1185,7 @@ class Nutri10WidgetState extends State<Nutri10> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri10(
       label:
-          '¿Cree que tiene más problemas de nutri10 que la mayoría de la gente?',
+          '¿Cree que tiene más problemas de nutrición que la mayoría de la gente?',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       value: nutri10,
       onChanged: (bool newValue) {

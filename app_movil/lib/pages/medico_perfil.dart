@@ -23,7 +23,14 @@ class MedicoPerfil extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
             onPressed: () {
               Navigator.pushNamed(context, '/list_medicos');
             },
@@ -34,18 +41,6 @@ class MedicoPerfil extends StatelessWidget {
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             ),
           ),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: FutureBuilder(
           future: read_medico(context, rela_medico),

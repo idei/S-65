@@ -1,4 +1,9 @@
+import 'package:app_salud/models/departamentos_model.dart';
 import 'package:app_salud/models/usuario_model.dart';
+import 'package:app_salud/services/departamento_service.dart';
+import 'package:app_salud/services/genero_service.dart';
+import 'package:app_salud/services/grupo_conviviente_service.dart';
+import 'package:app_salud/services/nivel_educativo_service.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,20 +34,22 @@ class _LoginPage extends State<LoginPage> {
   var tokenId;
   String estado_read_date;
   String estado_login;
+  var _obscureText = true;
 
   Widget build(BuildContext context) {
     final usuarioService = Provider.of<UsuarioServices>(context);
 
     return Scaffold(
+        key: UniqueKey(),
         body: Form(
-      key: _formKey_ingresar,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          LoginWidget(context),
-        ],
-      ),
-    ));
+          key: _formKey_ingresar,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              LoginWidget(context),
+            ],
+          ),
+        ));
   }
 
   set_preference() async {
@@ -174,15 +181,27 @@ class _LoginPage extends State<LoginPage> {
     );
   }
 
+  _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   Widget InputPasswordWidget() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
         controller: password,
         enabled: _isEnabled,
-        obscureText: true,
+        obscureText: _obscureText,
         decoration: InputDecoration(
             labelText: 'Contraseña',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility : Icons.visibility_off,
+              ),
+              onPressed: _togglePasswordVisibility,
+            ),
             labelStyle: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
         validator: (value) {
@@ -226,6 +245,14 @@ class _LoginPage extends State<LoginPage> {
     });
 
     await fetchLogin();
+
+    await Provider.of<DepartamentoServices>(context, listen: false)
+        .loadDepartamentos();
+    await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
+    await Provider.of<NivelEducativoService>(context, listen: false)
+        .loadNivelEducativo();
+    await Provider.of<GrupoConvivienteServices>(context, listen: false)
+        .loadGrupoConviviente();
 
     setState(() {
       _isLoading = false;

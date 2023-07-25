@@ -71,19 +71,6 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(45, 175, 168, 1),
           title: Text('Recordatorio'),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Card(
           child: Form(

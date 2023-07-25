@@ -29,7 +29,6 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   var usuarioModel;
 
   void read_vademecum() async {
-    //await getStringValuesSF(usuarioModel);
     try {
       String URL_base = Env.URL_API;
       var url = URL_base + "/vademecum";
@@ -59,12 +58,6 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
       listMedicamentos.add(Medicamentos_database.fromJson(medicamentos));
     }
     return listMedicamentos;
-
-    // final parsed = json.decode(jsonString).cast<Map<String, dynamic>>();
-    // return parsed
-    //     .map<Medicamentos_database>(
-    //         (json) => Medicamentos_database.fromJson(json))
-    //     .toList();
   }
 
   @override
@@ -93,6 +86,10 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
     );
   }
 
+  bool _isChecked = false; // Valor seleccionado por defecto
+  bool _isExpanded = false;
+  bool _isExpandedBuscador = true;
+
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
@@ -109,25 +106,12 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
             ),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/menu');
+            Navigator.pushNamed(context, '/medicamentos');
           },
         ),
         title: Text("Buscador de Medicamentos",
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -141,45 +125,77 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                 ? Container(
                     alignment: Alignment.center,
                     child: CircularProgressIndicator())
-                : searchTextField =
-                    AutoCompleteTextField<Medicamentos_database>(
-                    key: key,
-                    clearOnSubmit: false,
-                    suggestions: list_medicamentos_vademecum,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16.0,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily),
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
-                      hintText: "Ingrese el nombre del medicamento",
-                      hintStyle: TextStyle(
-                          color: Colors.grey,
+                : AnimatedContainer(
+                    duration: Duration(milliseconds: 400),
+                    height: _isExpandedBuscador ? 100.0 : 0.0,
+                    child: searchTextField =
+                        AutoCompleteTextField<Medicamentos_database>(
+                      key: key,
+                      clearOnSubmit: false,
+                      suggestions: list_medicamentos_vademecum,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.0,
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily),
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
+                        hintText: "Ingrese el nombre del medicamento",
+                        hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                      itemFilter: (item, query) {
+                        return item.nombre_comercial
+                            .toLowerCase()
+                            .startsWith(query.toLowerCase());
+                      },
+                      itemSorter: (a, b) {
+                        return a.nombre_comercial.compareTo(b.nombre_comercial);
+                      },
+                      itemSubmitted: (item) {
+                        setState(() {
+                          searchTextField.textField.controller.text =
+                              item.nombre_comercial;
+                          data_id = item.id_medicamento;
+                          print(data_id);
+                        });
+                      },
+                      itemBuilder: (context, item) {
+                        return row(item);
+                      },
                     ),
-                    itemFilter: (item, query) {
-                      return item.nombre_comercial
-                          .toLowerCase()
-                          .startsWith(query.toLowerCase());
-                    },
-                    itemSorter: (a, b) {
-                      return a.nombre_comercial.compareTo(b.nombre_comercial);
-                    },
-                    itemSubmitted: (item) {
-                      setState(() {
-                        searchTextField.textField.controller.text =
-                            item.nombre_comercial;
-                        data_id = item.id_medicamento;
-                        print(data_id);
-                      });
-                    },
-                    itemBuilder: (context, item) {
-                      return row(item);
-                    },
                   ),
+            SizedBox(height: 40.0),
+            Container(
+              alignment: Alignment.centerLeft,
+              child: CheckboxListTile(
+                contentPadding:
+                    EdgeInsets.zero, // Ajusta el relleno alrededor del título
+                title: Text('¿No encuentra su medicamento?'),
+                value: _isChecked,
+                onChanged: (bool value) {
+                  setState(() {
+                    _isChecked = value;
+                    _isExpanded = value;
+                    _isExpandedBuscador = !value;
+                  });
+                },
+              ),
+            ),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 400),
+              height: _isExpanded ? 100.0 : 0.0,
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Ingrese el nombre del medicamento',
+                ),
+              ),
+            ),
             SizedBox(height: 40.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(),

@@ -38,7 +38,14 @@ class _ListMedicosState extends State<ListMedicos> {
     return Scaffold(
       appBar: AppBar(
         leading: new IconButton(
-          icon: new Icon(Icons.arrow_back),
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
           onPressed: () {
             Navigator.pushNamed(context, '/menu');
           },
@@ -49,19 +56,6 @@ class _ListMedicosState extends State<ListMedicos> {
             fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
           ),
         ),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          )
-        ],
       ),
       body: FutureBuilder<List<MedicoModel>>(
         future: fetchMedicos(),

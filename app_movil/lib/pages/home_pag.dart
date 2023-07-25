@@ -17,6 +17,7 @@ class _FormpruebaState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
+        key: UniqueKey(),
         future: test_datos(),
         builder: (BuildContext context, snapshot) {
           print(snapshot.connectionState);
@@ -30,6 +31,7 @@ class _FormpruebaState extends State<HomePage> {
             }
           } else {
             return MaterialApp(
+                key: UniqueKey(),
                 debugShowCheckedModeBanner: false,
                 home: Scaffold(
                   body: Padding(
@@ -67,16 +69,19 @@ Future test_datos() async {
 
 class HomeInicio extends StatefulWidget {
   @override
-  Otras_drogasWidgetState createState() => Otras_drogasWidgetState();
+  HomeInicioWidgetState createState() => HomeInicioWidgetState();
 }
 
-class Otras_drogasWidgetState extends State<HomeInicio> {
+class HomeInicioWidgetState extends State<HomeInicio> {
   @override
-  void initState() {}
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: UniqueKey(),
       body: Card(
         child: Center(
           child: Column(

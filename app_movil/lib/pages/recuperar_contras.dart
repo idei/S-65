@@ -19,15 +19,28 @@ class _RecuperarState extends State<RecuperarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(30, 20, 108, 1),
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, 'ingresar');
+            },
+          ),
           title: Text('Recuperación de Contraseña',
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
-          actions: <Widget>[],
         ),
         body: Center(
           child: Form(
-              key: _formKey_recuperar,
+              key: UniqueKey(),
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ListView(children: <Widget>[
@@ -45,23 +58,28 @@ class _RecuperarState extends State<RecuperarPage> {
                     SizedBox(
                       height: 30,
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
+                    Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromRGBO(30, 20, 108, 1),
                           textStyle: TextStyle(
                               fontFamily: Theme.of(context)
                                   .textTheme
                                   .headline1
-                                  .fontFamily)),
-                      child: Container(
-                        child: Text('Recuperar contraseña'),
+                                  .fontFamily),
+                        ),
+                        child: Container(
+                          child: Text('Recuperar'),
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      MostrarPass()));
+                        },
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    MostrarPass()));
-                      },
                     )
                   ]))),
         ));
@@ -102,9 +120,9 @@ class MostrarPass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
+        key: UniqueKey(),
         future: get_pass(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
           if (snapshot.hasData) {
             if (mensajeRetornado["estado"] == "Error") {
               return Scaffold(
@@ -145,10 +163,6 @@ class MostrarPass extends StatelessWidget {
                                 horizontal: 60.0, vertical: 15.0),
                             child: Text('Volver a Iniciar Sesión'),
                           ),
-                          //shape: RoundedRectangleBorder(
-                          //  borderRadius: BorderRadius.circular(5.0)),
-                          //color: Color.fromRGBO(157, 19, 34, 1),
-                          //textColor: Colors.white,
                           onPressed: () {
                             Navigator.pushReplacement(
                                 context,
@@ -163,6 +177,7 @@ class MostrarPass extends StatelessWidget {
             }
           } else {
             return Scaffold(
+              key: UniqueKey(),
               appBar: AppBar(
                   backgroundColor: Color.fromRGBO(157, 19, 34, 1),
                   title: Text('Recuperación de Contraseña')),

@@ -283,19 +283,6 @@ class AntecedentesWidgetState extends State<Antecedentes> {
               ),
             ),
           ),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Form(
           key: _formKey_antecedentes_familiares,

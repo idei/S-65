@@ -38,19 +38,6 @@ class _AvisosState extends State<Avisos> {
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
       ),
       body: FutureBuilder<List<AvisosModel>>(
           future: read_avisos(),
@@ -78,10 +65,28 @@ class _AvisosState extends State<Avisos> {
                               },
                               child: Card(
                                 child: ListTile(
-                                  leading: Icon(
-                                    Icons.calendar_today,
-                                    color: Colors.blue,
+                                  leading: Container(
+                                    width: 90,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        data.fecha_limite,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                  // leading: Icon(
+                                  //   Icons.calendar_today,
+                                  //   color: Colors.blue,
+                                  // ),
                                   title: Text(data.descripcion.toUpperCase(),
                                       maxLines: 2,
                                       style: TextStyle(

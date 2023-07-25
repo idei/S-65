@@ -122,8 +122,15 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(45, 175, 168, 1),
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Color.fromRGBO(45, 175, 168, 1),
+              ),
+            ),
             onPressed: () {
               Navigator.pushNamed(context, '/avisos');
             },
@@ -132,19 +139,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
         ),
         body: Card(
           child: Form(
@@ -197,19 +191,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ],
         ),
         body: Form(
             child: Padding(

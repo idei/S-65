@@ -1,4 +1,8 @@
 import 'package:app_salud/models/paciente_model.dart';
+import 'package:app_salud/services/departamento_service.dart';
+import 'package:app_salud/services/genero_service.dart';
+import 'package:app_salud/services/grupo_conviviente_service.dart';
+import 'package:app_salud/services/nivel_educativo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
@@ -17,33 +21,53 @@ var userModel;
 var rela_users;
 var usuarioModel;
 
-class Formprueba extends StatefulWidget {
+String rela_departamento = '1';
+String rela_genero = '1';
+String rela_nivel_instruccion = '1';
+String rela_grupo_conviviente = '1';
+var return_apellido;
+var return_nombre;
+var return_email;
+var estado_users = 2;
+var loadingUsuario = true;
+var providerdepto;
+
+class FormDatosGenerales extends StatefulWidget {
+  FormDatosGenerales({Key key}) : super(key: key);
+
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _FormDatosGeneralesState createState() => _FormDatosGeneralesState();
 }
 
-class _FormpruebaState extends State<Formprueba> {
-  final myController = TextEditingController();
-  final pageName = '/form_datos_generales';
+class _FormDatosGeneralesState extends State<FormDatosGenerales> {
+  final _formKey_datos_personales = GlobalKey<FormState>();
+  final _nombreFieldKey = GlobalKey<FormFieldState<String>>();
+  final _apellidoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _dniFieldKey = GlobalKey<FormFieldState<String>>();
+  final _celularPacienteFieldKey = GlobalKey<FormFieldState<String>>();
+  final _fechaNacimientoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _relaDeptoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _relaGeneroFieldKey = GlobalKey<FormFieldState<String>>();
+  final _relaNivelFieldKey = GlobalKey<FormFieldState<String>>();
+  final _relaGrupoFieldKey = GlobalKey<FormFieldState<String>>();
+
+  final _nombreContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
 
   @override
   void initState() {
     super.initState();
+    Provider.of<UsuarioServices>(context, listen: false).loadData(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey_datos_personales = GlobalKey<FormState>();
-
     usuarioModel = Provider.of<UsuarioServices>(context);
 
     rela_users = usuarioModel.usuario.paciente.rela_users;
     email_argument = usuarioModel.usuario.emailUser;
 
-    final format = DateFormat("dd-MM-yyyy");
-    final initialValue = DateTime.now();
-    bool autoValidate = false;
-    DateTime value = DateTime.now();
     int changedCount = 0;
 
     return Scaffold(
@@ -65,234 +89,388 @@ class _FormpruebaState extends State<Formprueba> {
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Center(
-          child: SingleChildScrollView(
-            child: FutureBuilder<PacienteModel>(
-              future: getDataPaciente(usuarioModel),
-              builder: (context, snapshot) {
-                if (isGenero &&
-                    isDepto &&
-                    isGrupoConviviente &&
-                    isNiveleducativo &&
-                    snapshot.hasData) {
-                  return Form(
+          child: Consumer5<UsuarioServices, DepartamentoServices,
+              GeneroServices, NivelEducativoService, GrupoConvivienteServices>(
+            builder: (context, provider, provider2, provider3, provider4,
+                provider5, _) {
+              if (provider2.isLoadingDeptos) {
+                List<DropdownMenuItem<String>> myDropdownMenuItemsDeptos =
+                    provider2.formDataList.map(
+                  (item) {
+                    if (provider2.isLoadingDeptos) {
+                      return DropdownMenuItem<String>(
+                        value: item.idDepartamento.toString(),
+                        child: Text(item.nombreDepartamento),
+                      );
+                    }
+                  },
+                ).toList();
+
+                List<DropdownMenuItem<String>> myDropdownMenuItemsGenero =
+                    provider3.formDataList.map(
+                  (item) {
+                    if (provider3.isLoadingGenero) {
+                      return DropdownMenuItem<String>(
+                        value: item.idGenero.toString(),
+                        child: Text(item.nombreGenero),
+                      );
+                    }
+                  },
+                ).toList();
+
+                List<DropdownMenuItem<String>>
+                    myDropdownMenuItemsNivelEducativo =
+                    provider4.formDataList.map(
+                  (item) {
+                    if (provider4.isLoadingNivelEducativo) {
+                      return DropdownMenuItem<String>(
+                        value: item.idNivelEducativo.toString(),
+                        child: Text(item.nombreNivelEducativo),
+                      );
+                    }
+                  },
+                ).toList();
+
+                List<DropdownMenuItem<String>>
+                    myDropdownMenuItemsGrupoConvivencia =
+                    provider5.formDataList.map(
+                  (item) {
+                    if (provider5.isLoadingGrupos) {
+                      return DropdownMenuItem<String>(
+                        value: item.idGrupo.toString(),
+                        child: Text(item.nombreGrupo),
+                      );
+                    }
+                  },
+                ).toList();
+
+                return SingleChildScrollView(
+                  child: Form(
                     key: _formKey_datos_personales,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: apellido,
-                            decoration: InputDecoration(
-                                labelText: 'Apellido',
-                                labelStyle: TextStyle(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              key: _apellidoFieldKey,
+                              initialValue: provider.usuario.paciente.apellido,
+                              onSaved: (value) =>
+                                  provider.usuario.paciente.apellido = value,
+                              decoration: InputDecoration(
+                                  labelText: 'Apellido',
+                                  labelStyle: TextStyle(
                                     fontFamily: Theme.of(context)
                                         .textTheme
                                         .headline1
                                         .fontFamily,
-                                    fontWeight: FontWeight.bold)),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Por favor ingrese el apellido';
-                              }
-                              return null;
-                            },
-                            onChanged: (text) {
-                              print("Debe completar el campo");
-                            },
-                          ),
-                          TextFormField(
-                            controller: nombre,
-                            decoration: InputDecoration(
-                                labelText: 'Nombre',
-                                labelStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Por favor ingrese el nombre';
-                              }
-                              return null;
-                            },
-                            onChanged: (text) {
-                              print("Debe completar el campo");
-                            },
-                          ),
-                          TextFormField(
-                            controller: dni,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                labelText: 'DNI',
-                                labelStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Por favor ingrese el DNI';
-                              }
-                              return null;
-                            },
-                            onChanged: (text) {
-                              print("Debe completar el campo");
-                            },
-                          ),
-                          SizedBox(height: 10.0),
-                          DateTimeField(
-                            decoration: InputDecoration(
-                              labelText: 'Fecha de Nacimiento',
-                            ),
-                            controller: fecha_nacimiento,
-                            format: format,
-                            onShowPicker: (context, currentValue) {
-                              return showDatePicker(
-                                  locale: const Locale("es", "ES"),
-                                  context: context,
-                                  firstDate: DateTime(1900),
-                                  initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100));
-                            },
-                            validator: (date) =>
-                                date == null ? 'Invalid date' : null,
-                            initialValue: initialValue,
-                            onChanged: (date) => setState(() {
-                              value = date;
-                              changedCount++;
-                            }),
-                          ),
-                          SizedBox(height: 10.0),
-                          FormGenero(),
-                          SizedBox(height: 10.0),
-                          FormNivelEducativo(),
-                          SizedBox(height: 10.0),
-                          FormGrupoConviviente(),
-                          TextFormField(
-                            controller: celular,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                labelText: 'Celular',
-                                labelStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Por favor ingrese un número de teléfono';
-                              }
-                              return null;
-                            },
-                            onChanged: (text) {
-                              print("Debe completar el campo");
-                            },
-                          ),
-                          TextFormField(
-                            controller: contacto,
-                            decoration: InputDecoration(
-                                labelText: 'Contacto',
-                                labelStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Por favor ingrese el contacto';
-                              }
-                              return null;
-                            },
-                            onChanged: (text) {
-                              print("Debe completar el campo");
-                            },
-                          ),
-                          SizedBox(height: 10.0),
-                          FormDepartamentos(),
-                          SizedBox(height: 15.0),
-                          Container(
-                            alignment: Alignment.center,
-                            child: ElevatedButton.icon(
-                              icon: _isLoading
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 5),
-                                      child: const CircularProgressIndicator(),
-                                    )
-                                  : const Icon(Icons.save_alt),
-                              style: ElevatedButton.styleFrom(
-                                textStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily),
-                              ),
-                              onPressed: () {
-                                if (_formKey_datos_personales.currentState
-                                        .validate() &&
-                                    !_isLoading) {
-                                  _startLoading(usuarioModel);
-                                } else {
-                                  null;
-                                }
-                              },
-                              label: Text('Guardar Datos',
-                                  style: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily,
-                                    fontSize: 16.0,
                                   )),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el apellido';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
                             ),
-                          ),
-                        ],
+                            TextFormField(
+                              key: _nombreFieldKey,
+                              initialValue: provider.usuario.paciente.nombre,
+                              onSaved: (value) =>
+                                  provider.usuario.paciente.nombre = value,
+                              decoration: InputDecoration(
+                                  labelText: 'Nombre',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el nombre';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            TextFormField(
+                              key: _dniFieldKey,
+                              initialValue: provider.usuario.paciente.dni,
+                              onSaved: (value) =>
+                                  provider.usuario.paciente.dni = value,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                  labelText: 'DNI',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el DNI';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            SizedBox(height: 10.0),
+                            DateTimeField(
+                              key: _fechaNacimientoFieldKey,
+                              decoration: InputDecoration(
+                                labelText: 'Fecha de Nacimiento',
+                              ),
+                              initialValue:
+                                  provider.usuario.paciente.fecha_nacimiento,
+                              onSaved: (value) => provider
+                                  .usuario.paciente.fecha_nacimiento = value,
+                              format: DateFormat('dd-MM-yyyy'),
+                              onShowPicker: (context, currentValue) {
+                                return showDatePicker(
+                                    locale: const Locale("es", "ES"),
+                                    context: context,
+                                    firstDate: DateTime(1900),
+                                    initialDate: currentValue ?? DateTime.now(),
+                                    lastDate: DateTime(2100));
+                              },
+                              validator: (date) =>
+                                  date == null ? 'Invalid date' : null,
+                              onChanged: (value) => setState(() {
+                                value = value;
+                                changedCount++;
+                              }),
+                            ),
+                            SizedBox(height: 10.0),
+                            TextFormField(
+                              key: _celularPacienteFieldKey,
+                              initialValue: provider.usuario.paciente.celular,
+                              onSaved: (value) =>
+                                  provider.usuario.paciente.celular = value,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                  labelText: 'Número de celular',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el número de teléfono del contacto';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            SizedBox(height: 10.0),
+                            DropdownButtonFormField<String>(
+                                key: _relaGeneroFieldKey,
+                                hint: Text("Género"),
+                                value:
+                                    rela_genero.isNotEmpty ? rela_genero : null,
+                                items: myDropdownMenuItemsGenero,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    rela_genero = newValue;
+                                  });
+                                }),
+                            SizedBox(height: 10.0),
+                            DropdownButtonFormField<String>(
+                                key: _relaDeptoFieldKey,
+                                hint: Text("Departamento"),
+                                value: rela_departamento.isNotEmpty
+                                    ? rela_departamento
+                                    : null,
+                                items: myDropdownMenuItemsDeptos,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    rela_departamento = newValue;
+                                  });
+                                }),
+                            SizedBox(height: 15.0),
+                            DropdownButtonFormField<String>(
+                                key: _relaNivelFieldKey,
+                                hint: Text("Nivel Educativo"),
+                                value: rela_nivel_instruccion.isNotEmpty
+                                    ? rela_nivel_instruccion
+                                    : null,
+                                items: myDropdownMenuItemsNivelEducativo,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    rela_nivel_instruccion = newValue;
+                                  });
+                                }),
+                            SizedBox(height: 25.0),
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              color: Color.fromARGB(134, 190, 218, 241),
+                              child: Center(
+                                child: Text(
+                                  'GRUPO CONVIVIENTE',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10.0),
+                            DropdownButtonFormField<String>(
+                                key: _relaGrupoFieldKey,
+                                hint: Text("Relación con Paciente"),
+                                value: rela_grupo_conviviente.isNotEmpty
+                                    ? rela_grupo_conviviente
+                                    : null,
+                                items: myDropdownMenuItemsGrupoConvivencia,
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    rela_grupo_conviviente = newValue;
+                                  });
+                                }),
+                            TextFormField(
+                              key: _nombreContactoFieldKey,
+                              initialValue:
+                                  provider.usuario.paciente.nombre_contacto,
+                              decoration: InputDecoration(
+                                  labelText: 'Nombre del Contacto',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el nombre del contacto';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            TextFormField(
+                              key: _apellidoContactoFieldKey,
+                              initialValue:
+                                  provider.usuario.paciente.apellido_contacto,
+                              decoration: InputDecoration(
+                                  labelText: 'Apellido del contacto',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el apellido del contacto';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            SizedBox(height: 10.0),
+                            TextFormField(
+                              key: _celularContactoFieldKey,
+                              initialValue:
+                                  provider.usuario.paciente.celular_contacto,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                  labelText: 'Celular del contacto',
+                                  labelStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Por favor ingrese el número de teléfono del contacto';
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                print("Debe completar el campo");
+                              },
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              alignment: Alignment.center,
+                              child: ElevatedButton.icon(
+                                icon: _isLoading
+                                    ? Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        child:
+                                            const CircularProgressIndicator(),
+                                      )
+                                    : const Icon(Icons.save_alt),
+                                style: ElevatedButton.styleFrom(
+                                  textStyle: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily),
+                                ),
+                                onPressed: () {
+                                  if (_formKey_datos_personales.currentState
+                                          .validate() &&
+                                      !_isLoading) {
+                                    _startLoading(usuarioModel);
+                                  } else {
+                                    null;
+                                  }
+                                },
+                                label: Text('Guardar Datos',
+                                    style: TextStyle(
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily,
+                                      fontSize: 16.0,
+                                    )),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  );
-                } else {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "Cargando...",
+                        style: TextStyle(
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily,
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          "Cargando...",
-                          style: TextStyle(
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily,
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                }
-              },
-            ),
+                      )
+                    ],
+                  ),
+                );
+              }
+            },
           ),
         ));
   }
@@ -328,21 +506,37 @@ class _FormpruebaState extends State<Formprueba> {
   }
 
   guardarDatos(UsuarioServices usuarioModel) async {
+    String nombre_paciente = _nombreFieldKey.currentState.value;
+    String apellido_paciente = _apellidoFieldKey.currentState.value;
+    String celular_paciente = _celularPacienteFieldKey.currentState.value;
+    String fecha_paciente =
+        usuarioModel.usuario.paciente.fecha_nacimiento.toString();
+    String dni_paciente = _dniFieldKey.currentState.value;
+    String rela_depto = _relaDeptoFieldKey.currentState.value;
+    String rela_genero = _relaGeneroFieldKey.currentState.value;
+    String rela_nivel = _relaNivelFieldKey.currentState.value;
+    String rela_grupo = _relaGrupoFieldKey.currentState.value;
+    String nombre_contacto = _nombreContactoFieldKey.currentState.value;
+    String apellido_contacto = _apellidoContactoFieldKey.currentState.value;
+    String celular_contacto = _celularContactoFieldKey.currentState.value;
+
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_personales";
 
     var response = await http.post(url, body: {
-      "nombre": nombre.text,
-      "apellido": apellido.text,
-      "dni": dni.text,
-      "fecha_nacimiento": fecha_nacimiento.text.toString(),
+      "nombre": nombre_paciente,
+      "apellido": apellido_paciente,
+      "dni": dni_paciente,
+      "fecha_nacimiento": fecha_paciente,
       "email": email_argument.toString(),
-      "rela_genero": rela_genero.toString(),
-      "rela_departamento": rela_departamento.toString(),
-      "rela_nivel_instruccion": rela_nivel_instruccion.toString(),
-      "rela_grupo_conviviente": rela_grupo_conviviente.toString(),
-      "celular": celular.text,
-      "contacto": contacto.text,
+      "rela_genero": rela_genero,
+      "rela_departamento": rela_depto,
+      "rela_nivel_instruccion": rela_nivel,
+      "rela_grupo_conviviente": rela_grupo,
+      "celular": celular_paciente,
+      "nombre_contacto": nombre_contacto,
+      "apellido_contacto": apellido_contacto,
+      "celular_contacto": celular_contacto,
       "estado_users": estado_users.toString(),
       "rela_users": rela_users.toString(),
     });
@@ -399,15 +593,6 @@ _alert_informe(context, message, colorNumber) {
         textAlign: TextAlign.center,
         style: const TextStyle(color: Colors.white)),
   ));
-}
-
-loadingSelectData() async {
-  if (!isDepto && !isGenero && !isGrupoConviviente && !isNiveleducativo) {
-    await getAllDepartamentos();
-    await getAllGeneros();
-    await getAllNivelesEducativos();
-    await getAllGrupoConviviente();
-  }
 }
 
 List dataDepartamento;
@@ -478,199 +663,6 @@ getAllGrupoConviviente() async {
     } else {
       print(responseBody['status']);
     }
-  }
-}
-
-TextEditingController apellido = TextEditingController();
-TextEditingController nombre = TextEditingController();
-TextEditingController fecha_nacimiento = TextEditingController();
-TextEditingController genero = TextEditingController();
-TextEditingController email = TextEditingController();
-TextEditingController dni = TextEditingController();
-TextEditingController celular = TextEditingController();
-TextEditingController contacto = TextEditingController();
-
-String rela_departamento = '1';
-String rela_genero = '1';
-String rela_nivel_instruccion = '1';
-String rela_grupo_conviviente = '1';
-var return_apellido;
-var return_nombre;
-var return_email;
-var estado_users = 2;
-
-Future<PacienteModel> getDataPaciente(UsuarioServices usuarioModel) async {
-  if (usuarioModel.existeUsuarioModel) {
-    await loadingSelectData();
-
-    rela_departamento = usuarioModel.usuario.paciente.rela_departamento;
-    rela_nivel_instruccion =
-        usuarioModel.usuario.paciente.rela_nivel_instruccion;
-    rela_grupo_conviviente =
-        usuarioModel.usuario.paciente.rela_grupo_conviviente;
-    rela_genero = usuarioModel.usuario.paciente.rela_genero;
-    rela_users = usuarioModel.usuario.paciente.rela_users;
-    nombre.text = usuarioModel.usuario.paciente.nombre;
-    apellido.text = usuarioModel.usuario.paciente.apellido;
-    fecha_nacimiento.text = usuarioModel.usuario.paciente.fecha_nacimiento;
-    dni.text = usuarioModel.usuario.paciente.dni.toString();
-    celular.text = usuarioModel.usuario.paciente.celular;
-    contacto.text = usuarioModel.usuario.paciente.contacto;
-    rela_users = usuarioModel.usuario.paciente.rela_users;
-
-    return usuarioModel.usuario.paciente;
-  } else {
-    return null;
-  }
-}
-
-// ----------------------- WIDGET DEPARTAMENTOS -----------------------------------------------------------------------------------
-
-class FormDepartamentos extends StatefulWidget {
-  FormDepartamentos({Key key}) : super(key: key);
-
-  @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<FormDepartamentos> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-        hint: Text("Departamento"),
-        value: rela_departamento.isNotEmpty ? rela_departamento : null,
-        items: dataDepartamento.map(
-          (item) {
-            return DropdownMenuItem<String>(
-              child: Text(item['nombre']),
-              value: item['id'].toString(),
-            );
-          },
-        ).toList(),
-        onChanged: (String newValue) {
-          setState(() {
-            rela_departamento = newValue;
-          });
-        });
-  }
-}
-
-//------------------------------------------------------------------------------------------------------
-
-// ----------------------- WIDGET GENERO -----------------------------------------------------------------------------------
-
-class FormGenero extends StatefulWidget {
-  FormGenero({Key key}) : super(key: key);
-
-  @override
-  _GeneroWidgetState createState() => _GeneroWidgetState();
-}
-
-class _GeneroWidgetState extends State<FormGenero> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-        hint: Text("Géneros"),
-        value: rela_genero.isNotEmpty ? rela_genero : null,
-        items: dataGenero.map(
-          (list) {
-            return DropdownMenuItem<String>(
-              child: Text(list['nombre']),
-              value: list['id'].toString(),
-            );
-          },
-        ).toList(),
-        onChanged: (String Value) {
-          setState(() {
-            rela_genero = Value;
-          });
-        });
-  }
-}
-
-// ----------------------- WIDGET NIVEL EDUCACION -----------------------------------------------------------------------------------
-
-class FormNivelEducativo extends StatefulWidget {
-  @override
-  _FormNivelEducativoState createState() => _FormNivelEducativoState();
-}
-
-class _FormNivelEducativoState extends State<FormNivelEducativo> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-        hint: Text("Nivel Educativo Alcanzado"),
-        value:
-            rela_nivel_instruccion.isNotEmpty ? rela_nivel_instruccion : null,
-        items: dataNivelEducativo.map(
-          (list) {
-            return DropdownMenuItem<String>(
-              child: Text(list['nombre_nivel']),
-              value: list['id'].toString(),
-            );
-          },
-        ).toList(),
-        onChanged: (String newValue) {
-          setState(() {
-            rela_nivel_instruccion = newValue;
-          });
-        });
-  }
-}
-
-// ----------------------- WIDGET GRUPO CONVIVIENTE -----------------------------------------------------------------------------------
-
-class FormGrupoConviviente extends StatefulWidget {
-  @override
-  _FormpruebaState3 createState() => _FormpruebaState3();
-}
-
-class _FormpruebaState3 extends State<FormGrupoConviviente> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-        hint: Text("Grupo Conviviente"),
-        value:
-            rela_grupo_conviviente.isNotEmpty ? rela_grupo_conviviente : null,
-        items: dataGrupoConviviente.map(
-          (list) {
-            if (list == null) {
-              return DropdownMenuItem<String>(
-                child: Text('Cargando...'),
-              );
-            } else {
-              return DropdownMenuItem<String>(
-                child: Text(list['nombre']),
-                value: list['id'].toString(),
-              );
-            }
-          },
-        ).toList(),
-        onChanged: (String newValue) {
-          setState(() {
-            rela_grupo_conviviente = newValue;
-          });
-        });
   }
 }
 

@@ -1,4 +1,8 @@
+import 'package:app_salud/services/departamento_service.dart';
+import 'package:app_salud/services/genero_service.dart';
+import 'package:app_salud/services/grupo_conviviente_service.dart';
 import 'package:app_salud/services/medico_services.dart';
+import 'package:app_salud/services/nivel_educativo_service.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,8 +18,13 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => new UsuarioServices()),
         ChangeNotifierProvider(create: (_) => new MedicoServices()),
+        ChangeNotifierProvider(create: (_) => new DepartamentoServices()),
+        ChangeNotifierProvider(create: (_) => new GeneroServices()),
+        ChangeNotifierProvider(create: (_) => new NivelEducativoService()),
+        ChangeNotifierProvider(create: (_) => new GrupoConvivienteServices()),
       ],
       child: MaterialApp(
+        key: UniqueKey(),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: [
           const Locale('es', 'ES'),

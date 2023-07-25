@@ -141,7 +141,9 @@ function login_paciente()
                 $dni = $result_paciente['dni'];
                 $fecha_nacimiento = $result_paciente['fecha_nacimiento'];
                 $celular = $result_paciente['celular'];
-                $contacto = $result_paciente['contacto'];
+                $nombre_contacto = $result_paciente['nombre_contacto'];
+                $apellido_contacto = $result_paciente['apellido_contacto'];
+                $celular_contacto = $result_paciente['celular_contacto'];
                 $estado_users = $result_paciente['estado_users'];
 
 
@@ -161,7 +163,9 @@ function login_paciente()
                         "dni" => $dni,
                         "fecha_nacimiento" => $fecha_nacimiento,
                         "celular" => $celular,
-                        "contacto" => $contacto,
+                        "nombre_contacto" => $nombre_contacto,
+                        "apellido_contacto" => $apellido_contacto,
+                        "celular_contacto" => $celular_contacto,
                         "estado_users" => $estado_users
                     ],
                 );
@@ -930,7 +934,7 @@ function read_datos_personales()
 
         $select_data = Flight::db()->prepare("SELECT rela_users, rela_nivel_instruccion,
         rela_grupo_conviviente, rela_departamento, rela_genero, nombre, apellido, dni, 
-        fecha_nacimiento, celular, contacto 
+        fecha_nacimiento, celular, nombre_contacto, apellido_contacto, celular_contacto 
         FROM pacientes 
         WHERE id = '" . $id_paciente . "'");
 
@@ -4650,11 +4654,25 @@ function respuesta_screening_nutricional()
         $nutri8 = 0;
     }
 
+    if ($_POST['nutri81'] == "true") {
+        $nutri81 = 1;
+        $result_screening += 1;
+    } else {
+        $nutri81 = 0;
+    }
+
     if ($_POST['nutri9'] == "true") {
         $nutri9 = 1;
         $result_screening += 2;
     } else {
         $nutri9 = 0;
+    }
+
+    if ($_POST['nutri91'] == "true") {
+        $nutri91 = 1;
+        $result_screening += 2;
+    } else {
+        $nutri91 = 0;
     }
 
     if ($_POST['nutri10'] == "true") {
@@ -4722,10 +4740,20 @@ function respuesta_screening_nutricional()
     } else {
         $cod_event_nutri8 = verificar($data_input, "cod_event_nutri8");
     }
+    if (isset($_POST['cod_event_nutri81'])) {
+        $cod_event_nutri81 = $_POST["cod_event_nutri81"];
+    } else {
+        $cod_event_nutri81 = verificar($data_input, "cod_event_nutri81");
+    }
     if (isset($_POST['cod_event_nutri9'])) {
         $cod_event_nutri9 = $_POST["cod_event_nutri9"];
     } else {
         $cod_event_nutri9 = verificar($data_input, "cod_event_nutri9");
+    }
+    if (isset($_POST['cod_event_nutri91'])) {
+        $cod_event_nutri91 = $_POST["cod_event_nutri91"];
+    } else {
+        $cod_event_nutri91 = verificar($data_input, "cod_event_nutri91");
     }
     if (isset($_POST['cod_event_nutri10'])) {
         $cod_event_nutri10 = $_POST["cod_event_nutri10"];
@@ -4740,7 +4768,7 @@ function respuesta_screening_nutricional()
 
         // SELECCION DE EVENTOS
         $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos` WHERE codigo_evento
-                    IN ('NUTRI1','NUTRI2','NUTRI3','NUTRI4','NUTRI5','NUTRI6','NUTRI7','NUTRI8','NUTRI9','NUTRI10')");
+                    IN ('NUTRI1','NUTRI2','NUTRI3','NUTRI4','NUTRI5','NUTRI6','NUTRI7','NUTRI8','NUTRI81','NUTRI9','NUTRI91','NUTRI10')");
 
         $select_evento->execute();
         $evento = $select_evento->fetchAll();
@@ -4854,9 +4882,35 @@ function respuesta_screening_nutricional()
                 );
             }
 
+            if ($eventos["codigo_evento"] == $cod_event_nutri81) {
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $nutri81,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                );
+            }
+
             if ($eventos["codigo_evento"] == $cod_event_nutri9) {
                 $rowsToInsert[] = array(
                     'rela_tipo' => $nutri9,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                );
+            }
+
+            if ($eventos["codigo_evento"] == $cod_event_nutri91) {
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $nutri91,
                     'rela_evento' => $eventos["id"],
                     'rela_tipo_screening' => $tipo_screening,
                     'rela_recordatorio_medico' => $recordatorio_medico,
@@ -4882,7 +4936,6 @@ function respuesta_screening_nutricional()
         }
 
 
-        //Call our custom function.
         pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
 
         if ($recordatorio_medico <> null) {
@@ -7291,10 +7344,22 @@ function save_datos_personales()
         $celular = verificar($data_input, "celular");
     }
 
-    if (isset($_POST['contacto'])) {
-        $contacto = $_POST["contacto"];
+    if (isset($_POST['nombre_contacto'])) {
+        $nombre_contacto = $_POST["nombre_contacto"];
     } else {
-        $contacto = verificar($data_input, "contacto");
+        $nombre_contacto = verificar($data_input, "nombre_contacto");
+    }
+
+    if (isset($_POST['apellido_contacto'])) {
+        $apellido_contacto = $_POST["apellido_contacto"];
+    } else {
+        $apellido_contacto = verificar($data_input, "apellido_contacto");
+    }
+
+    if (isset($_POST['celular_contacto'])) {
+        $celular_contacto = $_POST["celular_contacto"];
+    } else {
+        $celular_contacto = verificar($data_input, "celular_contacto");
     }
 
     if (isset($_POST['estado_users'])) {
@@ -7321,7 +7386,9 @@ function save_datos_personales()
             'rela_nivel_instruccion' => $rela_nivel_instruccion,
             'rela_grupo_conviviente' => $rela_grupo_conviviente,
             'celular' => $celular,
-            'contacto' => $contacto,
+            'nombre_contacto' => $nombre_contacto,
+            'apellido_contacto' => $apellido_contacto,
+            'celular_contacto' => $celular_contacto,
             'rela_departamento' => $rela_departamento,
             'estado_users' => $estado_users,
             'rela_users' => $rela_users
@@ -7336,7 +7403,9 @@ function save_datos_personales()
                 rela_nivel_instruccion=:rela_nivel_instruccion,
                 rela_grupo_conviviente=:rela_grupo_conviviente,
                 celular=:celular, 
-                contacto=:contacto,
+                nombre_contacto=:nombre_contacto,
+                apellido_contacto=:apellido_contacto,
+                celular_contacto=:celular_contacto,
                 rela_departamento=:rela_departamento,
                 estado_users=:estado_users,
                 rela_users=:rela_users
@@ -7345,7 +7414,7 @@ function save_datos_personales()
 
         $insert_paciente->execute($data);
 
-        $select_id_paciente = Flight::db()->prepare("SELECT id FROM pacientes WHERE email = '".$rela_users."'");
+        $select_id_paciente = Flight::db()->prepare("SELECT id FROM pacientes WHERE email = '".$email."'");
         $select_id_paciente->execute();
         $id_paciente= $select_id_paciente->fetch();
         $id_paciente= $id_paciente["id"];
@@ -7361,7 +7430,9 @@ function save_datos_personales()
             "rela_nivel_instruccion" => $rela_nivel_instruccion,
             "rela_grupo_conviviente" => $rela_grupo_conviviente,
             "celular" => $celular,
-            "contacto" => $contacto,
+            'nombre_contacto' => $nombre_contacto,
+            'apellido_contacto' => $apellido_contacto,
+            'celular_contacto' => $celular_contacto,
             "rela_departamento" => $rela_departamento,
             "estado_users" => $estado_users,
 

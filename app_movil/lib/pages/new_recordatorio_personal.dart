@@ -39,7 +39,6 @@ class _RecuperarState extends State<RecordatorioPersonal> {
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
-          actions: <Widget>[],
         ),
         body: Center(
           child: Form(
