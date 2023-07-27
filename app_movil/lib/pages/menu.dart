@@ -378,20 +378,22 @@ class _FormMenuState extends State<MenuPage> {
                               if (badgeCount >
                                   0) // Círculo con número si el contador es mayor que cero
                                 Positioned(
-                                  top: -0.6,
-                                  right: -0.5,
+                                  top: -0.7,
+                                  right: -0.6,
                                   child: Container(
-                                    width: 18,
-                                    height: 18,
+                                    width: 25,
+                                    height: 25,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.red[700],
                                     ),
-                                    child: Text(" " + badgeCount.toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        )),
+                                    child: Center(
+                                      child: Text(badgeCount.toString(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          )),
+                                    ),
                                   ),
                                 ),
                             ]),
@@ -422,18 +424,27 @@ class _FormMenuState extends State<MenuPage> {
                                 child: Icon(Icons.priority_high,
                                     color: Colors.white, size: 70.0),
                               ),
-                              Positioned(
-                                top: -0.6,
-                                right: -0.5,
-                                child: Container(
-                                  width: 18,
-                                  height: 18,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red[800],
+                              if (badgeCount >
+                                  0) // Círculo con número si el contador es mayor que cero
+                                Positioned(
+                                  top: -0.7,
+                                  right: -0.6,
+                                  child: Container(
+                                    width: 25,
+                                    height: 25,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.red[700],
+                                    ),
+                                    child: Center(
+                                      child: Text(badgeCount.toString(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          )),
+                                    ),
                                   ),
                                 ),
-                              ),
                             ]),
                             SizedBox(height: 8.0),
                             Text(
