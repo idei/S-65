@@ -9,7 +9,7 @@ $apellido=$_SESSION['apellido'];
   <a href="home.php" class="brand-link">
     <img src="dist/img/logoChico.png" alt="Logo" class="brand-image img-circle elevation-3"
       style="opacity: .8">
-    <span class="brand-text font-weight-light">S-65</span>
+    <span class="brand-text font-weight-light">Agenda Salud</span>
   </a>
 
   <!-- Sidebar -->
@@ -77,8 +77,8 @@ $apellido=$_SESSION['apellido'];
   <!-- /.sidebar -->
 
   <div class="sidebar-custom">
-    <a href="#" class="btn btn-link"><i class="fas fa-cogs"></i></a>
-    <a href="#" class="btn btn-secondary hide-on-collapse pos-right">Ayuda</a>
+    <a href="#" class="btn btn-link" id="buttonfix2"><i class="fas fa-cog"></i></a>
+    <a href="#" class="btn btn-secondary hide-on-collapse pos-right"  id="buttonfix1" >Ayuda</a>
   </div>
   <!-- /.sidebar-custom -->
 </aside>

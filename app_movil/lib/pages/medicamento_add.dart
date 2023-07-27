@@ -171,31 +171,31 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                     ),
                   ),
             SizedBox(height: 40.0),
-            Container(
-              alignment: Alignment.centerLeft,
-              child: CheckboxListTile(
-                contentPadding:
-                    EdgeInsets.zero, // Ajusta el relleno alrededor del título
-                title: Text('¿No encuentra su medicamento?'),
-                value: _isChecked,
-                onChanged: (bool value) {
-                  setState(() {
-                    _isChecked = value;
-                    _isExpanded = value;
-                    _isExpandedBuscador = !value;
-                  });
-                },
-              ),
-            ),
-            AnimatedContainer(
-              duration: Duration(milliseconds: 400),
-              height: _isExpanded ? 100.0 : 0.0,
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Ingrese el nombre del medicamento',
-                ),
-              ),
-            ),
+            // Container(
+            //   alignment: Alignment.centerLeft,
+            //   child: CheckboxListTile(
+            //     contentPadding:
+            //         EdgeInsets.zero, // Ajusta el relleno alrededor del título
+            //     title: Text('¿No encuentra su medicamento?'),
+            //     value: _isChecked,
+            //     onChanged: (bool value) {
+            //       setState(() {
+            //         _isChecked = value;
+            //        // _isExpanded = value;
+            //         //_isExpandedBuscador = !value;
+            //       });
+            //     },
+            //   ),
+            // ),
+            // AnimatedContainer(
+            //   duration: Duration(milliseconds: 400),
+            //   height: _isExpanded ? 100.0 : 0.0,
+            //   child: TextFormField(
+            //     decoration: InputDecoration(
+            //       labelText: 'Ingrese el nombre del medicamento',
+            //     ),
+            //   ),
+            // ),
             SizedBox(height: 40.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(),

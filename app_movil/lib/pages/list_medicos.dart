@@ -25,10 +25,49 @@ final _formKey_list_medicos = GlobalKey<_ListMedicosState>();
 List<MedicoModel> medicos_items;
 bool _isLoading = false;
 
-class _ListMedicosState extends State<ListMedicos> {
+class _ListMedicosState extends State<ListMedicos>
+    with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation<Offset> _slideAnimation;
+  bool _isCardVisible = true;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000), // Duración de la animación
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: Offset(0, -1), // Desplazamiento hacia arriba
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut, // Curva de animación
+    ));
+  }
+
+  void _handleAccept() {
+    _animationController.forward().then((value) {
+      setState(() {
+        // Actualizar el estado para eliminar el Card después de la animación
+        _isCardVisible = false;
+      });
+
+      _alert_informe(context, "Médico vinculado correctamente", 1);
+    });
+  }
+
+  void _handleCancel() {
+    _animationController.forward().then((value) {
+      setState(() {
+        // Actualizar el estado para eliminar el Card después de la animación
+        _isCardVisible = false;
+      });
+
+      _alert_informe(context, "Se rechazó la vinculación", 2);
+    });
   }
 
   @override
@@ -86,65 +125,130 @@ class _ListMedicosState extends State<ListMedicos> {
               ));
             }
           } else {
-            return ListView(
-              children: ListTile.divideTiles(
-                color: Colors.black,
-                tiles: snapshot.data
-                    .map((data) => ListTile(
-                          title: GestureDetector(
-                            onTap: () {},
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.arrow_right_rounded,
-                                color: Colors.blue,
-                              ),
-                              title: Text(
-                                  data.nombre_medico +
-                                      " " +
-                                      data.apellido_medico,
-                                  style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              subtitle: Text(data.especialidad,
-                                  style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              trailing: Wrap(
-                                spacing: 10, // space between two icons
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.text_snippet),
-                                    color: Colors.green,
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, '/medico_perfil',
-                                          arguments: {
-                                            'id_paciente': id_paciente,
-                                            'rela_medico': data.rela_medico,
-                                            'especialidad': data.especialidad,
-                                            'nombre_medico': data.nombre_medico,
-                                            'apellido_medico':
-                                                data.apellido_medico,
-                                            'matricula': data.matricula
-                                          });
-                                    },
-                                  ), // icon-1
-                                ],
-                              ),
-                            ),
-                          ),
-                        ))
-                    .toList(),
-              ).toList(),
+            return Column(
+              children: [
+                // AnimatedBuilder(
+                //   animation: _animationController,
+                //   builder: (BuildContext context, Widget child) {
+                //     return SlideTransition(
+                //       position: _slideAnimation,
+                //       child: _isCardVisible
+                //           ? Card(
+                //               child: Column(
+                //                 children: [
+                //                   Container(
+                //                     height: 60,
+                //                     width: double.infinity,
+                //                     child: Center(
+                //                       child: Text(
+                //                         'Tiene una solicitud de la Dra Estefania Lucero',
+                //                         style: TextStyle(fontSize: 16),
+                //                       ),
+                //                     ),
+                //                   ),
+                //                   SizedBox(height: 5),
+                //                   Row(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: [
+                //                       ElevatedButton(
+                //                         onPressed: _handleAccept,
+                //                         child: Text('Aceptar'),
+                //                       ),
+                //                       SizedBox(width: 10),
+                //                       ElevatedButton(
+                //                         onPressed: _handleCancel,
+                //                         child: Text('Denegar'),
+                //                       ),
+                //                     ],
+                //                   ),
+                //                   SizedBox(height: 5),
+                //                 ],
+                //               ),
+                //             )
+                //           : SizedBox(),
+                //     );
+                //   },
+                // ),
+                // SizedBox(height: 5),
+                Expanded(
+                  child: ListView(
+                    children: ListTile.divideTiles(
+                      color: Colors.black,
+                      tiles: snapshot.data
+                          .map((data) => ListTile(
+                                title: GestureDetector(
+                                  onTap: () {},
+                                  child: ListTile(
+                                    leading: Icon(
+                                      Icons.arrow_right_rounded,
+                                      color: Colors.blue,
+                                    ),
+                                    title: Text(
+                                        data.nombre_medico +
+                                            " " +
+                                            data.apellido_medico,
+                                        style: TextStyle(
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily)),
+                                    subtitle: Text(data.especialidad,
+                                        style: TextStyle(
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily)),
+                                    trailing: Wrap(
+                                      spacing: 10, // space between two icons
+                                      children: <Widget>[
+                                        IconButton(
+                                          icon: Icon(Icons.text_snippet),
+                                          color: Colors.green,
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                                context, '/medico_perfil',
+                                                arguments: {
+                                                  'id_paciente': id_paciente,
+                                                  'rela_medico':
+                                                      data.rela_medico,
+                                                  'especialidad':
+                                                      data.especialidad,
+                                                  'nombre_medico':
+                                                      data.nombre_medico,
+                                                  'apellido_medico':
+                                                      data.apellido_medico,
+                                                  'matricula': data.matricula
+                                                });
+                                          },
+                                        ), // icon-1
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ).toList(),
+                  ),
+                ),
+              ],
             );
           }
         },
       ),
     );
+  }
+
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: Duration(milliseconds: 2000),
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 
   void choiceAction(String choice) {

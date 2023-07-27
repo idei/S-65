@@ -27,6 +27,7 @@ class _FormMenuState extends State<MenuPage> {
   Widget build(BuildContext context) {
     final isTablet = Device.get().isTablet;
     final usuarioModel = Provider.of<UsuarioServices>(context);
+    final int badgeCount = 5;
 
     if (usuarioModel.existeUsuarioModel) {
       // print(usuarioModel.usuario);
@@ -81,9 +82,10 @@ class _FormMenuState extends State<MenuPage> {
                         child: Column(
                           children: [
                             CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 9.5,
-                                child: Icon(Icons.priority_high,
-                                    color: Colors.white, size: 90.0)),
+                              radius: MediaQuery.of(context).size.width / 9.5,
+                              child: Icon(Icons.priority_high,
+                                  color: Colors.white, size: 90.0),
+                            ),
                             SizedBox(height: 8.0),
                             Text(
                               "AVISOS",
@@ -365,12 +367,34 @@ class _FormMenuState extends State<MenuPage> {
                         },
                         child: Column(
                           children: [
-                            CircleAvatar(
+                            Stack(children: [
+                              CircleAvatar(
                                 backgroundColor:
                                     Color.fromRGBO(45, 175, 168, 1),
                                 radius: MediaQuery.of(context).size.width / 7.3,
                                 child: Icon(Icons.event_note,
-                                    color: Colors.white, size: 70.0)),
+                                    color: Colors.white, size: 70.0),
+                              ),
+                              if (badgeCount >
+                                  0) // Círculo con número si el contador es mayor que cero
+                                Positioned(
+                                  top: -0.6,
+                                  right: -0.5,
+                                  child: Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.red[700],
+                                    ),
+                                    child: Text(" " + badgeCount.toString(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ),
+                                ),
+                            ]),
                             SizedBox(height: 8.0),
                             Text(
                               "RECORDATORIOS",
@@ -390,12 +414,27 @@ class _FormMenuState extends State<MenuPage> {
                         },
                         child: Column(
                           children: [
-                            CircleAvatar(
+                            Stack(children: [
+                              CircleAvatar(
                                 backgroundColor:
                                     Color.fromRGBO(45, 175, 168, 1),
                                 radius: MediaQuery.of(context).size.width / 7.3,
                                 child: Icon(Icons.priority_high,
-                                    color: Colors.white, size: 70.0)),
+                                    color: Colors.white, size: 70.0),
+                              ),
+                              Positioned(
+                                top: -0.6,
+                                right: -0.5,
+                                child: Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.red[800],
+                                  ),
+                                ),
+                              ),
+                            ]),
                             SizedBox(height: 8.0),
                             Text(
                               "AVISOS",

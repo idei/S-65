@@ -954,7 +954,10 @@ function read_datos_personales()
             $dni = $select_data["dni"];
             $fecha_nacimiento = $select_data["fecha_nacimiento"];
             $celular = $select_data["celular"];
-            $contacto = $select_data["contacto"];
+            $nombre_contacto = $select_data["nombre_contacto"];
+            $apellido_contacto = $select_data["apellido_contacto"];
+            $celular_contacto = $select_data["celular_contacto"];
+
         } else {
             $error_msg = msg_error("Error: ", "No se encuetra usuario con el DNI ingresado", 0);
             Flight::json($error_msg);
@@ -1052,7 +1055,9 @@ function read_datos_personales()
                 "dni" => $dni,
                 "fecha_nacimiento" => $fecha_nacimiento,
                 "celular" => $celular,
-                "contacto" => $contacto,
+                "nombre_contacto" => $nombre_contacto,
+                "apellido_contacto" => $apellido_contacto,
+                "celular_contacto" => $celular_contacto,
                 "presion_alta" => $presion_alta,
                 "presion_baja" => $presion_baja,
                 "pulso" => $pulso,
@@ -1077,7 +1082,9 @@ function read_datos_personales()
                 "dni" => $dni,
                 "fecha_nacimiento" => $fecha_nacimiento,
                 "celular" => $celular,
-                "contacto" => $contacto,
+                "nombre_contacto" => $nombre_contacto,
+                "apellido_contacto" => $apellido_contacto,
+                "celular_contacto" => $celular_contacto,
                 "presion_alta" => "",
                 "presion_baja" => "",
                 "pulso" => "",

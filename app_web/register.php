@@ -19,12 +19,14 @@ $rutaRaiz = Env::$_URL_API;
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!-- FIXES style -->
+  <link rel="stylesheet" href="dist/css/fixes.css">
 </head>
 <body class="hold-transition register-page">
 <div class="register-box">
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
-      <a href="../index.php" class="h1"><b>S +</b>65</a>
+      <a href="../index.php" class="h1"><img src="dist/img/logo.png" class="img-fluid" alt="Responsive image"></a>
     </div>
     <div class="card-body">
       <p class="login-box-msg">Registrar Nuevo Médico</p>
@@ -67,7 +69,7 @@ $rutaRaiz = Env::$_URL_API;
             <div class="icheck-primary">
               <input type="checkbox" id="agreeTerms" name="terms" value="agree">
               <label for="agreeTerms">
-               Accepto todos los <a href="#">términos</a>
+              <a href="#" class="anchorAgree">Accepto todos los términos</a>
               </label>
             </div>
           </div>

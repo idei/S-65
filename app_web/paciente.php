@@ -31,11 +31,22 @@ $rutaRaiz = Env::$_URL_API;
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!-- FIXES style -->
+  <link rel="stylesheet" href="dist/css/fixes.css">
 </head>
 <style>
   .modal-lg {
     max-width: 80%;
   }
+
+  #loading-indicator {
+  display: block;
+  text-align: center;
+  padding: 20px;
+}
+#content_paciente {
+  display: none;
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed" onload="leerInformacionPaciente()">
@@ -59,10 +70,17 @@ $rutaRaiz = Env::$_URL_API;
         <!-- Page content-->
         <div class="callout callout-info">
           <div class="row">
-            <div id="content_paciente" class="col-6">
+            <div class="col-6">
+            <div id="loading-indicator">Cargando...</div>
+              <div id="content_paciente">
               <h4>Datos de Paciente</h4>
               <div id="nombre"></div>
               <div id="dni"></div>
+              <div>
+                <br>
+                <b>Información del Grupo Conviviente</b>
+                <br>
+              </div>
               <div id="contacto"></div>
               <div id="depto"></div>
               </br>
@@ -76,6 +94,8 @@ $rutaRaiz = Env::$_URL_API;
               <div id="fuma"></div>
               <div id="mari"></div>
               <div id="otras"></div>
+              </div>
+              
             </div>
             <div class="col-6 text-center">
 
@@ -166,7 +186,6 @@ $rutaRaiz = Env::$_URL_API;
                     <div id="intoxicaciones"></div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
                   </div>
                 </div>
               </div>
@@ -211,7 +230,6 @@ $rutaRaiz = Env::$_URL_API;
                     <div id="colesterol"></div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
                   </div>
                 </div>
               </div>
@@ -237,6 +255,9 @@ $rutaRaiz = Env::$_URL_API;
 
   <script>
     function leerInformacionPaciente() {
+
+      document.getElementById('loading-indicator').style.display = 'block';
+
       var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
       leerChequeosPacientes();
@@ -248,16 +269,15 @@ $rutaRaiz = Env::$_URL_API;
         }),
       };
 
-      $('#content_paciente').html('<div class="loading"><img src="dist/img/loading.gif" alt="loading" /><br/>Un momento, por favor...</div>');
 
       $.ajax(settings).done(function (response) {
             if (response['status'] == "Success") {
-          $('#content_paciente').fadeIn(4000).html('<h4>Datos de Paciente</h4><div id="nombre"></div><div id="dni"></div><div id="contacto"></div> <div id="depto"></div> </br> <h4>Últimos Datos Clínicos</h4> <div id="peso"></div> <div id="presionA"></div> <div id="presionB"></div> <div id="pulso"></div> <div id="circun"></div> <div id="alcohol"></div> <div id="fuma"></div> <div id="mari"></div> <div id="otras"></div> </div>');
+              document.getElementById('loading-indicator').style.display = 'none';
 
           var response = response['data'];
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']
           var dni = "DNI: " + response['dni']
-          var contacto = "Contacto: " + response['contacto']
+          var contacto = "Nombre y Apellido : " + response['nombre_contacto'] + " " + response['apellido_contacto']
           $("#nombre").html(nombre);
           $('#dni').html(dni)
           $('#contacto').html(contacto);
@@ -280,6 +300,9 @@ $rutaRaiz = Env::$_URL_API;
           $('#mari').html(marihuana)
           $('#alcohol').html(alcohol)
           $('#otras').html(otras)
+
+          document.getElementById('content_paciente').style.display = 'block';
+
 
         } else {
           if (response['status'] == "Vacio") {
@@ -322,7 +345,7 @@ $rutaRaiz = Env::$_URL_API;
                 <td>${element['fecha_creacion']}</td>
                 <td>${element['fecha_limite']}</td>
                 <td>${element['nombre_estado']}</td>
-                <td><button class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre']}','${element['resultado']}')"><i class="fa-solid fa-file-lines"></i></button>
+                <td><button id="button_vermas" class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre']}','${element['resultado']}','${element['nombre_estado']}')"><i class="fa-solid fa-file-lines"></i></button>
               
                 </td>
                 </tr>
@@ -348,19 +371,17 @@ $rutaRaiz = Env::$_URL_API;
 
     }
 
-    function ver_mas_chequeo(id_chequeo, nombre_estado, resultado) {
-      if (nombre_estado == "Enviado") {
-        console.log(nombre_estado);
-
-      } else {
-        if (nombre_estado = "Respondido") {
+    
+    function ver_mas_chequeo(id_chequeo, nombre, resultado, nombre_estado) {
+       
+        if (nombre_estado == "Respondido") {
           console.log(nombre_estado);
           $('#modal_resultado_chequeo').modal('show'); // abrir
           modal_resultado.innerHTML = `
-          <p style="color:red;">${resultado}</p>`;
+          <p style="color:black;">Puntaje obtenido: <b> ${resultado} </b></p>`;
 
         }
-      }
+      
     }
 
     function antecedentesP() {
@@ -809,7 +830,6 @@ $rutaRaiz = Env::$_URL_API;
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
             </div>
           </div>
         </div>
@@ -849,7 +869,6 @@ $rutaRaiz = Env::$_URL_API;
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
             </div>
           </div>
         </div>
