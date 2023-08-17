@@ -12,9 +12,9 @@ class RecuperarPage extends StatefulWidget {
   _RecuperarState createState() => _RecuperarState();
 }
 
-final _formKey_recuperar = GlobalKey<FormState>();
-
 class _RecuperarState extends State<RecuperarPage> {
+  final _formKey_recuperar = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +40,7 @@ class _RecuperarState extends State<RecuperarPage> {
         ),
         body: Center(
           child: Form(
-              key: UniqueKey(),
+              key: _formKey_recuperar,
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ListView(children: <Widget>[
@@ -61,34 +61,47 @@ class _RecuperarState extends State<RecuperarPage> {
                     Container(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Color.fromRGBO(30, 20, 108, 1),
-                          textStyle: TextStyle(
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily),
-                        ),
-                        child: Container(
-                          child: Text('Recuperar'),
-                        ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      MostrarPass()));
-                        },
-                      ),
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromRGBO(30, 20, 108, 1),
+                            textStyle: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily),
+                          ),
+                          child: Container(
+                            child: Text('Recuperar'),
+                          ),
+                          onPressed: () {
+                            if (_formKey_recuperar.currentState.validate() &&
+                                !_isLoading) {
+                              _startLoading();
+                            } else {
+                              null;
+                            }
+                          }),
                     )
                   ]))),
         ));
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await get_pass(context);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 }
 
 var mensajeRetornado;
 
-Future get_pass() async {
+Future get_pass(BuildContext context) async {
   String URL_base = Env.URL_API;
   var url = URL_base + "/recuperar_pass";
   var response = await http.post(url, body: {
@@ -98,13 +111,12 @@ Future get_pass() async {
   mensajeRetornado = json.decode(response.body);
 
   if (mensajeRetornado['status'] == "Success") {
-    print("Se ha recuperado la contraseña");
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) => MostrarPass()));
   } else {
     loginToast(
         "No se ha recuperado la contraseña : " + mensajeRetornado['status']);
   }
-
-  return true;
 }
 
 loginToast(String toast) {
@@ -119,84 +131,32 @@ loginToast(String toast) {
 class MostrarPass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        key: UniqueKey(),
-        future: get_pass(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            if (mensajeRetornado["estado"] == "Error") {
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Recuperar Contraseña'),
-                  actions: <Widget>[],
-                ),
-                body: Center(
-                  child: Text(mensajeRetornado["estado"]),
-                ),
-              );
-            } else {
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Recuperación de Contraseña'),
-                  automaticallyImplyLeading: false,
-                ),
-                body: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListView(
-                      children: [
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text("Su contraseña es: "),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              labelText: mensajeRetornado["password"]),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        ElevatedButton(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 60.0, vertical: 15.0),
-                            child: Text('Volver a Iniciar Sesión'),
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        LoginPage()));
-                          },
-                        )
-                      ],
-                    )),
-              );
-            }
-          } else {
-            return Scaffold(
-              key: UniqueKey(),
-              appBar: AppBar(
-                  backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-                  title: Text('Recuperación de Contraseña')),
-              body: Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              ),
-            );
-          }
-        });
+    final _formKey_mostrar_pass = GlobalKey<FormState>();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(30, 20, 108, 1),
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, 'ingresar');
+          },
+        ),
+        title: Text('Recuperar Contraseña',
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      ),
+      key: UniqueKey(),
+      body: Center(
+        child:
+            Text("Su contraseña es: " + mensajeRetornado["data"]["password"]),
+      ),
+    );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

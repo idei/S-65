@@ -31,6 +31,7 @@ var return_email;
 var estado_users = 2;
 var loadingUsuario = true;
 var providerdepto;
+var id_paciente;
 
 class FormDatosGenerales extends StatefulWidget {
   FormDatosGenerales({Key key}) : super(key: key);
@@ -45,12 +46,13 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   final _apellidoFieldKey = GlobalKey<FormFieldState<String>>();
   final _dniFieldKey = GlobalKey<FormFieldState<String>>();
   final _celularPacienteFieldKey = GlobalKey<FormFieldState<String>>();
-  final _fechaNacimientoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _fechaNacimientoFieldKey = GlobalKey<FormFieldState<DateFormat>>();
   final _relaDeptoFieldKey = GlobalKey<FormFieldState<String>>();
   final _relaGeneroFieldKey = GlobalKey<FormFieldState<String>>();
   final _relaNivelFieldKey = GlobalKey<FormFieldState<String>>();
   final _relaGrupoFieldKey = GlobalKey<FormFieldState<String>>();
 
+  var currentfecha;
   final _nombreContactoFieldKey = GlobalKey<FormFieldState<String>>();
   final _apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
   final _celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
@@ -66,6 +68,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     usuarioModel = Provider.of<UsuarioServices>(context);
 
     rela_users = usuarioModel.usuario.paciente.rela_users;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
     email_argument = usuarioModel.usuario.emailUser;
 
     int changedCount = 0;
@@ -244,6 +247,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                               validator: (date) =>
                                   date == null ? 'Invalid date' : null,
                               onChanged: (value) => setState(() {
+                                currentfecha = value;
                                 value = value;
                                 changedCount++;
                               }),
@@ -509,8 +513,6 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     String nombre_paciente = _nombreFieldKey.currentState.value;
     String apellido_paciente = _apellidoFieldKey.currentState.value;
     String celular_paciente = _celularPacienteFieldKey.currentState.value;
-    String fecha_paciente =
-        usuarioModel.usuario.paciente.fecha_nacimiento.toString();
     String dni_paciente = _dniFieldKey.currentState.value;
     String rela_depto = _relaDeptoFieldKey.currentState.value;
     String rela_genero = _relaGeneroFieldKey.currentState.value;
@@ -519,15 +521,21 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     String nombre_contacto = _nombreContactoFieldKey.currentState.value;
     String apellido_contacto = _apellidoContactoFieldKey.currentState.value;
     String celular_contacto = _celularContactoFieldKey.currentState.value;
+    DateTime fecha_paciente;
+
+    if (usuarioModel.usuario.paciente.fecha_nacimiento.toString() == "null") {
+      fecha_paciente = currentfecha;
+    }
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_personales";
 
     var response = await http.post(url, body: {
+      "id_paciente": id_paciente,
       "nombre": nombre_paciente,
       "apellido": apellido_paciente,
       "dni": dni_paciente,
-      "fecha_nacimiento": fecha_paciente,
+      "fecha_nacimiento": fecha_paciente.toString(),
       "email": email_argument.toString(),
       "rela_genero": rela_genero,
       "rela_departamento": rela_depto,

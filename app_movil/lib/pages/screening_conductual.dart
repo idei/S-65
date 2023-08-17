@@ -155,18 +155,17 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
         Widget>[
       Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
-          elevation: 10,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                      '  ¿Qué parentesco tiene con (nombre del usuario)?  ',
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        margin: EdgeInsets.all(20),
+        elevation: 10,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Text('¿Qué parentesco tiene con (nombre del usuario)?',
                       style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -175,13 +174,51 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
                               .headline1
                               .fontFamily)),
                 ),
+              ),
 
-                Conductual1(),
+              Conductual1(),
 
-                // Usamos Container para el contenedor de la descripción
-              ],
-            ),
-          )),
+              // Usamos Container para el contenedor de la descripción
+            ],
+          ),
+        ),
+      ),
+      Divider(height: 5.0, color: Colors.black),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+      ),
+      Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        margin: EdgeInsets.all(20),
+        elevation: 10,
+        child: ClipRRect(
+          // Los bordes del contenido del card se cortan usando BorderRadius
+          borderRadius: BorderRadius.circular(15),
+
+          // EL widget hijo que será recortado segun la propiedad anterior
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  '¿Tiene el paciente creencias falsas, como creer que otras personas le están robando o que planean hacerle daño de alguna manera?',
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              //espacio entre el texto y el radio button
+              SizedBox(
+                height: 10,
+              ),
+              Conductual2(),
+            ],
+          ),
+        ),
+      ),
       Divider(height: 5.0, color: Colors.black),
       Padding(
         padding: EdgeInsets.all(8.0),
@@ -189,7 +226,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -199,39 +236,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    '¿Tiene el paciente creencias falsas, como creer que otras personas le están robando o que planean hacerle daño de alguna manera?',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                //espacio entre el texto y el radio button
-                SizedBox(
-                  height: 10,
-                ),
-                Conductual2(),
-              ],
-            ),
-          )),
-      Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
-          elevation: 10,
-          child: ClipRRect(
-            // Los bordes del contenido del card se cortan usando BorderRadius
-            borderRadius: BorderRadius.circular(15),
-
-            // EL widget hijo que será recortado segun la propiedad anterior
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Tiene el paciente alucinaciones como visiones falsas o voces? ¿Actúa el paciente como si oyera o viera cosas que no están presentes?',
                     style: TextStyle(
@@ -256,7 +261,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -266,7 +271,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Se resiste el paciente a la ayuda de otros o es difícil de manejar?',
                     style: TextStyle(
@@ -294,7 +299,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -304,7 +309,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Actúa el paciente como si estuviera triste o dice que está deprimido?',
                     style: TextStyle(
@@ -326,7 +331,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -336,7 +341,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Se molesta el paciente cuando se separa de usted? ¿Muestra otras señales de nerviosismo, como falta de aire, suspiros, incapacidad de relajarse o se siente excesivamente tenso?',
                     style: TextStyle(
@@ -361,7 +366,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -371,7 +376,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Parece que el paciente se siente demasiado bien o actúa excesivamente alegre?',
                     style: TextStyle(
@@ -399,7 +404,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -409,7 +414,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Parece el paciente menos interesado en sus actividades habituales o en las actividades y planes de los demás?',
                     style: TextStyle(
@@ -437,7 +442,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -447,7 +452,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Parece que el paciente actúa impulsivamente? Por ejemplo, habla el paciente con extraños como si los conociera o dice cosas que podrían herir los sentimientos de los demás?',
                     style: TextStyle(
@@ -475,7 +480,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -485,7 +490,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Se muestra el paciente irritable o impaciente? ¿Tiene dificultad para lidiar con retrasos o para esperar actividades planeadas?',
                     style: TextStyle(
@@ -513,7 +518,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -523,7 +528,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Lleva a cabo el paciente actividades repetitivas, como dar vueltas por la casa, jugar con botones, enrollar hilos o hacer otras cosas repetitivamente?',
                     style: TextStyle(
@@ -551,14 +556,14 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿Le despierta el paciente durante la noche, se levanta muy temprano por la mañana o toma siestas excesivas durante el día?',
                     style: TextStyle(
@@ -586,7 +591,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(20),
           elevation: 10,
           child: ClipRRect(
             // Los bordes del contenido del card se cortan usando BorderRadius
@@ -596,7 +601,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(20),
                   child: Text(
                     '¿El paciente ha perdido o aumentado de peso o ha tenido algún cambio en la comida que le gusta?',
                     style: TextStyle(
@@ -917,7 +922,7 @@ class Conductual1WidgetState extends State<Conductual1> {
           Visibility(
             visible: otroVisible,
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(20),
               child: TextFormField(
                 style: TextStyle(
                     fontFamily:

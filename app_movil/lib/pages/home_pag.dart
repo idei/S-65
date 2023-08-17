@@ -10,12 +10,12 @@ class HomePage extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
-GlobalKey<FormState> _formKey_home = GlobalKey<FormState>();
-
 class _FormpruebaState extends State<HomePage> {
   AsyncSnapshot snapshot;
   @override
   Widget build(BuildContext context) {
+    final _formKey_home = ObjectKey("key_home");
+
     return FutureBuilder(
         key: UniqueKey(),
         future: test_datos(),

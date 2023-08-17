@@ -129,6 +129,12 @@ Flight::route('POST /respuesta_screening_quejas','respuesta_screening_quejas');
 // Read tipo de respuesta CDR
 Flight::route('POST /tipo_respuesta_cdr','tipo_respuesta_cdr');
 
+// Read tipo de respuesta ADLQ - Alimentarse
+Flight::route('POST /tipo_respuesta_adlq','tipo_respuesta_adlq');
+
+// Read tipo de respuesta Salud Cerebral
+Flight::route('POST /tipo_respuesta_salud_cerebral','tipo_respuesta_salud_cerebral');
+
 // Register User
 Flight::route('POST /user_register','user_register');
 

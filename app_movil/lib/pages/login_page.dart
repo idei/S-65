@@ -1,4 +1,3 @@
-import 'package:app_salud/models/departamentos_model.dart';
 import 'package:app_salud/models/usuario_model.dart';
 import 'package:app_salud/services/departamento_service.dart';
 import 'package:app_salud/services/genero_service.dart';
@@ -11,6 +10,7 @@ import 'package:email_validator/email_validator.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../services/session_service.dart';
 import 'recuperar_contras.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,8 +20,7 @@ class LoginPage extends StatefulWidget {
   _LoginPage createState() => _LoginPage();
 }
 
-GlobalKey<FormState> _formKey_ingresar =
-    GlobalKey<FormState>(debugLabel: 'GlobalFormKey #Login ');
+final _formKey_ingresar = ObjectKey("key_login");
 
 class _LoginPage extends State<LoginPage> {
   TextEditingController email = TextEditingController();
@@ -37,8 +36,6 @@ class _LoginPage extends State<LoginPage> {
   var _obscureText = true;
 
   Widget build(BuildContext context) {
-    final usuarioService = Provider.of<UsuarioServices>(context);
-
     return Scaffold(
         key: UniqueKey(),
         body: Form(
@@ -52,29 +49,9 @@ class _LoginPage extends State<LoginPage> {
         ));
   }
 
-  set_preference() async {
-    await consult_preference();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setInt("id_paciente", int.parse(id_paciente));
-    prefs.setString("email", email.text);
-  }
-
-  consult_preference() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/consult_preference";
-    var response = await http.post(url, body: {"email": email.text});
-    var responseDecoder = json.decode(response.body);
-
-    if (responseDecoder['status'] == "Success") {
-      estado_clinico = responseDecoder['data']['estado_users'];
-      id_paciente = responseDecoder['data']['id_paciente'];
-    } else {
-      loginToast(responseDecoder['data']);
-    }
-  }
-
   fetchLogin() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     String URL_base = Env.URL_API;
 
     var url = URL_base + "/login_paciente";
@@ -97,6 +74,8 @@ class _LoginPage extends State<LoginPage> {
 
         estado_users = userMap['data']['paciente']['estado_users'];
 
+        authProvider.login();
+
         if (estado_users == "2" && responseBody['status'] == "Success") {
           set_preference();
           Navigator.pushNamed(
@@ -118,6 +97,28 @@ class _LoginPage extends State<LoginPage> {
       }
     } else {
       _alert_informe(context, "Error: " + responseBody['request'], 2);
+    }
+  }
+
+  set_preference() async {
+    await consult_preference();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setInt("id_paciente", int.parse(id_paciente));
+    prefs.setString("email", email.text);
+  }
+
+  consult_preference() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/consult_preference";
+    var response = await http.post(url, body: {"email": email.text});
+    var responseDecoder = json.decode(response.body);
+
+    if (responseDecoder['status'] == "Success") {
+      estado_clinico = responseDecoder['data']['estado_users'];
+      id_paciente = responseDecoder['data']['id_paciente'];
+    } else {
+      loginToast(responseDecoder['data']);
     }
   }
 
@@ -198,7 +199,7 @@ class _LoginPage extends State<LoginPage> {
             labelText: 'Contraseña',
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureText ? Icons.visibility : Icons.visibility_off,
+                _obscureText ? Icons.visibility_off : Icons.visibility,
               ),
               onPressed: _togglePasswordVisibility,
             ),

@@ -1,10 +1,11 @@
-import 'package:app_salud/pages/ant_familiares.dart';
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/session_service.dart';
 
 var email_argument;
 var id_paciente;
@@ -28,13 +29,17 @@ class _FormMenuState extends State<MenuPage> {
     final isTablet = Device.get().isTablet;
     final usuarioModel = Provider.of<UsuarioServices>(context);
     final int badgeCount = 5;
+    //final _formKey_menu = GlobalKey<FormState>();
+    final _formKey_menu = ObjectKey("key_menu");
+
+    final authProvider = Provider.of<AuthProvider>(context);
 
     if (usuarioModel.existeUsuarioModel) {
       // print(usuarioModel.usuario);
     }
 
     return Scaffold(
-      key: UniqueKey(),
+      key: _formKey_menu,
       backgroundColor: Color.fromRGBO(30, 20, 108, 1),
       body: isTablet
           // Menu si es tablet
@@ -47,10 +52,10 @@ class _FormMenuState extends State<MenuPage> {
                   child: GridView.count(
                     crossAxisCount:
                         4, // Define el número de columnas de la grilla
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 1.0,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 5.0,
                     mainAxisSpacing: 50.0,
-                    padding: EdgeInsets.all(1.0),
+                    padding: EdgeInsets.all(0.5),
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
@@ -59,6 +64,7 @@ class _FormMenuState extends State<MenuPage> {
                         child: Column(
                           children: [
                             CircleAvatar(
+                              backgroundColor: Color.fromRGBO(45, 175, 168, 1),
                               radius: MediaQuery.of(context).size.width / 9.5,
                               child: Icon(Icons.event_note,
                                   color: Colors.white, size: 90.0),
@@ -82,6 +88,7 @@ class _FormMenuState extends State<MenuPage> {
                         child: Column(
                           children: [
                             CircleAvatar(
+                              backgroundColor: Color.fromRGBO(45, 175, 168, 1),
                               radius: MediaQuery.of(context).size.width / 9.5,
                               child: Icon(Icons.priority_high,
                                   color: Colors.white, size: 90.0),
@@ -223,28 +230,6 @@ class _FormMenuState extends State<MenuPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/recordatorio');
-                        },
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: MediaQuery.of(context).size.width / 9.5,
-                                child: Icon(Icons.event_note,
-                                    color: Colors.white, size: 90.0)),
-                            SizedBox(height: 8.0),
-                            Text(
-                              "RECORDATORIOS",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
                           Navigator.pushNamed(context, '/menu_chequeo',
                               arguments: {
                                 "email": usuarioModel.usuario.emailUser,
@@ -321,6 +306,8 @@ class _FormMenuState extends State<MenuPage> {
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           prefs.remove('email_prefer');
+
+                          authProvider.logout();
 
                           Navigator.pushNamed(context, '/');
                         },
@@ -668,6 +655,8 @@ class _FormMenuState extends State<MenuPage> {
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           prefs.remove('email_prefer');
+
+                          authProvider.logout();
 
                           Navigator.pushNamed(context, '/');
                         },

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
 import 'package:app_salud/pages/screening_fisico.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import '../services/usuario_services.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -29,7 +32,7 @@ var nombre_medico;
 var apellido_medico;
 var especialidad;
 var matricula;
-var id_pacientes;
+var id_paciente;
 
 class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   @override
@@ -43,6 +46,9 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
     fecha_limite = parametros["fecha_limite"];
     rela_creador = parametros["rela_creador"];
     rela_medico = parametros["rela_medico"];
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return FutureBuilder(
         future: timer(),
@@ -77,7 +83,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   bool estado_visible_aviso;
   timer() async {
     await new Future.delayed(new Duration(milliseconds: 500));
-    await getStringValuesSF();
+    //await getStringValuesSF();
 
     if (rela_creador == 3) {
       await read_medico();
@@ -113,10 +119,10 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
     }
   }
 
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    id_paciente = prefs.getInt("id_paciente");
-  }
+  // getStringValuesSF() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   id_paciente = prefs.getInt("id_paciente");
+  // }
 
   Widget Avisos(BuildContext context) {
     return Scaffold(

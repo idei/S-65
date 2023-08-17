@@ -313,6 +313,9 @@ class FisicoWidgetState extends State<ScreeningFisico> {
       child: Card(
         child: ListView(
           children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
             CheckDolorCabeza(),
             Padding(
               padding: EdgeInsets.all(5.0),
@@ -484,29 +487,35 @@ class FisicoWidgetState extends State<ScreeningFisico> {
             ),
             Divider(height: 3.0, color: Colors.black),
             Dolor(),
+            Divider(height: 3.0, color: Colors.black),
             Padding(
-              padding: EdgeInsets.all(5.0),
+              padding: EdgeInsets.all(18.0),
             ),
-            ElevatedButton.icon(
-              icon: _isLoading
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: const CircularProgressIndicator(),
-                    )
-                  : const Icon(Icons.save_alt),
-              style: ElevatedButton.styleFrom(
-                textStyle: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily),
+            Center(
+              child: ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
+                style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
+                ),
+                onPressed: () => !_isLoading ? _startLoading() : null,
+                label: Text('GUARDAR',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontWeight: FontWeight.bold,
+                    )),
               ),
-              onPressed: () => !_isLoading ? _startLoading() : null,
-              label: Text('GUARDAR',
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                    fontWeight: FontWeight.bold,
-                  )),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
             ),
           ],
         ),
@@ -726,15 +735,18 @@ class LabeledCheckboxDC extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -806,15 +818,18 @@ class LabeledCheckboxMareos extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -881,14 +896,17 @@ class LabeledCheckboxNauseas extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -955,14 +973,17 @@ class LabeledCheckboxVom extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1029,14 +1050,17 @@ class LabeledCheckboxFatExc extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1103,14 +1127,17 @@ class LabeledCheckboxIU extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1178,14 +1205,17 @@ class LabeledCheckboxProblemasIns extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1252,14 +1282,17 @@ class LabeledCheckboxDebilCuerpo extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1327,14 +1360,17 @@ class LabeledCheckboxPMF extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1402,14 +1438,17 @@ class LabeledCheckboxTemblores extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1475,14 +1514,17 @@ class LabeledCheckboxInestabilidadMarcha extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1549,14 +1591,17 @@ class LabeledCheckboxTicsMovEx extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1622,14 +1667,17 @@ class LabeledCheckboxProblemaEq extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1695,14 +1743,17 @@ class LabeledCheckboxFrecCosas extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1768,14 +1819,17 @@ class LabeledCheckboxDesoDes extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1841,14 +1895,17 @@ class LabeledCheckboxCaidas extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1914,14 +1971,17 @@ class LabeledCheckboxPerdidaSensibilidad extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1988,14 +2048,17 @@ class LabeledCheckboxCosqSensaPiel extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2061,14 +2124,17 @@ class LabeledCheckboxEntreojos extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2136,14 +2202,17 @@ class LabeledCheckboxIntox extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2210,14 +2279,17 @@ class LabeledCheckboxUtilizaAuidi extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2284,14 +2356,17 @@ class LabeledCheckboxZumbido extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2358,14 +2433,17 @@ class LabeledCheckboxUtilizaAnteojosCerca extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2433,14 +2511,17 @@ class LabeledCheckboxUtilizaAnteojosLejos extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2508,14 +2589,17 @@ class LabeledCheckboxProbVisLado extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2583,14 +2667,17 @@ class LabeledCheckboxVisionBorrosa extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2657,14 +2744,17 @@ class LabeledCheckboxVisionDoble extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2731,14 +2821,17 @@ class LabeledCheckboxVeCosasNoExisten extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2805,14 +2898,17 @@ class LabeledCheckboxSensiLucesBrillantes extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2880,14 +2976,17 @@ class LabeledCheckboxPeriodosCortosCeguera extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -2955,14 +3054,17 @@ class LabeledCheckboxCosasPasanCuerpo extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -3029,14 +3131,17 @@ class LabeledCheckboxDistinguirCalorFrio extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -3104,14 +3209,17 @@ class LabeledCheckboxProblemasGusto extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -3178,14 +3286,17 @@ class LabeledCheckboxProblemasOlfato extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -3252,14 +3363,17 @@ class LabeledCheckboxDolor extends StatelessWidget {
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),

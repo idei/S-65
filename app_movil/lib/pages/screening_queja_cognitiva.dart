@@ -230,22 +230,18 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Text(
-                      'Atención',
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold),
+                    CustomDivider(
+                      text: 'Atención',
+                      color: Colors.lightGreen,
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    //Divider(height: 5.0, color: Colors.black),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Se distrae con facilidad, por ejemplo cuando lee, mira una película o conversa con alguien:',
+                        '¿Se distrae con facilidad, por ejemplo cuando lee, mira una película o conversa con alguien?',
                         textAlign: TextAlign.justify,
                         style: TextStyle(
                           fontFamily:
@@ -260,13 +256,11 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                   ],
                 ),
               )),
-          Divider(height: 5.0, color: Colors.black),
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -277,19 +271,21 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
 
                 // EL widget hijo que será recortado segun la propiedad anterior
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Atención',
+                      color: Colors.lightGreen,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Necesita prestar más atención que antes o hacer más esfuerzos que otros para realizar las tareas.',
+                        '¿Necesita prestar más atención que antes o hacer más esfuerzos que otros para realizar las tareas?',
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -324,14 +320,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Atención',
+                      color: Colors.lightGreen,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Pierde el hilo del pensamiento, por ejemplo cuando está conversando con alguien cambia de tema en tema.',
+                        '¿Pierde el hilo del pensamiento, por ejemplo cuando está conversando con alguien cambia de tema en tema?',
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -357,7 +356,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
           ),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -373,14 +371,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Atención',
+                      color: Colors.lightGreen,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le resulta difícil hacer más de una cosa a la vez.',
+                        '¿Le resulta difícil hacer más de una cosa a la vez?',
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -404,21 +405,20 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
-          Text(
-            'Orientación',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          // Text(
+          //   'Orientación',
+          //   style: TextStyle(
+          //     fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+          //     fontSize: 20.0,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
 
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -434,14 +434,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Orientación',
+                      color: Colors.indigoAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene problemas para orientarse en lugares conocidos (por ejemplo, su barrio).',
+                        '¿Tiene problemas para orientarse en lugares conocidos (por ejemplo, su barrio)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -457,7 +460,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -473,14 +475,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Orientación',
+                      color: Colors.indigoAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene problemas para encontrar alguna habitación dentro de su propia casa o institución que frecuenta (por ejemplo, baño).',
+                        '¿Tiene problemas para encontrar alguna habitación dentro de su propia casa o institución que frecuenta (por ejemplo, baño)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -496,7 +501,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -512,14 +516,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Orientación',
+                      color: Colors.indigoAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Se equivoca o no está seguro de la fecha (día, mes y año).',
+                        '¿Se equivoca o no está seguro de la fecha (día, mes y año)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -535,7 +542,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -551,14 +557,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Orientación',
+                      color: Colors.indigoAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para decir con precisión su edad actual.',
+                        '¿Tiene dificultades para decir con precisión su edad actual?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -574,7 +583,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -590,14 +598,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Orientación',
+                      color: Colors.indigoAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para decir con precisión su edad actual.',
+                        '¿Tiene dificultades para decir con precisión su edad actual?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -612,14 +623,12 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Text(
-            'Funciones Ejecutivas',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
           Divider(height: 5.0, color: Colors.black),
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -635,14 +644,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Funciones Ejecutivas',
+                      color: Colors.teal,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le cuesta tomar decisiones o decidir qué hacer.',
+                        '¿Le cuesta tomar decisiones o decidir qué hacer?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -658,7 +670,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -674,14 +685,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Funciones Ejecutivas',
+                      color: Colors.teal,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para organizar planes, por ejemplo una salida con amigos.',
+                        '¿Tiene dificultades para organizar planes, por ejemplo una salida con amigos?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -697,7 +711,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -713,14 +726,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Funciones Ejecutivas',
+                      color: Colors.teal,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Presenta dificultades para hacer cambios de planes o cambiar la actividad cuando es necesario, por ejemplo no hacer las compras como todos los viernes porque el domingo se irá de viaje por unas semanas.',
+                        '¿Presenta dificultades para hacer cambios de planes o cambiar la actividad cuando es necesario, por ejemplo no hacer las compras como todos los viernes porque el domingo se irá de viaje por unas semanas?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -736,7 +752,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -752,14 +767,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Funciones Ejecutivas',
+                      color: Colors.teal,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Dificultad para seguir el orden de pasos necesario para realizar una tarea (ejemplo, cocinar, vestirse) o deja cosas sin terminar.',
+                        '¿Dificultad para seguir el orden de pasos necesario para realizar una tarea (ejemplo, cocinar, vestirse) o deja cosas sin terminar?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -774,20 +792,19 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Text(
-            'Memoria',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
+          // Text(
+          //   'Memoria',
+          //   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          // ),
           Padding(
             padding: EdgeInsets.all(8.0),
           ),
           Divider(height: 5.0, color: Colors.black),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(10),
           ),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -803,14 +820,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Memoria',
+                      color: Colors.orangeAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Olvida o confunde los nombres de personas conocidas (por ejemplo, nombres de nietos o amigos. ',
+                        '¿Olvida o confunde los nombres de personas conocidas (por ejemplo, nombres de nietos o amigos?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -826,7 +846,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -842,14 +861,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Memoria',
+                      color: Colors.orangeAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Olvida citas o planes previamente pautados. ',
+                        '¿Olvida citas o planes previamente pautados?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -865,7 +887,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -881,14 +902,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Memoria',
+                      color: Colors.orangeAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Olvida el lugar donde dejo objetos de uso cotidiano (por ejemplo, llaves, anteojos, celular). ',
+                        '¿Olvida el lugar donde dejo objetos de uso cotidiano (por ejemplo, llaves, anteojos, celular)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -904,7 +928,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -920,14 +943,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Memoria',
+                      color: Colors.orangeAccent,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Algunas veces no recuerda hechos recientes (por ejemplo, que almorzó ayer, que le regalaron para su cumpleaños, quien llamó por teléfono). ',
+                        '¿Algunas veces no recuerda hechos recientes (por ejemplo, que almorzó ayer, que le regalaron para su cumpleaños, quien llamó por teléfono)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -942,14 +968,13 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Text(
-            'Praxias y gnosias',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
+          // Text(
+          //   'Praxias y gnosias',
+          //   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          // ),
           Divider(height: 5.0, color: Colors.black),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -965,14 +990,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Praxias y gnosias',
+                      color: Colors.blueGrey,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para vestirse (no por problemas motrices, por ejemplo, prender los botones de la camisa).',
+                        '¿Tiene dificultades para vestirse (no por problemas motrices, por ejemplo, prender los botones de la camisa)?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -988,7 +1016,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1004,14 +1031,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Praxias y gnosias',
+                      color: Colors.blueGrey,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le cuesta hacer o copiar dibujos.',
+                        '¿Le cuesta hacer o copiar dibujos?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1027,7 +1057,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1043,14 +1072,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Praxias y gnosias',
+                      color: Colors.blueGrey,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para reconocer objetos o personas que conoce.',
+                        '¿Tiene dificultades para reconocer objetos o personas que conoce?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1066,7 +1098,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1082,14 +1113,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Praxias y gnosias',
+                      color: Colors.blueGrey,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le cuesta encontrar objetos, particularmente cuando no están en la posición habitual.',
+                        '¿Le cuesta encontrar objetos, particularmente cuando no están en la posición habitual?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1104,14 +1138,15 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Text(
-            'Lenguaje',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
+          // Text(
+          //   'Lenguaje',
+          //   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          // ),
           Divider(height: 5.0, color: Colors.black),
-
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1127,14 +1162,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Lenguaje',
+                      color: Colors.brown,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Tiene dificultades para encontrar la palabra correcta',
+                        '¿Tiene dificultades para encontrar la palabra correcta?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1150,7 +1188,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1166,14 +1203,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Lenguaje',
+                      color: Colors.brown,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le cuesta escribir, su letra empeoró en el último tiempo',
+                        '¿Le cuesta escribir, su letra empeoró en el último tiempo?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1189,7 +1229,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1205,14 +1244,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Lenguaje',
+                      color: Colors.brown,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le resulta difícil entender lo que otros dicen',
+                        '¿Le resulta difícil entender lo que otros dicen?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1228,7 +1270,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               )),
 
           Card(
-              color: Colors.blue[50],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               margin: EdgeInsets.all(10),
@@ -1244,14 +1285,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
-                    Divider(height: 5.0, color: Colors.black),
+                    CustomDivider(
+                      text: 'Lenguaje',
+                      color: Colors.brown,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
                     ),
                     Container(
                       width: 320,
                       child: Text(
-                        'Le cuesta entender lo que lee',
+                        '¿Le cuesta entender lo que lee?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -1286,6 +1330,45 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
             padding: EdgeInsets.all(4.0),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+class CustomDivider extends StatelessWidget {
+  var text;
+  var color;
+
+  CustomDivider({this.text, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        children: [
+          Expanded(
+              child: Divider(
+            thickness: 5,
+            color: color,
+          )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+              child: Divider(
+            thickness: 5,
+            color: color,
+          )),
+        ],
       ),
     );
   }

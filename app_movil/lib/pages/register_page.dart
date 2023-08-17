@@ -3,17 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../services/departamento_service.dart';
+import '../services/genero_service.dart';
+import '../services/grupo_conviviente_service.dart';
+import '../services/nivel_educativo_service.dart';
+import '../services/session_service.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 
-TextEditingController emailPaciente = TextEditingController();
-TextEditingController passwordNuevo = TextEditingController();
-TextEditingController nombrePaciente = TextEditingController();
-TextEditingController apellidoPaciente = TextEditingController();
-TextEditingController passwordRepetido = TextEditingController();
-TextEditingController dni = TextEditingController();
+final emailPaciente = TextEditingController();
+final passwordNuevo = TextEditingController();
+final nombrePaciente = TextEditingController();
+final apellidoPaciente = TextEditingController();
+final passwordRepetido = TextEditingController();
+final dni = TextEditingController();
 
 // Define a custom Form widget.
 class RegisterPage extends StatefulWidget {
@@ -21,10 +26,23 @@ class RegisterPage extends StatefulWidget {
   _FormRegisterState createState() => _FormRegisterState();
 }
 
-GlobalKey<FormState> _formKey_registrar = GlobalKey<FormState>();
+final _formKey_registrar = GlobalKey<FormState>();
 
 class _FormRegisterState extends State<RegisterPage> {
   bool acepto = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _formKey_registrar.currentState?.reset();
+    emailPaciente.clear();
+    passwordNuevo.clear();
+    nombrePaciente.clear();
+    apellidoPaciente.clear();
+    passwordRepetido.clear();
+    dni.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,39 +51,37 @@ class _FormRegisterState extends State<RegisterPage> {
         body: Form(
           key: _formKey_registrar,
           child: SingleChildScrollView(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(5.0),
-                  ),
-                  Container(
-                    child: Image.asset('assets/logo1.png'),
-                    height: 110.0,
-                  ),
-                  Column(children: <Widget>[
-                    _crearEmail(),
-                    SizedBox(height: 10),
-                    _crearPassword(),
-                    SizedBox(height: 10),
-                    _repetirPassword(),
-                    SizedBox(height: 10),
-                    _crearApellido(),
-                    SizedBox(height: 10),
-                    _crearNombre(),
-                    SizedBox(height: 10),
-                    _crearDNI(),
-                    SizedBox(height: 10),
-                    _crearCheck(),
-                    SizedBox(height: 10),
-                    _crearBotonRegistrar(context),
-                    SizedBox(height: 10),
-                    _crearBotonRegresar(context),
-                    SizedBox(height: 20),
-                  ])
-                ],
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                ),
+                Container(
+                  child: Image.asset('assets/logo1.png'),
+                  height: 110.0,
+                ),
+                Column(children: <Widget>[
+                  _crearEmail(),
+                  SizedBox(height: 10),
+                  _crearPassword(),
+                  SizedBox(height: 10),
+                  _repetirPassword(),
+                  SizedBox(height: 10),
+                  _crearApellido(),
+                  SizedBox(height: 10),
+                  _crearNombre(),
+                  SizedBox(height: 10),
+                  _crearDNI(),
+                  SizedBox(height: 10),
+                  _crearCheck(),
+                  SizedBox(height: 10),
+                  _crearBotonRegistrar(context),
+                  SizedBox(height: 10),
+                  _crearBotonRegresar(context),
+                  SizedBox(height: 20),
+                ])
+              ],
             ),
           ),
         ));
@@ -93,6 +109,17 @@ class _FormRegisterState extends State<RegisterPage> {
       usuarioService.usuario = newUsuarioModel;
       //---------------------------
 
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.login();
+
+      await Provider.of<DepartamentoServices>(context, listen: false)
+          .loadDepartamentos();
+      await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
+      await Provider.of<NivelEducativoService>(context, listen: false)
+          .loadNivelEducativo();
+      await Provider.of<GrupoConvivienteServices>(context, listen: false)
+          .loadGrupoConviviente();
+
       Navigator.pushNamed(context, '/form_datos_generales', arguments: {
         'nombre': newUsuarioModel.paciente.nombre,
         "apellido": apellidoPaciente.text,
@@ -101,8 +128,12 @@ class _FormRegisterState extends State<RegisterPage> {
         "bandera": 1,
       });
     } else {
-      var error = response.statusCode + responseDecoder['data'];
-      loginToast(error.toString());
+      if (responseDecoder['status'] == "Vacio") {
+        _alert_informe(context, responseDecoder['data'], 2);
+      } else {
+        var error = response.statusCode + responseDecoder['data'];
+        loginToast(error.toString());
+      }
     }
   }
 
@@ -226,7 +257,36 @@ class _FormRegisterState extends State<RegisterPage> {
     // });
   }
 
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: Duration(milliseconds: 2000),
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
+  }
+
+  var _obscureTextPass = true;
+  var _obscureTextRepeatPass = true;
+
+  _togglePasswordVisibility() {
+    setState(() {
+      _obscureTextPass = !_obscureTextPass;
+    });
+  }
+
+  _togglePasswordRepeatVisibility() {
+    setState(() {
+      _obscureTextRepeatPass = !_obscureTextRepeatPass;
+    });
+  }
+
   Widget _crearPassword() {
+    passwordNuevo.clear();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
@@ -236,12 +296,17 @@ class _FormRegisterState extends State<RegisterPage> {
           }
           return null;
         },
-        obscureText: true,
+        obscureText: _obscureTextPass,
         decoration: InputDecoration(
           labelText: 'Contraseña',
           labelStyle: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
-          suffixIcon: Icon(Icons.password),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscureTextPass ? Icons.visibility_off : Icons.visibility,
+            ),
+            onPressed: _togglePasswordVisibility,
+          ),
         ),
         controller: passwordNuevo,
       ),
@@ -250,6 +315,7 @@ class _FormRegisterState extends State<RegisterPage> {
 
 //modificar
   Widget _repetirPassword() {
+    passwordRepetido.clear();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
@@ -259,12 +325,17 @@ class _FormRegisterState extends State<RegisterPage> {
           }
           return null;
         },
-        obscureText: true,
+        obscureText: _obscureTextRepeatPass,
         decoration: InputDecoration(
           labelText: 'Repetir Contraseña',
           labelStyle: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
-          suffixIcon: Icon(Icons.repeat),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscureTextRepeatPass ? Icons.visibility_off : Icons.visibility,
+            ),
+            onPressed: _togglePasswordRepeatVisibility,
+          ),
         ),
         controller: passwordRepetido,
       ),

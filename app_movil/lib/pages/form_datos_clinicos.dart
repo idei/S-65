@@ -471,10 +471,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
       "peso_corporal": _peso_corporal.text,
       "talla": _altura.text,
       "circunfer_cintura": _circunfer_cintura.text,
-      "id_alcohol": id_alcohol,
-      "id_tabaco": id_tabaco,
-      "id_marihuana": id_marihuana,
-      "id_otras": id_otras_drogas,
+      "id_alcohol": id_alcohol.toString(),
+      "id_tabaco": id_tabaco.toString(),
+      "id_marihuana": id_marihuana.toString(),
+      "id_otras": id_otras_drogas.toString(),
       "id_paciente": id_paciente.toString(),
     });
 

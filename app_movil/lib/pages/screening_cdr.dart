@@ -12,7 +12,6 @@ class ScreeningCDR extends StatefulWidget {
   _ScreeningCDRState createState() => _ScreeningCDRState();
 }
 
-final _formKey_screening_cdr = GlobalKey<_ScreeningCDRState>();
 var id_paciente;
 var id_medico;
 var tipo_screening;
@@ -21,8 +20,6 @@ var email;
 var screening_recordatorio;
 
 class _ScreeningCDRState extends State<ScreeningCDR> {
-  double _animatedHeight = 0.0;
-
   getStringValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email_prefer = prefs.getString("email_prefer");

@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/screening.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -248,6 +247,9 @@ Form FormNutricional(BuildContext context) {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
           Nutri1(),
           Padding(
             padding: EdgeInsets.all(8.0),
@@ -284,6 +286,9 @@ Form FormNutricional(BuildContext context) {
           ),
           Divider(height: 5.0, color: Colors.black),
           Nutri8(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
           Divider(height: 5.0, color: Colors.black),
           Nutri81(),
           Padding(
@@ -291,6 +296,9 @@ Form FormNutricional(BuildContext context) {
           ),
           Divider(height: 5.0, color: Colors.black),
           Nutri9(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
           Divider(height: 5.0, color: Colors.black),
           Nutri91(),
           Padding(
@@ -298,15 +306,20 @@ Form FormNutricional(BuildContext context) {
           ),
           Divider(height: 5.0, color: Colors.black),
           Nutri10(),
-          Padding(padding: const EdgeInsets.fromLTRB(7.0, 17.0, 22.0, 30.0)),
-          ElevatedButton(
-            onPressed: () {
-              guardarDatos(context);
-            },
-            child: Text(
-              'GUARDAR',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+          Divider(height: 10.0, color: Colors.black),
+          Padding(
+            padding: EdgeInsets.all(15.0),
+          ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                guardarDatos(context);
+              },
+              child: Text(
+                'GUARDAR',
+                style: TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                ),
               ),
             ),
           ),
@@ -375,15 +388,18 @@ class LabeledCheckboxNutri1 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -406,7 +422,7 @@ class CheckNutri1WidgetState extends State<Nutri1> {
     return LabeledCheckboxNutri1(
       label:
           '¿Tiene una enfermedad o malestar que le ha hecho cambiar el tipo y/o cantidad de alimento que come?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri1,
       onChanged: (bool newValue) {
         setState(() {
@@ -449,15 +465,18 @@ class LabeledCheckboxNutri2 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -479,7 +498,7 @@ class CheckNutri2WidgetState extends State<Nutri2> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri2(
       label: '¿Realiza menos de dos comidas al día?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri2,
       onChanged: (bool newValue) {
         setState(() {
@@ -520,15 +539,18 @@ class LabeledCheckboxNutri3 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -550,7 +572,7 @@ class Nutri3WidgetState extends State<Nutri3> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri3(
       label: '¿Come poca fruta, verduras o productos lácteos?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri3,
       onChanged: (bool newValue) {
         setState(() {
@@ -591,15 +613,18 @@ class LabeledCheckboxNutri4 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -621,7 +646,7 @@ class Nutri4WidgetState extends State<Nutri4> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri4(
       label: '¿Toma tres vasos o más de vino, cerveza o licor al día?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri4,
       onChanged: (bool newValue) {
         setState(() {
@@ -662,15 +687,18 @@ class LabeledCheckboxNutri5 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -692,8 +720,8 @@ class Nutri5WidgetState extends State<Nutri5> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri5(
       label:
-          '¿Tiene problemas en la boca o dentadura que le causan dificultad o molestias al comer ?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          '¿Tiene problemas en la boca o dentadura que le causan dificultad o molestias al comer? ',
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri5,
       onChanged: (bool newValue) {
         setState(() {
@@ -734,15 +762,18 @@ class LabeledCheckboxNutri6 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -765,7 +796,7 @@ class Nutri6WidgetState extends State<Nutri6> {
     return LabeledCheckboxNutri6(
       label:
           '¿En  ocasiones, le falta dinero para comprar la comida que necesita?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri6,
       onChanged: (bool newValue) {
         setState(() {
@@ -806,15 +837,18 @@ class LabeledCheckboxNutri7 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -836,7 +870,7 @@ class Nutri7WidgetState extends State<Nutri7> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri7(
       label: '¿Come sólo la mayoría de las veces?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri7,
       onChanged: (bool newValue) {
         setState(() {
@@ -876,15 +910,18 @@ class LabeledCheckboxNutri8 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -905,7 +942,7 @@ class Nutri8WidgetState extends State<Nutri8> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri8(
       label: '¿Toma más de 2 vasos de agua o líquido por día?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri8,
       onChanged: (bool newValue) {
         setState(() {
@@ -945,15 +982,18 @@ class LabeledCheckboxNutri81 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -974,7 +1014,7 @@ class Nutri81WidgetState extends State<Nutri81> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri8(
       label: '¿Toma menos 2 vasos de agua o líquido por día?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri81,
       onChanged: (bool newValue) {
         setState(() {
@@ -1015,15 +1055,18 @@ class LabeledCheckboxNutri9 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1044,7 +1087,7 @@ class Nutri9WidgetState extends State<Nutri9> {
   Widget build(BuildContext context) {
     return LabeledCheckboxNutri9(
       label: '¿Ha ganado (sin querer) 5 kg de peso en los últimos  seis meses?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri9,
       onChanged: (bool newValue) {
         setState(() {
@@ -1085,15 +1128,18 @@ class LabeledCheckboxNutri91 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1115,7 +1161,7 @@ class Nutri91WidgetState extends State<Nutri91> {
     return LabeledCheckboxNutri9(
       label:
           '¿Ha perdido (sin querer) 5 kg de peso en los últimos  seis meses?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri91,
       onChanged: (bool newValue) {
         setState(() {
@@ -1155,15 +1201,18 @@ class LabeledCheckboxNutri10 extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             )),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
+            Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                value: value,
+                onChanged: (bool newValue) {
+                  onChanged(newValue);
+                },
+              ),
             ),
           ],
         ),
@@ -1186,7 +1235,7 @@ class Nutri10WidgetState extends State<Nutri10> {
     return LabeledCheckboxNutri10(
       label:
           '¿Cree que tiene más problemas de nutrición que la mayoría de la gente?',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
       value: nutri10,
       onChanged: (bool newValue) {
         setState(() {

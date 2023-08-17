@@ -129,9 +129,10 @@ class _VerScreeningState extends State<VerScreening> {
               ),
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "CONDUC",
-              });
+              Navigator.pop(context);
+              // Navigator.pushNamed(context, '/screening', arguments: {
+              //   "select_screening": "CONDUC",
+              // });
             },
           ),
           title: Text('Chequeo ' + titulo,
@@ -143,40 +144,78 @@ class _VerScreeningState extends State<VerScreening> {
             key: _formKey_ver_screening,
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  Text('Tipo: $nombre',
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontSize: 20)),
-                  SizedBox(
-                    height: 20,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  margin: EdgeInsets.all(15),
+                  child: Container(
+                    padding: EdgeInsets.all(20),
+                    child: ListView(children: <Widget>[
+                      Center(
+                        child: Text(
+                          'Resultado Obtenido',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily,
+                              fontSize: 25),
+                        ),
+                      ),
+                      Divider(height: 3.0, color: Colors.black),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text(
+                        'Tipo: $nombre',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily,
+                            fontSize: 20),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text("Fecha: $fecha ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily,
+                              fontSize: 20)),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text("Puntuación: $result_screening ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily,
+                              fontSize: 20)),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text("$mensaje ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily,
+                              fontSize: 20)),
+                      SizedBox(
+                        height: 30,
+                      ),
+                    ]),
                   ),
-                  Text("Fecha: $fecha ",
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontSize: 20)),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text("Puntuación: $result_screening ",
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontSize: 20)),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text("$mensaje ",
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontSize: 20)),
-                  SizedBox(
-                    height: 30,
-                  ),
-                ]))));
+                ))));
   }
 
   void choiceAction(String choice) {

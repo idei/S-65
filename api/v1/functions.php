@@ -5002,6 +5002,532 @@ function tipo_respuesta_quejas()
 
     Flight::json($returnData);
 }
+function respuesta_screening_adlq()
+{
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    $id_paciente = $_POST['id_paciente'];
+
+    if ($_POST['id_medico'] === "null") {
+        $id_medico = null;
+    } else {
+        $id_medico = $_POST['id_medico'];
+    }
+
+    if ($_POST['id_recordatorio'] === "null") {
+        $recordatorio_medico = null;
+    } else {
+        $recordatorio_medico = $_POST['id_recordatorio'];
+    }
+
+    $id_alimentacion = $_POST['id_alimentacion'];
+    $id_vestimenta = $_POST['id_vestimenta'];
+    $id_arreglos_hogar = $_POST['id_arreglos_hogar'];
+    $id_aspecto_personal = $_POST['id_aspecto_personal'];
+
+    $id_bano = $_POST['id_bano'];
+    $id_comprar_comida = $_POST['id_comprar_comida'];
+    $id_comprension = $_POST['id_comprension'];
+    $id_conducir = $_POST['id_conducir'];
+    $id_conversacion = $_POST['id_conversacion'];
+    $id_cuidado_hogar = $_POST['id_cuidado_hogar'];
+    $id_empleo = $_POST['id_empleo'];
+    $id_escritura = $_POST['id_escritura'];
+    $id_evacuacion = $_POST['id_evacuacion'];
+    $id_lavado_ropa = $_POST['id_lavado_ropa'];
+    $id_lectura = $_POST['id_lectura'];
+    $id_manejo_efectivo = $_POST['id_manejo_efectivo'];
+    $id_manejo_finanzas = $_POST['id_manejo_finanzas'];
+    $id_mantenimiento_hogar = $_POST['id_mantenimiento_hogar'];
+    $id_movilidad_barrio = $_POST['id_movilidad_barrio'];
+    $id_poner_mesa = $_POST['id_poner_mesa'];
+    $id_prepara_comida = $_POST['id_prepara_comida'];
+    $id_recreacion = $_POST['id_recreacion'];
+    $id_reuniones = $_POST['id_reuniones'];
+    $id_tomar_medicacion = $_POST['id_tomar_medicacion'];
+    $id_transporte_publico = $_POST['id_transporte_publico'];
+    $id_uso_telefono = $_POST['id_uso_telefono'];
+    $id_viaje_fuera_ambiente = $_POST['id_viaje_fuera_ambiente'];
+    $id_viajes = $_POST['id_viajes'];
+
+    
+    $tipo_screening = $_POST['tipo_screening'];
+    $estado = 1;
+
+
+    // CALCULO DE RESULTADO
+
+    $result_screening = 0;
+
+        //--------------------------------------------------
+        $select_evento = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'ADLQ%'");
+        $select_evento->execute();
+        
+        $select_evento->execute();
+        $evento = $select_evento->fetchAll();
+
+    try {
+        $fecha = date('Y/m/d');
+
+        $id_respuesta = 0;
+
+        foreach ($evento as $eventos) {
+
+            if ($eventos["codigo_evento"] == "ADLQALI") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_alimentacion,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQVES") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_vestimenta,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQBAN") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_bano,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQEVA") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_evacuacion,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQTM") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_tomar_medicacion,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQIAP") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_aspecto_personal,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQPCC") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_prepara_comida,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+             if ($eventos["codigo_evento"] == "ADLQPM") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_poner_mesa,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQCH") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_cuidado_hogar,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQMH") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_mantenimiento_hogar,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQAH") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_arreglos_hogar,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQLR") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_lavado_ropa,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQEMP") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_empleo,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQREC") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_recreacion,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQREU") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_reuniones,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQVIA") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_viajes,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQCC") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_comprar_comida,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQMEF") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_manejo_efectivo,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQMFIN") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_manejo_finanzas,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQTM") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_transporte_publico,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQCON") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_conducir,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQMB") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_movilidad_barrio,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQVFF") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_viaje_fuera_ambiente,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQUT") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_uso_telefono,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQCONV") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_conversacion,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQCOM") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_comprension,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQLEC") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_lectura,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ADLQESC") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_escritura,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+
+                );
+            }
+        }
+
+        //Call our custom function.
+        pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
+
+        if ($recordatorio_medico <> null) {
+            $rela_estado_recordatorio = 3;
+
+            $data = [
+                'rela_estado_recordatorio' => $rela_estado_recordatorio,
+                'recordatorio_medico' => $recordatorio_medico,
+            ];
+
+            $update_estado_recordatorio = Flight::db()->prepare("UPDATE recordatorios_medicos
+                    SET rela_estado_recordatorio=:rela_estado_recordatorio
+                    WHERE id=:recordatorio_medico");
+
+            $update_estado_recordatorio->execute($data);
+        }
+
+        // if ($result_screening > 20) {
+        //     $returnData = msg("Success", "alert");
+        // } else {
+            $returnData = msg("Success", []);
+        //}
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 
 function respuesta_screening_quejas()
 {
@@ -5656,6 +6182,63 @@ function tipo_respuesta_cdr()
     Flight::json($returnData);
 }
 
+
+function tipo_respuesta_adlq()
+{
+
+    try {
+       
+        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code LIKE 'ADLQ%'");
+
+
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        //var_dump($result);
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function tipo_respuesta_salud_cerebral()
+{
+
+    try {
+       
+        $stmt = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'SCER%'");
+
+
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        //var_dump($result);
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function user_register()
 {
 
@@ -5707,10 +6290,14 @@ function user_register()
         $stmt = Flight::db()->prepare("SELECT email FROM users WHERE email = '" . $email . "'");
         $stmt->execute();
         $result = $stmt->rowCount();
+        
+        var_dump($result);
 
         if ($result == 1) {
-            $lista = array("request" => "Error : Ya existe un paciente con ese email");
-            echo json_encode($lista);
+            $lista = "Ya existe un paciente con ese email";
+            
+            $returnData = msg("Vacio", $lista);
+
         } else {
 
             $stmt = Flight::db()->prepare('INSERT INTO users(email,password,token) VALUES(?, ?, ?)');
@@ -5735,6 +6322,8 @@ function user_register()
                 $insert_paciente->bindParam(5, $dni);
                 $insert_paciente->execute();
 
+                $lastInsertedId = Flight::db()->lastInsertId();
+
 
                 $insert_paciente = $stmt->rowCount();
                 if ($insert_paciente) {
@@ -5745,6 +6334,7 @@ function user_register()
                         "email" => $email,
                         "password" => $password,
                         "paciente" => [
+                            "id_paciente"=>$lastInsertedId,
                             "rela_users" => $rela_users,
                             "nombre" => $nombre,
                             "apellido" => $apellido,
@@ -7297,6 +7887,12 @@ function save_datos_personales()
         $email = verificar($data_input, "email");
     }
 
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
     if (isset($_POST['nombre'])) {
         $nombre = $_POST["nombre"];
     } else {
@@ -7421,7 +8017,7 @@ function save_datos_personales()
 
         $insert_paciente->execute($data);
 
-        $select_id_paciente = Flight::db()->prepare("SELECT id FROM pacientes WHERE email = '".$email."'");
+        $select_id_paciente = Flight::db()->prepare("SELECT id FROM pacientes WHERE id = '".$id_paciente."'");
         $select_id_paciente->execute();
         $id_paciente= $select_id_paciente->fetch();
         $id_paciente= $id_paciente["id"];

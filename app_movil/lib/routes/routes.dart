@@ -22,6 +22,8 @@ import 'package:app_salud/pages/recordatorios.dart';
 import 'package:app_salud/pages/recuperar_contras.dart';
 import 'package:app_salud/pages/register_page.dart';
 import 'package:app_salud/pages/screening.dart';
+import 'package:app_salud/pages/screening_adlq.dart';
+import 'package:app_salud/pages/screening_cerebral.dart';
 import 'package:app_salud/pages/ver_screening.dart';
 import 'package:app_salud/pages/screening_animo.dart';
 import 'package:app_salud/pages/screening_cdr.dart';
@@ -72,11 +74,13 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/screening_animo': (context) => FormScreeningAnimo(),
     '/screening_nutricional': (context) => ScreeningNutricional(),
     '/screening_cdr': (context) => ScreeningCDR(),
+    '/screening_adlq': (context) => ScreeningADLQPage(),
     '/new_recordatorio_personal': (context) => RecordatorioPersonal(),
     '/menu_chequeo': (context) => MenuChequeoPage(),
     '/list_medicos': (context) => ListMedicos(),
     '/screening_diabetes': (context) => ScreeningDiabetes(),
     '/screening_encro': (context) => ScreeningEnfCronicas(),
     '/medico_perfil': (context) => MedicoPerfil(),
+    '/screening_cerebral': (context) => ScreeningCerebral(),
   };
 }
