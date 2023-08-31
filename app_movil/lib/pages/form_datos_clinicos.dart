@@ -151,7 +151,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _presion_alta,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(hintText: ''),
+                    maxLength: 3, // Establecer el número máximo de caracteres
+                    decoration: InputDecoration(
+                      hintText: '95',
+                    ),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor complete el campo';
@@ -195,8 +198,11 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _presion_baja,
                     keyboardType: TextInputType.number,
+                    maxLength: 2, // Establecer el número máximo de caracteres
                     //decoration: InputDecoration(labelText: 'Presión Baja'),
-                    decoration: InputDecoration(hintText: ''),
+                    decoration: InputDecoration(
+                      hintText: '65',
+                    ),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor complete el campo';
@@ -259,7 +265,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                       Column(
                         children: [
                           Text(
-                            "Peso(Kg) ",
+                            "Peso(kg) ",
                             style: TextStyle(
                                 fontSize: 17,
                                 fontFamily: Theme.of(context)
@@ -295,7 +301,9 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _peso_corporal,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(hintText: ''),
+                    decoration: InputDecoration(
+                      hintText: '75.5',
+                    ),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor ingrese el peso corporal';
@@ -313,7 +321,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                       Column(
                         children: [
                           Text(
-                            "Altura (Metros)",
+                            "Talla / Altura (mts)",
                             style: TextStyle(
                                 fontSize: 17,
                                 fontFamily: Theme.of(context)
@@ -334,7 +342,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                               onPressed: () {
                                 _alert_clinicos(
                                     context,
-                                    "Circunferencia de Cintura",
+                                    "Altura",
                                     "Recuerde ingresar su altura en metro por ejemplo: 1,70 m y no en cm 170 cm.",
                                     1);
                               })
@@ -345,6 +353,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _altura,
                     keyboardType: TextInputType.number,
+                    maxLength: 4,
+                    decoration: InputDecoration(
+                      hintText: '1.70',
+                    ),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor ingrese la altura';
@@ -361,7 +373,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                       Column(
                         children: [
                           Text(
-                            "Circunferencia de Cintura ",
+                            "Circunferencia de Cintura (cm)",
                             style: TextStyle(
                                 fontSize: 17,
                                 fontFamily: Theme.of(context)
@@ -396,7 +408,11 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   ),
                   TextFormField(
                     controller: _circunfer_cintura,
+                    maxLength: 4, // Establecer el número máximo de caracteres
                     keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '90',
+                    ),
                     onChanged: (text) {
                       print("Debe completar el campo");
                     },
@@ -544,7 +560,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
       }
     }
 
-    if (int.parse(_presion_alta.text) > 130 ||
+    if (int.parse(_presion_alta.text) > 130 &&
         int.parse(_presion_alta.text) < 179) {
       descri_informe +=
           "\n\nSu presion se encuentra un poco elevada. Le sugerimos que consulte con su medico de cabecera o cardiologo.";
@@ -622,31 +638,31 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
     var circintura;
     circintura = int.parse(_circunfer_cintura.text);
 
-    if (int.parse(_circunfer_cintura.text) < 30) {
-      if (int.parse(_circunfer_cintura.text) > 160 &&
-          cintura_confirm == false) {
-        cintura_confirm = true;
-        _alert_clinicos(context, "Confirmar datos",
-            "Ingresaste $circintura cm ¿Es correcto? ", 1);
-      }
-    } else {
-      if (int.parse(_circunfer_cintura.text) < 80) {
-        descri_informe +=
-            "\n\nUsted no presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
-      } else {
-        if (int.parse(_circunfer_cintura.text) >= 80) {
-          if (int.parse(_circunfer_cintura.text) <= 88) {
-            descri_informe +=
-                "\n\nUsted presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
-          }
-        } else {
-          if (int.parse(_circunfer_cintura.text) > 88) {
-            descri_informe +=
-                "\n\nUsted presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
-          }
-        }
-      }
-    }
+    // if (int.parse(_circunfer_cintura.text) < 30) {
+    //   if (int.parse(_circunfer_cintura.text) > 160 &&
+    //       cintura_confirm == false) {
+    //     cintura_confirm = true;
+    //     _alert_clinicos(context, "Confirmar datos",
+    //         "Ingresaste $circintura cm ¿Es correcto? ", 1);
+    //   }
+    // } else {
+    //   if (int.parse(_circunfer_cintura.text) < 80) {
+    //     descri_informe +=
+    //         "\n\nUsted no presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
+    //   } else {
+    //     if (int.parse(_circunfer_cintura.text) >= 80) {
+    //       if (int.parse(_circunfer_cintura.text) <= 88) {
+    //         descri_informe +=
+    //             "\n\nUsted presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
+    //       }
+    //     } else {
+    //       if (int.parse(_circunfer_cintura.text) > 88) {
+    //         descri_informe +=
+    //             "\n\nUsted presenta indicadores de riesgo cardio vascular asociado a la circunferencia de cintura.";
+    //       }
+    //     }
+    //   }
+    // }
 
     // CIRCUNFERENCIA DE LA CINTURA HOMBRES
 
@@ -728,17 +744,6 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
   );
 }
 
-var id_alcohol = null;
-String text_resp_alcohol;
-var id_tabaco = null;
-String text_resp_tabaco;
-var id_marihuana = null;
-String text_resp_marihuana;
-var id_otras_drogas = null;
-String text_resp_otras;
-bool estado_verification = false;
-var option_alcohol = null;
-
 String email_prefer;
 var id_paciente;
 
@@ -751,7 +756,18 @@ getStringValuesSF() async {
 }
 
 String descri_informe = "";
-var _opcionSeleccionada = null;
+
+var _opcionSeleccionada;
+var id_alcohol;
+String text_resp_alcohol;
+var id_tabaco;
+String text_resp_tabaco;
+var id_marihuana;
+String text_resp_marihuana;
+var id_otras_drogas;
+String text_resp_otras;
+bool estado_verification = false;
+var option_alcohol;
 
 //----------------------------------------CONSUME ALCOHOL------------------------------------------------------------------------------------------
 class ConsumeAlcohol extends StatefulWidget {
@@ -761,6 +777,13 @@ class ConsumeAlcohol extends StatefulWidget {
 
 class _ConsumeAlcoholState extends State<ConsumeAlcohol> {
   bool _mostrarOpcion = false;
+
+  @override
+  void initState() {
+    id_alcohol = null;
+    _opcionSeleccionada = null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -826,6 +849,7 @@ class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
 
   @override
   void initState() {
+    super.initState();
     getAllRespuesta();
   }
 
@@ -866,10 +890,17 @@ class ConsumeTabaco extends StatefulWidget {
   _ConsumeTabacoState createState() => _ConsumeTabacoState();
 }
 
-var _opcionSeleccionadaTabaco = null;
+var _opcionSeleccionadaTabaco;
 
 class _ConsumeTabacoState extends State<ConsumeTabaco> {
   bool _mostrarOpcion = false;
+
+  @override
+  void initState() {
+    id_tabaco = null;
+    _opcionSeleccionadaTabaco = null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -930,6 +961,7 @@ class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
 
   @override
   void initState() {
+    super.initState();
     getAllRespuesta();
   }
 
@@ -969,10 +1001,17 @@ class ConsumeMarihuana extends StatefulWidget {
   _ConsumeMarihuanaState createState() => _ConsumeMarihuanaState();
 }
 
-var _opcionSeleccionadaMarihuana = null;
+var _opcionSeleccionadaMarihuana;
 
 class _ConsumeMarihuanaState extends State<ConsumeMarihuana> {
   bool _mostrarOpcion = false;
+
+  @override
+  void initState() {
+    id_marihuana = null;
+    _opcionSeleccionadaMarihuana = null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1074,10 +1113,17 @@ class ConsumeOtrasDrogas extends StatefulWidget {
   _ConsumeOtrasDrogasState createState() => _ConsumeOtrasDrogasState();
 }
 
-var _opcionSeleccionadaOtrasDrogas = null;
+var _opcionSeleccionadaOtrasDrogas;
 
 class _ConsumeOtrasDrogasState extends State<ConsumeOtrasDrogas> {
   bool _mostrarOpcion = false;
+
+  @override
+  void initState() {
+    id_otras_drogas = null;
+    _opcionSeleccionadaOtrasDrogas = null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/LabeledCheckboxGeneric.dart';
+import 'package:app_salud/widgets/alert_informe.dart';
 import 'env.dart';
 import 'ajustes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 var id_paciente;
 var id_medico;
@@ -12,24 +14,26 @@ var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
 var email;
+List respuestaAnimo;
 
 class FormScreeningAnimo extends StatefulWidget {
-  final pageName = 'screening_animo';
-
   @override
-  _FormpruebaState createState() => _FormpruebaState();
+  _FormScreeningAnimoState createState() => _FormScreeningAnimoState();
 }
 
-class _FormpruebaState extends State<FormScreeningAnimo> {
+class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   final myController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
-        context,
-        "Cuestionario de Ánimo",
-        "Este cuestionario valora cómo está su ánimo actualmente . Por favor responda sinceramente a cada una de las preguntas.  "));
+    WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
+          context,
+          "Cuestionario de Ánimo",
+          "Este cuestionario valora cómo está su ánimo actualmente . Por favor responda sinceramente a cada una de las preguntas.  ",
+          true,
+          () => Navigator.pop(context),
+        ));
   }
 
   @override
@@ -93,8 +97,8 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
             ),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "ANIMO",
+            Navigator.pushReplacementNamed(context, '/screening', arguments: {
+              "select_screening": "ÁNIMO",
             });
           },
         ),
@@ -106,7 +110,7 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
             )),
       ),
       body: FutureBuilder(
-          future: delayScreeningAnimo(),
+          future: getAllRespuestaNutricional(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             print(snapshot.connectionState);
             if (snapshot.hasData) {
@@ -121,159 +125,23 @@ class _FormpruebaState extends State<FormScreeningAnimo> {
           }),
     );
   }
-}
 
-delayScreeningAnimo() async {
-  await Future.delayed(Duration(milliseconds: 1500));
-  return true;
-}
+  Future<List> getAllRespuestaNutricional() async {
+    var response;
 
-var responseDecoder;
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_eventos_animo";
 
-guardar_datos(context) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/respuesta_screening_animo";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente.toString(),
-    "id_medico": id_medico.toString(),
-    "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening["data"].toString(),
-    "satisfecho": satisfecho.toString().toString(),
-    "abandonado": abandonado.toString(),
-    "vacia": vacia.toString(),
-    "aburrida": aburrida.toString(),
-    "humor": humor.toString(),
-    "temor": temor.toString(),
-    "feliz": feliz.toString(),
-    "desamparado": desamparado.toString(),
-    "prefiere": prefiere.toString(),
-    "memoria": memoria.toString(),
-    "estar_vivo": estar_vivo.toString(),
-    "inutil": inutil.toString(),
-    "energia": energia.toString(),
-    "situacion": situacion.toString(),
-    "situacion_mejor": situacion_mejor.toString(),
-    "cod_event_satisfecho": cod_event_satisfecho,
-    "cod_event_abandonado": cod_event_abandonado,
-    "cod_event_vacia": cod_event_vacia,
-    "cod_event_aburrida": cod_event_aburrida,
-    "cod_event_humor": cod_event_humor,
-    "cod_event_temor": cod_event_temor,
-    "cod_event_feliz": cod_event_feliz,
-    "cod_event_desamparado": cod_event_desamparado,
-    "cod_event_prefiere": cod_event_prefiere,
-    "cod_event_memoria": cod_event_memoria,
-    "cod_event_estar_vivo": cod_event_estar_vivo,
-    "cod_event_inutil": cod_event_inutil,
-    "cod_event_energia": cod_event_energia,
-    "cod_event_situacion": cod_event_situacion,
-    "cod_event_situacion_mejor": cod_event_situacion_mejor,
-  });
+    response = await http.post(url, body: {});
 
-  if (response.statusCode == 200) {
-    responseDecoder = json.decode(response.body);
+    var jsonData = json.decode(response.body);
 
-    if (responseDecoder['status'] == "Success") {
-      _resetChecksFalse();
-
-      if (int.parse(responseDecoder['data']) > 9) {
-        _alert_informe(
-          context,
-          "Para tener en cuenta",
-          "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
-        );
-      } else {
-        if (screening_recordatorio == true) {
-          Navigator.pushNamed(context, '/recordatorio');
-        } else {
-          Navigator.pushNamed(context, '/screening', arguments: {
-            "select_screening": "ÁNIMO",
-          });
-        }
-      }
+    if (response.statusCode == 200) {
+      return respuestaAnimo = jsonData['data'];
+    } else {
+      return null;
     }
-  } else {
-    _alert_informe(
-      context,
-      "Error al guardar",
-      response.body,
-    );
   }
-}
-
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
-_resetChecksFalse() {
-  satisfecho = false;
-  abandonado = false;
-  vacia = false;
-  aburrida = false;
-  humor = false;
-  temor = false;
-  feliz = false;
-
-  desamparado = false;
-  prefiere = false;
-  memoria = false;
-  estar_vivo = false;
-  inutil = false;
-  energia = false;
-  situacion = false;
-  situacion_mejor = false;
-}
-
-_alert_clinicos(context, title, descripcion) {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () => Navigator.pop(context),
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-_alert_informe(context, title, descripcion) {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "ANIMO",
-            });
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
 }
 
 class ScreeningAnimo extends StatefulWidget {
@@ -286,122 +154,225 @@ class ScreeningAnimo extends StatefulWidget {
 class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   final _formKey_screening_animo = GlobalKey<FormState>();
 
+  //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
+  ValueNotifier<bool> valueNotifierSatisfecho = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAbandonado = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierVidaVacia = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAburrida = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierHumor = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierTemor = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierFeliz = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> valueNotifierDesamparado = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierPrefiere = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierMemoria = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierEstar_vivo = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierInutil = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierEnergia = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierSituacion = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierSituacionMejor = ValueNotifier<bool>(false);
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey_screening_animo,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(10.0),
-            ),
-            SatisfechoVida(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Abandonado(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Nauseas(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Aburrida(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Humor(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Temor(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Feliz(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Desamparados(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Prefiere(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Memoria(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            EstarVivo(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Inutil(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Energia(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            Situacion(),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            Divider(height: 10.0, color: Colors.black),
-            MejorUsted(),
-            Divider(height: 10.0, color: Colors.black),
-            Padding(
-              padding: EdgeInsets.all(15.0),
-            ),
-            Center(
-              child: ElevatedButton.icon(
-                icon: _isLoading
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        child: const CircularProgressIndicator(),
-                      )
-                    : const Icon(Icons.save_alt),
-                style: ElevatedButton.styleFrom(
-                  textStyle: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-                onPressed: () => !_isLoading ? _startLoading() : null,
-                label: Text('GUARDAR',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontWeight: FontWeight.bold,
-                    )),
+      child: ListView(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(10.0),
+          ),
+          SatisfechoVida(valueNotifierSatisfecho: valueNotifierSatisfecho),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Abandonado(valueNotifierAbandonado: valueNotifierAbandonado),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          VidaVacia(valueNotifierVidaVacia: valueNotifierVidaVacia),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Aburrida(valueNotifierAburrida: valueNotifierAburrida),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Humor(valueNotifierHumor: valueNotifierHumor),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Temor(valueNotifierTemor: valueNotifierTemor),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Feliz(valueNotifierFeliz: valueNotifierFeliz),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Desamparados(valueNotifierDesamparado: valueNotifierDesamparado),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Prefiere(valueNotifierPrefiere: valueNotifierPrefiere),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Memoria(valueNotifierMemoria: valueNotifierMemoria),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          EstarVivo(valueNotifierEstar_vivo: valueNotifierEstar_vivo),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Inutil(valueNotifierInutil: valueNotifierInutil),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Energia(valueNotifierEnergia: valueNotifierEnergia),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Situacion(valueNotifierSituacion: valueNotifierSituacion),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          MejorUsted(valueNotifierSituacion_mejor: valueNotifierSituacionMejor),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+          ),
+          Divider(height: 10.0, color: Colors.black),
+          Padding(
+            padding: EdgeInsets.all(15.0),
+          ),
+          Center(
+            child: ElevatedButton.icon(
+              icon: _isLoading
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: const CircularProgressIndicator(),
+                    )
+                  : const Icon(Icons.save_alt),
+              style: ElevatedButton.styleFrom(
+                textStyle: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
               ),
+              onPressed: () => !_isLoading ? _startLoading() : null,
+              label: Text('GUARDAR',
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontWeight: FontWeight.bold,
+                  )),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  var responseDecoder;
+
+  guardar_datos(context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_animo";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening["data"].toString(),
+      "satisfecho": valueNotifierSatisfecho.value.toString(),
+      "abandonado": valueNotifierAbandonado.value.toString(),
+      "vacia": valueNotifierVidaVacia.value.toString(),
+      "aburrida": valueNotifierAburrida.value.toString(),
+      "humor": valueNotifierHumor.value.toString(),
+      "temor": valueNotifierTemor.value.toString(),
+      "feliz": valueNotifierFeliz.value.toString(),
+      "desamparado": valueNotifierDesamparado.value.toString(),
+      "prefiere": valueNotifierPrefiere.value.toString(),
+      "memoria": valueNotifierMemoria.value.toString(),
+      "estar_vivo": valueNotifierEstar_vivo.value.toString(),
+      "inutil": valueNotifierInutil.value.toString(),
+      "energia": valueNotifierEnergia.value.toString(),
+      "situacion": valueNotifierSituacion.value.toString(),
+      "situacion_mejor": valueNotifierSituacionMejor.value.toString(),
+      "cod_event_satisfecho": cod_event_satisfecho,
+      "cod_event_abandonado": cod_event_abandonado,
+      "cod_event_vacia": cod_event_vacia,
+      "cod_event_aburrida": cod_event_aburrida,
+      "cod_event_humor": cod_event_humor,
+      "cod_event_temor": cod_event_temor,
+      "cod_event_feliz": cod_event_feliz,
+      "cod_event_desamparado": cod_event_desamparado,
+      "cod_event_prefiere": cod_event_prefiere,
+      "cod_event_memoria": cod_event_memoria,
+      "cod_event_estar_vivo": cod_event_estar_vivo,
+      "cod_event_inutil": cod_event_inutil,
+      "cod_event_energia": cod_event_energia,
+      "cod_event_situacion": cod_event_situacion,
+      "cod_event_situacion_mejor": cod_event_situacion_mejor,
+    });
+
+    if (response.statusCode == 200) {
+      responseDecoder = json.decode(response.body);
+
+      if (responseDecoder['status'] == "Success") {
+        if (int.parse(responseDecoder['data']) >= 9) {
+          showCustomAlert(
+            context,
+            "Para tener en cuenta",
+            "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
+            screening_recordatorio,
+            () {},
+          );
+        } else {
+          if (int.parse(responseDecoder['data']) < 9) {
+            showCustomAlert(
+              context,
+              "Para tener en cuenta",
+              "En este momento no presenta sintomatología del estado del ánimo que requiera una consulta con especialista. Sin embargo, le sugerimos seguir controlando su estado de ánimo periódicamente.",
+              screening_recordatorio,
+              () {},
+            );
+          } else {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "ÁNIMO",
+              });
+            }
+          }
+        }
+      }
+    } else {
+      showCustomAlert(
+        context,
+        "Error al guardar",
+        response.body,
+        screening_recordatorio,
+        () {},
+      );
+    }
   }
 
   bool _isLoading = false;
@@ -458,25 +429,6 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   }
 }
 
-//----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-
-bool satisfecho = false;
-bool abandonado = false;
-bool vacia = false;
-bool aburrida = false;
-bool humor = false;
-bool temor = false;
-bool feliz = false;
-
-bool desamparado = false;
-bool prefiere = false;
-bool memoria = false;
-bool estar_vivo = false;
-bool inutil = false;
-bool energia = false;
-bool situacion = false;
-bool situacion_mejor = false;
-
 String cod_event_satisfecho = "ANI1";
 String cod_event_abandonado = 'ANI2';
 String cod_event_vacia = 'ANI3';
@@ -495,55 +447,10 @@ String cod_event_situacion_mejor = 'ANI15';
 
 //-------------------------------------- ÄNIMO 1 -----------------------------------------------------
 
-class LabeledCheckboxANI1 extends StatelessWidget {
-  const LabeledCheckboxANI1({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class SatisfechoVida extends StatefulWidget {
-  SatisfechoVida({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierSatisfecho;
+
+  SatisfechoVida({this.valueNotifierSatisfecho});
 
   @override
   CheckSatisfechoVidaWidgetState createState() =>
@@ -553,13 +460,13 @@ class SatisfechoVida extends StatefulWidget {
 class CheckSatisfechoVidaWidgetState extends State<SatisfechoVida> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxANI1(
-      label: 'En general ¿Está satisfecho con su vida?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[0]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: satisfecho,
+      value: widget.valueNotifierSatisfecho.value,
       onChanged: (bool newValue) {
         setState(() {
-          satisfecho = newValue;
+          widget.valueNotifierSatisfecho.value = newValue ?? false;
         });
       },
     );
@@ -570,55 +477,11 @@ class CheckSatisfechoVidaWidgetState extends State<SatisfechoVida> {
 
 // --------------------------------- ANIMO 2 ----------------------------------------------------
 
-class LabeledCheckboxANI2 extends StatelessWidget {
-  const LabeledCheckboxANI2({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+// ignore: must_be_immutable
 class Abandonado extends StatefulWidget {
-  Abandonado({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierAbandonado;
+
+  Abandonado({this.valueNotifierAbandonado});
 
   @override
   CheckAbandonadoWidgetState createState() => CheckAbandonadoWidgetState();
@@ -627,13 +490,13 @@ class Abandonado extends StatefulWidget {
 class CheckAbandonadoWidgetState extends State<Abandonado> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxANI2(
-      label: '¿Ha abandonado muchas de sus tareas habituales y aficiones?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[1]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: abandonado,
+      value: widget.valueNotifierAbandonado.value,
       onChanged: (bool newValue) {
         setState(() {
-          abandonado = newValue;
+          widget.valueNotifierAbandonado.value = newValue;
         });
       },
     );
@@ -642,72 +505,25 @@ class CheckAbandonadoWidgetState extends State<Abandonado> {
 
 //-------------------------------------------ANIMO 3--------------------------------------------
 
-class LabeledCheckboxVacia extends StatelessWidget {
-  const LabeledCheckboxVacia({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
+class VidaVacia extends StatefulWidget {
+  ValueNotifier<bool> valueNotifierVidaVacia;
 
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
+  VidaVacia({this.valueNotifierVidaVacia});
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  VidaVaciaWidgetState createState() => VidaVaciaWidgetState();
 }
 
-class Nauseas extends StatefulWidget {
-  Nauseas({Key key}) : super(key: key);
-
-  @override
-  NauseasWidgetState createState() => NauseasWidgetState();
-}
-
-class NauseasWidgetState extends State<Nauseas> {
+class VidaVaciaWidgetState extends State<VidaVacia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVacia(
-      label: '¿Siente que su vida está vacía?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[2]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: vacia,
+      value: widget.valueNotifierVidaVacia.value,
       onChanged: (bool newValue) {
         setState(() {
-          vacia = newValue;
+          widget.valueNotifierVidaVacia.value = newValue;
         });
       },
     );
@@ -716,55 +532,11 @@ class NauseasWidgetState extends State<Nauseas> {
 
 //------------------------------------------ ANIMO 4 -------------------------------------------
 
-class LabeledCheckboxANIMO4 extends StatelessWidget {
-  const LabeledCheckboxANIMO4({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+// ignore: must_be_immutable
 class Aburrida extends StatefulWidget {
-  Aburrida({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierAburrida;
+
+  Aburrida({this.valueNotifierAburrida});
 
   @override
   AburridaWidgetState createState() => AburridaWidgetState();
@@ -773,13 +545,13 @@ class Aburrida extends StatefulWidget {
 class AburridaWidgetState extends State<Aburrida> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxANIMO4(
-      label: '¿Se siente con frecuencia aburrido/a?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[3]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: aburrida,
+      value: widget.valueNotifierAburrida.value,
       onChanged: (bool newValue) {
         setState(() {
-          aburrida = newValue;
+          widget.valueNotifierAburrida.value = newValue;
         });
       },
     );
@@ -788,55 +560,10 @@ class AburridaWidgetState extends State<Aburrida> {
 
 //------------------------------------------ANIMO 5 ---------------------------------------
 
-class LabeledCheckboxAnimo5 extends StatelessWidget {
-  const LabeledCheckboxAnimo5({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Humor extends StatefulWidget {
-  Humor({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierHumor;
+
+  Humor({this.valueNotifierHumor});
 
   @override
   HumorWidgetState createState() => HumorWidgetState();
@@ -845,13 +572,13 @@ class Humor extends StatefulWidget {
 class HumorWidgetState extends State<Humor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo5(
-      label: '¿Se encuentra de buen humor la mayor parte del tiempo?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[4]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: humor,
+      value: widget.valueNotifierHumor.value,
       onChanged: (bool newValue) {
         setState(() {
-          humor = newValue;
+          widget.valueNotifierHumor.value = newValue;
         });
       },
     );
@@ -860,55 +587,10 @@ class HumorWidgetState extends State<Humor> {
 
 // ----------------------------------------ANIMO 6---------------------------------------
 
-class LabeledCheckboxAnimo6 extends StatelessWidget {
-  const LabeledCheckboxAnimo6({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Temor extends StatefulWidget {
-  Temor({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierTemor;
+
+  Temor({this.valueNotifierTemor});
 
   @override
   TemorWidgetState createState() => TemorWidgetState();
@@ -917,13 +599,13 @@ class Temor extends StatefulWidget {
 class TemorWidgetState extends State<Temor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo6(
-      label: '¿Teme que algo malo pueda ocurrirle?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[5]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: temor,
+      value: widget.valueNotifierTemor.value,
       onChanged: (bool newValue) {
         setState(() {
-          temor = newValue;
+          widget.valueNotifierTemor.value = newValue;
         });
       },
     );
@@ -932,55 +614,10 @@ class TemorWidgetState extends State<Temor> {
 
 // ---------------------------------------- ANIMO 7 -----------------------------------
 
-class LabeledCheckboxFeliz extends StatelessWidget {
-  const LabeledCheckboxFeliz({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Feliz extends StatefulWidget {
-  Feliz({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierFeliz;
+
+  Feliz({this.valueNotifierFeliz});
 
   @override
   FelizWidgetState createState() => FelizWidgetState();
@@ -989,13 +626,13 @@ class Feliz extends StatefulWidget {
 class FelizWidgetState extends State<Feliz> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxFeliz(
-      label: '¿Se siente feliz la mayor parte del tiempo?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[6]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: feliz,
+      value: widget.valueNotifierFeliz.value,
       onChanged: (bool newValue) {
         setState(() {
-          feliz = newValue;
+          widget.valueNotifierFeliz.value = newValue;
         });
       },
     );
@@ -1003,56 +640,11 @@ class FelizWidgetState extends State<Feliz> {
 }
 
 // -----------------------------------------ANIMO 8 -----------------------------------------------------
-class LabeledCheckboxAnimo8 extends StatelessWidget {
-  const LabeledCheckboxAnimo8({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Desamparados extends StatefulWidget {
-  Desamparados({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierDesamparado;
 
+  Desamparados({this.valueNotifierDesamparado});
   @override
   DesamparadosWidgetState createState() => DesamparadosWidgetState();
 }
@@ -1060,14 +652,13 @@ class Desamparados extends StatefulWidget {
 class DesamparadosWidgetState extends State<Desamparados> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo8(
-      label:
-          '¿Con frecuencia se siente desamparado/a, desprotegido, abandonado?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[7]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: desamparado,
+      value: widget.valueNotifierDesamparado.value,
       onChanged: (bool newValue) {
         setState(() {
-          desamparado = newValue;
+          widget.valueNotifierDesamparado.value = newValue;
         });
       },
     );
@@ -1076,56 +667,10 @@ class DesamparadosWidgetState extends State<Desamparados> {
 
 //-------------------------------------------- ANIMO 9 -----------------------------------------------------------
 
-class LabeledCheckboxAnimo9 extends StatelessWidget {
-  const LabeledCheckboxAnimo9({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Prefiere extends StatefulWidget {
-  Prefiere({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierPrefiere;
 
+  Prefiere({this.valueNotifierPrefiere});
   @override
   PrefiereWidgetState createState() => PrefiereWidgetState();
 }
@@ -1133,14 +678,13 @@ class Prefiere extends StatefulWidget {
 class PrefiereWidgetState extends State<Prefiere> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo9(
-      label:
-          '¿Prefiere usted quedarse en casa, más que salir y hacer cosas nuevas?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[8]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: prefiere,
+      value: widget.valueNotifierPrefiere.value,
       onChanged: (bool newValue) {
         setState(() {
-          prefiere = newValue;
+          widget.valueNotifierPrefiere.value = newValue;
         });
       },
     );
@@ -1148,56 +692,11 @@ class PrefiereWidgetState extends State<Prefiere> {
 }
 
 // -------------------------------------------ANIMO 10 --------------------------------------------
-class LabeledCheckboxAnimo10 extends StatelessWidget {
-  const LabeledCheckboxAnimo10({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Memoria extends StatefulWidget {
-  Memoria({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierMemoria;
 
+  Memoria({this.valueNotifierMemoria});
   @override
   MemoriaWidgetState createState() => MemoriaWidgetState();
 }
@@ -1205,14 +704,13 @@ class Memoria extends StatefulWidget {
 class MemoriaWidgetState extends State<Memoria> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo10(
-      label:
-          '¿Cree que tiene más problemas de memoria que la mayoría de la gente?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[9]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: memoria,
+      value: widget.valueNotifierMemoria.value,
       onChanged: (bool newValue) {
         setState(() {
-          memoria = newValue;
+          widget.valueNotifierMemoria.value = newValue;
         });
       },
     );
@@ -1220,56 +718,11 @@ class MemoriaWidgetState extends State<Memoria> {
 }
 
 // ------------------------------------------ANIMO 11 ---------------------------------------------------
-class LabeledCheckboxVivo extends StatelessWidget {
-  const LabeledCheckboxVivo({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class EstarVivo extends StatefulWidget {
-  EstarVivo({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierEstar_vivo;
 
+  EstarVivo({this.valueNotifierEstar_vivo});
   @override
   EstarVivoWidgetState createState() => EstarVivoWidgetState();
 }
@@ -1277,13 +730,13 @@ class EstarVivo extends StatefulWidget {
 class EstarVivoWidgetState extends State<EstarVivo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVivo(
-      label: 'En estos momentos, ¿piensa que es estupendo estar vivo?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[10]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: estar_vivo,
+      value: widget.valueNotifierEstar_vivo.value,
       onChanged: (bool newValue) {
         setState(() {
-          estar_vivo = newValue;
+          widget.valueNotifierEstar_vivo.value = newValue;
         });
       },
     );
@@ -1291,55 +744,10 @@ class EstarVivoWidgetState extends State<EstarVivo> {
 }
 //-------------------------------------------- ANIMO 12---------------------------------------------------
 
-class LabeledCheckboxAnimo12 extends StatelessWidget {
-  const LabeledCheckboxAnimo12({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Inutil extends StatefulWidget {
-  Inutil({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierInutil;
+
+  Inutil({this.valueNotifierInutil});
 
   @override
   InutilWidgetState createState() => InutilWidgetState();
@@ -1348,13 +756,13 @@ class Inutil extends StatefulWidget {
 class InutilWidgetState extends State<Inutil> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo12(
-      label: '¿Actualmente se siente un/a inútil?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[11]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: inutil,
+      value: widget.valueNotifierInutil.value,
       onChanged: (bool newValue) {
         setState(() {
-          inutil = newValue;
+          widget.valueNotifierInutil.value = newValue;
         });
       },
     );
@@ -1362,55 +770,10 @@ class InutilWidgetState extends State<Inutil> {
 }
 //------------------------------------------ANIMO 13 --------------------------------------------------
 
-class LabeledCheckboxANIMO13 extends StatelessWidget {
-  const LabeledCheckboxANIMO13({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Energia extends StatefulWidget {
-  Energia({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierEnergia;
+
+  Energia({this.valueNotifierEnergia});
 
   @override
   EnergiaWidgetState createState() => EnergiaWidgetState();
@@ -1419,13 +782,13 @@ class Energia extends StatefulWidget {
 class EnergiaWidgetState extends State<Energia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxANIMO13(
-      label: '¿Se siente lleno/a de energía?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[12]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: energia,
+      value: widget.valueNotifierEnergia.value,
       onChanged: (bool newValue) {
         setState(() {
-          energia = newValue;
+          widget.valueNotifierEnergia.value = newValue;
         });
       },
     );
@@ -1433,55 +796,10 @@ class EnergiaWidgetState extends State<Energia> {
 }
 //-------------------------------------------- ANIMO 14 -------------------------------------------------
 
-class LabeledCheckboxAnimo14 extends StatelessWidget {
-  const LabeledCheckboxAnimo14({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Situacion extends StatefulWidget {
-  Situacion({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierSituacion;
+
+  Situacion({this.valueNotifierSituacion});
 
   @override
   ConFrecWidgetState createState() => ConFrecWidgetState();
@@ -1490,13 +808,13 @@ class Situacion extends StatefulWidget {
 class ConFrecWidgetState extends State<Situacion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo14(
-      label: '¿Siente que su situación actual es desesperada?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[13]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: situacion,
+      value: widget.valueNotifierSituacion.value,
       onChanged: (bool newValue) {
         setState(() {
-          situacion = newValue;
+          widget.valueNotifierSituacion.value = newValue;
         });
       },
     );
@@ -1504,55 +822,11 @@ class ConFrecWidgetState extends State<Situacion> {
 }
 
 // --------------------------------------------ANIMO 15 ------------------------------------------------
-class LabeledCheckboxAnimo15 extends StatelessWidget {
-  const LabeledCheckboxAnimo15({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class MejorUsted extends StatefulWidget {
-  MejorUsted({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierSituacion_mejor;
+
+  MejorUsted({this.valueNotifierSituacion_mejor});
 
   @override
   MejorUstedWidgetState createState() => MejorUstedWidgetState();
@@ -1561,14 +835,13 @@ class MejorUsted extends StatefulWidget {
 class MejorUstedWidgetState extends State<MejorUsted> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAnimo15(
-      label:
-          '¿Piensa que la mayoría de la gente está en mejor situación que usted?',
+    return LabeledCheckboxGeneric(
+      label: respuestaAnimo[14]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: situacion_mejor,
+      value: widget.valueNotifierSituacion_mejor.value,
       onChanged: (bool newValue) {
         setState(() {
-          situacion_mejor = newValue;
+          widget.valueNotifierSituacion_mejor.value = newValue;
         });
       },
     );

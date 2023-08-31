@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class NivelEducativoModel extends InheritedWidget {
-  String idNivelEducativo;
-  String nombreNivelEducativo;
+  final String idNivelEducativo;
+  final String nombreNivelEducativo;
 
   NivelEducativoModel({
     this.idNivelEducativo,

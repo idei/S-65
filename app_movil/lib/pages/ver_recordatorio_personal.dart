@@ -105,15 +105,6 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
                 ]))));
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/');
-    }
-  }
-
   update_estado_recordartorio() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/update_recordatorio_personal";

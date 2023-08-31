@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 
 var id_paciente;
 String nombre_medico;
@@ -64,22 +64,25 @@ class CardPerfilMedico extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text("$nombre_medico $apellido_medico",
-                  style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily)),
-              subtitle: Text(
-                  'Matricula: $matricula \n Especialidad: $especialidad',
-                  style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily)),
-            ),
-          ],
+        child: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text("$nombre_medico $apellido_medico",
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily)),
+                subtitle: Text(
+                    'Matricula: $matricula \nEspecialidad: $especialidad',
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily)),
+              ),
+            ],
+          ),
         ),
       ),
     );

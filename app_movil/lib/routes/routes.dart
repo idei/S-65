@@ -15,7 +15,6 @@ import 'package:app_salud/pages/medicamento_add.dart';
 import 'package:app_salud/pages/medicamentos.dart';
 import 'package:app_salud/pages/medico_perfil.dart';
 import 'package:app_salud/pages/menu.dart';
-import 'package:app_salud/pages/menuPrueba.dart';
 import 'package:app_salud/pages/menu_chequeo.dart';
 import 'package:app_salud/pages/new_recordatorio_personal.dart';
 import 'package:app_salud/pages/recordatorios.dart';
@@ -24,6 +23,7 @@ import 'package:app_salud/pages/register_page.dart';
 import 'package:app_salud/pages/screening.dart';
 import 'package:app_salud/pages/screening_adlq.dart';
 import 'package:app_salud/pages/screening_cerebral.dart';
+import 'package:app_salud/pages/splash_screen.dart';
 import 'package:app_salud/pages/ver_screening.dart';
 import 'package:app_salud/pages/screening_animo.dart';
 import 'package:app_salud/pages/screening_cdr.dart';
@@ -82,5 +82,6 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/screening_encro': (context) => ScreeningEnfCronicas(),
     '/medico_perfil': (context) => MedicoPerfil(),
     '/screening_cerebral': (context) => ScreeningCerebral(),
+    '/splash': (context) => SplashScreen(),
   };
 }

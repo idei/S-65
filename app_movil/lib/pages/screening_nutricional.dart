@@ -1,9 +1,12 @@
+import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import '../widgets/alert_informe.dart';
 
 var id_paciente;
 var id_medico;
@@ -25,17 +28,12 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   @override
   void initState() {
     super.initState();
-    myController.addListener(_printLatestValue);
   }
 
   @override
   void dispose() {
     myController.dispose();
     super.dispose();
-  }
-
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
   }
 
   getStringValuesSF() async {
@@ -80,6 +78,11 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
 
   @override
   Widget build(BuildContext context) {
+    @override
+    void dispose() {
+      super.dispose();
+    }
+
     getStringValuesSF();
 
     return Scaffold(
@@ -98,10 +101,10 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
             )),
       ),
       body: FutureBuilder(
-          future: timer(),
+          future: getAllRespuestaNutricional(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
-              return FormNutricional(context);
+              return FormNutricional();
             } else {
               return Center(
                 child: CircularProgressIndicator(
@@ -144,261 +147,131 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   }
 }
 
-timer() async {
-  await Future.delayed(Duration(milliseconds: 500));
-  return true;
-}
+List respuestaNutricional;
 
-guardarDatos(BuildContext context) async {
+Future<List> getAllRespuestaNutricional() async {
+  var response;
+
   String URL_base = Env.URL_API;
-  var url = URL_base + "/respuesta_screening_nutricional";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente.toString(),
-    "id_medico": id_medico.toString(),
-    "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening['data'].toString(),
-    "nutri1": nutri1.toString().toString(),
-    "nutri2": nutri2.toString(),
-    "nutri3": nutri3.toString(),
-    "nutri4": nutri4.toString(),
-    "nutri5": nutri5.toString(),
-    "nutri6": nutri6.toString(),
-    "nutri7": nutri7.toString(),
-    "nutri8": nutri8.toString(),
-    "nutri81": nutri81.toString(),
-    "nutri9": nutri9.toString(),
-    "nutri91": nutri91.toString(),
-    "nutri10": nutri10.toString(),
-    "cod_event_nutri1": cod_event_nutri1,
-    "cod_event_nutri2": cod_event_nutri2,
-    "cod_event_nutri3": cod_event_nutri3,
-    "cod_event_nutri4": cod_event_nutri4,
-    "cod_event_nutri5": cod_event_nutri5,
-    "cod_event_nutri6": cod_event_nutri6,
-    "cod_event_nutri7": cod_event_nutri7,
-    "cod_event_nutri8": cod_event_nutri8,
-    "cod_event_nutri81": cod_event_nutri81,
-    "cod_event_nutri9": cod_event_nutri9,
-    "cod_event_nutri91": cod_event_nutri91,
-    "cod_event_nutri10": cod_event_nutri10,
-  });
+  var url = URL_base + "/tipo_eventos_nutricional";
 
-  var responseDecode = json.decode(response.body);
+  response = await http.post(url, body: {});
 
-  if (responseDecode != "Vacio") {
-    _alert_informe(
-      context,
-      "Para tener en cuenta",
-      responseDecode['data'],
-    );
+  var jsonData = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    return respuestaNutricional = jsonData['data'];
   } else {
-    if (screening_recordatorio == true) {
-      Navigator.pushNamed(context, '/recordatorio');
-    } else {
-      Navigator.pushNamed(context, '/screening', arguments: {
-        "select_screening": "RNUTRI",
-      });
-    }
+    return null;
   }
-}
-
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
-_alert_informe(context, title, descripcion) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "RNUTRI",
-            });
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
 }
 
 //----------------------------------------Screening de Sintomas ------------------------------------------
 
-Form FormNutricional(BuildContext context) {
-  return Form(
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Nutri1(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri2(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri3(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri4(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri5(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri6(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri7(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri8(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri81(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri9(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri91(),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          Divider(height: 5.0, color: Colors.black),
-          Nutri10(),
-          Divider(height: 10.0, color: Colors.black),
-          Padding(
-            padding: EdgeInsets.all(15.0),
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                guardarDatos(context);
-              },
-              child: Text(
-                'GUARDAR',
-                style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+class FormNutricional extends StatefulWidget {
+  FormNutricional({Key key}) : super(key: key);
+
+  @override
+  State<FormNutricional> createState() => _FormNutricionalState();
 }
 
-//----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-
-bool nutri1 = false;
-bool nutri2 = false;
-bool nutri3 = false;
-bool nutri4 = false;
-bool nutri5 = false;
-bool nutri6 = false;
-bool nutri7 = false;
-
-bool nutri8 = false;
-bool nutri81 = false;
-bool nutri9 = false;
-bool nutri91 = false;
-bool nutri10 = false;
-
-String cod_event_nutri1 = "NUTRI1";
-String cod_event_nutri2 = 'NUTRI2';
-String cod_event_nutri3 = 'NUTRI3';
-String cod_event_nutri4 = 'NUTRI4';
-String cod_event_nutri5 = 'NUTRI5';
-String cod_event_nutri6 = 'NUTRI6';
-String cod_event_nutri7 = 'NUTRI7';
-String cod_event_nutri8 = 'NUTRI8';
-String cod_event_nutri81 = "NUTRI81";
-String cod_event_nutri9 = 'NUTRI9';
-String cod_event_nutri91 = "NUTRI91";
-String cod_event_nutri10 = 'NUTRI10';
-
-//-------------------------------------- NUTRICIONAL 1 -----------------------------------------------------
-
-class LabeledCheckboxNutri1 extends StatelessWidget {
-  const LabeledCheckboxNutri1({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
+class _FormNutricionalState extends State<FormNutricional> {
+  //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
+  ValueNotifier<bool> valueNotifierNutri1 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri2 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri3 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri4 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri5 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri6 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri7 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri8 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri81 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri9 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri91 = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNutri10 = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
+    return Form(
       child: Padding(
-        padding: padding,
-        child: Row(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
           children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Nutri1(valueNotifierNutri1: valueNotifierNutri1),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri2(valueNotifierNutri2: valueNotifierNutri2),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri3(valueNotifierNutri3: valueNotifierNutri3),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri4(valueNotifierNutri4: valueNotifierNutri4),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri5(valueNotifierNutri5: valueNotifierNutri5),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri6(valueNotifierNutri6: valueNotifierNutri6),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri7(valueNotifierNutri7: valueNotifierNutri7),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri8(valueNotifierNutri8: valueNotifierNutri8),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri81(valueNotifierNutri81: valueNotifierNutri81),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri9(valueNotifierNutri9: valueNotifierNutri9),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri91(valueNotifierNutri91: valueNotifierNutri91),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Divider(height: 5.0, color: Colors.black),
+            Nutri10(valueNotifierNutri10: valueNotifierNutri10),
+            Divider(height: 10.0, color: Colors.black),
+            Padding(
+              padding: EdgeInsets.all(15.0),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  guardarDatos(context);
                 },
+                child: Text(
+                  'GUARDAR',
+                  style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                  ),
+                ),
               ),
             ),
           ],
@@ -406,29 +279,116 @@ class LabeledCheckboxNutri1 extends StatelessWidget {
       ),
     );
   }
+
+  guardarDatos(BuildContext context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_nutricional";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "nutri1": valueNotifierNutri1.value.toString(),
+      "nutri2": valueNotifierNutri2.value.toString(),
+      "nutri3": valueNotifierNutri3.value.toString(),
+      "nutri4": valueNotifierNutri4.value.toString(),
+      "nutri5": valueNotifierNutri5.value.toString(),
+      "nutri6": valueNotifierNutri6.value.toString(),
+      "nutri7": valueNotifierNutri7.value.toString(),
+      "nutri8": valueNotifierNutri8.value.toString(),
+      "nutri81": valueNotifierNutri81.value.toString(),
+      "nutri9": valueNotifierNutri9.value.toString(),
+      "nutri91": valueNotifierNutri91.value.toString(),
+      "nutri10": valueNotifierNutri10.value.toString(),
+      "cod_event_nutri1": cod_event_nutri1,
+      "cod_event_nutri2": cod_event_nutri2,
+      "cod_event_nutri3": cod_event_nutri3,
+      "cod_event_nutri4": cod_event_nutri4,
+      "cod_event_nutri5": cod_event_nutri5,
+      "cod_event_nutri6": cod_event_nutri6,
+      "cod_event_nutri7": cod_event_nutri7,
+      "cod_event_nutri8": cod_event_nutri8,
+      "cod_event_nutri81": cod_event_nutri81,
+      "cod_event_nutri9": cod_event_nutri9,
+      "cod_event_nutri91": cod_event_nutri91,
+      "cod_event_nutri10": cod_event_nutri10,
+    });
+
+    var responseDecode = json.decode(response.body);
+
+    if (responseDecode != "Vacio") {
+      showCustomAlert(
+          context, "Para tener en cuenta", responseDecode['data'], true, () {
+        if (screening_recordatorio == true) {
+          Navigator.pushNamed(context, '/recordatorio');
+        } else {
+          Navigator.pushNamed(context, '/screening', arguments: {
+            "select_screening": "RNUTRI",
+          });
+        }
+      });
+      // _alert_informe(
+      //   context,
+      //   "Para tener en cuenta",
+      //   responseDecode['data'],
+      // );
+    } else {
+      if (screening_recordatorio == true) {
+        Navigator.pushNamed(context, '/recordatorio');
+      } else {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "RNUTRI",
+        });
+      }
+    }
+  }
 }
 
+//----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
+
+String cod_event_nutri1 = 'NUTRI1';
+String cod_event_nutri2 = 'NUTRI2';
+String cod_event_nutri3 = 'NUTRI3';
+String cod_event_nutri4 = 'NUTRI4';
+String cod_event_nutri5 = 'NUTRI5';
+String cod_event_nutri6 = 'NUTRI6';
+String cod_event_nutri7 = 'NUTRI7';
+String cod_event_nutri8 = 'NUTRI8';
+String cod_event_nutri81 = 'NUTRI81';
+String cod_event_nutri9 = 'NUTRI9';
+String cod_event_nutri91 = 'NUTRI91';
+String cod_event_nutri10 = 'NUTRI10';
+
+//-------------------------------------- NUTRICIONAL 1 -----------------------------------------------------
+
 class Nutri1 extends StatefulWidget {
-  Nutri1({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri1;
+
+  Nutri1({this.valueNotifierNutri1});
 
   @override
   CheckNutri1WidgetState createState() => CheckNutri1WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckNutri1WidgetState extends State<Nutri1> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri1(
-      label:
-          '¿Tiene una enfermedad o malestar que le ha hecho cambiar el tipo y/o cantidad de alimento que come?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[0]["nombre_evento"],
+      // '¿Tiene una enfermedad o malestar que le ha hecho cambiar el tipo y/o cantidad de alimento que come?',
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri1,
+      value: widget.valueNotifierNutri1.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri1 = newValue;
+          widget.valueNotifierNutri1.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
@@ -437,501 +397,208 @@ class CheckNutri1WidgetState extends State<Nutri1> {
 
 // --------------------------------- NUTRI 2 ----------------------------------------------------
 
-class LabeledCheckboxNutri2 extends StatelessWidget {
-  const LabeledCheckboxNutri2({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri2 extends StatefulWidget {
-  Nutri2({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri2;
+
+  Nutri2({this.valueNotifierNutri2});
 
   @override
   CheckNutri2WidgetState createState() => CheckNutri2WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckNutri2WidgetState extends State<Nutri2> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri2(
-      label: '¿Realiza menos de dos comidas al día?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[1]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri2,
+      value: widget.valueNotifierNutri2.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri2 = newValue;
+          widget.valueNotifierNutri2.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //-------------------------------------------NUTRI 3--------------------------------------------
 
-class LabeledCheckboxNutri3 extends StatelessWidget {
-  const LabeledCheckboxNutri3({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri3 extends StatefulWidget {
-  Nutri3({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri3;
+
+  Nutri3({this.valueNotifierNutri3});
 
   @override
   Nutri3WidgetState createState() => Nutri3WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri3WidgetState extends State<Nutri3> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri3(
-      label: '¿Come poca fruta, verduras o productos lácteos?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[2]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri3,
+      value: widget.valueNotifierNutri3.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri3 = newValue;
+          widget.valueNotifierNutri3.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //------------------------------------------ NUTRI 4 -------------------------------------------
 
-class LabeledCheckboxNutri4 extends StatelessWidget {
-  const LabeledCheckboxNutri4({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri4 extends StatefulWidget {
-  Nutri4({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri4;
+
+  Nutri4({this.valueNotifierNutri4});
 
   @override
   Nutri4WidgetState createState() => Nutri4WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri4WidgetState extends State<Nutri4> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri4(
-      label: '¿Toma tres vasos o más de vino, cerveza o licor al día?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[3]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri4,
+      value: widget.valueNotifierNutri4.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri4 = newValue;
+          widget.valueNotifierNutri4.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //------------------------------------------NUTRI 5 ---------------------------------------
 
-class LabeledCheckboxNutri5 extends StatelessWidget {
-  const LabeledCheckboxNutri5({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri5 extends StatefulWidget {
-  Nutri5({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri5;
+
+  Nutri5({this.valueNotifierNutri5});
 
   @override
   Nutri5WidgetState createState() => Nutri5WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri5WidgetState extends State<Nutri5> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri5(
-      label:
-          '¿Tiene problemas en la boca o dentadura que le causan dificultad o molestias al comer? ',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[4]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri5,
+      value: widget.valueNotifierNutri5.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri5 = newValue;
+          widget.valueNotifierNutri5.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // ----------------------------------------NUTRI 6---------------------------------------
 
-class LabeledCheckboxNutri6 extends StatelessWidget {
-  const LabeledCheckboxNutri6({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri6 extends StatefulWidget {
-  Nutri6({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri6;
+
+  Nutri6({this.valueNotifierNutri6});
 
   @override
   Nutri6WidgetState createState() => Nutri6WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri6WidgetState extends State<Nutri6> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri6(
-      label:
-          '¿En  ocasiones, le falta dinero para comprar la comida que necesita?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[5]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri6,
+      value: widget.valueNotifierNutri6.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri6 = newValue;
+          widget.valueNotifierNutri6.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // ---------------------------------------- NUTRI 7 -----------------------------------
 
-class LabeledCheckboxNutri7 extends StatelessWidget {
-  const LabeledCheckboxNutri7({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri7 extends StatefulWidget {
-  Nutri7({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri7;
+
+  Nutri7({this.valueNotifierNutri7});
 
   @override
   Nutri7WidgetState createState() => Nutri7WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri7WidgetState extends State<Nutri7> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri7(
-      label: '¿Come sólo la mayoría de las veces?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[6]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri7,
+      value: widget.valueNotifierNutri7.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri7 = newValue;
+          widget.valueNotifierNutri7.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // -----------------------------------------NUTRI 8 -----------------------------------------------------
-class LabeledCheckboxNutri8 extends StatelessWidget {
-  const LabeledCheckboxNutri8({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Nutri8 extends StatefulWidget {
-  Nutri8({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri8;
+
+  Nutri8({this.valueNotifierNutri8});
 
   @override
   Nutri8WidgetState createState() => Nutri8WidgetState();
@@ -940,70 +607,31 @@ class Nutri8 extends StatefulWidget {
 class Nutri8WidgetState extends State<Nutri8> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri8(
-      label: '¿Toma más de 2 vasos de agua o líquido por día?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[7]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri8,
+      value: widget.valueNotifierNutri8.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri8 = newValue;
+          widget.valueNotifierNutri8.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // -----------------------------------------NUTRI 8.1 -----------------------------------------------------
-class LabeledCheckboxNutri81 extends StatelessWidget {
-  const LabeledCheckboxNutri81({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Nutri81 extends StatefulWidget {
-  Nutri81({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri81;
+
+  Nutri81({this.valueNotifierNutri81});
 
   @override
   Nutri81WidgetState createState() => Nutri81WidgetState();
@@ -1012,71 +640,31 @@ class Nutri81 extends StatefulWidget {
 class Nutri81WidgetState extends State<Nutri81> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri8(
-      label: '¿Toma menos 2 vasos de agua o líquido por día?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[10]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri81,
+      value: widget.valueNotifierNutri81.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri81 = newValue;
+          widget.valueNotifierNutri81.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //-------------------------------------------- NUTRI 9 -----------------------------------------------------------
 
-class LabeledCheckboxNutri9 extends StatelessWidget {
-  const LabeledCheckboxNutri9({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri9 extends StatefulWidget {
-  Nutri9({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri9;
+
+  Nutri9({this.valueNotifierNutri9});
 
   @override
   Nutri9WidgetState createState() => Nutri9WidgetState();
@@ -1085,71 +673,31 @@ class Nutri9 extends StatefulWidget {
 class Nutri9WidgetState extends State<Nutri9> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri9(
-      label: '¿Ha ganado (sin querer) 5 kg de peso en los últimos  seis meses?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[8]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri9,
+      value: widget.valueNotifierNutri9.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri9 = newValue;
+          widget.valueNotifierNutri9.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //-------------------------------------------- NUTRI 9.1 -----------------------------------------------------------
 
-class LabeledCheckboxNutri91 extends StatelessWidget {
-  const LabeledCheckboxNutri91({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nutri91 extends StatefulWidget {
-  Nutri91({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri91;
+
+  Nutri91({this.valueNotifierNutri91});
 
   @override
   Nutri91WidgetState createState() => Nutri91WidgetState();
@@ -1158,90 +706,54 @@ class Nutri91 extends StatefulWidget {
 class Nutri91WidgetState extends State<Nutri91> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri9(
-      label:
-          '¿Ha perdido (sin querer) 5 kg de peso en los últimos  seis meses?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[11]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri91,
+      value: widget.valueNotifierNutri91.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri91 = newValue;
+          widget.valueNotifierNutri91.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // -------------------------------------------NUTRI 10 --------------------------------------------
-class LabeledCheckboxNutri10 extends StatelessWidget {
-  const LabeledCheckboxNutri10({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Nutri10 extends StatefulWidget {
-  Nutri10({Key key}) : super(key: key);
+  ValueNotifier<bool> valueNotifierNutri10;
+
+  Nutri10({this.valueNotifierNutri10});
 
   @override
   Nutri10WidgetState createState() => Nutri10WidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class Nutri10WidgetState extends State<Nutri10> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNutri10(
-      label:
-          '¿Cree que tiene más problemas de nutrición que la mayoría de la gente?',
+    return LabeledCheckboxGeneric(
+      label: respuestaNutricional[9]["nombre_evento"],
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: nutri10,
+      value: widget.valueNotifierNutri10.value,
       onChanged: (bool newValue) {
         setState(() {
-          nutri10 = newValue;
+          widget.valueNotifierNutri10.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }

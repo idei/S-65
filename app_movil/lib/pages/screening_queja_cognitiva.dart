@@ -1,3 +1,4 @@
+import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 
 class ScreeningBPage extends StatefulWidget {
   @override
@@ -22,55 +23,17 @@ var id_recordatorio;
 var email;
 var screening_recordatorio;
 
+List dataScreeningQC = [];
+
 class _ScreeningBState extends State<ScreeningBPage> {
-  double _animatedHeight = 0.0;
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
-    print(email);
-
-    Map parametros = ModalRoute.of(context).settings.arguments;
-
-    get_tiposcreening(parametros["tipo_screening"]);
-
-    if (parametros["bandera"] == "recordatorio") {
-      screening_recordatorio = true;
-      id_recordatorio = parametros["id_recordatorio"];
-      id_paciente = id_paciente;
-      id_medico = parametros["id_medico"];
-      tipo_screening = parametros["tipo_screening"];
-    } else {
-      if (parametros["bandera"] == "screening_nuevo") {
-        screening_recordatorio = false;
-        id_paciente = id_paciente;
-        id_recordatorio = null;
-        id_medico = null;
-        //tipo_screening = parametros["tipo_screening"];
-      }
-    }
-  }
-
-  get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
-      "codigo_screening": codigo_screening,
-    });
-    print(response);
-    var jsonDate = json.decode(response.body);
-    print(jsonDate);
-    tipo_screening = jsonDate['data'];
-  }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _alert_clinicos(context, "Cuestionario de Quejas Cognitivas",
-          "Este cuestionario explora sobre posibles y actuales quejas cognitivas, por ejemplo que ultimamente hay a notado que se olvida más que antes o que está mnás disperso. Deberà elegir la opción que describa la frecuencia en que dicha queja aparece en su rutina."),
+      (_) => alert_screenings_generico(
+          context,
+          "Cuestionario de Quejas Cognitivas",
+          "Este cuestionario explora sobre posibles y actuales quejas cognitivas, por ejemplo que ultimamente hay a notado que se olvida más que antes o que está más disperso. Deberà elegir la opción que describa la frecuencia en que dicha queja aparece en su rutina."),
     );
   }
 
@@ -109,7 +72,7 @@ class _ScreeningBState extends State<ScreeningBPage> {
         ],
       ),
       body: FutureBuilder(
-          future: read_recordatorios(),
+          future: getAllRespuestaQC(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return ScreeningQCQ();
@@ -124,6 +87,63 @@ class _ScreeningBState extends State<ScreeningBPage> {
     );
   }
 
+  getAllRespuestaQC() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_quejas";
+    var response = await http.post(url, body: {});
+
+    var jsonDate = json.decode(response.body);
+
+    if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+      //setState(() {
+      dataScreeningQC = jsonDate['data'];
+      //});
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email_prefer = prefs.getString("email_prefer");
+    email = email_prefer;
+    id_paciente = prefs.getInt("id_paciente");
+    print(email);
+
+    Map parametros = ModalRoute.of(context).settings.arguments;
+
+    get_tiposcreening(parametros["tipo_screening"]);
+
+    if (parametros["bandera"] == "recordatorio") {
+      screening_recordatorio = true;
+      id_recordatorio = parametros["id_recordatorio"];
+      id_paciente = id_paciente;
+      id_medico = parametros["id_medico"];
+      tipo_screening = parametros["tipo_screening"];
+    } else {
+      if (parametros["bandera"] == "screening_nuevo") {
+        screening_recordatorio = false;
+        id_paciente = id_paciente;
+        id_recordatorio = null;
+        id_medico = null;
+        //tipo_screening = parametros["tipo_screening"];
+      }
+    }
+  }
+
+  get_tiposcreening(var codigo_screening) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
+    var response = await http.post(url, body: {
+      "codigo_screening": codigo_screening,
+    });
+
+    var jsonDate = json.decode(response.body);
+
+    tipo_screening = jsonDate['data'];
+  }
+
   choiceAction(String choice) {
     if (choice == Constants.Ajustes) {
       Navigator.pushNamed(context, '/ajustes');
@@ -131,67 +151,6 @@ class _ScreeningBState extends State<ScreeningBPage> {
       Navigator.pushNamed(context, '/');
     }
   }
-}
-
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
-_alert_clinicos(context, title, descripcion) {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () => Navigator.pop(context),
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-_alert_informe(context, title, descripcion) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "QCQ",
-            });
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-read_recordatorios() async {
-  await Future.delayed(Duration(milliseconds: 500));
-  return true;
 }
 
 //----------------------------------------Screening de Quejas Cognitivas ------------------------------------------
@@ -203,7 +162,6 @@ class ScreeningQCQ extends StatefulWidget {
   ScreeningQCQWidgetState createState() => ScreeningQCQWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
   final _formKey_quejas_cognitivas = GlobalKey<FormState>();
 
@@ -220,10 +178,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
               margin: EdgeInsets.all(10),
               elevation: 10,
               child: ClipRRect(
-                // Los bordes del contenido del card se cortan usando BorderRadius
                 borderRadius: BorderRadius.circular(15),
-
-                // EL widget hijo que será recortado segun la propiedad anterior
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -1335,12 +1290,17 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
   }
 }
 
-class CustomDivider extends StatelessWidget {
+class CustomDivider extends StatefulWidget {
   var text;
   var color;
 
   CustomDivider({this.text, this.color});
 
+  @override
+  State<CustomDivider> createState() => _CustomDividerState();
+}
+
+class _CustomDividerState extends State<CustomDivider> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1351,12 +1311,12 @@ class CustomDivider extends StatelessWidget {
           Expanded(
               child: Divider(
             thickness: 5,
-            color: color,
+            color: widget.color,
           )),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Text(
-              text,
+              widget.text,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1366,7 +1326,7 @@ class CustomDivider extends StatelessWidget {
           Expanded(
               child: Divider(
             thickness: 5,
-            color: color,
+            color: widget.color,
           )),
         ],
       ),
@@ -1384,192 +1344,122 @@ loginToast(String toast) {
 }
 
 guardarDatos(BuildContext context) async {
-  if (id_ate1 == null) {
-    loginToast("Debe responder si los item de atención");
-  } else {
-    if (id_ate2 == null) {
-      loginToast("Debe responder si los item de atención");
-    } else {
-      if (id_ate3 == null) {
-        loginToast("Debe responder si los item de atención");
-      } else {
-        if (id_ate4 == null) {
-          loginToast("Debe responder si los item de atención");
-        } else {
-          if (id_funejec1 == null) {
-            loginToast("Debe responder si los item de Funciones Ejecutivas");
-          } else {
-            if (id_funejec2 == null) {
-              loginToast("Debe responder si los item de Funciones Ejecutivas");
-            } else {
-              if (id_funejec3 == null) {
-                loginToast(
-                    "Debe responder si los item de Funciones Ejecutivas");
-              } else {
-                if (id_funejec4 == null) {
-                  loginToast(
-                      "Debe responder si los item de Funciones Ejecutivas");
-                } else {
-                  if (id_ori1 == null) {
-                    loginToast("Debe responder si los item de Orientación");
-                  } else {
-                    if (id_ori2 == null) {
-                      loginToast("Debe responder si los item de Orientación");
-                    } else {
-                      if (id_ori3 == null) {
-                        loginToast("Debe responder si los item de Orientación");
-                      } else {
-                        if (id_ori4 == null) {
-                          loginToast(
-                              "Debe responder si los item de Orientación");
-                        } else {
-                          if (id_memoria1 == null) {
-                            loginToast("Debe responder si los item de Memoria");
-                          } else {
-                            if (id_memoria2 == null) {
-                              loginToast(
-                                  "Debe responder si los item de Memoria");
-                            } else {
-                              if (id_memoria3 == null) {
-                                loginToast(
-                                    "Debe responder si los item de Memoria");
-                              } else {
-                                if (id_memoria4 == null) {
-                                  loginToast(
-                                      "Debe responder si los item de Memoria");
-                                } else {
-                                  if (id_prexgnosia1 == null) {
-                                    loginToast(
-                                        "Debe responder si los item de Praxias y Gnosias");
-                                  } else {
-                                    if (id_prexgnosia2 == null) {
-                                      loginToast(
-                                          "Debe responder si los item de Praxias y Gnosias");
-                                    } else {
-                                      if (id_prexgnosia3 == null) {
-                                        loginToast(
-                                            "Debe responder si los item de Praxias y Gnosias");
-                                      } else {
-                                        if (id_prexgnosia4 == null) {
-                                          loginToast(
-                                              "Debe responder si los item de Praxias y Gnosias");
-                                        } else {
-                                          if (id_leng1 == null) {
-                                            loginToast(
-                                                "Debe responder si los item de Lenguajes");
-                                          } else {
-                                            if (id_leng2 == null) {
-                                              loginToast(
-                                                  "Debe responder si los item de Lenguajes");
-                                            } else {
-                                              if (id_leng3 == null) {
-                                                loginToast(
-                                                    "Debe responder si los item de Lenguajes");
-                                              } else {
-                                                if (id_leng4 == null) {
-                                                  loginToast(
-                                                      "Debe responder si los item de Lenguajes");
-                                                } else {
-                                                  String URL_base = Env.URL_API;
-                                                  var url = URL_base +
-                                                      "/respuesta_screening_quejas";
-                                                  var response = await http
-                                                      .post(url, body: {
-                                                    "id_paciente":
-                                                        id_paciente.toString(),
-                                                    "id_medico":
-                                                        id_medico.toString(),
-                                                    "id_recordatorio":
-                                                        id_recordatorio
-                                                            .toString(),
-                                                    "tipo_screening":
-                                                        tipo_screening
-                                                            .toString(),
-                                                    "id_ate1": id_ate1,
-                                                    "id_ate2": id_ate2,
-                                                    "id_ate3": id_ate3,
-                                                    "id_ate4": id_ate4,
-                                                    "id_ori1": id_ori1,
-                                                    "id_ori2": id_ori2,
-                                                    "id_ori3": id_ori3,
-                                                    "id_ori4": id_ori4,
-                                                    "id_funejec1": id_funejec1,
-                                                    "id_funejec2": id_funejec2,
-                                                    "id_funejec3": id_funejec3,
-                                                    "id_funejec4": id_funejec4,
-                                                    "id_memoria1": id_memoria1,
-                                                    "id_memoria2": id_memoria2,
-                                                    "id_memoria3": id_memoria3,
-                                                    "id_memoria4": id_memoria4,
-                                                    "id_prexgnosia1":
-                                                        id_prexgnosia1,
-                                                    "id_prexgnosia2":
-                                                        id_prexgnosia2,
-                                                    "id_prexgnosia3":
-                                                        id_prexgnosia3,
-                                                    "id_prexgnosia4":
-                                                        id_prexgnosia4,
-                                                    "id_leng1": id_leng1,
-                                                    "id_leng2": id_leng2,
-                                                    "id_leng3": id_leng3,
-                                                    "id_leng4": id_leng4,
-                                                  });
-
-                                                  var data = json
-                                                      .decode(response.body);
-
-                                                  if (data['data'] == "alert") {
-                                                    _alert_informe(
-                                                      context,
-                                                      "Para tener en cuenta",
-                                                      "Sería bueno que consulte con su médico clínico o neurologo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.",
-                                                    );
-                                                  } else {
-                                                    if (screening_recordatorio ==
-                                                        true) {
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/recordatorio');
-                                                    } else {
-                                                      Navigator.pushNamed(
-                                                          context, '/screening',
-                                                          arguments: {
-                                                            "select_screening":
-                                                                "QCQ",
-                                                          });
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  if (id_ate1 == null ||
+      id_ate2 == null ||
+      id_ate3 == null ||
+      id_ate4 == null) {
+    loginToast("Debe responder si los item de Atención");
+    return;
   }
+
+  if (id_funejec1 == null ||
+      id_funejec2 == null ||
+      id_funejec3 == null ||
+      id_funejec4 == null) {
+    loginToast("Debe responder si los item de Funciones Ejecutivas");
+    return;
+  }
+
+  if (id_ori1 == null ||
+      id_ori2 == null ||
+      id_ori3 == null ||
+      id_ori4 == null) {
+    loginToast("Debe responder si los item de Orientación");
+    return;
+  }
+
+  if (id_memoria1 == null ||
+      id_memoria2 == null ||
+      id_memoria3 == null ||
+      id_memoria4 == null) {
+    loginToast("Debe responder si los item de Memoria");
+    return;
+  }
+
+  if (id_prexgnosia1 == null ||
+      id_prexgnosia2 == null ||
+      id_prexgnosia3 == null ||
+      id_prexgnosia4 == null) {
+    loginToast("Debe responder si los item de Praxias y Gnosias");
+    return;
+  }
+
+  if (id_leng1 == null ||
+      id_leng2 == null ||
+      id_leng3 == null ||
+      id_leng4 == null) {
+    loginToast("Debe responder si los item de Lenguajes");
+    return;
+  }
+
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta_screening_quejas";
+  var response = await http.post(url, body: {
+    "id_paciente": id_paciente.toString(),
+    "id_medico": id_medico.toString(),
+    "id_recordatorio": id_recordatorio.toString(),
+    "tipo_screening": tipo_screening.toString(),
+    "id_ate1": id_ate1,
+    "id_ate2": id_ate2,
+    "id_ate3": id_ate3,
+    "id_ate4": id_ate4,
+    "id_ori1": id_ori1,
+    "id_ori2": id_ori2,
+    "id_ori3": id_ori3,
+    "id_ori4": id_ori4,
+    "id_funejec1": id_funejec1,
+    "id_funejec2": id_funejec2,
+    "id_funejec3": id_funejec3,
+    "id_funejec4": id_funejec4,
+    "id_memoria1": id_memoria1,
+    "id_memoria2": id_memoria2,
+    "id_memoria3": id_memoria3,
+    "id_memoria4": id_memoria4,
+    "id_prexgnosia1": id_prexgnosia1,
+    "id_prexgnosia2": id_prexgnosia2,
+    "id_prexgnosia3": id_prexgnosia3,
+    "id_prexgnosia4": id_prexgnosia4,
+    "id_leng1": id_leng1,
+    "id_leng2": id_leng2,
+    "id_leng3": id_leng3,
+    "id_leng4": id_leng4,
+  });
+
+  var data = json.decode(response.body);
+  String mensajeCQC;
+
+  if (data['data'] == "mas_20") {
+    mensajeCQC =
+        "Sería bueno que consulte con su médico clínico o neurólogo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.";
+  }
+
+  if (data['data'] == "menos_20") {
+    mensajeCQC =
+        "En este momento no presenta quejas cognitivas significativas. Continue estimulando sus funciones cognitivas, como la memoria, con actividades desafiantes para su cerebro.";
+  }
+
+  showCustomAlert(
+    context,
+    "Para tener en cuenta",
+    mensajeCQC,
+    true,
+    () {
+      if (screening_recordatorio == true) {
+        Navigator.pushNamed(context, '/recordatorio');
+      } else {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "QCQ",
+        });
+      }
+    },
+  );
 }
 
 //----------------------------------------ATENCION 1------------------------------------------------------------------------------------------
-var id_ate1 = null;
-var id_ate2 = null;
-var id_ate3 = null;
-var id_ate4 = null;
+var id_ate1;
+var id_ate2;
+var id_ate3;
+var id_ate4;
 
 class Atencion1 extends StatefulWidget {
   @override
@@ -1577,38 +1467,21 @@ class Atencion1 extends StatefulWidget {
 }
 
 class Atencion1WidgetState extends State<Atencion1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ate1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ate1,
                   title: Text(list['respuesta']),
@@ -1632,38 +1505,21 @@ class Atencion2 extends StatefulWidget {
 }
 
 class Atencion2WidgetState extends State<Atencion2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ate2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ate2,
                   title: Text(list['respuesta']),
@@ -1687,38 +1543,21 @@ class Atencion3 extends StatefulWidget {
 }
 
 class Atencion3WidgetState extends State<Atencion3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ate3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ate3,
                   title: Text(list['respuesta']),
@@ -1742,38 +1581,21 @@ class Atencion4 extends StatefulWidget {
 }
 
 class Atencion4WidgetState extends State<Atencion4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ate4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ate4,
                   title: Text(list['respuesta']),
@@ -1793,10 +1615,10 @@ class Atencion4WidgetState extends State<Atencion4> {
 
 //--------------------------------------------------------------------------------------------
 ////----------------------------------------ORIENTACION ------------------------------------------------------------------------------------------
-var id_ori1 = null;
-var id_ori2 = null;
-var id_ori3 = null;
-var id_ori4 = null;
+var id_ori1;
+var id_ori2;
+var id_ori3;
+var id_ori4;
 
 class Orientacion1 extends StatefulWidget {
   @override
@@ -1804,38 +1626,21 @@ class Orientacion1 extends StatefulWidget {
 }
 
 class Orientacion1WidgetState extends State<Orientacion1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ori1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ori1,
                   title: Text(list['respuesta']),
@@ -1859,38 +1664,21 @@ class Orientacion2 extends StatefulWidget {
 }
 
 class Orientacion2WidgetState extends State<Orientacion2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ori2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ori2,
                   title: Text(list['respuesta']),
@@ -1914,38 +1702,21 @@ class Orientacion3 extends StatefulWidget {
 }
 
 class Orientacion3WidgetState extends State<Orientacion3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ori3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ori3,
                   title: Text(list['respuesta']),
@@ -1969,38 +1740,21 @@ class Orientacion4 extends StatefulWidget {
 }
 
 class Orientacion4WidgetState extends State<Orientacion4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_ori4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_ori4,
                   title: Text(list['respuesta']),
@@ -2021,10 +1775,10 @@ class Orientacion4WidgetState extends State<Orientacion4> {
 //-----------------------------------------------------------------------------
 //
 ////----------------------------------------ATENCION 1------------------------------------------------------------------------------------------
-var id_funejec1 = null;
-var id_funejec2 = null;
-var id_funejec3 = null;
-var id_funejec4 = null;
+var id_funejec1;
+var id_funejec2;
+var id_funejec3;
+var id_funejec4;
 
 class FunEjec1 extends StatefulWidget {
   @override
@@ -2032,38 +1786,21 @@ class FunEjec1 extends StatefulWidget {
 }
 
 class FunEjec1WidgetState extends State<FunEjec1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_funejec1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_funejec1,
                   title: Text(list['respuesta']),
@@ -2087,38 +1824,21 @@ class FunEjec2 extends StatefulWidget {
 }
 
 class FunEjec2WidgetState extends State<FunEjec2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_funejec2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_funejec2,
                   title: Text(list['respuesta']),
@@ -2142,38 +1862,21 @@ class FunEjec3 extends StatefulWidget {
 }
 
 class FunEjec3WidgetState extends State<FunEjec3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_funejec3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_funejec3,
                   title: Text(list['respuesta']),
@@ -2197,38 +1900,21 @@ class FunEjec4 extends StatefulWidget {
 }
 
 class FunEjec4WidgetState extends State<FunEjec4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_funejec4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_funejec4,
                   title: Text(list['respuesta']),
@@ -2249,10 +1935,10 @@ class FunEjec4WidgetState extends State<FunEjec4> {
 //-----------------------------------------------------------------
 //
 ////----------------------------------------MEMORIA ------------------------------------------------------------------------------------------
-var id_memoria1 = null;
-var id_memoria2 = null;
-var id_memoria3 = null;
-var id_memoria4 = null;
+var id_memoria1;
+var id_memoria2;
+var id_memoria3;
+var id_memoria4;
 
 class Memoria1 extends StatefulWidget {
   @override
@@ -2260,38 +1946,21 @@ class Memoria1 extends StatefulWidget {
 }
 
 class Memoria1WidgetState extends State<Memoria1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_memoria1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_memoria1,
                   title: Text(list['respuesta']),
@@ -2315,38 +1984,21 @@ class Memoria2 extends StatefulWidget {
 }
 
 class Memoria2WidgetState extends State<Memoria2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_memoria2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_memoria2,
                   title: Text(list['respuesta']),
@@ -2370,38 +2022,21 @@ class Memoria3 extends StatefulWidget {
 }
 
 class Memoria3WidgetState extends State<Memoria3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_memoria3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_memoria3,
                   title: Text(list['respuesta']),
@@ -2425,38 +2060,21 @@ class Memoria4 extends StatefulWidget {
 }
 
 class Memoria4WidgetState extends State<Memoria4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_memoria4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_memoria4,
                   title: Text(list['respuesta']),
@@ -2475,11 +2093,11 @@ class Memoria4WidgetState extends State<Memoria4> {
 }
 
 //-------------------------------------------------------------------------
-//////----------------------------------------MEMORIA ------------------------------------------------------------------------------------------
-var id_prexgnosia1 = null;
-var id_prexgnosia2 = null;
-var id_prexgnosia3 = null;
-var id_prexgnosia4 = null;
+//////----------------------------------------PraxiaGnosia ------------------------------------------------------------------------------------------
+var id_prexgnosia1;
+var id_prexgnosia2;
+var id_prexgnosia3;
+var id_prexgnosia4;
 
 class PraxiaGnosia1 extends StatefulWidget {
   @override
@@ -2487,38 +2105,21 @@ class PraxiaGnosia1 extends StatefulWidget {
 }
 
 class PraxiaGnosia1WidgetState extends State<PraxiaGnosia1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_prexgnosia1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_prexgnosia1,
                   title: Text(list['respuesta']),
@@ -2542,38 +2143,21 @@ class PraxiaGnosia2 extends StatefulWidget {
 }
 
 class PraxiaGnosia2WidgetState extends State<PraxiaGnosia2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_prexgnosia2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_prexgnosia2,
                   title: Text(list['respuesta']),
@@ -2597,38 +2181,21 @@ class PraxiaGnosia3 extends StatefulWidget {
 }
 
 class PraxiaGnosia3WidgetState extends State<PraxiaGnosia3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_prexgnosia3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_prexgnosia3,
                   title: Text(list['respuesta']),
@@ -2652,38 +2219,21 @@ class PraxiaGnosia4 extends StatefulWidget {
 }
 
 class PraxiaGnosia4WidgetState extends State<PraxiaGnosia4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_prexgnosia4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_prexgnosia4,
                   title: Text(list['respuesta']),
@@ -2714,38 +2264,21 @@ class Lenguaje1 extends StatefulWidget {
 }
 
 class Lenguaje1WidgetState extends State<Lenguaje1> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_leng1 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_leng1,
                   title: Text(list['respuesta']),
@@ -2769,38 +2302,21 @@ class Lenguaje2 extends StatefulWidget {
 }
 
 class Lenguaje2WidgetState extends State<Lenguaje2> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_leng2 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_leng2,
                   title: Text(list['respuesta']),
@@ -2824,38 +2340,21 @@ class Lenguaje3 extends StatefulWidget {
 }
 
 class Lenguaje3WidgetState extends State<Lenguaje3> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_leng3 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_leng3,
                   title: Text(list['respuesta']),
@@ -2879,38 +2378,21 @@ class Lenguaje4 extends StatefulWidget {
 }
 
 class Lenguaje4WidgetState extends State<Lenguaje4> {
-  List data = List();
-  var list_view_alcohol;
-
-  getAllRespuesta() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    setState(() {
-      data = jsonDate['data'];
-    });
-    print(jsonDate);
-  }
-
   @override
   void initState() {
-    getAllRespuesta();
+    id_leng4 = null;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      // width: 350,
       child: ListView(
-        key: list_view_alcohol,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
-        children: data
+        children: dataScreeningQC
             .map((list) => RadioListTile(
                   groupValue: id_leng4,
                   title: Text(list['respuesta']),

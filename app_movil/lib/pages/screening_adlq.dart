@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
+import '../widgets/alert_informe.dart';
 import 'env.dart';
 
 var id_paciente;
@@ -20,9 +21,13 @@ class ScreeningADLQPage extends StatefulWidget {
 
 class _ScreeningADLQState extends State<ScreeningADLQPage> {
   @override
-  Widget build(BuildContext context) {
-    getStringValuesSF(context);
+  void initState() {
+    super.initState();
+    getStringValuesSF();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -35,7 +40,9 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
             ),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/menu_chequeo');
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "ADLQ",
+            });
           },
         ),
         title: Text('Chequeo de Actividades de la Vida Diaria',
@@ -56,27 +63,80 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ColumnWidgetAlimentacion();
-            } else {
-              return Container(
-                alignment: Alignment.center,
-                child: Positioned(
-                  child: _isLoadingIcon(),
-                ),
-              );
-            }
-          },
-        ),
+      body: FutureBuilder(
+        future: getAllRespuestasADLQ(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: "Cargando",
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Container(
+              child: Center(
+                child: Text("Error: ${snapshot.error}"),
+              ),
+            );
+          } else if (snapshot.hasData) {
+            return ColumnWidgetAlimentacion();
+          } else {
+            return Container(
+              child: Center(
+                child: Text("No hay datos disponibles."),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
-  Future<List> getAllRespuesta() async {
+  //Funciones -----------------------------------------------------------
+
+  get_tiposcreening(var codigo_screening) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
+    var response = await http.post(url, body: {
+      "codigo_screening": codigo_screening,
+    });
+    if (response.statusCode == 200) {
+      var datatipo = json.decode(response.body);
+      tipo_screening = datatipo["data"];
+    } else {
+      loginToast("Ocurrió un problema");
+      print(tipo_screening);
+    }
+  }
+
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email_prefer = prefs.getString("email_prefer");
+    email = email_prefer;
+    id_paciente = prefs.getInt("id_paciente");
+
+    Map parametros = ModalRoute.of(context).settings.arguments;
+
+    get_tiposcreening(parametros["tipo_screening"]);
+
+    if (parametros["bandera"] == "recordatorio") {
+      screening_recordatorio = true;
+      id_recordatorio = parametros["id_recordatorio"];
+      id_paciente = id_paciente;
+      id_medico = parametros["id_medico"];
+      tipo_screening = parametros["tipo_screening"];
+    } else {
+      if (parametros["bandera"] == "screening_nuevo") {
+        screening_recordatorio = false;
+        id_paciente = id_paciente;
+        id_recordatorio = null;
+        id_medico = null;
+        //tipo_screening = parametros["tipo_screening"];
+      }
+    }
+  }
+
+  Future<List> getAllRespuestasADLQ() async {
     var response;
 
     String URL_base = Env.URL_API;
@@ -87,7 +147,6 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
     var jsonData = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      await Future.delayed(Duration(milliseconds: 500));
       return itemsRespuestasADLQ = jsonData['data'];
     } else {
       return null;
@@ -100,24 +159,6 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
     } else if (choice == Constants.Salir) {
       Navigator.pushNamed(context, '/');
     }
-  }
-}
-
-class _isLoadingIcon extends StatelessWidget {
-  const _isLoadingIcon({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-      child: const CircularProgressIndicator(color: Colors.blue),
-    );
   }
 }
 
@@ -166,7 +207,6 @@ class ColumnWidgetAlimentacion extends StatefulWidget {
   const ColumnWidgetAlimentacion({
     Key key,
   }) : super(key: key);
-
   @override
   State<ColumnWidgetAlimentacion> createState() =>
       _ColumnWidgetAlimentacionState();
@@ -174,900 +214,952 @@ class ColumnWidgetAlimentacion extends StatefulWidget {
 
 class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
+        context,
+        "Chequeo Actividades de la Vida Diaria",
+        "El ADLQ es un cuestionario de ACTIVIDADES DE LA VIDA DIARIA que idealmente debe ser respondida por un familiar cercano, cuidador o persona de referencia para poder informar adecuadamente sobre el desenvolvimiento de la persona en diferentes aspectos de la vida diaria al momento actual. Consigna: seleccione la opción que mejor describa a la persona al día de la fecha"));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Container(
-        padding: EdgeInsets.only(top: 20.0), // Padding superior de 20 puntos
-        child: CustomDivider(
-          text: 'ACTIVIDADES DE AUTOCUIDADO',
-          color: Colors.red,
+    return SingleChildScrollView(
+      child: Column(children: [
+        Container(
+          padding: EdgeInsets.only(top: 20.0),
+          child: CustomDivider(
+            text: 'ACTIVIDADES DE AUTOCUIDADO',
+            color: Colors.red,
+          ),
         ),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Alimentarse',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Alimentarse',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
                 ),
-              ),
-              Alimentarse(),
-            ],
-          ),
-        ),
-      ),
-      //Divider(height: 5.0, color: Colors.black),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text('Vestido',
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily)),
-              ),
-              Vestirse(),
-            ],
-          ),
-        ),
-      ),
-      //Divider(height: 5.0, color: Colors.black),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text('Baño',
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily)),
-              ),
-              Bano(),
-            ],
-          ),
-        ),
-      ),
-      //Divider(height: 5.0, color: Colors.black),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text('Evacuación',
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily)),
-              ),
-              Evacuacion(),
-            ],
-          ),
-        ),
-      ),
-      //Divider(height: 5.0, color: Colors.black),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text('Tomar la Medicación',
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily)),
-              ),
-              TomarMedic(),
-            ],
-          ),
-        ),
-      ),
-      //Divider(height: 5.0, color: Colors.black),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.red,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Interés en su aspecto personal',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              AspectoPersonal(),
-            ],
-          ),
-        ),
-      ),
-
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Column(
-        children: [
-          Container(
-            child: CustomDivider(
-              text: 'CUIDADO Y MANEJO DEL HOGAR',
-              color: Colors.green,
+                Alimentarse(),
+              ],
             ),
           ),
-          Card(
-            shadowColor: Colors.green,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Preparación de comidas, cocinar',
+        ),
+        //Divider(height: 5.0, color: Colors.black),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Vestido',
                       style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                  ),
-                  PreparaComida(),
-                ],
-              ),
+                          fontFamily: Theme.of(context)
+                              .textTheme
+                              .headline1
+                              .fontFamily)),
+                ),
+                Vestirse(),
+              ],
             ),
           ),
-        ],
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Poner la Mesa',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        ),
+        //Divider(height: 5.0, color: Colors.black),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Baño',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context)
+                              .textTheme
+                              .headline1
+                              .fontFamily)),
                 ),
-              ),
-              PonerMesa(),
-            ],
+                Bano(),
+              ],
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Cuidados del Hogar',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        //Divider(height: 5.0, color: Colors.black),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Evacuación',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context)
+                              .textTheme
+                              .headline1
+                              .fontFamily)),
                 ),
-              ),
-              CuidadoHogar(),
-            ],
+                Evacuacion(),
+              ],
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Mantenimiento del Hogar',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        //Divider(height: 5.0, color: Colors.black),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Tomar la Medicación',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: Theme.of(context)
+                              .textTheme
+                              .headline1
+                              .fontFamily)),
                 ),
-              ),
-              AspectoPersonal(),
-            ],
+                TomarMedic(),
+              ],
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Arreglos del Hogar',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        //Divider(height: 5.0, color: Colors.black),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.red,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Interés en su aspecto personal',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
                 ),
-              ),
-              ArreglosHogar(),
-            ],
+                AspectoPersonal(),
+              ],
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Lavado de Ropa',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              LavadoRopa(),
-            ],
-          ),
-        ),
-      ),
 
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Column(
-        children: [
-          Container(
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Column(
+          children: [
+            Container(
               child: CustomDivider(
-            text: 'EMPLEO Y RECREACIÓN',
-            color: Colors.blue,
-          )),
-          Card(
-            shadowColor: Colors.blue,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Empleo',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                  ),
-                  Empleo(),
-                ],
+                text: 'CUIDADO Y MANEJO DEL HOGAR',
+                color: Colors.green,
               ),
             ),
-          ),
-        ],
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Recreación',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+            Card(
+              shadowColor: Colors.green,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Preparación de comidas, cocinar',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                    ),
+                    PreparaComida(),
+                  ],
                 ),
               ),
-              Recreacion(),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Reuniones (eventos laborales)',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.green,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Poner la Mesa',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
                 ),
-              ),
-              Reuniones(),
-            ],
+                PonerMesa(),
+              ],
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Viajes',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.green,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Cuidados del Hogar',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
                 ),
-              ),
-              Viajes(),
-            ],
+                CuidadoHogar(),
+              ],
+            ),
           ),
         ),
-      ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.green,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Mantenimiento del Hogar',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                AspectoPersonal(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.green,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Arreglos del Hogar',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                ArreglosHogar(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.green,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Lavado de Ropa',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                LavadoRopa(),
+              ],
+            ),
+          ),
+        ),
 
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Column(
-        children: [
-          Container(
-            child: CustomDivider(
-              text: 'COMPRAS Y DINERO',
-              color: Colors.yellow,
-            ),
-          ),
-          Card(
-            shadowColor: Colors.yellow,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Comprar Comida',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                  ),
-                  ComprarComida(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.yellow,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Manejo de Efectivo',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              ManejoEfectivo(),
-            ],
-          ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.yellow,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Manejo de Finanzas',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              ManejoFinanzas(),
-            ],
-          ),
-        ),
-      ),
-
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Column(
-        children: [
-          CustomDivider(
-            text: 'VIAJAR',
-            color: Colors.deepPurple,
-          ),
-          Card(
-            shadowColor: Colors.deepPurple,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Transporte Público',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                  ),
-                  TransportePublico(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Conducir',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              Conducir(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Movilidad en el Barrio',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              MovilidadBarrio(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Viajar fuera del ambiente familiar (conocido)',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              ViajarFueraAmbiente(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Column(
-        children: [
-          Container(
-              child: CustomDivider(
-                  text: 'COMUNICACIÓN', color: Colors.deepOrange)),
-          Card(
-            shadowColor: Colors.deepOrange,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Uso del teléfono',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    ),
-                  ),
-                  UsoTelefono(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepOrange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Conversación',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              Conversacion(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepOrange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Comprensión',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              Comprension(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepOrange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Lectura',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              Lectura(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      Card(
-        shadowColor: Colors.deepOrange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Escritura',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily),
-                ),
-              ),
-              Escritura(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-      ),
-      ElevatedButton.icon(
-        icon: _isLoading
-            ? Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: const CircularProgressIndicator(),
-              )
-            : const Icon(Icons.save_alt),
-        style: ElevatedButton.styleFrom(
-          textStyle: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
-        ),
-        onPressed: () => !_isLoading ? _startLoading() : null,
-        label: Text('GUARDAR',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              fontWeight: FontWeight.bold,
+        Column(
+          children: [
+            Container(
+                child: CustomDivider(
+              text: 'EMPLEO Y RECREACIÓN',
+              color: Colors.blue,
             )),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-      ),
-    ]);
+            Card(
+              shadowColor: Colors.blue,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Empleo',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                    ),
+                    Empleo(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.blue,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Recreación',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Recreacion(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.blue,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Reuniones (eventos laborales)',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Reuniones(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.blue,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Viajes',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Viajes(),
+              ],
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Column(
+          children: [
+            Container(
+              child: CustomDivider(
+                text: 'COMPRAS Y DINERO',
+                color: Colors.yellow,
+              ),
+            ),
+            Card(
+              shadowColor: Colors.yellow,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Comprar Comida',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                    ),
+                    ComprarComida(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.yellow,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Manejo de Efectivo',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                ManejoEfectivo(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.yellow,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Manejo de Finanzas',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                ManejoFinanzas(),
+              ],
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Column(
+          children: [
+            CustomDivider(
+              text: 'VIAJAR',
+              color: Colors.deepPurple,
+            ),
+            Card(
+              shadowColor: Colors.deepPurple,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Transporte Público',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                    ),
+                    TransportePublico(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepPurple,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Conducir',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Conducir(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepPurple,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Movilidad en el Barrio',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                MovilidadBarrio(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepPurple,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Viajar fuera del ambiente familiar (conocido)',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                ViajarFueraAmbiente(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Column(
+          children: [
+            Container(
+                child: CustomDivider(
+                    text: 'COMUNICACIÓN', color: Colors.deepOrange)),
+            Card(
+              shadowColor: Colors.deepOrange,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Uso del teléfono',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      ),
+                    ),
+                    UsoTelefono(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepOrange,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Conversación',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Conversacion(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepOrange,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Comprensión',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Comprension(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepOrange,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Lectura',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Lectura(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.deepOrange,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Escritura',
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Escritura(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        ElevatedButton.icon(
+          icon: _isLoading
+              ? Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: const CircularProgressIndicator(),
+                )
+              : const Icon(Icons.save_alt),
+          style: ElevatedButton.styleFrom(
+            textStyle: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+          ),
+          onPressed: () => !_isLoading ? _startLoading() : null,
+          label: Text('GUARDAR',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontWeight: FontWeight.bold,
+              )),
+        ),
+        Padding(
+          padding: EdgeInsets.all(4.0),
+        ),
+      ]),
+    );
   }
 
   bool _isLoading = false;
@@ -1076,151 +1168,108 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
       _isLoading = true;
     });
 
-    await guardarDatosConductual(context);
+    await guardarDatosADLQ();
 
     setState(() {
       _isLoading = false;
     });
   }
-}
 
-get_tiposcreening(var codigo_screening) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/read_tipo_screening";
-  var response = await http.post(url, body: {
-    "codigo_screening": codigo_screening,
-  });
-  print(response);
-  var jsonDate = json.decode(response.body);
-  print(jsonDate);
-  tipo_screening = jsonDate;
-}
+  guardarDatosADLQ() async {
+    if (id_alimentacion == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
+    if (id_arreglos_hogar == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_aspecto_personal == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_bano == null) loginToast("Debe responder todas las preguntas");
+    if (id_comprar_comida == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_comprension == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_conducir == null) loginToast("Debe responder todas las preguntas");
+    if (id_conversacion == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_cuidado_hogar == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_empleo == null) loginToast("Debe responder todas las preguntas");
+    if (id_escritura == null) loginToast("Debe responder todas las preguntas");
+    if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
+    if (id_lavado_ropa == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_lectura == null) loginToast("Debe responder todas las preguntas");
+    if (id_manejo_efectivo == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_manejo_finanzas == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_mantenimiento_hogar == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_movilidad_barrio == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
+    if (id_prepara_comida == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
+    if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
+    if (id_tomar_medicacion == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_transporte_publico == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_uso_telefono == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_viaje_fuera_ambiente == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_viajes == null) loginToast("Debe responder todas las preguntas");
 
-getStringValuesSF(BuildContext context) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email_prefer");
-  email = email_prefer;
-  id_paciente = prefs.getInt("id_paciente");
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_adlq";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening,
+      "id_alimentacion": id_alimentacion.toString(),
+      "id_vestimenta": id_vestimenta.toString(),
+      "id_arreglos_hogar": id_arreglos_hogar.toString(),
+      "id_aspecto_personal": id_aspecto_personal.toString(),
+      "id_bano": id_bano.toString(),
+      "id_comprar_comida": id_comprar_comida.toString(),
+      "id_comprension": id_comprension.toString(),
+      "id_conducir": id_conducir.toString(),
+      "id_conversacion": id_conversacion.toString(),
+      "id_cuidado_hogar": id_cuidado_hogar.toString(),
+      "id_empleo": id_empleo.toString(),
+      "id_escritura": id_escritura.toString(),
+      "id_evacuacion": id_evacuacion.toString(),
+      "id_lavado_ropa": id_lavado_ropa.toString(),
+      "id_lectura": id_lectura.toString(),
+      "id_manejo_efectivo": id_manejo_efectivo.toString(),
+      "id_manejo_finanzas": id_manejo_finanzas.toString(),
+      "id_mantenimiento_hogar": id_mantenimiento_hogar.toString(),
+      "id_movilidad_barrio": id_movilidad_barrio.toString(),
+      "id_poner_mesa": id_poner_mesa.toString(),
+      "id_prepara_comida": id_prepara_comida.toString(),
+      "id_recreacion": id_recreacion.toString(),
+      "id_reuniones": id_reuniones.toString(),
+      "id_tomar_medicacion": id_tomar_medicacion.toString(),
+      "id_transporte_publico": id_transporte_publico.toString(),
+      "id_uso_telefono": id_uso_telefono.toString(),
+      "id_viaje_fuera_ambiente": id_viaje_fuera_ambiente.toString(),
+      "id_viajes": id_viajes.toString(),
+    });
 
-  Map parametros = ModalRoute.of(context).settings.arguments;
+    if (response.statusCode == 200) {
+      var responseDecoder = json.decode(response.body);
 
-  get_tiposcreening(parametros["tipo_screening"]);
-
-  if (parametros["bandera"] == "recordatorio") {
-    screening_recordatorio = true;
-    id_recordatorio = parametros["id_recordatorio"];
-    id_paciente = id_paciente;
-    id_medico = parametros["id_medico"];
-    tipo_screening = parametros["tipo_screening"];
-  } else {
-    if (parametros["bandera"] == "screening_nuevo") {
-      screening_recordatorio = false;
-      id_paciente = id_paciente;
-      id_recordatorio = null;
-      id_medico = null;
-      //tipo_screening = parametros["tipo_screening"];
-    }
-  }
-}
-
-guardarDatosConductual(BuildContext context) async {
-  if (id_alimentacion == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_arreglos_hogar == null)
-    loginToast("Debe responder todas las preguntas");
-
-  if (id_aspecto_personal == null)
-    loginToast("Debe responder todas las preguntas");
-
-  if (id_bano == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_comprar_comida == null)
-    loginToast("Debe responder todas las preguntas");
-
-  if (id_comprension == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_conducir == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_conversacion == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_cuidado_hogar == null)
-    loginToast("Debe responder todas las preguntas");
-
-  if (id_empleo == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_escritura == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_lavado_ropa == null) loginToast("Debe responder todas las preguntas");
-
-  if (id_lectura == null) loginToast("Debe responder todas las preguntas");
-  if (id_manejo_efectivo == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_manejo_finanzas == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_mantenimiento_hogar == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_movilidad_barrio == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
-  if (id_prepara_comida == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
-  if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
-  if (id_tomar_medicacion == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_transporte_publico == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_uso_telefono == null) loginToast("Debe responder todas las preguntas");
-  if (id_viaje_fuera_ambiente == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_viajes == null) loginToast("Debe responder todas las preguntas");
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/respuesta_screening_quejas";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente.toString(),
-    "id_medico": id_medico.toString(),
-    "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening.toString(),
-    "id_alimentacion": id_alimentacion,
-    "id_vestimenta": id_vestimenta,
-    "id_arreglos_hogar": id_arreglos_hogar,
-    "id_aspecto_personal": id_aspecto_personal,
-    "id_bano": id_bano,
-    "id_comprar_comida": id_comprar_comida,
-    "id_comprension": id_comprension,
-    "id_conducir": id_conducir,
-    "id_conversacion": id_conversacion,
-    "id_cuidado_hogar": id_cuidado_hogar,
-    "id_empleo": id_empleo,
-    "id_escritura": id_escritura,
-    "id_evacuacion": id_evacuacion,
-    "id_lavado_ropa": id_lavado_ropa,
-    "id_lectura": id_lectura,
-    "id_manejo_efectivo": id_manejo_efectivo,
-    "id_manejo_finanzas": id_manejo_finanzas,
-    "id_mantenimiento_hogar": id_mantenimiento_hogar,
-    "id_movilidad_barrio": id_movilidad_barrio,
-    "id_poner_mesa": id_poner_mesa,
-    "id_prepara_comida": id_prepara_comida,
-    "id_recreacion": id_recreacion,
-    "id_reuniones": id_reuniones,
-    "id_tomar_medicacion": id_tomar_medicacion,
-    "id_transporte_publico": id_transporte_publico,
-    "id_uso_telefono": id_uso_telefono,
-    "id_viaje_fuera_ambiente": id_viaje_fuera_ambiente,
-    "id_viajes": id_viajes,
-  });
-
-  if (response.statusCode == 200) {
-    var responseDecoder = json.decode(response.body);
-
-    if (responseDecoder['status'] == "Success") {
-      showDialogMessage(context);
+      if (responseDecoder['status'] == "Success") {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ADLQ",
+        });
+        _scaffold_messenger(context, "Screening Registrado", 1);
+      } else {
+        _scaffold_messenger(context, "No se pudo guardar el Chequeo", 2);
+      }
     }
   }
 }
@@ -1264,11 +1313,23 @@ loginToast(String toast) {
       textColor: Colors.white);
 }
 
+_scaffold_messenger(context, message, colorNumber) {
+  var color;
+  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: color,
+    content: Text(message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white)),
+  ));
+}
+
 //******************Respuestas************************
 
 // Alimentarse *******************
 
-var id_alimentacion = null;
+var id_alimentacion;
 
 class Alimentarse extends StatefulWidget {
   @override
@@ -1276,6 +1337,12 @@ class Alimentarse extends StatefulWidget {
 }
 
 class AlimentacionWidgetState extends State<Alimentarse> {
+  @override
+  void initState() {
+    id_alimentacion = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1290,7 +1357,6 @@ class AlimentacionWidgetState extends State<Alimentarse> {
               (list) => list['code'] == "ADLQ1" ||
                       list['code'] == "ADLQ2" ||
                       list['code'] == "ADLQ3" ||
-                      list['code'] == "ADLQ4" ||
                       list['code'] == "ADLQ5" ||
                       list['code'] == "ADLQ600"
                   ? RadioListTile(
@@ -1321,7 +1387,7 @@ class AlimentacionWidgetState extends State<Alimentarse> {
 // Vestirse *******************
 
 List itemsVestimenta;
-var id_vestimenta = null;
+var id_vestimenta;
 
 class Vestirse extends StatefulWidget {
   @override
@@ -1329,6 +1395,12 @@ class Vestirse extends StatefulWidget {
 }
 
 class VestirseWidgetState extends State<Vestirse> {
+  @override
+  void initState() {
+    id_vestimenta = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1372,7 +1444,7 @@ class VestirseWidgetState extends State<Vestirse> {
 
 // Bano *******************
 
-var id_bano = null;
+var id_bano;
 
 class Bano extends StatefulWidget {
   @override
@@ -1380,6 +1452,12 @@ class Bano extends StatefulWidget {
 }
 
 class BanoWidgetState extends State<Bano> {
+  @override
+  void initState() {
+    id_bano = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1421,7 +1499,7 @@ class BanoWidgetState extends State<Bano> {
 
 // Evacuacion *******************
 
-var id_evacuacion = null;
+var id_evacuacion;
 
 class Evacuacion extends StatefulWidget {
   @override
@@ -1429,6 +1507,12 @@ class Evacuacion extends StatefulWidget {
 }
 
 class EvacuacionWidgetState extends State<Evacuacion> {
+  @override
+  void initState() {
+    id_evacuacion = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1441,7 +1525,6 @@ class EvacuacionWidgetState extends State<Evacuacion> {
         children: itemsRespuestasADLQ
             .map((list) => list['code'] == "ADLQ13" ||
                     list['code'] == "ADLQ14" ||
-                    list['code'] == "ADLQ15" ||
                     list['code'] == "ADLQ16" ||
                     list['code'] == "ADLQ17" ||
                     list['code'] == "ADLQ600"
@@ -1471,7 +1554,7 @@ class EvacuacionWidgetState extends State<Evacuacion> {
 
 // Toma Medicacion *******************
 
-var id_tomar_medicacion = null;
+var id_tomar_medicacion;
 
 class TomarMedic extends StatefulWidget {
   @override
@@ -1479,6 +1562,12 @@ class TomarMedic extends StatefulWidget {
 }
 
 class TomarMedicWidgetState extends State<TomarMedic> {
+  @override
+  void initState() {
+    id_tomar_medicacion = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1521,7 +1610,7 @@ class TomarMedicWidgetState extends State<TomarMedic> {
 
 // Aspecto Personal *******************
 
-var id_aspecto_personal = null;
+var id_aspecto_personal;
 
 class AspectoPersonal extends StatefulWidget {
   @override
@@ -1529,6 +1618,12 @@ class AspectoPersonal extends StatefulWidget {
 }
 
 class AspectoPersonalWidgetState extends State<AspectoPersonal> {
+  @override
+  void initState() {
+    id_aspecto_personal = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1570,7 +1665,7 @@ class AspectoPersonalWidgetState extends State<AspectoPersonal> {
 
 // Preparacion de Comida *******************
 
-var id_prepara_comida = null;
+var id_prepara_comida;
 
 class PreparaComida extends StatefulWidget {
   @override
@@ -1578,6 +1673,12 @@ class PreparaComida extends StatefulWidget {
 }
 
 class PreparaComidaWidgetState extends State<PreparaComida> {
+  @override
+  void initState() {
+    id_prepara_comida = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1620,7 +1721,7 @@ class PreparaComidaWidgetState extends State<PreparaComida> {
 
 // Poner la Mesa *******************
 
-var id_poner_mesa = null;
+var id_poner_mesa;
 
 class PonerMesa extends StatefulWidget {
   @override
@@ -1628,6 +1729,12 @@ class PonerMesa extends StatefulWidget {
 }
 
 class PonerMesaWidgetState extends State<PonerMesa> {
+  @override
+  void initState() {
+    id_poner_mesa = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1670,7 +1777,7 @@ class PonerMesaWidgetState extends State<PonerMesa> {
 
 // Cuidados del Hogar *******************
 
-var id_cuidado_hogar = null;
+var id_cuidado_hogar;
 
 class CuidadoHogar extends StatefulWidget {
   @override
@@ -1678,6 +1785,12 @@ class CuidadoHogar extends StatefulWidget {
 }
 
 class CuidadoHogarWidgetState extends State<CuidadoHogar> {
+  @override
+  void initState() {
+    id_cuidado_hogar = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1720,7 +1833,7 @@ class CuidadoHogarWidgetState extends State<CuidadoHogar> {
 
 // Mantenimiento del Hogar *******************
 
-var id_mantenimiento_hogar = null;
+var id_mantenimiento_hogar;
 
 class MantenimientoHogar extends StatefulWidget {
   @override
@@ -1729,6 +1842,12 @@ class MantenimientoHogar extends StatefulWidget {
 }
 
 class MantenimientoHogarWidgetState extends State<MantenimientoHogar> {
+  @override
+  void initState() {
+    id_mantenimiento_hogar = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1771,7 +1890,7 @@ class MantenimientoHogarWidgetState extends State<MantenimientoHogar> {
 
 // Arreglos del Hogar *******************
 
-var id_arreglos_hogar = null;
+var id_arreglos_hogar;
 
 class ArreglosHogar extends StatefulWidget {
   @override
@@ -1779,6 +1898,12 @@ class ArreglosHogar extends StatefulWidget {
 }
 
 class ArreglosHogarWidgetState extends State<ArreglosHogar> {
+  @override
+  void initState() {
+    id_arreglos_hogar = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1821,7 +1946,7 @@ class ArreglosHogarWidgetState extends State<ArreglosHogar> {
 
 // Lavado de Ropa *******************
 
-var id_lavado_ropa = null;
+var id_lavado_ropa;
 
 class LavadoRopa extends StatefulWidget {
   @override
@@ -1829,6 +1954,12 @@ class LavadoRopa extends StatefulWidget {
 }
 
 class LavadoRopaWidgetState extends State<LavadoRopa> {
+  @override
+  void initState() {
+    id_lavado_ropa = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1869,7 +2000,7 @@ class LavadoRopaWidgetState extends State<LavadoRopa> {
 
 // Empleo *******************
 
-var id_empleo = null;
+var id_empleo;
 
 class Empleo extends StatefulWidget {
   @override
@@ -1877,6 +2008,12 @@ class Empleo extends StatefulWidget {
 }
 
 class EmpleoWidgetState extends State<Empleo> {
+  @override
+  void initState() {
+    id_empleo = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1920,7 +2057,7 @@ class EmpleoWidgetState extends State<Empleo> {
 
 // Recreacion *******************
 
-var id_recreacion = null;
+var id_recreacion;
 
 class Recreacion extends StatefulWidget {
   @override
@@ -1929,9 +2066,15 @@ class Recreacion extends StatefulWidget {
 
 class RecreacionWidgetState extends State<Recreacion> {
   @override
+  void initState() {
+    id_recreacion = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 400,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1941,7 +2084,6 @@ class RecreacionWidgetState extends State<Recreacion> {
             .map((list) => list['code'] == "ADLQ57" ||
                     list['code'] == "ADLQ58" ||
                     list['code'] == "ADLQ59" ||
-                    list['code'] == "ADLQ60" ||
                     list['code'] == "ADLQ61" ||
                     list['code'] == "ADLQ62" ||
                     list['code'] == "ADLQ600"
@@ -1971,7 +2113,7 @@ class RecreacionWidgetState extends State<Recreacion> {
 
 // Reuniones (eventos laborales) *******************
 
-var id_reuniones = null;
+var id_reuniones;
 
 class Reuniones extends StatefulWidget {
   @override
@@ -1979,6 +2121,12 @@ class Reuniones extends StatefulWidget {
 }
 
 class ReunionesWidgetState extends State<Reuniones> {
+  @override
+  void initState() {
+    id_reuniones = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2021,7 +2169,7 @@ class ReunionesWidgetState extends State<Reuniones> {
 
 // Viajes *******************
 
-var id_viajes = null;
+var id_viajes;
 
 class Viajes extends StatefulWidget {
   @override
@@ -2029,6 +2177,12 @@ class Viajes extends StatefulWidget {
 }
 
 class ViajesWidgetState extends State<Viajes> {
+  @override
+  void initState() {
+    id_viajes = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2071,7 +2225,7 @@ class ViajesWidgetState extends State<Viajes> {
 
 // Comprar Comida *******************
 
-var id_comprar_comida = null;
+var id_comprar_comida;
 
 class ComprarComida extends StatefulWidget {
   @override
@@ -2079,6 +2233,12 @@ class ComprarComida extends StatefulWidget {
 }
 
 class ComprarComidaWidgetState extends State<ComprarComida> {
+  @override
+  void initState() {
+    id_comprar_comida = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2121,7 +2281,7 @@ class ComprarComidaWidgetState extends State<ComprarComida> {
 
 // Manejo de Efectivo *******************
 
-var id_manejo_efectivo = null;
+var id_manejo_efectivo;
 
 class ManejoEfectivo extends StatefulWidget {
   @override
@@ -2129,6 +2289,12 @@ class ManejoEfectivo extends StatefulWidget {
 }
 
 class ManejoEfectivoWidgetState extends State<ManejoEfectivo> {
+  @override
+  void initState() {
+    id_manejo_efectivo = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2171,7 +2337,7 @@ class ManejoEfectivoWidgetState extends State<ManejoEfectivo> {
 
 // Manejo de Finanzas *******************
 
-var id_manejo_finanzas = null;
+var id_manejo_finanzas;
 
 class ManejoFinanzas extends StatefulWidget {
   @override
@@ -2180,9 +2346,15 @@ class ManejoFinanzas extends StatefulWidget {
 
 class ManejoFinanzasWidgetState extends State<ManejoFinanzas> {
   @override
+  void initState() {
+    id_manejo_finanzas = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 480,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2193,7 +2365,6 @@ class ManejoFinanzasWidgetState extends State<ManejoFinanzas> {
                     list['code'] == "ADLQ79" ||
                     list['code'] == "ADLQ80" ||
                     list['code'] == "ADLQ81" ||
-                    list['code'] == "ADLQ82" ||
                     list['code'] == "ADLQ83" ||
                     list['code'] == "ADLQ84" ||
                     list['code'] == "ADLQ600"
@@ -2231,6 +2402,12 @@ class TransportePublico extends StatefulWidget {
 }
 
 class TransportePublicoWidgetState extends State<TransportePublico> {
+  @override
+  void initState() {
+    id_transporte_publico = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2273,7 +2450,7 @@ class TransportePublicoWidgetState extends State<TransportePublico> {
 
 // Conducir *******************
 
-var id_conducir = null;
+var id_conducir;
 
 class Conducir extends StatefulWidget {
   @override
@@ -2281,6 +2458,12 @@ class Conducir extends StatefulWidget {
 }
 
 class ConducirWidgetState extends State<Conducir> {
+  @override
+  void initState() {
+    id_conducir = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2323,7 +2506,7 @@ class ConducirWidgetState extends State<Conducir> {
 
 // Movilidad en el Barrio *******************
 
-var id_movilidad_barrio = null;
+var id_movilidad_barrio;
 
 class MovilidadBarrio extends StatefulWidget {
   @override
@@ -2331,6 +2514,12 @@ class MovilidadBarrio extends StatefulWidget {
 }
 
 class MovilidadBarrioWidgetState extends State<MovilidadBarrio> {
+  @override
+  void initState() {
+    id_movilidad_barrio = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2373,7 +2562,7 @@ class MovilidadBarrioWidgetState extends State<MovilidadBarrio> {
 
 // Viajar fuera del ambiente familiar (conocido) *******************
 
-var id_viaje_fuera_ambiente = null;
+var id_viaje_fuera_ambiente;
 
 class ViajarFueraAmbiente extends StatefulWidget {
   @override
@@ -2382,6 +2571,12 @@ class ViajarFueraAmbiente extends StatefulWidget {
 }
 
 class ViajarFueraAmbienteWidgetState extends State<ViajarFueraAmbiente> {
+  @override
+  void initState() {
+    id_viaje_fuera_ambiente = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2424,7 +2619,7 @@ class ViajarFueraAmbienteWidgetState extends State<ViajarFueraAmbiente> {
 
 // Uso del telefono *******************
 
-var id_uso_telefono = null;
+var id_uso_telefono;
 
 class UsoTelefono extends StatefulWidget {
   @override
@@ -2432,6 +2627,12 @@ class UsoTelefono extends StatefulWidget {
 }
 
 class UsoTelefonoWidgetState extends State<UsoTelefono> {
+  @override
+  void initState() {
+    id_uso_telefono = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2474,7 +2675,7 @@ class UsoTelefonoWidgetState extends State<UsoTelefono> {
 
 // Conversacion *******************
 
-var id_conversacion = null;
+var id_conversacion;
 
 class Conversacion extends StatefulWidget {
   @override
@@ -2482,6 +2683,12 @@ class Conversacion extends StatefulWidget {
 }
 
 class ConversacionWidgetState extends State<Conversacion> {
+  @override
+  void initState() {
+    id_conversacion = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2523,7 +2730,7 @@ class ConversacionWidgetState extends State<Conversacion> {
 
 // Comprension *******************
 
-var id_comprension = null;
+var id_comprension;
 
 class Comprension extends StatefulWidget {
   @override
@@ -2531,6 +2738,12 @@ class Comprension extends StatefulWidget {
 }
 
 class ComprensionWidgetState extends State<Comprension> {
+  @override
+  void initState() {
+    id_comprension = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2572,7 +2785,7 @@ class ComprensionWidgetState extends State<Comprension> {
 
 // Lectura *******************
 
-var id_lectura = null;
+var id_lectura;
 
 class Lectura extends StatefulWidget {
   @override
@@ -2580,6 +2793,12 @@ class Lectura extends StatefulWidget {
 }
 
 class LecturaWidgetState extends State<Lectura> {
+  @override
+  void initState() {
+    id_lectura = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2621,7 +2840,7 @@ class LecturaWidgetState extends State<Lectura> {
 }
 // Escritura *******************
 
-var id_escritura = null;
+var id_escritura;
 
 class Escritura extends StatefulWidget {
   @override
@@ -2629,6 +2848,12 @@ class Escritura extends StatefulWidget {
 }
 
 class EscrituraWidgetState extends State<Escritura> {
+  @override
+  void initState() {
+    id_escritura = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(

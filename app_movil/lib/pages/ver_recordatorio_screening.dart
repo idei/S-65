@@ -1,6 +1,7 @@
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 
 import 'env.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,6 @@ class VerRecordatorio extends StatefulWidget {
   _VerRecordatorioState createState() => _VerRecordatorioState();
 }
 
-final _formKey_ver_recordatorio_screening = GlobalKey<FormState>();
 var id_paciente;
 var id_medico;
 var rela_estado_recordatorio;
@@ -27,6 +27,8 @@ var id_recordatorio;
 var recordatorioModel;
 var descripcion;
 var widget_boton;
+final isTablet = Device.get().isTablet;
+var radiusAvatar;
 
 class _VerRecordatorioState extends State<VerRecordatorio> {
   @override
@@ -39,6 +41,12 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     descripcion = parametros["descripcion"];
 
     getRecordatorioMedico(id_recordatorio);
+
+    if (isTablet) {
+      radiusAvatar = 15.3;
+    } else {
+      radiusAvatar = 10.3;
+    }
 
     return FutureBuilder(
         future: timer(),
@@ -73,187 +81,186 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
           title: Text('Recordatorio'),
         ),
         body: Card(
-          child: Form(
-              key: _formKey_ver_recordatorio_screening,
-              child: Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: ListView(children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                            backgroundColor: Color.fromRGBO(45, 175, 168, 1),
-                            radius: MediaQuery.of(context).size.width / 9.3,
-                            child: Icon(
-                              Icons.event_note,
-                              color: Colors.white,
-                              size: 60.0,
-                            )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text("El Doctor/a $nombre_medico $apellido_medico" +
-                        " le ha enviado el siguiente mensaje:"),
-                    // Text("El Doctor/a $id_medico" +
-                    //" le ha enviado el siguiente mensaje:"),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    //Text("Screening $tipo_screening: "),
-                    Text(
-                      "Estimado paciente le envio para que complete el siguiente Screening de $nombre_screening ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
+          child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: ListView(children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                        backgroundColor: Color.fromRGBO(45, 175, 168, 1),
+                        radius:
+                            MediaQuery.of(context).size.width / radiusAvatar,
+                        child: Icon(
+                          Icons.event_note,
+                          color: Colors.white,
+                          size: 60.0,
+                        )),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("El Doctor/a $nombre_medico $apellido_medico" +
+                    " le ha enviado el siguiente mensaje:"),
+                // Text("El Doctor/a $id_medico" +
+                //" le ha enviado el siguiente mensaje:"),
+                SizedBox(
+                  height: 20,
+                ),
+                //Text("Screening $tipo_screening: "),
+                Text(
+                  "Estimado paciente le envio para que complete el siguiente Screening de $nombre_screening ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 40,
+                ),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              minimumSize: Size(100, 50),
-                              primary: Color.fromRGBO(45, 175, 168, 1)),
-                          onPressed: () {
-                            if (rela_estado_recordatorio != "3") {
-                              if (tipo_screening == "SFMS") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_fisico',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "CONDUC") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_conductual',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "ANIMO") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_animo',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "QCQ") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_queja_cognitiva',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "CDR") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_cdr',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "RNUTRI") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_nutricional',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "DIAB") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_diabetes',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                              if (tipo_screening == "ENCRO") {
-                                Navigator.of(context).pushReplacementNamed(
-                                    '/screening_encro',
-                                    arguments: {
-                                      "id_recordatorio": id_recordatorio,
-                                      "id_paciente": id_paciente,
-                                      "estado_recordatorio":
-                                          rela_estado_recordatorio,
-                                      "id_medico": id_medico,
-                                      "tipo_screening": tipo_screening,
-                                      "bandera": "recordatorio"
-                                    });
-                              }
-                            } else {
-                              _alert_informe(context,
-                                  "Este Screening ya fue respondido", 1);
-                            }
-                          },
-                          child: Text('Ir a Screening'),
-                        ),
-                      ],
-                    )
-                    // : Container(
-                    //     width: 50, // Ancho del contenedor
-                    //     height: 40, // Alto del contenedor
-                    //     decoration: BoxDecoration(
-                    //       color:
-                    //           Colors.green, // Color de fondo del contenedor
-                    //       borderRadius: BorderRadius.circular(
-                    //           10), // Borde redondeado del contenedor
-                    //     ),
-                    //     child: Center(
-                    //       child: Text(
-                    //         'Este Screening ya fue respondido',
-                    //         style: TextStyle(
-                    //           color: Colors.white, // Color del texto
-                    //           fontSize: 20, // Tamaño del texto
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   )
-                  ]))),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: Size(100, 50),
+                          primary: Color.fromRGBO(45, 175, 168, 1)),
+                      onPressed: () {
+                        if (rela_estado_recordatorio != "3") {
+                          if (tipo_screening == "SFMS") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_fisico',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "CONDUC") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_conductual',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "ANIMO") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_animo',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "QCQ") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_queja_cognitiva',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "CDR") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_cdr',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "RNUTRI") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_nutricional',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "DIAB") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_diabetes',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                          if (tipo_screening == "ENCRO") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_encro',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
+                        } else {
+                          _alert_informe(
+                              context, "Este Screening ya fue respondido", 1);
+                        }
+                      },
+                      child: Text('Ir a Screening'),
+                    ),
+                  ],
+                )
+                // : Container(
+                //     width: 50, // Ancho del contenedor
+                //     height: 40, // Alto del contenedor
+                //     decoration: BoxDecoration(
+                //       color:
+                //           Colors.green, // Color de fondo del contenedor
+                //       borderRadius: BorderRadius.circular(
+                //           10), // Borde redondeado del contenedor
+                //     ),
+                //     child: Center(
+                //       child: Text(
+                //         'Este Screening ya fue respondido',
+                //         style: TextStyle(
+                //           color: Colors.white, // Color del texto
+                //           fontSize: 20, // Tamaño del texto
+                //         ),
+                //       ),
+                //     ),
+                //   )
+              ])),
         ));
   }
 
@@ -288,15 +295,6 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
         print(jsonDate['status']);
         id_medico = "";
       }
-    }
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/');
     }
   }
 }

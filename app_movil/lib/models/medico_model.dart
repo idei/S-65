@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MedicoModel extends InheritedWidget {
-  String nombre_medico;
-  String apellido_medico;
-  String especialidad;
+  final String nombre_medico;
+  final String apellido_medico;
+  final String especialidad;
   var rela_medico;
-  String matricula;
+  final String matricula;
 
   MedicoModel({
     this.nombre_medico,

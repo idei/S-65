@@ -1,10 +1,10 @@
 import 'package:app_salud/models/paciente_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class UsuarioModel extends InheritedWidget {
-  String tokenId;
-  String emailUser;
-  String password;
+  final String tokenId;
+  final String emailUser;
+  final String password;
   PacienteModel paciente;
 
   UsuarioModel({

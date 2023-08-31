@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
-import 'package:app_salud/pages/screening_fisico.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
@@ -146,39 +144,60 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
         ),
-        body: Card(
-          child: Form(
-              child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListView(children: <Widget>[
-                    Text("$descripcion".toUpperCase(),
-                        style: TextStyle(fontFamily: 'NunitoR')),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text("Fecha: $fecha_limite ",
-                        style: TextStyle(fontFamily: 'NunitoR')),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Center(
-                      child: ElevatedButton(
-                        child: Text('Leído',
-                            style: TextStyle(
-                                fontFamily: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .fontFamily)),
-                        style: ElevatedButton.styleFrom(
-                          primary: Color.fromRGBO(45, 175, 168, 1),
-                        ),
-                        onPressed: () {
-                          update_aviso_paciente();
-                          Navigator.of(context).pushReplacementNamed('/avisos');
-                        },
+        body: Column(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: double
+                  .infinity, // Esto hace que el Container y el Column ocupen todo el ancho disponible
+              child: Card(
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  child:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    ListTile(
+                      leading: Icon(
+                        Icons.arrow_right_rounded,
+                        size: 30,
                       ),
+                      title: Text('Aviso: ' + '$descripcion'.toUpperCase(),
+                          style: TextStyle(
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily)),
+                      subtitle: Text("Fecha: $fecha_limite ",
+                          style: TextStyle(
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily)),
                     ),
-                  ]))),
+                  ]),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Center(
+              child: ElevatedButton(
+                child: Text('Leído',
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily)),
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromRGBO(45, 175, 168, 1),
+                ),
+                onPressed: () {
+                  update_aviso_paciente();
+                  Navigator.of(context).pushReplacementNamed('/avisos');
+                },
+              ),
+            ),
+          ],
         ));
   }
 
@@ -191,83 +210,68 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
               Navigator.pushNamed(context, '/avisos');
             },
           ),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
-          //backgroundColor: Color.fromRGBO(157, 19, 34, 1),
           title: Text('Avisos Generales',
               style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headline1.fontFamily)),
         ),
-        body: Form(
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  Text("$descripcion".toUpperCase(),
-                      style: TextStyle(fontFamily: 'NunitoR')),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Fecha: $fecha_limite ",
-                      style: TextStyle(fontFamily: 'NunitoR')),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  MyStatelessWidget(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Visibility(
-                      visible: estado_visible_aviso,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                //primary: Color.fromRGBO(157, 19, 34, 1),
-                                ),
-                            onPressed: () {
-                              update_estado_aviso(id_aviso, context);
-                              //generate_vinculation();
-                            },
-                            child: Text('Acepto',
-                                style: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                //primary: Color.fromRGBO(157, 19, 34, 1),
-                                ),
-                            onPressed: () {
-                              update_estado_aviso(id_aviso, context);
-                              _alert_clinicos(
-                                  context,
-                                  "Gracias",
-                                  "Pronto se le notificará de un nuevo médico",
-                                  2);
-                            },
-                            child: Text('No Acepto',
-                                style: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                          ),
-                        ],
-                      )),
-                ]))));
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/avisos');
-    }
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(children: <Widget>[
+              Text("$descripcion".toUpperCase(),
+                  style: TextStyle(fontFamily: 'NunitoR')),
+              SizedBox(
+                height: 20,
+              ),
+              Text("Fecha: $fecha_limite ",
+                  style: TextStyle(fontFamily: 'NunitoR')),
+              SizedBox(
+                height: 20,
+              ),
+              MyStatelessWidget(),
+              SizedBox(
+                height: 30,
+              ),
+              Visibility(
+                  visible: estado_visible_aviso,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            //primary: Color.fromRGBO(157, 19, 34, 1),
+                            ),
+                        onPressed: () {
+                          update_estado_aviso(id_aviso, context);
+                          //generate_vinculation();
+                        },
+                        child: Text('Acepto',
+                            style: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            //primary: Color.fromRGBO(157, 19, 34, 1),
+                            ),
+                        onPressed: () {
+                          update_estado_aviso(id_aviso, context);
+                          _alert_clinicos(context, "Gracias",
+                              "Pronto se le notificará de un nuevo médico", 2);
+                        },
+                        child: Text('No Acepto',
+                            style: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                      ),
+                    ],
+                  )),
+            ])));
   }
 
   update_aviso_paciente() async {

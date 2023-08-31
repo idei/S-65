@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:app_salud/models/grupo_conviviente_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:app_salud/models/departamentos_model.dart';
 import 'package:flutter/foundation.dart';
 
 import '../pages/env.dart';

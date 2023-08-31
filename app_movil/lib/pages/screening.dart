@@ -1,9 +1,8 @@
-import 'package:app_salud/pages/screening_animo.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/opciones_navbar.dart';
+
 import '../models/screening_model.dart';
 import 'env.dart';
 
@@ -18,6 +17,16 @@ var titulo;
 bool isLoading = false;
 
 class _ScreeningState extends State<ScreeningPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
@@ -98,14 +107,6 @@ class _ScreeningState extends State<ScreeningPage> {
                   ).toList(),
                 );
               } else {
-                // if (!isLoading) {
-                //   return Container(
-                //     alignment: Alignment.center,
-                //     child: Positioned(
-                //       child: _isLoadingIcon(),
-                //     ),
-                //   );
-                // } else {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Container(
                       child: Column(
@@ -127,128 +128,114 @@ class _ScreeningState extends State<ScreeningPage> {
                 }
                 return Container(
                   alignment: Alignment.center,
-                  child: Positioned(
-                    child: _isLoadingIcon(),
-                  ),
+                  child: _isLoadingIcon(),
                 );
               }
               // }
             }),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          //onPressed: () {},
           child: IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              if (select_screening == "SFMS") {
-                Navigator.of(context).pushReplacementNamed('/screening_fisico',
-                    arguments: {
-                      "tipo_screening": select_screening,
-                      "bandera": "screening_nuevo"
-                    });
-              } else {
-                if (select_screening == "QCQ") {
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                if (select_screening == "SFMS")
+                  Navigator.of(context)
+                      .pushReplacementNamed('/screening_fisico', arguments: {
+                    "tipo_screening": select_screening,
+                    "bandera": "screening_nuevo"
+                  });
+
+                if (select_screening == "QCQ")
                   Navigator.of(context).pushReplacementNamed(
                       '/screening_queja_cognitiva',
                       arguments: {
                         "tipo_screening": select_screening,
                         "bandera": "screening_nuevo"
                       });
-                } else {
-                  if (select_screening == "ÁNIMO") {
-                    Navigator.of(context)
-                        .pushReplacementNamed('/screening_animo', arguments: {
-                      "tipo_screening": select_screening,
-                      "bandera": "screening_nuevo"
-                    });
-                  } else {
-                    if (select_screening == "CONDUC") {
-                      Navigator.of(context).pushReplacementNamed(
-                          '/screening_conductual',
-                          arguments: {
-                            "tipo_screening": select_screening,
-                            "bandera": "screening_nuevo"
-                          });
-                    } else {
-                      if (select_screening == "CDR") {
-                        Navigator.of(context)
-                            .pushReplacementNamed('/screening_cdr', arguments: {
-                          "tipo_screening": select_screening,
-                          "bandera": "screening_nuevo"
-                        });
-                      } else {
-                        if (select_screening == "RNUTRI") {
-                          Navigator.of(context).pushReplacementNamed(
-                              '/screening_nutricional',
-                              arguments: {
-                                "tipo_screening": select_screening,
-                                "bandera": "screening_nuevo"
-                              });
-                        } else {
-                          if (select_screening == "DIAB") {
-                            Navigator.of(context).pushReplacementNamed(
-                                '/screening_diabetes',
-                                arguments: {
-                                  "tipo_screening": select_screening,
-                                  "bandera": "screening_nuevo"
-                                });
-                          } else {
-                            if (select_screening == "ENCRO") {
-                              Navigator.of(context).pushReplacementNamed(
-                                  '/screening_encro',
-                                  arguments: {
-                                    "tipo_screening": select_screening,
-                                    "bandera": "screening_nuevo"
-                                  });
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-          ),
+
+                if (select_screening == "ÁNIMO")
+                  Navigator.of(context).pushReplacementNamed('/screening_animo',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                if (select_screening == "CONDUC")
+                  Navigator.of(context).pushReplacementNamed(
+                      '/screening_conductual',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                if (select_screening == "CDR")
+                  Navigator.of(context).pushReplacementNamed('/screening_cdr',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                if (select_screening == "RNUTRI")
+                  Navigator.of(context).pushReplacementNamed(
+                      '/screening_nutricional',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                if (select_screening == "DIAB")
+                  Navigator.of(context)
+                      .pushReplacementNamed('/screening_diabetes', arguments: {
+                    "tipo_screening": select_screening,
+                    "bandera": "screening_nuevo"
+                  });
+
+                if (select_screening == "ENCRO")
+                  Navigator.of(context).pushReplacementNamed('/screening_encro',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                if (select_screening == "ADLQ")
+                  Navigator.of(context).pushReplacementNamed('/screening_adlq',
+                      arguments: {
+                        "tipo_screening": select_screening,
+                        "bandera": "screening_nuevo"
+                      });
+
+                // if (select_screening == "SCER")
+                //   Navigator.of(context)
+                //       .pushReplacementNamed('/screening_cerebral', arguments: {
+                //     "tipo_screening": select_screening,
+                //     "bandera": "screening_nuevo"
+                //   });
+              }),
         ));
   }
 
-  delayScreeningAnimo() async {
-    await Future.delayed(Duration(milliseconds: 1500));
-    return true;
-  }
-
   String setTitulo(var select_screening) {
-    if (select_screening == "SFMS") {
-      titulo = "Físicos";
-    }
+    titulo = "";
 
-    if (select_screening == "QCQ") {
-      titulo = "de Cognición";
-    }
+    if (select_screening == "SFMS") titulo = "Físicos";
 
-    if (select_screening == "ÁNIMO") {
-      titulo = "de Ánimo";
-    }
+    if (select_screening == "QCQ") titulo = "de Cognición";
 
-    if (select_screening == "CONDUC") {
-      titulo = "Conductuales";
-    }
+    if (select_screening == "ÁNIMO") titulo = "de Ánimo";
 
-    if (select_screening == "CDR") {
-      titulo = "de Cognición y Vida Cotidiana";
-    }
+    if (select_screening == "CONDUC") titulo = "Conductuales";
 
-    if (select_screening == "RNUTRI") {
-      titulo = "de Nutrición";
-    }
+    if (select_screening == "CDR") titulo = "de Cognición y Vida Cotidiana";
 
-    if (select_screening == "DIAB") {
-      titulo = "de Diabetes";
-    }
+    if (select_screening == "RNUTRI") titulo = "de Nutrición";
 
-    if (select_screening == "ENCRO") {
-      titulo = "enfermedades crónicas";
-    }
+    if (select_screening == "DIAB") titulo = "de Diabetes";
+
+    if (select_screening == "ENCRO") titulo = "Enfermedades crónicas";
+
+    if (select_screening == "ADLQ") titulo = "Actividades de la Vida Diaria";
+
+    if (select_screening == "SCER") titulo = "Salud Cerebral";
 
     return titulo;
   }
@@ -279,14 +266,6 @@ class _ScreeningState extends State<ScreeningPage> {
     } else {
       isLoading = true;
       return null;
-    }
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
     }
   }
 

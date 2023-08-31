@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 
@@ -35,7 +36,9 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
           builder: (BuildContext context, BoxConstraints constraints) {
             return Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: paddingHorizontal, vertical: paddingVertical),
+                horizontal: paddingHorizontal,
+                vertical: paddingVertical,
+              ),
               height: constraints.maxHeight * heightContainer,
               width: constraints.maxWidth * widthContainer,
               child: GridView.count(
@@ -57,7 +60,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                           CircleAvatar(
                             backgroundImage:
                                 AssetImage('assets/comportamiento.png'),
-                            radius: MediaQuery.of(context).size.width / 7.5,
+                            radius: MediaQuery.of(context).size.width / radius,
                           ),
                           SizedBox(height: 8.0),
                           Text(
@@ -82,7 +85,8 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                              radius: MediaQuery.of(context).size.width / 7.5,
+                              radius:
+                                  MediaQuery.of(context).size.width / radius,
                               child: Icon(Icons.directions_run_rounded,
                                   color: Colors.white, size: 70.0)),
                           SizedBox(height: 8.0),
@@ -109,7 +113,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                         children: [
                           CircleAvatar(
                             backgroundImage: AssetImage('assets/cognicion.png'),
-                            radius: MediaQuery.of(context).size.width / 7.5,
+                            radius: MediaQuery.of(context).size.width / radius,
                           ),
                           SizedBox(height: 8.0),
                           Text(
@@ -135,7 +139,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                         children: [
                           CircleAvatar(
                             backgroundImage: AssetImage('assets/animo.png'),
-                            radius: MediaQuery.of(context).size.width / 7.5,
+                            radius: MediaQuery.of(context).size.width / radius,
                           ),
                           SizedBox(height: 8.0),
                           Text(
@@ -161,7 +165,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                     //     children: [
                     //       CircleAvatar(
                     //         backgroundImage: AssetImage('assets/cotidiana.png'),
-                    //         radius: MediaQuery.of(context).size.width / 7.5,
+                    //         radius: MediaQuery.of(context).size.width / radius,
                     //       ),
                     //       SizedBox(height: 8.0),
                     //       Text(
@@ -187,7 +191,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                         children: [
                           CircleAvatar(
                             backgroundImage: AssetImage('assets/nutricion.png'),
-                            radius: MediaQuery.of(context).size.width / 7.5,
+                            radius: MediaQuery.of(context).size.width / radius,
                           ),
                           SizedBox(height: 8.0),
                           Text(
@@ -204,8 +208,8 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        select_screening = "ADLQ";
-                        Navigator.pushNamed(context, '/screening_adlq',
+                        select_screening = "SCER";
+                        Navigator.pushNamed(context, '/screening_cerebral',
                             arguments: {
                               "select_screening": select_screening,
                             });
@@ -213,7 +217,35 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                              radius: MediaQuery.of(context).size.width / 7.5,
+                              radius:
+                                  MediaQuery.of(context).size.width / radius,
+                              child: Icon(Icons.add_reaction_sharp,
+                                  color: Colors.white, size: 70.0)),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "SALUD CEREBRAL",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        select_screening = "ADLQ";
+                        Navigator.pushNamed(context, '/screening', arguments: {
+                          "select_screening": select_screening,
+                        });
+                      },
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                              radius:
+                                  MediaQuery.of(context).size.width / radius,
                               child: Icon(Icons.abc_sharp,
                                   color: Colors.white, size: 70.0)),
                           SizedBox(height: 8.0),
@@ -229,7 +261,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                         ],
                       ),
                     ),
-                    GestureDetector(),
+
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/menu');
@@ -237,7 +269,8 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                              radius: MediaQuery.of(context).size.width / 8.5,
+                              radius:
+                                  MediaQuery.of(context).size.width / radius,
                               child: Icon(Icons.arrow_circle_left_outlined,
                                   color: Colors.white, size: 70.0)),
                           SizedBox(height: 8.0),
@@ -261,33 +294,26 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
     );
   }
 
-  Widget texto(String entrada) {
-    return Text(
-      entrada,
-      style: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-          fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
-    );
-  }
-
   void setParametrosMenu() {
     if (isTablet) {
       heightContainer = 1;
       widthContainer = 1;
       childAspectRatioGrid = 0.8;
-      crossAxisSpacingGrid = 8.0;
-      mainAxisSpacingGrid = 5.0;
-      paddingHorizontal = 10.0;
-      paddingVertical = 40.0;
+      crossAxisSpacingGrid = 60.0;
+      mainAxisSpacingGrid = 1.0;
+      paddingHorizontal = 30.0;
+      paddingVertical = 75.0;
+      radius = 8.2;
+      // size = 70.0;
     } else {
       heightContainer = 0.7;
       widthContainer = 0.9;
-      childAspectRatioGrid = 0.73;
-      crossAxisSpacingGrid = 10.0;
-      mainAxisSpacingGrid = 25.0;
-      paddingHorizontal;
-      paddingVertical;
+      childAspectRatioGrid = 0.7;
+      crossAxisSpacingGrid = 20.0;
+      mainAxisSpacingGrid = 34.0;
+      paddingHorizontal = 10.0;
+      paddingVertical = 0.0;
+      radius = 7.5;
     }
   }
 }

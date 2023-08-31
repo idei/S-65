@@ -35,19 +35,6 @@ class _NewScreeningState extends State<NewScreening> {
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Form(
             key: _formKey_screening_new,
@@ -70,15 +57,6 @@ class _NewScreeningState extends State<NewScreening> {
                         )),
                   ),
                 ]))));
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/');
-    }
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -697,22 +697,22 @@ var data;
 
 guardar_datos(BuildContext context) async {
   if (memoria == null) {
-    loginToast("Debe responder si los item de atención");
+    loginToast("Debe responder si los item de Atención");
   } else {
     if (orientacion == null) {
-      loginToast("Debe responder si los item de atención");
+      loginToast("Debe responder si los item de Orientación");
     } else {
       if (juicio_res_problema == null) {
         loginToast("Debe responder si los item de atención");
       } else {
         if (vida_social == null) {
-          loginToast("Debe responder si los item de atención");
+          loginToast("Debe responder si los item de Vida Social");
         } else {
           if (hogar == null) {
-            loginToast("Debe responder si los item de Orientación");
+            loginToast("Debe responder si los item de Hogar");
           } else {
             if (cuid_personal == null) {
-              loginToast("Debe responder si los item de Orientación");
+              loginToast("Debe responder si los item de Cuidado Personal");
             } else {
               String URL_base = Env.URL_PREFIX;
               var url = URL_base + "/respuesta_screening_cdr.php";

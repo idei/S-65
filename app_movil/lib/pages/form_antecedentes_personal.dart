@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
-import 'package:app_salud/pages/ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Define a custom Form widget.
@@ -18,7 +17,7 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
 
   @override
   void initState() {
-    myController.addListener(_printLatestValue);
+    super.initState();
   }
 
   @override
@@ -27,20 +26,16 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
     super.dispose();
   }
 
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
-  }
-
   @override
   Widget build(BuildContext context) {
     //Map parametros = ModalRoute.of(context).settings.arguments;
     //email = parametros["email"];
     //email = "fabricio@gmail.com";
 
-    read_datos_paciente();
+    read_datos_paciente(context);
 
     return FutureBuilder(
-        future: read_datos_paciente(),
+        future: read_datos_paciente(context),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           print(snapshot.connectionState);
 
@@ -97,26 +92,26 @@ guardar_datos(BuildContext context) async {
   var url = URL_base + "/save_antec_personales";
   var response = await http.post(url, body: {
     "email": email,
-    "retraso": retraso.toString(),
-    "desorden": desorden.toString(),
-    "deficit": deficit.toString(),
-    "lesiones_cabeza": lesiones_cabeza.toString(),
-    "perdidas": perdidas.toString(),
-    "accidentes_caidas": accidentes_caidas.toString(),
-    "lesiones_espalda": lesiones_espalda.toString(),
-    "infecciones": infecciones.toString(),
-    "toxinas": toxinas.toString(),
-    "acv": acv.toString(),
-    "demencia": demencia.toString(),
-    "parkinson": parkinson.toString(),
-    "epilepsia": epilepsia.toString(),
-    "esclerosis": esclerosis.toString(),
-    "huntington": huntington.toString(),
-    "depresion": depresion.toString(),
-    "trastorno": trastorno.toString(),
-    "esquizofrenia": esquizofrenia.toString(),
-    "enfermedad_desorden": enfermedad_desorden.toString(),
-    "intoxicaciones": intoxicaciones.toString(),
+    "retraso": valueNotifierRetrasoMental.value.toString(),
+    "desorden": valueNotifierDesorden.value.toString(),
+    "deficit": valueNotifierDeficit.value.toString(),
+    "lesiones_cabeza": valueNotifierLesiones_cabeza.value.toString(),
+    "perdidas": valueNotifierPerdidas.value.toString(),
+    "accidentes_caidas": valueNotifierAccidentes_caidas.value.toString(),
+    "lesiones_espalda": valueNotifierLesiones_espalda.value.toString(),
+    "infecciones": valueNotifierInfecciones.value.toString(),
+    "toxinas": valueNotifierToxinas.value.toString(),
+    "acv": valueNotifierAcv.value.toString(),
+    "demencia": valueNotifierDemencia.value.toString(),
+    "parkinson": valueNotifierParkinson.value.toString(),
+    "epilepsia": valueNotifierEpilepsia.value.toString(),
+    "esclerosis": valueNotifierEsclerosis.value.toString(),
+    "huntington": valueNotifierHuntington.value.toString(),
+    "depresion": valueNotifierDepresion.value.toString(),
+    "trastorno": valueNotifierTrastorno.value.toString(),
+    "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
+    "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
+    "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
     "cod_event_retraso": cod_event_retraso,
     "cod_event_desorden": cod_event_desorden,
     "cod_event_deficit": cod_event_deficit,
@@ -145,6 +140,8 @@ guardar_datos(BuildContext context) async {
       _alert_informe(context, "Antecedentes Guardados", 1);
       Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
     }
+  } else {
+    _alert_informe(context, "Error al guardar Antecendentes", 2);
   }
 }
 
@@ -160,7 +157,7 @@ _alert_informe(context, message, colorNumber) {
   ));
 }
 
-read_datos_paciente() async {
+read_datos_paciente(BuildContext context) async {
   await getStringValuesSF();
 
   String URL_base = Env.URL_API;
@@ -189,56 +186,59 @@ read_datos_paciente() async {
     "cod_event_intoxicaciones": cod_event_intoxicaciones,
   });
 
-  //print(response.body);
   var responseData = json.decode(response.body);
 
   if (responseData["status"] == "Success") {
     var data = responseData['data'];
 
-    retraso = data["retraso"] == "1" ? true : false;
+    valueNotifierRetrasoMental.value = data["retraso"] == "1" ? true : false;
 
-    desorden = data["desorden"] == "1" ? true : false;
+    valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
 
-    deficit = data["deficit"] == "1" ? true : false;
+    valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
 
-    lesiones_cabeza = data["lesiones_cabeza"] == "1" ? true : false;
+    valueNotifierLesiones_cabeza.value =
+        data["lesiones_cabeza"] == "1" ? true : false;
 
-    perdidas = data["perdidas"] == "1" ? true : false;
+    valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
 
-    accidentes_caidas = data["accidentes_caidas"] == "1" ? true : false;
+    valueNotifierAccidentes_caidas.value =
+        data["accidentes_caidas"] == "1" ? true : false;
 
-    lesiones_espalda = data["lesiones_espalda"] == "1" ? true : false;
+    valueNotifierLesiones_espalda.value =
+        data["lesiones_espalda"] == "1" ? true : false;
 
-    infecciones = data["infecciones"] == "1" ? true : false;
+    valueNotifierInfecciones.value = data["infecciones"] == "1" ? true : false;
 
-    toxinas = data["toxinas"] == "1" ? true : false;
+    valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
 
-    acv = data["acv"] == "1" ? true : false;
+    valueNotifierAcv.value = data["acv"] == "1" ? true : false;
 
-    demencia = data["demencia"] == "1" ? true : false;
+    valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
 
-    parkinson = data["parkinson"] == "1" ? true : false;
+    valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
 
-    epilepsia = data["epilepsia"] == "1" ? true : false;
+    valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
 
-    esclerosis = data["esclerosis"] == "1" ? true : false;
+    valueNotifierEsclerosis.value = data["esclerosis"] == "1" ? true : false;
 
-    huntington = data["huntington"] == "1" ? true : false;
+    valueNotifierHuntington.value = data["huntington"] == "1" ? true : false;
 
-    depresion = data["depresion"] == "1" ? true : false;
+    valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
 
-    trastorno = data["trastorno"] == "1" ? true : false;
+    valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
 
-    esquizofrenia = data["esquizofrenia"] == "1" ? true : false;
+    valueNotifierEsquizofrenia.value =
+        data["esquizofrenia"] == "1" ? true : false;
 
-    enfermedad_desorden = data["enfermedad_desorden"] == "1" ? true : false;
+    valueNotifierEnfermedad_desorden.value =
+        data["enfermedad_desorden"] == "1" ? true : false;
 
-    intoxicaciones = data["intoxicaciones"] == "1" ? true : false;
+    valueNotifierIntoxicaciones.value =
+        data["intoxicaciones"] == "1" ? true : false;
   } else {
-    //loginToast(data);
+    _alert_informe(context, "No se pudieron leer los datos", 2);
   }
-
-  //await new Future.delayed(new Duration(milliseconds: 1500));
 
   return true;
 }
@@ -252,7 +252,6 @@ class Antecedentes extends StatefulWidget {
   AntecedentesWidgetState createState() => AntecedentesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class AntecedentesWidgetState extends State<Antecedentes> {
   final _formKey_antecedentes_familiares = GlobalKey<FormState>();
 
@@ -270,7 +269,7 @@ class AntecedentesWidgetState extends State<Antecedentes> {
               ),
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/menu');
+              Navigator.pushNamed(context, '/antecedentes_personales');
             },
           ),
           backgroundColor: Theme.of(context).primaryColor,
@@ -329,37 +328,38 @@ class AntecedentesWidgetState extends State<Antecedentes> {
         ));
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
+  // void choiceAction(String choice) {
+  //   if (choice == Constants.Ajustes) {
+  //     Navigator.pushNamed(context, '/ajustes');
+  //   } else if (choice == Constants.Salir) {
+  //     Navigator.pushNamed(context, '/');
+  //   }
+  // }
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
 
-bool retraso = false;
-bool desorden = false;
-bool deficit = false;
-bool lesiones_cabeza = false;
-bool perdidas = false;
-bool accidentes_caidas = false;
-bool lesiones_espalda = false;
-bool infecciones = false;
-bool toxinas = false;
-bool acv = false;
-bool demencia = false;
-bool parkinson = false;
-bool epilepsia = false;
-bool esclerosis = false;
-bool huntington = false;
-bool depresion = false;
-bool trastorno = false;
-bool esquizofrenia = false;
-bool enfermedad_desorden = false;
-bool intoxicaciones = false;
+ValueNotifier<bool> valueNotifierRetrasoMental = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierDesorden = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierDeficit = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierLesiones_cabeza = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierPerdidas = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierAccidentes_caidas = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierLesiones_espalda = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierInfecciones = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierToxinas = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierAcv = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierDemencia = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierParkinson = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierEpilepsia = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierEsclerosis = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierHuntington = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierDepresion = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierTrastorno = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierEsquizofrenia = ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierEnfermedad_desorden =
+    ValueNotifier<bool>(false);
+ValueNotifier<bool> valueNotifierIntoxicaciones = ValueNotifier<bool>(false);
 
 String cod_event_retraso = "RM";
 String cod_event_desorden = 'DH';
@@ -382,40 +382,46 @@ String cod_event_esquizofrenia = 'ESQ';
 String cod_event_enfermedad_desorden = 'EDG';
 String cod_event_intoxicaciones = 'INTOX';
 
-//-------------------------------------- RETRASO MENTAL -----------------------------------------------------
+//-------------------------------------- LabeledCheckbox -----------------------------------------------------
 
 class LabeledCheckbox extends StatelessWidget {
   const LabeledCheckbox({
     this.label,
     this.padding,
-    this.value,
-    this.onChanged,
+    this.valueNotifier,
   });
 
   final String label;
   final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
+  final ValueNotifier<bool> valueNotifier;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        onChanged(!value);
+        valueNotifier.value = !valueNotifier.value;
       },
       child: Padding(
         padding: padding,
         child: Row(
           children: <Widget>[
             Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                ),
+              ),
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: valueNotifier,
+              builder: (context, value, child) {
+                return Checkbox(
+                  value: value,
+                  onChanged: (newValue) {
+                    valueNotifier.value = newValue ?? false;
+                  },
+                );
               },
             ),
           ],
@@ -424,6 +430,10 @@ class LabeledCheckbox extends StatelessWidget {
     );
   }
 }
+
+//-------------------------------------------------------------------------------------------
+
+//-------------------------------------- RETRASO MENTAL -----------------------------------------------------
 
 class CheckRetrasoMental extends StatefulWidget {
   CheckRetrasoMental({Key key}) : super(key: key);
@@ -433,19 +443,13 @@ class CheckRetrasoMental extends StatefulWidget {
       CheckRetrasoMentalWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckRetrasoMentalWidgetState extends State<CheckRetrasoMental> {
   @override
   Widget build(BuildContext context) {
     return LabeledCheckbox(
       label: 'Retraso Mental',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: retraso,
-      onChanged: (bool newValue) {
-        setState(() {
-          retraso = newValue;
-        });
-      },
+      valueNotifier: valueNotifierRetrasoMental,
     );
   }
 }
@@ -454,47 +458,6 @@ class CheckRetrasoMentalWidgetState extends State<CheckRetrasoMental> {
 
 // --------------------------------- DESORDEN DEL HABLA ----------------------------------------------------
 
-class LabeledCheckboxHabla extends StatelessWidget {
-  const LabeledCheckboxHabla({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CheckDesorHabla extends StatefulWidget {
   CheckDesorHabla({Key key}) : super(key: key);
 
@@ -502,65 +465,18 @@ class CheckDesorHabla extends StatefulWidget {
   CheckDesorHablaWidgetState createState() => CheckDesorHablaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class CheckDesorHablaWidgetState extends State<CheckDesorHabla> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxHabla(
+    return LabeledCheckbox(
       label: 'Desorden del habla',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: desorden,
-      onChanged: (bool newValue) {
-        setState(() {
-          desorden = newValue;
-        });
-      },
+      valueNotifier: valueNotifierDesorden,
     );
   }
 }
 
 //-------------------------------------------DEFICIT DE ATENCION--------------------------------------------
-
-class LabeledCheckboxDeficit extends StatelessWidget {
-  const LabeledCheckboxDeficit({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class DeficitAtencion extends StatefulWidget {
   DeficitAtencion({Key key}) : super(key: key);
@@ -569,65 +485,18 @@ class DeficitAtencion extends StatefulWidget {
   DeficitAtencionWidgetState createState() => DeficitAtencionWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DeficitAtencionWidgetState extends State<DeficitAtencion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDeficit(
+    return LabeledCheckbox(
       label: 'Déficit de atención',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: deficit,
-      onChanged: (bool newValue) {
-        setState(() {
-          deficit = newValue;
-        });
-      },
+      valueNotifier: valueNotifierDeficit,
     );
   }
 }
 
 //------------------------------------------LESIONES EN LA CABEZA -------------------------------------------
-
-class LabeledCheckboxLesCab extends StatelessWidget {
-  const LabeledCheckboxLesCab({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class LesionCabeza extends StatefulWidget {
   LesionCabeza({Key key}) : super(key: key);
@@ -636,65 +505,18 @@ class LesionCabeza extends StatefulWidget {
   LesionCabezaWidgetState createState() => LesionCabezaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class LesionCabezaWidgetState extends State<LesionCabeza> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxLesCab(
+    return LabeledCheckbox(
       label: 'Lesiones en la cabeza',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: lesiones_cabeza,
-      onChanged: (bool newValue) {
-        setState(() {
-          lesiones_cabeza = newValue;
-        });
-      },
+      valueNotifier: valueNotifierLesiones_cabeza,
     );
   }
 }
 
 //------------------------------------------PERDIDAS DE CONOCIMIENTO ---------------------------------------
-
-class LabeledCheckboxPerdCon extends StatelessWidget {
-  const LabeledCheckboxPerdCon({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class PerdidaConocimiento extends StatefulWidget {
   PerdidaConocimiento({Key key}) : super(key: key);
@@ -704,65 +526,18 @@ class PerdidaConocimiento extends StatefulWidget {
       PerdidaConocimientoWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class PerdidaConocimientoWidgetState extends State<PerdidaConocimiento> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxPerdCon(
+    return LabeledCheckbox(
       label: 'Perdida del conocimiento',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: perdidas,
-      onChanged: (bool newValue) {
-        setState(() {
-          perdidas = newValue;
-        });
-      },
+      valueNotifier: valueNotifierPerdidas,
     );
   }
 }
 
 // ----------------------------------------ACCIDENTES, CAIDAS Y GOLPES ---------------------------------------
-
-class LabeledCheckboxAccCaiGol extends StatelessWidget {
-  const LabeledCheckboxAccCaiGol({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class AccidentesCaidasGolpes extends StatefulWidget {
   AccidentesCaidasGolpes({Key key}) : super(key: key);
@@ -772,65 +547,18 @@ class AccidentesCaidasGolpes extends StatefulWidget {
       AccidentesCaidasGolpesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class AccidentesCaidasGolpesWidgetState extends State<AccidentesCaidasGolpes> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAccCaiGol(
+    return LabeledCheckbox(
       label: 'Accidentes, Caidas y Golpes',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: accidentes_caidas,
-      onChanged: (bool newValue) {
-        setState(() {
-          accidentes_caidas = newValue;
-        });
-      },
+      valueNotifier: valueNotifierAccidentes_caidas,
     );
   }
 }
 
 // ----------------------------------------LESIONES EN LA ESPALDA O CUELLO -----------------------------------
-
-class LabeledCheckboxLesEspalCuello extends StatelessWidget {
-  const LabeledCheckboxLesEspalCuello({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Lesiones extends StatefulWidget {
   Lesiones({Key key}) : super(key: key);
@@ -839,64 +567,18 @@ class Lesiones extends StatefulWidget {
   LesionesWidgetState createState() => LesionesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class LesionesWidgetState extends State<Lesiones> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxLesEspalCuello(
+    return LabeledCheckbox(
       label: 'Lesiones en la espalda o cuello',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: lesiones_espalda,
-      onChanged: (bool newValue) {
-        setState(() {
-          lesiones_espalda = newValue;
-        });
-      },
+      valueNotifier: valueNotifierLesiones_espalda,
     );
   }
 }
 
 // -----------------------------------------INFECCIONES -----------------------------------------------------
-class LabeledCheckboxInfecciones extends StatelessWidget {
-  const LabeledCheckboxInfecciones({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Infecciones extends StatefulWidget {
   Infecciones({Key key}) : super(key: key);
@@ -905,65 +587,18 @@ class Infecciones extends StatefulWidget {
   InfeccionesWidgetState createState() => InfeccionesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class InfeccionesWidgetState extends State<Infecciones> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxInfecciones(
+    return LabeledCheckbox(
       label: 'Infecciones(meningitis,encefalitis)/privación de oxígeno',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: infecciones,
-      onChanged: (bool newValue) {
-        setState(() {
-          infecciones = newValue;
-        });
-      },
+      valueNotifier: valueNotifierInfecciones,
     );
   }
 }
 
 //--------------------------------------------ACV -----------------------------------------------------------
-
-class LabeledCheckboxAcv extends StatelessWidget {
-  const LabeledCheckboxAcv({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Acv extends StatefulWidget {
   Acv({Key key}) : super(key: key);
@@ -972,64 +607,18 @@ class Acv extends StatefulWidget {
   AcvWidgetState createState() => AcvWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class AcvWidgetState extends State<Acv> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAcv(
+    return LabeledCheckbox(
       label: 'Accidente Cerebrovascular (ACV)',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: acv,
-      onChanged: (bool newValue) {
-        setState(() {
-          acv = newValue;
-        });
-      },
+      valueNotifier: valueNotifierAcv,
     );
   }
 }
 
 // -------------------------------------------EXPOSICION A TOXINAS --------------------------------------------
-class LabeledCheckboxTox extends StatelessWidget {
-  const LabeledCheckboxTox({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Exposicion extends StatefulWidget {
   Exposicion({Key key}) : super(key: key);
@@ -1038,64 +627,18 @@ class Exposicion extends StatefulWidget {
   ExposicionWidgetState createState() => ExposicionWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ExposicionWidgetState extends State<Exposicion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxTox(
+    return LabeledCheckbox(
       label: 'Exposición a toxinas (plomo, solventes, químicos, etc.)',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: toxinas,
-      onChanged: (bool newValue) {
-        setState(() {
-          toxinas = newValue;
-        });
-      },
+      valueNotifier: valueNotifierToxinas,
     );
   }
 }
 
 // ------------------------------------------DEMENCIAS ---------------------------------------------------
-class LabeledCheckboxDemencia extends StatelessWidget {
-  const LabeledCheckboxDemencia({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Demencia extends StatefulWidget {
   Demencia({Key key}) : super(key: key);
@@ -1104,64 +647,17 @@ class Demencia extends StatefulWidget {
   DemenciaWidgetState createState() => DemenciaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DemenciaWidgetState extends State<Demencia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDemencia(
+    return LabeledCheckbox(
       label: 'Demencias (ejemplo Alzheimer)',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: demencia,
-      onChanged: (bool newValue) {
-        setState(() {
-          demencia = newValue;
-        });
-      },
+      valueNotifier: valueNotifierDemencia,
     );
   }
 }
 //-------------------------------------------- PARKINSON---------------------------------------------------
-
-class LabeledCheckboxParkinson extends StatelessWidget {
-  const LabeledCheckboxParkinson({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Parkinzon extends StatefulWidget {
   Parkinzon({Key key}) : super(key: key);
@@ -1170,64 +666,17 @@ class Parkinzon extends StatefulWidget {
   ParkinzonWidgetState createState() => ParkinzonWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class ParkinzonWidgetState extends State<Parkinzon> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxParkinson(
+    return LabeledCheckbox(
       label: 'Parkinson',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: parkinson,
-      onChanged: (bool newValue) {
-        setState(() {
-          parkinson = newValue;
-        });
-      },
+      valueNotifier: valueNotifierParkinson,
     );
   }
 }
 //------------------------------------------EPILEPSIA --------------------------------------------------
-
-class LabeledCheckboxEpilepsia extends StatelessWidget {
-  const LabeledCheckboxEpilepsia({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Epilepsia extends StatefulWidget {
   Epilepsia({Key key}) : super(key: key);
@@ -1236,64 +685,17 @@ class Epilepsia extends StatefulWidget {
   EpilepsiaWidgetState createState() => EpilepsiaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EpilepsiaWidgetState extends State<Epilepsia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxEpilepsia(
+    return LabeledCheckbox(
       label: 'Epilepsia',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: epilepsia,
-      onChanged: (bool newValue) {
-        setState(() {
-          epilepsia = newValue;
-        });
-      },
+      valueNotifier: valueNotifierEpilepsia,
     );
   }
 }
 //-------------------------------------------- ESCLEROSIS -------------------------------------------------
-
-class LabeledCheckboxEsclerosis extends StatelessWidget {
-  const LabeledCheckboxEsclerosis({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Esclerosis extends StatefulWidget {
   Esclerosis({Key key}) : super(key: key);
@@ -1302,64 +704,18 @@ class Esclerosis extends StatefulWidget {
   EsclerosisWidgetState createState() => EsclerosisWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EsclerosisWidgetState extends State<Esclerosis> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxEsclerosis(
+    return LabeledCheckbox(
       label: 'Esclerosis múltiple',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: esclerosis,
-      onChanged: (bool newValue) {
-        setState(() {
-          esclerosis = newValue;
-        });
-      },
+      valueNotifier: valueNotifierEsclerosis,
     );
   }
 }
 
 // --------------------------------------------HUNTINGTON ------------------------------------------------
-class LabeledCheckboxHun extends StatelessWidget {
-  const LabeledCheckboxHun({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Huntington extends StatefulWidget {
   Huntington({Key key}) : super(key: key);
@@ -1368,64 +724,17 @@ class Huntington extends StatefulWidget {
   HuntingtonWidgetState createState() => HuntingtonWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class HuntingtonWidgetState extends State<Huntington> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxHun(
+    return LabeledCheckbox(
       label: 'Huntington',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: huntington,
-      onChanged: (bool newValue) {
-        setState(() {
-          huntington = newValue;
-        });
-      },
+      valueNotifier: valueNotifierHuntington,
     );
   }
 }
 // --------------------------------------------DEPRESION -------------------------------------------------
-
-class LabeledCheckboxDepresion extends StatelessWidget {
-  const LabeledCheckboxDepresion({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Depresion extends StatefulWidget {
   Depresion({Key key}) : super(key: key);
@@ -1434,64 +743,17 @@ class Depresion extends StatefulWidget {
   DepresionWidgetState createState() => DepresionWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class DepresionWidgetState extends State<Depresion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDepresion(
+    return LabeledCheckbox(
       label: 'Depresión',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: depresion,
-      onChanged: (bool newValue) {
-        setState(() {
-          depresion = newValue;
-        });
-      },
+      valueNotifier: valueNotifierDepresion,
     );
   }
 }
 // --------------------------------------------TRASTORNO BIPOLAR -----------------------------------------
-
-class LabeledCheckboxBipolar extends StatelessWidget {
-  const LabeledCheckboxBipolar({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class TrastornoBipolar extends StatefulWidget {
   TrastornoBipolar({Key key}) : super(key: key);
@@ -1500,64 +762,17 @@ class TrastornoBipolar extends StatefulWidget {
   TrastornoBipolarWidgetState createState() => TrastornoBipolarWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class TrastornoBipolarWidgetState extends State<TrastornoBipolar> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxBipolar(
+    return LabeledCheckbox(
       label: 'Trastorno bipolar',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: trastorno,
-      onChanged: (bool newValue) {
-        setState(() {
-          trastorno = newValue;
-        });
-      },
+      valueNotifier: valueNotifierTrastorno,
     );
   }
 }
 // --------------------------------------------ESQUISOFRENIA ---------------------------------------------
-
-class LabeledCheckboxEsqui extends StatelessWidget {
-  const LabeledCheckboxEsqui({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Esquizofrenia extends StatefulWidget {
   Esquizofrenia({Key key}) : super(key: key);
@@ -1566,64 +781,18 @@ class Esquizofrenia extends StatefulWidget {
   EsquizofreniaWidgetState createState() => EsquizofreniaWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EsquizofreniaWidgetState extends State<Esquizofrenia> {
   @override
   Widget build(BuildContext context) {
     return LabeledCheckbox(
       label: 'Esquizofrenia',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: esquizofrenia,
-      onChanged: (bool newValue) {
-        setState(() {
-          esquizofrenia = newValue;
-        });
-      },
+      valueNotifier: valueNotifierEsquizofrenia,
     );
   }
 }
 
 //---------------------------------------------ENFERMEDAD O DESORDEN DEL GRAVE ----------------------------
-class LabeledCheckboxEnfDeso extends StatelessWidget {
-  const LabeledCheckboxEnfDeso({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class EnfermedadDesordenGrave extends StatefulWidget {
   EnfermedadDesordenGrave({Key key}) : super(key: key);
@@ -1633,66 +802,19 @@ class EnfermedadDesordenGrave extends StatefulWidget {
       EnfermedadDesordenGraveWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class EnfermedadDesordenGraveWidgetState
     extends State<EnfermedadDesordenGrave> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxEnfDeso(
+    return LabeledCheckbox(
       label:
           'Enfermedad o desorden grave (inmunológico, parálisis cerebral, polio, pulmones, etc.)',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: enfermedad_desorden,
-      onChanged: (bool newValue) {
-        setState(() {
-          enfermedad_desorden = newValue;
-        });
-      },
+      valueNotifier: valueNotifierEnfermedad_desorden,
     );
   }
 }
 //---------------------------------------------INTOXICACIONES ---------------------------------------------
-
-class LabeledCheckboxIntox extends StatelessWidget {
-  const LabeledCheckboxIntox({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily))),
-            Checkbox(
-              value: value,
-              onChanged: (bool newValue) {
-                onChanged(newValue);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Intoxicaciones extends StatefulWidget {
   Intoxicaciones({Key key}) : super(key: key);
@@ -1701,19 +823,13 @@ class Intoxicaciones extends StatefulWidget {
   IntoxicacionesWidgetState createState() => IntoxicacionesWidgetState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class IntoxicacionesWidgetState extends State<Intoxicaciones> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxIntox(
+    return LabeledCheckbox(
       label: 'Intoxicaciones',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: intoxicaciones,
-      onChanged: (bool newValue) {
-        setState(() {
-          intoxicaciones = newValue;
-        });
-      },
+      valueNotifier: valueNotifierIntoxicaciones,
     );
   }
 }

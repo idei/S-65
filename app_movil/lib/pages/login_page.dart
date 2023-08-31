@@ -43,7 +43,39 @@ class _LoginPage extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              LoginWidget(context),
+              Container(
+                child: Column(children: <Widget>[
+                  Container(
+                    child: Image.asset('assets/logo1.png'),
+                    height: 110.0,
+                  ),
+                  InputEmailWidget(),
+                  SizedBox(height: 30),
+                  InputPasswordWidget(),
+                  SizedBox(height: 30),
+                  ButtonIniciarSesion(context),
+                  SizedBox(height: 10),
+                  GestureDetector(
+                      child: Text("¿Olvido la contraseña?",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              fontSize: 15,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily)),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    RecuperarPage()));
+                      }),
+                  SizedBox(height: 20),
+                  ButtonRegresar(context),
+                ]),
+              )
             ],
           ),
         ));
@@ -122,48 +154,6 @@ class _LoginPage extends State<LoginPage> {
     }
   }
 
-  loginToast(String toast) {
-    return Fluttertoast.showToast(
-        msg: toast,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white);
-  }
-
-  Widget LoginWidget(BuildContext context1) {
-    return Container(
-      child: Column(children: <Widget>[
-        Container(
-          child: Image.asset('assets/logo1.png'),
-          height: 110.0,
-        ),
-        InputEmailWidget(),
-        SizedBox(height: 30),
-        InputPasswordWidget(),
-        SizedBox(height: 30),
-        ButtonIniciarSesion(context1),
-        SizedBox(height: 10),
-        GestureDetector(
-            child: Text("¿Olvido la contraseña?",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    fontSize: 15,
-                    fontFamily:
-                        Theme.of(context1).textTheme.headline1.fontFamily)),
-            onTap: () {
-              Navigator.pushReplacement(
-                  context1,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => RecuperarPage()));
-            }),
-        SizedBox(height: 20),
-        ButtonRegresar(context1),
-      ]),
-    );
-  }
-
   Widget InputEmailWidget() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -175,6 +165,7 @@ class _LoginPage extends State<LoginPage> {
             : "Por favor ingresar un correo electrónico válido",
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
+            prefixIcon: Icon(Icons.mail_outline),
             labelText: 'Correo electrónico',
             labelStyle: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
@@ -196,6 +187,7 @@ class _LoginPage extends State<LoginPage> {
         enabled: _isEnabled,
         obscureText: _obscureText,
         decoration: InputDecoration(
+            prefixIcon: Icon(Icons.lock_outline),
             labelText: 'Contraseña',
             suffixIcon: IconButton(
               icon: Icon(
@@ -230,7 +222,8 @@ class _LoginPage extends State<LoginPage> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: const CircularProgressIndicator(),
             )
-          : const Icon(Icons.email_outlined),
+          : SizedBox(),
+      // : const Icon(Icons.email_outlined),
       label: Text(_isLoading ? 'Cargando...' : 'INICIAR SESION',
           style: TextStyle(
               color: Colors.white,
@@ -270,12 +263,7 @@ class _LoginPage extends State<LoginPage> {
   }
 
   Widget ButtonRegresar(BuildContext context) {
-    return ElevatedButton.icon(
-      icon: Icon(Icons.arrow_circle_left_outlined),
-      label: Text('REGRESAR',
-          style: TextStyle(
-              color: Colors.white,
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         primary: Color.fromRGBO(30, 20, 108, 1),
         maximumSize: const Size(400, 50),
@@ -284,6 +272,10 @@ class _LoginPage extends State<LoginPage> {
       onPressed: () {
         Navigator.popAndPushNamed(context, '/');
       },
+      child: Text('REGRESAR',
+          style: TextStyle(
+              color: Colors.white,
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
     );
   }
 
@@ -297,5 +289,14 @@ class _LoginPage extends State<LoginPage> {
           textAlign: TextAlign.center,
           style: const TextStyle(color: Colors.white)),
     ));
+  }
+
+  loginToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white);
   }
 }

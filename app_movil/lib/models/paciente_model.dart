@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class PacienteModel {
   var rela_users;
   var rela_genero;
@@ -75,7 +73,7 @@ class PacienteModel {
       rela_departamento: json['rela_departamento'].toString(),
       rela_nivel_instruccion: json['rela_nivel_instruccion'].toString(),
       rela_grupo_conviviente: json['rela_grupo_conviviente'].toString(),
-      fecha_nacimiento: json['fecha_nacimiento'] != null
+      fecha_nacimiento: json['fecha_nacimiento'] != "null"
           ? DateTime.parse(json['fecha_nacimiento'])
           : null,
       celular: json['celular'],

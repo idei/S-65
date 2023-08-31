@@ -1,11 +1,13 @@
+import 'dart:async';
+
+import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
+import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/opciones_navbar.dart';
 import 'env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ScreeningCerebral extends StatefulWidget {
   @override
@@ -26,14 +28,85 @@ var email;
 var screening_recordatorio;
 
 class _ScreeningCerebralState extends State<ScreeningCerebral> {
-  double _animatedHeight = 0.0;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    getStringValuesSF();
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/menu_chequeo');
+          },
+        ),
+        title: Center(
+          child: Text('Cuestionario de Hábitos \n     de Salud Cerebral',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+        ),
+      ),
+      body: FutureBuilder(
+          future: getAllRespuesta(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Estado de carga
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              // Estado de error
+              return Text("Error al cargar los datos");
+            } else {
+              // Estado de datos cargados
+              if (snapshot.data.isEmpty) {
+                // No hay datos
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'Ya realizó el Cuestionario de Salud Cerebral',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                    ListTile(
+                        title: Text(
+                      'El resultado obtenido fue: ' + mensajeResultado,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
+                ));
+              } else {
+                return ColumnWidgetCerebral();
+              }
+            }
+          }),
+    );
+  }
 
   getStringValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
     id_paciente = prefs.getInt("id_paciente");
-    print(email);
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -57,8 +130,8 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
   }
 
   get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_PREFIX;
-    var url = URL_base + "/read_tipo_screening.php";
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
@@ -66,115 +139,38 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
     tipo_screening = json.decode(response.body);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        _alert_clinicos(context, "Cuestionario Cerebral", " Descripcion"));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //getStringValuesSF();
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "SFMS",
-            });
-          },
-        ),
-        title: Text('Chequeo de Salud Cerebral',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          )
-        ],
-      ),
-      body: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ColumnWidgetCerebral();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
-    );
-  }
-
   Future<List> getAllRespuesta() async {
     var response;
+    final completer = Completer<List>();
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/tipo_respuesta_salud_cerebral";
 
-    response = await http.post(url, body: {});
-
-    var jsonData = json.decode(response.body);
+    response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+    });
 
     if (response.statusCode == 200) {
-      await Future.delayed(Duration(milliseconds: 500));
-      return itemsRespuestasSaludCerebral = jsonData['data'];
+      var jsonData = json.decode(response.body);
+
+      if (jsonData['status'] == "Success") {
+        itemsRespuestasSaludCerebral = jsonData['data'];
+        completer.complete(jsonData['data']);
+      } else {
+        if (jsonData['status'] == "SinScreening") {
+          mensajeResultado = jsonData['data'][0]['result_screening'];
+          completer.complete([]);
+        } else {
+          completer.completeError("Error en la respuesta");
+        }
+      }
     } else {
-      return null;
+      completer.completeError("Error en la solicitud");
     }
+    return completer.future;
   }
 
-  Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
-    return Align(
-      child: FadeTransition(
-        opacity: animation,
-        child: child,
-      ),
-    );
-  }
-
-  _alert_clinicos(context, title, descripcion) {
-    Alert(
-      context: context,
-      title: title,
-      desc: descripcion,
-      alertAnimation: FadeAlertAnimation,
-      buttons: [
-        DialogButton(
-          child: Text(
-            "Entendido",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
-        )
-      ],
-    ).show();
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
+  var mensajeResultado;
 }
 
 class ColumnWidgetCerebral extends StatefulWidget {
@@ -188,17 +184,29 @@ class ColumnWidgetCerebral extends StatefulWidget {
 
 class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
+        context,
+        "Cuestionario Cerebral",
+        "Consigna: seleccione la opción que mejor describa sus hábitos. Si este cuestionario no puede ser completado por Ud. mismo pida ayuda a alguien cercano que conozca sobre sus hábtitos actuales y pasados. Recuerde que este cuestionario se realiza una sola vez"));
+  }
+
+  ValueNotifier<bool> valueNotifierActividadFisica = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAlimentacionSaludable =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierContactoSocial = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierSueno = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierActividadEsfuerzoMental =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierOtro = ValueNotifier<bool>(false);
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(children: [
-        // Container(
-        //   padding: EdgeInsets.only(top: 20.0), // Padding superior de 20 puntos
-        //   child: CustomDivider(
-        //     text: 'ACTIVIDADES DE AUTOCUIDADO',
-        //     color: Colors.red,
-        //   ),
-        // ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -223,12 +231,18 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                   height: 5.0,
                   color: Colors.black,
                 ),
-                ActividadFisica(),
-                AlimentacionSaludable(),
-                ContactoSocial(),
-                Sueno(),
-                ActividadEsfuerzoMental(),
-                Otro(),
+                ActividadFisica(
+                    valueNotifierActividadFisica: valueNotifierActividadFisica),
+                AlimentacionSaludable(
+                    valueNotifierAlimentacionSaludable:
+                        valueNotifierAlimentacionSaludable),
+                ContactoSocial(
+                    valueNotifierContactoSocial: valueNotifierContactoSocial),
+                Sueno(valueNotifierSueno: valueNotifierSueno),
+                ActividadEsfuerzoMental(
+                    valueNotifierActividadEsfuerzoMental:
+                        valueNotifierActividadEsfuerzoMental),
+                Otro(valueNotifierOtro: valueNotifierOtro),
                 Padding(
                   padding: EdgeInsets.all(10.0),
                 ),
@@ -240,6 +254,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -273,6 +288,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -306,6 +322,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -339,6 +356,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -372,6 +390,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -405,6 +424,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -438,6 +458,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -467,11 +488,11 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
             ),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -505,6 +526,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -538,6 +560,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -571,6 +594,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -604,6 +628,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -616,7 +641,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "Sueño. ¿A que hora se duerme habitualmenbte?",
+                    "Sueño. ¿A que hora se duerme habitualmente?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -637,6 +662,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -670,6 +696,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -703,6 +730,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -732,11 +760,11 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
             ),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -749,7 +777,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "¿Participa en actividades de indole cultural (cine, teatro, conciertos, museos) y/o artístico (canto, pintura, cerámica, baile, música)?",
+                    "¿Participa en actividades de índole cultural (cine, teatro, conciertos, museos) y/o artístico (canto, pintura, cerámica, baile, música)?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -770,6 +798,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -782,7 +811,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "¿Ud. tendría esperanza en que incorporando algunos hábitos saludables como los relacionados a las artes (incluidas las artes visuales, la música y la danza) podrían mejorar la salud de su cerebro?",
+                    "¿Usted tendría esperanza en que incorporando algunos hábitos saludables como los relacionados a las artes (incluidas las artes visuales, la música y la danza) podrían mejorar la salud de su cerebro?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -803,6 +832,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           padding: EdgeInsets.all(8.0),
         ),
         Card(
+          shadowColor: Colors.yellow,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           margin: EdgeInsets.all(15),
@@ -841,7 +871,6 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
             ),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.all(12.0),
         ),
@@ -865,10 +894,153 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
               )),
         ),
         Padding(
-          padding: EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(8.0),
         ),
       ]),
     );
+  }
+
+  guardarDatosSaludCerebral(BuildContext context) async {
+    if (id_actividad_fisica_moderada == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_actividad_fisica_minutos == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_persona_mantenida_10anos == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_persona_activa_vida == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_dias_alimenta_saludable == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_alimenta_saludable_vida == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_contacto_social_amigos == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_contacto_social_actividad == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_calidad_sueno == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_despierto_dia == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_siesta_dia == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_duerme == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_duerme_noche == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_sueno_hora_noche == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_actividades_esfuerzo_mental == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_actividad_indole_cultural == null)
+      loginToast("Debe responder todas las preguntas");
+    if (id_esperanza_habito_saludable == null)
+      loginToast("Debe responder todas las preguntas");
+
+    if (id_actividad_fisica_moderada != null &&
+        id_actividad_fisica_minutos != null &&
+        id_persona_mantenida_10anos != null &&
+        id_persona_activa_vida != null &&
+        id_dias_alimenta_saludable != null &&
+        id_alimenta_saludable_vida != null &&
+        id_contacto_social_amigos != null &&
+        id_contacto_social_actividad != null &&
+        id_sueno_calidad_sueno != null &&
+        id_sueno_despierto_dia != null &&
+        id_sueno_siesta_dia != null &&
+        id_sueno_duerme != null &&
+        id_sueno_hora_noche != null &&
+        id_sueno_duerme_noche != null &&
+        id_actividades_esfuerzo_mental != null &&
+        id_actividad_indole_cultural != null &&
+        id_esperanza_habito_saludable != null) {
+      showDialogMessage(context);
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/respuesta_screening_cerebral";
+      var response = await http.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+        "id_medico": id_medico.toString(),
+        "id_recordatorio": id_recordatorio.toString(),
+        "tipo_screening": tipo_screening['data'].toString(),
+        "actividad_fisica": valueNotifierActividadFisica.value.toString(),
+        "alimentacion_saludable":
+            valueNotifierAlimentacionSaludable.value.toString(),
+        "contacto_social": valueNotifierContactoSocial.value.toString(),
+        "sueno": valueNotifierSueno.value.toString(),
+        "actividades_esfuerzo_mental":
+            valueNotifierActividadEsfuerzoMental.value.toString(),
+        "otro": valueNotifierOtro.value.toString(),
+        "otro_texto": otro_controller.text.toString(),
+        "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
+        "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
+        "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
+        "id_persona_activa_vida": id_persona_activa_vida.toString(),
+        "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
+        "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
+        "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
+        "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
+        "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
+        "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
+        "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
+        "id_sueno_duerme": id_sueno_duerme.toString(),
+        "id_sueno_duerme_noche": id_sueno_duerme_noche.toString(),
+        "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
+        "id_actividades_esfuerzo_mental":
+            id_actividades_esfuerzo_mental.toString(),
+        "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
+        "id_esperanza_habito_saludable":
+            id_esperanza_habito_saludable.toString()
+      });
+
+      var data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        if (data['data'] == "alert") {
+          showCustomAlert(
+            context,
+            "Screening Terminado",
+            "",
+            true,
+            () {
+              _scaffold_messenger(context, "Screening Registrado", 1);
+
+              if (screening_recordatorio == true) {
+                Navigator.pushNamed(context, '/recordatorio');
+              } else {
+                Navigator.pushNamed(context, '/screening', arguments: {
+                  "select_screening": "SCER",
+                });
+              }
+            },
+          );
+        } else {
+          _scaffold_messenger(context, "Screening Registrado", 1);
+
+          if (data['status'] == "Success") {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "SCER",
+              });
+            }
+          }
+        }
+      } else {
+        _scaffold_messenger(context, "No se pudo guardar el chequeo", 2);
+      }
+    }
+  }
+
+  _scaffold_messenger(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 
   bool _isLoading = false;
@@ -882,111 +1054,6 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
     setState(() {
       _isLoading = false;
     });
-  }
-
-  delayTimer() async {
-    await Future.delayed(Duration(milliseconds: 500));
-    return true;
-  }
-}
-
-guardarDatosSaludCerebral(BuildContext context) async {
-  if (id_actividad_fisica == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_actividad_fisica_minutos == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_persona_mantenida_10anos == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_persona_activa_vida == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_dias_alimenta_saludable == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_alimenta_saludable_vida == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_contacto_social_amigos == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_contacto_social_actividad == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_sueno_calidad_sueno == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_sueno_despierto_dia == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_sueno_siesta_dia == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_sueno_duerme == null) loginToast("Debe responder todas las preguntas");
-  if (id_sueno_hora_noche == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_actividades_esfuerzo_mental == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_actividad_indole_cultural == null)
-    loginToast("Debe responder todas las preguntas");
-  if (id_esperanza_habito_saludable == null)
-    loginToast("Debe responder todas las preguntas");
-
-  if (id_actividad_fisica != null &&
-      id_actividad_fisica_minutos != null &&
-      id_persona_mantenida_10anos != null &&
-      id_persona_activa_vida != null &&
-      id_dias_alimenta_saludable != null &&
-      id_alimenta_saludable_vida != null &&
-      id_contacto_social_amigos != null &&
-      id_contacto_social_actividad != null &&
-      id_sueno_calidad_sueno != null &&
-      id_sueno_despierto_dia != null &&
-      id_sueno_siesta_dia != null &&
-      id_sueno_duerme != null &&
-      id_sueno_hora_noche != null &&
-      id_actividades_esfuerzo_mental &&
-      id_actividad_indole_cultural &&
-      id_esperanza_habito_saludable) {
-    showDialogMessage(context);
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/respuesta_screening_cerebral";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-      "id_medico": id_medico.toString(),
-      "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening['data'].toString(),
-      "id_actividad_fisica": id_actividad_fisica.toString(),
-      "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
-      "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
-      "id_persona_activa_vida": id_persona_activa_vida.toString(),
-      "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
-      "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
-      "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
-      "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
-      "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
-      "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
-      "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
-      "id_sueno_duerme": id_sueno_duerme.toString(),
-      "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
-      "id_actividades_esfuerzo_mental":
-          id_actividades_esfuerzo_mental.toString(),
-      "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
-      "id_esperanza_habito_saludable": id_esperanza_habito_saludable.toString()
-    });
-
-    var data = json.decode(response.body);
-
-    if (response.statusCode == 200) {
-      if (data['data'] == "alert") {
-        _alert_informe(
-          context,
-          "Para tener en cuenta",
-          "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-        );
-      } else {
-        if (data['status'] == "Success") {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          }
-        }
-      }
-    }
   }
 }
 
@@ -1029,114 +1096,15 @@ showDialogMessage(context) async {
       });
 }
 
-_alert_informe(context, title, descripcion) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
-//----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-
-bool actividadFisica = false;
-bool alimentacionSaludable = false;
-bool contactoSocial = false;
-bool sueno = false;
-bool actividadEsfuerzoMental = false;
-bool otro = false;
-
-String cod_event_satisfecho = "ANI1";
-String cod_event_abandonado = 'ANI2';
-String cod_event_vacia = 'ANI3';
-String cod_event_aburrida = 'ANI4';
-String cod_event_humor = 'ANI5';
-String cod_event_temor = 'ANI6';
-String cod_event_feliz = 'ANI7';
-
 int _characterLimit = 60; // Cambia este valor según tus necesidades
 int _characterLimitHabitos = 60; // Cambia este valor según tus necesidades
 
 //-------------------------------------- ActividadFisicas -----------------------------------------------------
 
-class LabeledCheckboxActividadFisica extends StatelessWidget {
-  const LabeledCheckboxActividadFisica({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      //fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ActividadFisica extends StatefulWidget {
-  ActividadFisica({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierActividadFisica;
+
+  ActividadFisica({this.valueNotifierActividadFisica});
 
   @override
   CheckActividadFisicaWidgetState createState() =>
@@ -1146,13 +1114,13 @@ class ActividadFisica extends StatefulWidget {
 class CheckActividadFisicaWidgetState extends State<ActividadFisica> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxActividadFisica(
+    return LabeledCheckboxGeneric(
       label: 'Actividad Física',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: actividadFisica,
+      value: widget.valueNotifierActividadFisica.value,
       onChanged: (bool newValue) {
         setState(() {
-          actividadFisica = newValue;
+          widget.valueNotifierActividadFisica.value = newValue;
         });
       },
     );
@@ -1162,54 +1130,10 @@ class CheckActividadFisicaWidgetState extends State<ActividadFisica> {
 //-----------------------------------------------------------------------------------------------------------
 //-------------------------------------- Alimentacion Saludable -----------------------------------------------------
 
-class LabeledCheckboxAlimentacionSaludable extends StatelessWidget {
-  const LabeledCheckboxAlimentacionSaludable({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class AlimentacionSaludable extends StatefulWidget {
-  AlimentacionSaludable({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierAlimentacionSaludable;
+
+  AlimentacionSaludable({this.valueNotifierAlimentacionSaludable});
 
   @override
   CheckAlimentacionSaludableWidgetState createState() =>
@@ -1220,13 +1144,13 @@ class CheckAlimentacionSaludableWidgetState
     extends State<AlimentacionSaludable> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxAlimentacionSaludable(
+    return LabeledCheckboxGeneric(
       label: 'Alimentación Saludable',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: alimentacionSaludable,
+      value: widget.valueNotifierAlimentacionSaludable.value,
       onChanged: (bool newValue) {
         setState(() {
-          alimentacionSaludable = newValue;
+          widget.valueNotifierAlimentacionSaludable.value = newValue;
         });
       },
     );
@@ -1236,54 +1160,10 @@ class CheckAlimentacionSaludableWidgetState
 //-----------------------------------------------------------------------------------------------------------
 //-------------------------------------- Alimentacion Saludable -----------------------------------------------------
 
-class LabeledCheckboxContactoSocial extends StatelessWidget {
-  const LabeledCheckboxContactoSocial({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ContactoSocial extends StatefulWidget {
-  ContactoSocial({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierContactoSocial;
+
+  ContactoSocial({this.valueNotifierContactoSocial});
 
   @override
   CheckContactoSocialWidgetState createState() =>
@@ -1293,13 +1173,13 @@ class ContactoSocial extends StatefulWidget {
 class CheckContactoSocialWidgetState extends State<ContactoSocial> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxContactoSocial(
+    return LabeledCheckboxGeneric(
       label: 'Contacto Social',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: contactoSocial,
+      value: widget.valueNotifierContactoSocial.value,
       onChanged: (bool newValue) {
         setState(() {
-          contactoSocial = newValue;
+          widget.valueNotifierContactoSocial.value = newValue;
         });
       },
     );
@@ -1310,57 +1190,10 @@ class CheckContactoSocialWidgetState extends State<ContactoSocial> {
 
 //-------------------------------------- Sueño -----------------------------------------------------
 
-class LabeledCheckboxSueno extends StatelessWidget {
-  const LabeledCheckboxSueno({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Sueno extends StatefulWidget {
-  Sueno({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierSueno;
 
+  Sueno({this.valueNotifierSueno});
   @override
   CheckSuenoWidgetState createState() => CheckSuenoWidgetState();
 }
@@ -1368,13 +1201,13 @@ class Sueno extends StatefulWidget {
 class CheckSuenoWidgetState extends State<Sueno> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxSueno(
+    return LabeledCheckboxGeneric(
       label: 'Sueño',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: sueno,
+      value: widget.valueNotifierSueno.value,
       onChanged: (bool newValue) {
         setState(() {
-          sueno = newValue;
+          widget.valueNotifierSueno.value = newValue;
         });
       },
     );
@@ -1385,56 +1218,10 @@ class CheckSuenoWidgetState extends State<Sueno> {
 
 //-------------------------------------- Actividades que implican esfuerzo mental -----------------------------------------------------
 
-class LabeledCheckboxActividadEsfuerzoMental extends StatelessWidget {
-  const LabeledCheckboxActividadEsfuerzoMental({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ActividadEsfuerzoMental extends StatefulWidget {
-  ActividadEsfuerzoMental({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierActividadEsfuerzoMental;
+
+  ActividadEsfuerzoMental({this.valueNotifierActividadEsfuerzoMental});
 
   @override
   CheckActividadEsfuerzoMentalWidgetState createState() =>
@@ -1445,13 +1232,13 @@ class CheckActividadEsfuerzoMentalWidgetState
     extends State<ActividadEsfuerzoMental> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxActividadEsfuerzoMental(
+    return LabeledCheckboxGeneric(
       label: 'Actividades que implican esfuerzo mental',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: actividadEsfuerzoMental,
+      value: widget.valueNotifierActividadEsfuerzoMental.value,
       onChanged: (bool newValue) {
         setState(() {
-          actividadEsfuerzoMental = newValue;
+          widget.valueNotifierActividadEsfuerzoMental.value = newValue;
         });
       },
     );
@@ -1462,56 +1249,10 @@ class CheckActividadEsfuerzoMentalWidgetState
 
 //-------------------------------------- Otro -----------------------------------------------------
 
-class LabeledCheckboxOtro extends StatelessWidget {
-  const LabeledCheckboxOtro({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Otro extends StatefulWidget {
-  Otro({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierOtro;
+
+  Otro({this.valueNotifierOtro});
 
   @override
   CheckOtroWidgetState createState() => CheckOtroWidgetState();
@@ -1522,26 +1263,26 @@ class CheckOtroWidgetState extends State<Otro> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        LabeledCheckboxOtro(
+        LabeledCheckboxGeneric(
           label: 'Otro',
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          value: otro,
+          value: widget.valueNotifierOtro.value,
           onChanged: (bool newValue) {
             setState(() {
-              otro = newValue;
-              if (!otro) {
-                otro_habito_controller
+              widget.valueNotifierOtro.value = newValue;
+              if (!widget.valueNotifierOtro.value) {
+                otro_controller
                     .clear(); // Reiniciar el TextField cuando el checkbox se desactiva
               }
-              print(otro);
+              print(widget.valueNotifierOtro.value);
             });
           },
         ),
-        if (otro)
+        if (widget.valueNotifierOtro.value)
           Container(
             padding: EdgeInsets.all(10),
             child: TextFormField(
-              controller: otro_habito_controller,
+              controller: otro_controller,
               maxLength: _characterLimit,
               decoration: InputDecoration(
                   labelText: '¿Qué otro hábito?',
@@ -1568,7 +1309,7 @@ class CheckOtroWidgetState extends State<Otro> {
 //-----------------------------------------------------------------------------------------------------------
 // Realiza Actividad Fisica *******************
 
-var id_actividad_fisica = null;
+var id_actividad_fisica_moderada = null;
 
 class ActividadFisicaModerada extends StatefulWidget {
   @override
@@ -1589,15 +1330,15 @@ class ActividadFisicaModeradaWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER06" ||
-                      list['codigo_evento'] == "SCER07" ||
-                      list['codigo_evento'] == "SCER08" ||
-                      list['codigo_evento'] == "SCER09" ||
-                      list['codigo_evento'] == "SCER10"
+              (list) => list['code'] == "SCER06" ||
+                      list['code'] == "SCER07" ||
+                      list['code'] == "SCER08" ||
+                      list['code'] == "SCER09" ||
+                      list['code'] == "SCER10"
                   ? RadioListTile(
-                      groupValue: id_actividad_fisica,
+                      groupValue: id_actividad_fisica_moderada,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1607,7 +1348,7 @@ class ActividadFisicaModeradaWidgetState
                       onChanged: (val) {
                         setState(() {
                           debugPrint('VAL = $val');
-                          id_actividad_fisica = val;
+                          id_actividad_fisica_moderada = val;
                         });
                       },
                     )
@@ -1642,15 +1383,15 @@ class ActividadFisicaModeradaMinutosWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER11" ||
-                      list['codigo_evento'] == "SCER12" ||
-                      list['codigo_evento'] == "SCER13" ||
-                      list['codigo_evento'] == "SCER14" ||
-                      list['codigo_evento'] == "SCER15"
+              (list) => list['code'] == "SCER11" ||
+                      list['code'] == "SCER12" ||
+                      list['code'] == "SCER13" ||
+                      list['code'] == "SCER14" ||
+                      list['code'] == "SCER15"
                   ? RadioListTile(
                       groupValue: id_actividad_fisica_minutos,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1694,14 +1435,14 @@ class PersonaActiva10AnosWidgetState extends State<PersonaActiva10Anos> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER16" ||
-                      list['codigo_evento'] == "SCER17" ||
-                      list['codigo_evento'] == "SCER18" ||
-                      list['codigo_evento'] == "SCER19"
+              (list) => list['code'] == "SCER16" ||
+                      list['code'] == "SCER17" ||
+                      list['code'] == "SCER18" ||
+                      list['code'] == "SCER19"
                   ? RadioListTile(
                       groupValue: id_persona_mantenida_10anos,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1725,7 +1466,7 @@ class PersonaActiva10AnosWidgetState extends State<PersonaActiva10Anos> {
 
 // Persona Activa Vida *******************
 
-var id_persona_activa_vida = null;
+var id_persona_activa_vida;
 
 class PersonaActivaVida extends StatefulWidget {
   @override
@@ -1733,6 +1474,12 @@ class PersonaActivaVida extends StatefulWidget {
 }
 
 class PersonaActivaVidaWidgetState extends State<PersonaActivaVida> {
+  @override
+  void initState() {
+    id_persona_activa_vida = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1744,14 +1491,14 @@ class PersonaActivaVidaWidgetState extends State<PersonaActivaVida> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER20" ||
-                      list['codigo_evento'] == "SCER21" ||
-                      list['codigo_evento'] == "SCER22" ||
-                      list['codigo_evento'] == "SCER23"
+              (list) => list['code'] == "SCER20" ||
+                      list['code'] == "SCER21" ||
+                      list['code'] == "SCER22" ||
+                      list['code'] == "SCER23"
                   ? RadioListTile(
                       groupValue: id_persona_activa_vida,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1795,15 +1542,15 @@ class DiasAlimentaSaludableWidgetState extends State<DiasAlimentaSaludable> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER24" ||
-                      list['codigo_evento'] == "SCER25" ||
-                      list['codigo_evento'] == "SCER26" ||
-                      list['codigo_evento'] == "SCER27" ||
-                      list['codigo_evento'] == "SCER28"
+              (list) => list['code'] == "SCER24" ||
+                      list['code'] == "SCER25" ||
+                      list['code'] == "SCER26" ||
+                      list['code'] == "SCER27" ||
+                      list['code'] == "SCER28"
                   ? RadioListTile(
                       groupValue: id_dias_alimenta_saludable,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1847,14 +1594,14 @@ class AlimentarSaludableVidaWidgetState extends State<AlimentarSaludableVida> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER29" ||
-                      list['codigo_evento'] == "SCER30" ||
-                      list['codigo_evento'] == "SCER31" ||
-                      list['codigo_evento'] == "SCER32"
+              (list) => list['code'] == "SCER29" ||
+                      list['code'] == "SCER30" ||
+                      list['code'] == "SCER31" ||
+                      list['code'] == "SCER32"
                   ? RadioListTile(
                       groupValue: id_alimenta_saludable_vida,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1898,14 +1645,14 @@ class ContactoSocialAmigosWidgetState extends State<ContactoSocialAmigos> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER33" ||
-                      list['codigo_evento'] == "SCER34" ||
-                      list['codigo_evento'] == "SCER35" ||
-                      list['codigo_evento'] == "SCER36"
+              (list) => list['code'] == "SCER33" ||
+                      list['code'] == "SCER34" ||
+                      list['code'] == "SCER35" ||
+                      list['code'] == "SCER36"
                   ? RadioListTile(
                       groupValue: id_contacto_social_amigos,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -1949,15 +1696,15 @@ class ContactoSocialFamiliaWidgetState extends State<ContactoSocialFamilia> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER37" ||
-                      list['codigo_evento'] == "SCER38" ||
-                      list['codigo_evento'] == "SCER39" ||
-                      list['codigo_evento'] == "SCER40" ||
-                      list['codigo_evento'] == "SCER41"
+              (list) => list['code'] == "SCER37" ||
+                      list['code'] == "SCER38" ||
+                      list['code'] == "SCER39" ||
+                      list['code'] == "SCER40" ||
+                      list['code'] == "SCER41"
                   ? RadioListTile(
                       groupValue: id_contacto_social_familia,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2002,14 +1749,14 @@ class ContactoSocialActividadWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER42" ||
-                      list['codigo_evento'] == "SCER43" ||
-                      list['codigo_evento'] == "SCER44" ||
-                      list['codigo_evento'] == "SCER45"
+              (list) => list['code'] == "SCER42" ||
+                      list['code'] == "SCER43" ||
+                      list['code'] == "SCER44" ||
+                      list['code'] == "SCER45"
                   ? RadioListTile(
                       groupValue: id_contacto_social_actividad,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2052,12 +1799,11 @@ class SuenoCalidadSuenoWidgetState extends State<SuenoCalidadSueno> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_calidad_sueno,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2100,12 +1846,11 @@ class SuenoDespiernoDiaWidgetState extends State<SuenoDespiernoDia> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_despierto_dia,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2148,12 +1893,11 @@ class SuenoSiestaDiaWidgetState extends State<SuenoSiestaDia> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_siesta_dia,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2196,12 +1940,11 @@ class SuenoDuermeWidgetState extends State<SuenoDuerme> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_duerme,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2244,12 +1987,11 @@ class SuenoDuermeNocheWidgetState extends State<SuenoDuermeNoche> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_duerme_noche,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2292,12 +2034,11 @@ class SuenoHoraNocheWidgetState extends State<SuenoHoraNoche> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_sueno_hora_noche,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2342,15 +2083,15 @@ class ActividadesEsfuerzoMentalWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER50" ||
-                      list['codigo_evento'] == "SCER51" ||
-                      list['codigo_evento'] == "SCER52" ||
-                      list['codigo_evento'] == "SCER53" ||
-                      list['codigo_evento'] == "SCER54"
+              (list) => list['code'] == "SCER50" ||
+                      list['code'] == "SCER51" ||
+                      list['code'] == "SCER52" ||
+                      list['code'] == "SCER53" ||
+                      list['code'] == "SCER54"
                   ? RadioListTile(
                       groupValue: id_actividades_esfuerzo_mental,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2395,15 +2136,15 @@ class ActividadesIndoleCulturalWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER55" ||
-                      list['codigo_evento'] == "SCER56" ||
-                      list['codigo_evento'] == "SCER57" ||
-                      list['codigo_evento'] == "SCER58" ||
-                      list['codigo_evento'] == "SCER59"
+              (list) => list['code'] == "SCER55" ||
+                      list['code'] == "SCER56" ||
+                      list['code'] == "SCER57" ||
+                      list['code'] == "SCER58" ||
+                      list['code'] == "SCER59"
                   ? RadioListTile(
                       groupValue: id_actividad_indole_cultural,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,
@@ -2448,12 +2189,11 @@ class EsperanzaHabitoSaludableWidgetState
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['codigo_evento'] == "SCER60" ||
-                      list['codigo_evento'] == "SCER61"
+              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
                   ? RadioListTile(
                       groupValue: id_esperanza_habito_saludable,
                       title: Text(
-                        list['nombre_evento'],
+                        list['respuesta'],
                         style: TextStyle(
                           fontFamily:
                               Theme.of(context).textTheme.headline1.fontFamily,

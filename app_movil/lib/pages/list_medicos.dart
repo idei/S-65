@@ -3,7 +3,7 @@ import 'package:app_salud/services/medico_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -202,7 +202,10 @@ class _ListMedicosState extends State<ListMedicos>
                                       spacing: 10, // space between two icons
                                       children: <Widget>[
                                         IconButton(
-                                          icon: Icon(Icons.text_snippet),
+                                          icon: Icon(
+                                            Icons.text_snippet,
+                                            size: 30,
+                                          ),
                                           color: Colors.green,
                                           onPressed: () {
                                             Navigator.pushNamed(

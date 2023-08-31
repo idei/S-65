@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/avisos_model.dart';
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 
 class Avisos extends StatefulWidget {

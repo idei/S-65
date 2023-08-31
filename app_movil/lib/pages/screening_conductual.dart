@@ -1,3 +1,4 @@
+import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,8 +6,6 @@ import 'package:app_salud/pages/env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../models/opciones_navbar.dart';
 
 class ScreeningConductualPage extends StatefulWidget {
   @override
@@ -29,6 +28,58 @@ List itemsConductualOtro;
 bool otroVisible = false;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        alert_screenings_generico(context, "Cuestionario Conductual",
+            " Tómese su tiempo para responder de la mejor manera "));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    getStringValuesSF();
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "CONDUC",
+            });
+          },
+        ),
+        title: Text('Chequeo de Conducta',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+      ),
+      body: SingleChildScrollView(
+        child: FutureBuilder(
+          future: getAllRespuesta(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ColumnWidgetConductual();
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   getStringValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email_prefer = prefs.getString("email_prefer");
@@ -67,75 +118,27 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     tipo_screening = jsonDate;
   }
 
-  @override
-  void initState() {
-    super.initState();
+  Future<List> getAllRespuesta({
+    bool otro = false,
+  }) async {
+    var response;
+    var responseOtro;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => _alert_clinicos(
-        context, "Cuestionario Conductual", " Texto Introductivo "));
-  }
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_conductual";
 
-  @override
-  Widget build(BuildContext context) {
-    getStringValuesSF();
+    responseOtro = await http.post(url, body: {"otro": "otro"});
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
-            ),
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          },
-        ),
-        title: Text('Chequeo de Conducta',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ColumnWidgetConductual();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
+    response = await http.post(url, body: {});
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
+    var jsonData = json.decode(response.body);
+    var jsonDataOtro = json.decode(responseOtro.body);
+
+    if (response.statusCode == 200 && (responseOtro.statusCode == 200)) {
+      itemsConductualOtro = jsonDataOtro['data'];
+      return itemsConductual = jsonData['data'];
+    } else {
+      return null;
     }
   }
 }
@@ -663,220 +666,230 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       _isLoading = false;
     });
   }
-}
 
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
-_alert_clinicos(context, title, descripcion) {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () => Navigator.pop(context),
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-showDialogMessage(context) async {
-  await Future.delayed(Duration(microseconds: 1));
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            height: 80,
-            width: 80,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "Guardando Información",
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
+  showDialogMessage(context) async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
                   ),
-                )
-              ],
+                  Text(
+                    "Guardando Información",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      });
-}
-
-Future<List> getAllRespuesta({
-  bool otro = false,
-}) async {
-  var response;
-  var responseOtro;
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_respuesta_conductual";
-
-  responseOtro = await http.post(url, body: {"otro": "otro"});
-
-  response = await http.post(url, body: {});
-
-  var jsonData = json.decode(response.body);
-  var jsonDataOtro = json.decode(responseOtro.body);
-
-  if (response.statusCode == 200 && (responseOtro.statusCode == 200)) {
-    itemsConductualOtro = jsonDataOtro['data'];
-    return itemsConductual = jsonData['data'];
-  } else {
-    return null;
+          );
+        });
   }
-}
 
-_alert_informe(context, title, descripcion) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
-}
+  _alert_informe(context, title, descripcion) async {
+    Alert(
+      context: context,
+      title: title,
+      desc: descripcion,
+      alertAnimation: FadeAlertAnimation,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Entendido",
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+          onPressed: () {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "CONDUC",
+              });
+            }
+          },
+          width: 120,
+        )
+      ],
+    ).show();
+  }
 
-guardarDatosConductual(BuildContext context) async {
-  if (id_conductual1 == null) loginToast("Debe responder todas las preguntas");
+  guardarDatosConductual(BuildContext context) async {
+    if (id_conductual1 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual2 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual2 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual3 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual3 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual4 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual4 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual5 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual5 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual6 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual6 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual7 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual7 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual8 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual8 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual9 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual9 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual10 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual10 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual11 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual11 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual12 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual12 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual13 == null) loginToast("Debe responder todas las preguntas");
+    if (id_conductual13 == null)
+      loginToast("Debe responder todas las preguntas");
 
-  if (id_conductual1 != null &&
-      id_conductual2 != null &&
-      id_conductual3 != null &&
-      id_conductual4 != null &&
-      id_conductual5 != null &&
-      id_conductual6 != null &&
-      id_conductual7 != null &&
-      id_conductual8 != null &&
-      id_conductual9 != null &&
-      id_conductual10 != null &&
-      id_conductual11 != null &&
-      id_conductual12 != null &&
-      id_conductual13 != null) {
-    showDialogMessage(context);
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/respuesta_screening_conductual";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-      "id_medico": id_medico.toString(),
-      "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening['data'].toString(),
-      "id_conductual1": id_conductual1,
-      "observaciones": otro.text,
-      "id_conductual2": id_conductual2,
-      "id_conductual3": id_conductual3,
-      "id_conductual4": id_conductual4,
-      "id_conductual5": id_conductual5,
-      "id_conductual6": id_conductual6,
-      "id_conductual7": id_conductual7,
-      "id_conductual8": id_conductual8,
-      "id_conductual9": id_conductual9,
-      "id_conductual10": id_conductual10,
-      "id_conductual11": id_conductual11,
-      "id_conductual12": id_conductual12,
-      "id_conductual13": id_conductual13,
-    });
+    if (id_conductual1 != null &&
+        id_conductual2 != null &&
+        id_conductual3 != null &&
+        id_conductual4 != null &&
+        id_conductual5 != null &&
+        id_conductual6 != null &&
+        id_conductual7 != null &&
+        id_conductual8 != null &&
+        id_conductual9 != null &&
+        id_conductual10 != null &&
+        id_conductual11 != null &&
+        id_conductual12 != null &&
+        id_conductual13 != null) {
+      showDialogMessage(context);
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/respuesta_screening_conductual";
+      var response = await http.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+        "id_medico": id_medico.toString(),
+        "id_recordatorio": id_recordatorio.toString(),
+        "tipo_screening": tipo_screening['data'].toString(),
+        "id_conductual1": id_conductual1,
+        "observaciones": otro.text,
+        "id_conductual2": id_conductual2,
+        "id_conductual3": id_conductual3,
+        "id_conductual4": id_conductual4,
+        "id_conductual5": id_conductual5,
+        "id_conductual6": id_conductual6,
+        "id_conductual7": id_conductual7,
+        "id_conductual8": id_conductual8,
+        "id_conductual9": id_conductual9,
+        "id_conductual10": id_conductual10,
+        "id_conductual11": id_conductual11,
+        "id_conductual12": id_conductual12,
+        "id_conductual13": id_conductual13,
+      });
 
-    var data = json.decode(response.body);
+      var data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      if (data['data'] == "alert") {
-        _alert_informe(
-          context,
-          "Para tener en cuenta",
-          "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-        );
-      } else {
-        if (data['status'] == "Success") {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
+      if (response.statusCode == 200) {
+        if (data['data'] == "alert") {
+          _alert_informe(
+            context,
+            "Para tener en cuenta",
+            "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+          );
+        } else {
+          if (data['status'] == "Success") {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "CONDUC",
+              });
+            }
           }
         }
       }
     }
   }
+
+  loginToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white);
+  }
 }
 
-loginToast(String toast) {
-  return Fluttertoast.showToast(
-      msg: toast,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white);
+//------------***************
+class GenericRadioList extends StatefulWidget {
+  final List items;
+  final String groupValue;
+  final void Function(String) onChanged;
+  final double heightContainer;
+
+  const GenericRadioList(
+      {this.items, this.groupValue, this.onChanged, this.heightContainer});
+
+  @override
+  _GenericRadioListState createState() => _GenericRadioListState();
+}
+
+class _GenericRadioListState extends State<GenericRadioList> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: widget.heightContainer,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: widget.items.map((list) {
+          return RadioListTile(
+            groupValue: widget.groupValue,
+            title: Text(
+              list['respuesta'],
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              ),
+            ),
+            value: list['id'].toString(),
+            onChanged: (val) {
+              setState(() {
+                widget.onChanged(val);
+                if (val == "48") {
+                  otroVisible = true;
+                } else {
+                  otroVisible = false;
+                }
+              });
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
 }
 
 //----------------------------------------Conductual ------------------------------------------------------------------------------------------
-var id_conductual1 = null;
-var id_conductual2 = null;
-var id_conductual3 = null;
-var id_conductual4 = null;
+var id_conductual1;
+var id_conductual2;
+var id_conductual3;
+var id_conductual4;
 
 class Conductual1 extends StatefulWidget {
   @override
@@ -885,57 +898,40 @@ class Conductual1 extends StatefulWidget {
 
 class Conductual1WidgetState extends State<Conductual1> {
   @override
+  void initState() {
+    id_conductual1 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 280,
-      child: Column(
-        children: [
-          ListView(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.all(8.0),
-            children: itemsConductualOtro
-                .map((list) => RadioListTile(
-                      groupValue: id_conductual1,
-                      title: Text(
-                        list['respuesta'],
-                        style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                        ),
-                      ),
-                      value: list['id'].toString(),
-                      onChanged: (val) {
-                        setState(() {
-                          debugPrint('VAL = $val');
-                          id_conductual1 = val;
-                          if (id_conductual1 == "48") {
-                            otroVisible = true;
-                          } else {
-                            otroVisible = false;
-                          }
-                        });
-                      },
-                    ))
-                .toList(),
-          ),
-          Visibility(
-            visible: otroVisible,
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: TextFormField(
-                style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily),
-                controller: otro,
-                keyboardType: TextInputType.name,
-                decoration:
-                    InputDecoration(labelText: "Si es otro, especifique"),
-              ),
+    return Column(
+      children: [
+        GenericRadioList(
+          items: itemsConductualOtro,
+          groupValue: id_conductual1,
+          heightContainer: 170.0,
+          onChanged: (val) {
+            setState(() {
+              debugPrint('VAL = $val');
+              id_conductual1 = val;
+            });
+          },
+        ),
+        Visibility(
+          visible: otroVisible,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: TextFormField(
+              style: TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily),
+              controller: otro,
+              keyboardType: TextInputType.name,
+              decoration: InputDecoration(labelText: "Si es otro, especifique"),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -947,34 +943,23 @@ class Conductual2 extends StatefulWidget {
 
 class Conductual2WidgetState extends State<Conductual2> {
   @override
+  void initState() {
+    id_conductual2 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual2,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual2 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual2,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual2 = val;
+        });
+      },
     );
   }
 }
@@ -986,34 +971,23 @@ class Conductual3 extends StatefulWidget {
 
 class Conductual3WidgetState extends State<Conductual3> {
   @override
+  void initState() {
+    id_conductual3 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual3,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual3 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual3,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual3 = val;
+        });
+      },
     );
   }
 }
@@ -1025,44 +999,33 @@ class Conductual4 extends StatefulWidget {
 
 class Conductual4WidgetState extends State<Conductual4> {
   @override
+  void initState() {
+    id_conductual4 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual4,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual4 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual4,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual4 = val;
+        });
+      },
     );
   }
 }
 
 //--------------------------------------------------------------------------------------------
 ////----------------------------------------CONDUCTUAL ------------------------------------------------------------------------------------------
-var id_conductual5 = null;
-var id_conductual6 = null;
-var id_conductual7 = null;
-var id_conductual8 = null;
+var id_conductual5;
+var id_conductual6;
+var id_conductual7;
+var id_conductual8;
 
 class Conductual5 extends StatefulWidget {
   @override
@@ -1071,34 +1034,23 @@ class Conductual5 extends StatefulWidget {
 
 class Conductual5WidgetState extends State<Conductual5> {
   @override
+  void initState() {
+    id_conductual5 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual5,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual5 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual5,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual5 = val;
+        });
+      },
     );
   }
 }
@@ -1110,34 +1062,23 @@ class Conductual6 extends StatefulWidget {
 
 class Conductual6WidgetState extends State<Conductual6> {
   @override
+  void initState() {
+    id_conductual6 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual6,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual6 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual6,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual6 = val;
+        });
+      },
     );
   }
 }
@@ -1149,34 +1090,23 @@ class Conductual7 extends StatefulWidget {
 
 class Conductual7WidgetState extends State<Conductual7> {
   @override
+  void initState() {
+    id_conductual7 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual7,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual7 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual7,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual7 = val;
+        });
+      },
     );
   }
 }
@@ -1188,34 +1118,23 @@ class Conductual8 extends StatefulWidget {
 
 class Conductual8WidgetState extends State<Conductual8> {
   @override
+  void initState() {
+    id_conductual8 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual8,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual8 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual8,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual8 = val;
+        });
+      },
     );
   }
 }
@@ -1223,11 +1142,11 @@ class Conductual8WidgetState extends State<Conductual8> {
 //-----------------------------------------------------------------------------
 //
 ////----------------------------------------ATENCION 1------------------------------------------------------------------------------------------
-var id_conductual9 = null;
-var id_conductual10 = null;
-var id_conductual11 = null;
-var id_conductual12 = null;
-var id_conductual13 = null;
+var id_conductual9;
+var id_conductual10;
+var id_conductual11;
+var id_conductual12;
+var id_conductual13;
 
 class Conductual9 extends StatefulWidget {
   @override
@@ -1236,34 +1155,23 @@ class Conductual9 extends StatefulWidget {
 
 class Conductual9WidgetState extends State<Conductual9> {
   @override
+  void initState() {
+    id_conductual9 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual9,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual9 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual9,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual9 = val;
+        });
+      },
     );
   }
 }
@@ -1275,34 +1183,23 @@ class Conductual10 extends StatefulWidget {
 
 class Conductual10WidgetState extends State<Conductual10> {
   @override
+  void initState() {
+    id_conductual10 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual10,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual10 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual10,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual10 = val;
+        });
+      },
     );
   }
 }
@@ -1314,34 +1211,23 @@ class Conductual11 extends StatefulWidget {
 
 class Conductual11WidgetState extends State<Conductual11> {
   @override
+  void initState() {
+    id_conductual11 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual11,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual11 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual11,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual11 = val;
+        });
+      },
     );
   }
 }
@@ -1353,34 +1239,23 @@ class Conductual12 extends StatefulWidget {
 
 class Conductual12WidgetState extends State<Conductual12> {
   @override
+  void initState() {
+    id_conductual12 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual12,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual12 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual12,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual12 = val;
+        });
+      },
     );
   }
 }
@@ -1392,34 +1267,23 @@ class Conductual13 extends StatefulWidget {
 
 class Conductual13WidgetState extends State<Conductual13> {
   @override
+  void initState() {
+    id_conductual13 = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      // width: 350,
-      child: ListView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(8.0),
-        children: itemsConductual
-            .map((list) => RadioListTile(
-                  groupValue: id_conductual13,
-                  title: Text(
-                    list['respuesta'],
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                  value: list['id'].toString(),
-                  onChanged: (val) {
-                    setState(() {
-                      debugPrint('VAL = $val');
-                      id_conductual13 = val;
-                    });
-                  },
-                ))
-            .toList(),
-      ),
+    return GenericRadioList(
+      items: itemsConductual,
+      groupValue: id_conductual13,
+      heightContainer: 300.0,
+      onChanged: (val) {
+        setState(() {
+          debugPrint('VAL = $val');
+          id_conductual13 = val;
+        });
+      },
     );
   }
 }

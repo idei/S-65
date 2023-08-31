@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GrupoConvivienteModel extends InheritedWidget {
-  String idGrupo;
-  String nombreGrupo;
+  final String idGrupo;
+  final String nombreGrupo;
 
   GrupoConvivienteModel({
     this.idGrupo,

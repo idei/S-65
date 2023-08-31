@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GeneroModel extends InheritedWidget {
-  String idGenero;
-  String nombreGenero;
+  final String idGenero;
+  final String nombreGenero;
 
   GeneroModel({
     this.idGenero,

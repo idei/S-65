@@ -12,19 +12,15 @@ import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
 
-String post_nombre;
-String post_apellido;
-String post_dni;
-String post_email;
 var email_argument;
 var userModel;
 var rela_users;
 var usuarioModel;
 
-String rela_departamento = '1';
-String rela_genero = '1';
-String rela_nivel_instruccion = '1';
-String rela_grupo_conviviente = '1';
+String rela_departamento;
+String rela_genero;
+String rela_nivel_instruccion;
+String rela_grupo_conviviente;
 var return_apellido;
 var return_nombre;
 var return_email;
@@ -41,36 +37,69 @@ class FormDatosGenerales extends StatefulWidget {
 }
 
 class _FormDatosGeneralesState extends State<FormDatosGenerales> {
-  final _formKey_datos_personales = GlobalKey<FormState>();
-  final _nombreFieldKey = GlobalKey<FormFieldState<String>>();
-  final _apellidoFieldKey = GlobalKey<FormFieldState<String>>();
-  final _dniFieldKey = GlobalKey<FormFieldState<String>>();
-  final _celularPacienteFieldKey = GlobalKey<FormFieldState<String>>();
-  final _fechaNacimientoFieldKey = GlobalKey<FormFieldState<DateFormat>>();
-  final _relaDeptoFieldKey = GlobalKey<FormFieldState<String>>();
-  final _relaGeneroFieldKey = GlobalKey<FormFieldState<String>>();
-  final _relaNivelFieldKey = GlobalKey<FormFieldState<String>>();
-  final _relaGrupoFieldKey = GlobalKey<FormFieldState<String>>();
+  var formKey_datos_personales = GlobalKey<FormState>();
+  var nombreFieldKey = GlobalKey<FormFieldState<String>>();
+  var apellidoFieldKey = GlobalKey<FormFieldState<String>>();
+  var dniFieldKey = GlobalKey<FormFieldState<String>>();
+  var celularPacienteFieldKey = GlobalKey<FormFieldState<String>>();
+  var fechaNacimientoFieldKey = GlobalKey<FormFieldState<DateFormat>>();
+  var relaDeptoFieldKey = GlobalKey<FormFieldState<String>>();
+  var relaGeneroFieldKey = GlobalKey<FormFieldState<String>>();
+  var relaNivelFieldKey = GlobalKey<FormFieldState<String>>();
+  var relaGrupoFieldKey = GlobalKey<FormFieldState<String>>();
 
   var currentfecha;
-  final _nombreContactoFieldKey = GlobalKey<FormFieldState<String>>();
-  final _apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
-  final _celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  var nombreContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  var apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  var celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
+  var isGrupoConviviente;
+
+  TextEditingController _dateController = TextEditingController();
+
+  ValueNotifier<bool> _showAdditionalFieldsNotifier =
+      ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
     Provider.of<UsuarioServices>(context, listen: false).loadData(context);
+    rela_departamento = '1';
+    rela_genero = '1';
+    rela_nivel_instruccion = '1';
+    rela_grupo_conviviente = '';
+  }
+
+  @override
+  void dispose() {
+    _showAdditionalFieldsNotifier.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
 
+    if (rela_grupo_conviviente == "") {
+      rela_grupo_conviviente =
+          usuarioModel.usuario.paciente.rela_grupo_conviviente;
+      if (rela_grupo_conviviente == "1") {
+        _showAdditionalFieldsNotifier.value = false;
+      } else {
+        _showAdditionalFieldsNotifier.value = true;
+      }
+    } else {
+      if (rela_grupo_conviviente == "1") {
+        _showAdditionalFieldsNotifier.value = false;
+      } else {
+        _showAdditionalFieldsNotifier.value = true;
+      }
+    }
+
     rela_users = usuarioModel.usuario.paciente.rela_users;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
     email_argument = usuarioModel.usuario.emailUser;
 
+    isGrupoConviviente;
     int changedCount = 0;
 
     return Scaffold(
@@ -93,389 +122,412 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
         ),
-        body: Center(
-          child: Consumer5<UsuarioServices, DepartamentoServices,
-              GeneroServices, NivelEducativoService, GrupoConvivienteServices>(
-            builder: (context, provider, provider2, provider3, provider4,
-                provider5, _) {
-              if (provider2.isLoadingDeptos) {
-                List<DropdownMenuItem<String>> myDropdownMenuItemsDeptos =
-                    provider2.formDataList.map(
-                  (item) {
-                    if (provider2.isLoadingDeptos) {
-                      return DropdownMenuItem<String>(
-                        value: item.idDepartamento.toString(),
-                        child: Text(item.nombreDepartamento),
-                      );
-                    }
-                  },
-                ).toList();
+        body: Consumer5<UsuarioServices, DepartamentoServices, GeneroServices,
+            NivelEducativoService, GrupoConvivienteServices>(
+          builder: (context, provider, provider2, provider3, provider4,
+              provider5, _) {
+            List<DropdownMenuItem<String>> myDropdownMenuItemsDeptos =
+                provider2.formDataList.map(
+              (item) {
+                if (provider2.isLoadingDeptos) {
+                  return DropdownMenuItem<String>(
+                    value: item.idDepartamento.toString(),
+                    child: Text(item.nombreDepartamento),
+                  );
+                }
+              },
+            ).toList();
 
-                List<DropdownMenuItem<String>> myDropdownMenuItemsGenero =
-                    provider3.formDataList.map(
-                  (item) {
-                    if (provider3.isLoadingGenero) {
-                      return DropdownMenuItem<String>(
-                        value: item.idGenero.toString(),
-                        child: Text(item.nombreGenero),
-                      );
-                    }
-                  },
-                ).toList();
+            List<DropdownMenuItem<String>> myDropdownMenuItemsGenero =
+                provider3.formDataList.map(
+              (item) {
+                if (provider3.isLoadingGenero) {
+                  return DropdownMenuItem<String>(
+                    value: item.idGenero.toString(),
+                    child: Text(item.nombreGenero),
+                  );
+                }
+              },
+            ).toList();
 
-                List<DropdownMenuItem<String>>
-                    myDropdownMenuItemsNivelEducativo =
-                    provider4.formDataList.map(
-                  (item) {
-                    if (provider4.isLoadingNivelEducativo) {
-                      return DropdownMenuItem<String>(
-                        value: item.idNivelEducativo.toString(),
-                        child: Text(item.nombreNivelEducativo),
-                      );
-                    }
-                  },
-                ).toList();
+            List<DropdownMenuItem<String>> myDropdownMenuItemsNivelEducativo =
+                provider4.formDataList.map(
+              (item) {
+                if (provider4.isLoadingNivelEducativo) {
+                  return DropdownMenuItem<String>(
+                    value: item.idNivelEducativo.toString(),
+                    child: Text(item.nombreNivelEducativo),
+                  );
+                }
+              },
+            ).toList();
 
-                List<DropdownMenuItem<String>>
-                    myDropdownMenuItemsGrupoConvivencia =
-                    provider5.formDataList.map(
-                  (item) {
-                    if (provider5.isLoadingGrupos) {
-                      return DropdownMenuItem<String>(
-                        value: item.idGrupo.toString(),
-                        child: Text(item.nombreGrupo),
-                      );
-                    }
-                  },
-                ).toList();
+            List<DropdownMenuItem<String>> myDropdownMenuItemsGrupoConvivencia =
+                provider5.formDataList.map(
+              (item) {
+                if (provider5.isLoadingGrupos) {
+                  // if (provider.usuario.paciente.rela_grupo_conviviente !=
+                  //     "null") {
+                  //   rela_grupo_conviviente =
+                  //       provider.usuario.paciente.rela_grupo_conviviente;
+                  //   if (rela_grupo_conviviente == '1') {
+                  //     _showAdditionalFieldsNotifier.value = false;
+                  //   } else {
+                  //     _showAdditionalFieldsNotifier.value = true;
+                  //   }
+                  // }
 
-                return SingleChildScrollView(
-                  child: Form(
-                    key: _formKey_datos_personales,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            TextFormField(
-                              key: _apellidoFieldKey,
-                              initialValue: provider.usuario.paciente.apellido,
-                              onSaved: (value) =>
-                                  provider.usuario.paciente.apellido = value,
-                              decoration: InputDecoration(
-                                  labelText: 'Apellido',
-                                  labelStyle: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily,
-                                  )),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el apellido';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            TextFormField(
-                              key: _nombreFieldKey,
-                              initialValue: provider.usuario.paciente.nombre,
-                              onSaved: (value) =>
-                                  provider.usuario.paciente.nombre = value,
-                              decoration: InputDecoration(
-                                  labelText: 'Nombre',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el nombre';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            TextFormField(
-                              key: _dniFieldKey,
-                              initialValue: provider.usuario.paciente.dni,
-                              onSaved: (value) =>
-                                  provider.usuario.paciente.dni = value,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                  labelText: 'DNI',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el DNI';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            SizedBox(height: 10.0),
-                            DateTimeField(
-                              key: _fechaNacimientoFieldKey,
-                              decoration: InputDecoration(
-                                labelText: 'Fecha de Nacimiento',
+                  // if (rela_grupo_conviviente == '1') {
+                  //   _showAdditionalFieldsNotifier.value = false;
+                  // } else {
+                  //   _showAdditionalFieldsNotifier.value = true;
+                  // }
+                  return DropdownMenuItem<String>(
+                    value: item.idGrupo.toString(),
+                    child: Text(item.nombreGrupo),
+                  );
+                }
+              },
+            ).toList();
+
+            return SingleChildScrollView(
+              child: Form(
+                key: formKey_datos_personales,
+                child: Card(
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          key: apellidoFieldKey,
+                          initialValue: provider.usuario.paciente.apellido,
+                          onSaved: (value) =>
+                              provider.usuario.paciente.apellido = value,
+                          decoration: InputDecoration(
+                              labelText: 'Apellido',
+                              labelStyle: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily,
+                              )),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Por favor ingrese el apellido';
+                            }
+                            return null;
+                          },
+                          onChanged: (text) {
+                            print("Debe completar el campo");
+                          },
+                        ),
+                        TextFormField(
+                          key: nombreFieldKey,
+                          initialValue: provider.usuario.paciente.nombre,
+                          onSaved: (value) =>
+                              provider.usuario.paciente.nombre = value,
+                          decoration: InputDecoration(
+                              labelText: 'Nombre',
+                              labelStyle: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily)),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Por favor ingrese el nombre';
+                            }
+                            return null;
+                          },
+                          onChanged: (text) {
+                            print("Debe completar el campo");
+                          },
+                        ),
+                        TextFormField(
+                          key: dniFieldKey,
+                          initialValue: provider.usuario.paciente.dni,
+                          onSaved: (value) =>
+                              provider.usuario.paciente.dni = value,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              labelText: 'DNI',
+                              labelStyle: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily)),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Por favor ingrese el DNI';
+                            }
+                            return null;
+                          },
+                          onChanged: (text) {
+                            print("Debe completar el campo");
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        DateTimeField(
+                          // controller: _dateController,
+                          key: fechaNacimientoFieldKey,
+                          decoration: InputDecoration(
+                            labelText: 'Fecha de Nacimiento',
+                          ),
+                          initialValue:
+                              provider.usuario.paciente.fecha_nacimiento,
+                          onSaved: (value) => provider
+                              .usuario.paciente.fecha_nacimiento = value,
+                          // format: DateFormat('dd-MM-yyyy'),
+                          format: DateFormat('yyyy-MM-dd'),
+                          onShowPicker: (context, currentValue) {
+                            return showDatePicker(
+                                locale: const Locale("es", "ES"),
+                                context: context,
+                                firstDate: DateTime(1900),
+                                initialDate: currentValue ?? DateTime.now(),
+                                lastDate: DateTime(2100));
+                          },
+                          validator: (date) =>
+                              date == null ? 'Invalid date' : null,
+                          onChanged: (value) => setState(() {
+                            currentfecha = value;
+                            //_dateController.text = value.toString();
+                            value = value;
+                            changedCount++;
+                          }),
+                        ),
+                        SizedBox(height: 10.0),
+                        TextFormField(
+                          key: celularPacienteFieldKey,
+                          initialValue: provider.usuario.paciente.celular,
+                          onSaved: (value) =>
+                              provider.usuario.paciente.celular = value,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              labelText: 'Número de celular',
+                              labelStyle: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily)),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Por favor ingrese el número de teléfono del contacto';
+                            }
+                            return null;
+                          },
+                          onChanged: (text) {
+                            print("Debe completar el campo");
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        DropdownButtonFormField<String>(
+                            key: relaGeneroFieldKey,
+                            hint: Text("Género"),
+                            value: rela_genero.isNotEmpty ? rela_genero : null,
+                            items: myDropdownMenuItemsGenero,
+                            onChanged: (String newValue) {
+                              setState(() {
+                                rela_genero = newValue;
+                              });
+                            }),
+                        SizedBox(height: 10.0),
+                        DropdownButtonFormField<String>(
+                            key: relaDeptoFieldKey,
+                            hint: Text("Departamento"),
+                            value: rela_departamento.isNotEmpty
+                                ? rela_departamento
+                                : null,
+                            items: myDropdownMenuItemsDeptos,
+                            onChanged: (String newValue) {
+                              setState(() {
+                                rela_departamento = newValue;
+                              });
+                            }),
+                        SizedBox(height: 15.0),
+                        DropdownButtonFormField<String>(
+                            key: relaNivelFieldKey,
+                            hint: Text("Nivel Educativo"),
+                            value: rela_nivel_instruccion.isNotEmpty
+                                ? rela_nivel_instruccion
+                                : null,
+                            items: myDropdownMenuItemsNivelEducativo,
+                            onChanged: (String newValue) {
+                              setState(() {
+                                rela_nivel_instruccion = newValue;
+                              });
+                            }),
+                        SizedBox(height: 25.0),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          color: Color.fromARGB(134, 190, 218, 241),
+                          child: Center(
+                            child: Text(
+                              'GRUPO CONVIVIENTE',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
                               ),
-                              initialValue:
-                                  provider.usuario.paciente.fecha_nacimiento,
-                              onSaved: (value) => provider
-                                  .usuario.paciente.fecha_nacimiento = value,
-                              format: DateFormat('dd-MM-yyyy'),
-                              onShowPicker: (context, currentValue) {
-                                return showDatePicker(
-                                    locale: const Locale("es", "ES"),
-                                    context: context,
-                                    firstDate: DateTime(1900),
-                                    initialDate: currentValue ?? DateTime.now(),
-                                    lastDate: DateTime(2100));
-                              },
-                              validator: (date) =>
-                                  date == null ? 'Invalid date' : null,
-                              onChanged: (value) => setState(() {
-                                currentfecha = value;
-                                value = value;
-                                changedCount++;
-                              }),
                             ),
-                            SizedBox(height: 10.0),
-                            TextFormField(
-                              key: _celularPacienteFieldKey,
-                              initialValue: provider.usuario.paciente.celular,
-                              onSaved: (value) =>
-                                  provider.usuario.paciente.celular = value,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                  labelText: 'Número de celular',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el número de teléfono del contacto';
+                          ),
+                        ),
+                        SizedBox(height: 10.0),
+                        DropdownButtonFormField<String>(
+                            key: relaGrupoFieldKey,
+                            hint: Text("Relación con Paciente"),
+                            value: rela_grupo_conviviente.isNotEmpty
+                                ? rela_grupo_conviviente
+                                : null,
+                            items: myDropdownMenuItemsGrupoConvivencia,
+                            onChanged: (String newValue) {
+                              setState(() {
+                                rela_grupo_conviviente = newValue;
+                                if (newValue == "1") {
+                                  _showAdditionalFieldsNotifier.value = false;
+                                } else {
+                                  _showAdditionalFieldsNotifier.value = true;
                                 }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            SizedBox(height: 10.0),
-                            DropdownButtonFormField<String>(
-                                key: _relaGeneroFieldKey,
-                                hint: Text("Género"),
-                                value:
-                                    rela_genero.isNotEmpty ? rela_genero : null,
-                                items: myDropdownMenuItemsGenero,
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    rela_genero = newValue;
-                                  });
-                                }),
-                            SizedBox(height: 10.0),
-                            DropdownButtonFormField<String>(
-                                key: _relaDeptoFieldKey,
-                                hint: Text("Departamento"),
-                                value: rela_departamento.isNotEmpty
-                                    ? rela_departamento
-                                    : null,
-                                items: myDropdownMenuItemsDeptos,
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    rela_departamento = newValue;
-                                  });
-                                }),
-                            SizedBox(height: 15.0),
-                            DropdownButtonFormField<String>(
-                                key: _relaNivelFieldKey,
-                                hint: Text("Nivel Educativo"),
-                                value: rela_nivel_instruccion.isNotEmpty
-                                    ? rela_nivel_instruccion
-                                    : null,
-                                items: myDropdownMenuItemsNivelEducativo,
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    rela_nivel_instruccion = newValue;
-                                  });
-                                }),
-                            SizedBox(height: 25.0),
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              color: Color.fromARGB(134, 190, 218, 241),
-                              child: Center(
-                                child: Text(
-                                  'GRUPO CONVIVIENTE',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
+                              });
+                            }),
+                        SizedBox(height: 10.0),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _showAdditionalFieldsNotifier,
+                          builder: (context, value, child) {
+                            return Visibility(
+                              visible: _showAdditionalFieldsNotifier.value,
+                              maintainSize:
+                                  false, // Esto evita que mantenga el espacio incluso cuando está oculto
+                              child: AnimatedOpacity(
+                                opacity: _showAdditionalFieldsNotifier.value
+                                    ? 1.0
+                                    : 0.0,
+                                duration: Duration(
+                                    milliseconds:
+                                        500), // Duración de la animación en milisegundos
+                                curve:
+                                    Curves.easeInOut, // Curva de la animación
+
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Card(
+                                    child: Column(children: [
+                                      TextFormField(
+                                        key: nombreContactoFieldKey,
+                                        initialValue: provider
+                                            .usuario.paciente.nombre_contacto,
+                                        decoration: InputDecoration(
+                                            labelText: 'Nombre del Contacto',
+                                            labelStyle: TextStyle(
+                                                fontFamily: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1
+                                                    .fontFamily)),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Por favor ingrese el nombre del contacto';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (text) {
+                                          print("Debe completar el campo");
+                                        },
+                                      ),
+                                      SizedBox(height: 10.0),
+                                      TextFormField(
+                                        key: apellidoContactoFieldKey,
+                                        initialValue: provider
+                                            .usuario.paciente.apellido_contacto,
+                                        decoration: InputDecoration(
+                                            labelText: 'Apellido del contacto',
+                                            labelStyle: TextStyle(
+                                                fontFamily: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1
+                                                    .fontFamily)),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Por favor ingrese el apellido del contacto';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (text) {
+                                          print("Debe completar el campo");
+                                        },
+                                      ),
+                                      SizedBox(height: 10.0),
+                                      TextFormField(
+                                        key: celularContactoFieldKey,
+                                        initialValue: provider
+                                            .usuario.paciente.celular_contacto,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                            labelText: 'Celular del contacto',
+                                            labelStyle: TextStyle(
+                                                fontFamily: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1
+                                                    .fontFamily)),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Por favor ingrese el número de teléfono del contacto';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (text) {
+                                          print("Debe completar el campo");
+                                        },
+                                      ),
+                                    ]),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 10.0),
-                            DropdownButtonFormField<String>(
-                                key: _relaGrupoFieldKey,
-                                hint: Text("Relación con Paciente"),
-                                value: rela_grupo_conviviente.isNotEmpty
-                                    ? rela_grupo_conviviente
-                                    : null,
-                                items: myDropdownMenuItemsGrupoConvivencia,
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    rela_grupo_conviviente = newValue;
-                                  });
-                                }),
-                            TextFormField(
-                              key: _nombreContactoFieldKey,
-                              initialValue:
-                                  provider.usuario.paciente.nombre_contacto,
-                              decoration: InputDecoration(
-                                  labelText: 'Nombre del Contacto',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el nombre del contacto';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            TextFormField(
-                              key: _apellidoContactoFieldKey,
-                              initialValue:
-                                  provider.usuario.paciente.apellido_contacto,
-                              decoration: InputDecoration(
-                                  labelText: 'Apellido del contacto',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el apellido del contacto';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            SizedBox(height: 10.0),
-                            TextFormField(
-                              key: _celularContactoFieldKey,
-                              initialValue:
-                                  provider.usuario.paciente.celular_contacto,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                  labelText: 'Celular del contacto',
-                                  labelStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily)),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Por favor ingrese el número de teléfono del contacto';
-                                }
-                                return null;
-                              },
-                              onChanged: (text) {
-                                print("Debe completar el campo");
-                              },
-                            ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              alignment: Alignment.center,
-                              child: ElevatedButton.icon(
-                                icon: _isLoading
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                        child:
-                                            const CircularProgressIndicator(),
-                                      )
-                                    : const Icon(Icons.save_alt),
-                                style: ElevatedButton.styleFrom(
-                                  textStyle: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily),
-                                ),
-                                onPressed: () {
-                                  if (_formKey_datos_personales.currentState
-                                          .validate() &&
-                                      !_isLoading) {
-                                    _startLoading(usuarioModel);
-                                  } else {
-                                    null;
-                                  }
-                                },
-                                label: Text('Guardar Datos',
-                                    style: TextStyle(
-                                      fontFamily: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .fontFamily,
-                                      fontSize: 16.0,
-                                    )),
-                              ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      ),
+                        SizedBox(height: 40.0),
+                        Center(
+                          child: ElevatedButton.icon(
+                            icon: _isLoading
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    child: const CircularProgressIndicator(),
+                                  )
+                                : const Icon(Icons.save_alt),
+                            style: ElevatedButton.styleFrom(
+                              textStyle: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily),
+                            ),
+                            onPressed: () {
+                              if (formKey_datos_personales.currentState
+                                      .validate() &&
+                                  !_isLoading) {
+                                _startLoading(usuarioModel);
+                              } else {
+                                null;
+                              }
+                            },
+                            label: Text('Guardar Datos',
+                                style: TextStyle(
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily,
+                                  fontSize: 16.0,
+                                )),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              } else {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "Cargando...",
-                        style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
+                ),
+              ),
+            );
+          },
         ));
   }
 
@@ -510,22 +562,38 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   }
 
   guardarDatos(UsuarioServices usuarioModel) async {
-    String nombre_paciente = _nombreFieldKey.currentState.value;
-    String apellido_paciente = _apellidoFieldKey.currentState.value;
-    String celular_paciente = _celularPacienteFieldKey.currentState.value;
-    String dni_paciente = _dniFieldKey.currentState.value;
-    String rela_depto = _relaDeptoFieldKey.currentState.value;
-    String rela_genero = _relaGeneroFieldKey.currentState.value;
-    String rela_nivel = _relaNivelFieldKey.currentState.value;
-    String rela_grupo = _relaGrupoFieldKey.currentState.value;
-    String nombre_contacto = _nombreContactoFieldKey.currentState.value;
-    String apellido_contacto = _apellidoContactoFieldKey.currentState.value;
-    String celular_contacto = _celularContactoFieldKey.currentState.value;
+    String nombre_paciente = nombreFieldKey.currentState.value;
+    String apellido_paciente = apellidoFieldKey.currentState.value;
+    String celular_paciente = celularPacienteFieldKey.currentState.value;
+    String dni_paciente = dniFieldKey.currentState.value;
+    String rela_depto = relaDeptoFieldKey.currentState.value;
+    String rela_genero = relaGeneroFieldKey.currentState.value;
+    String rela_nivel = relaNivelFieldKey.currentState.value;
+    String rela_grupo = relaGrupoFieldKey.currentState.value;
+
+    String nombre_contacto;
+    String apellido_contacto;
+    String celular_contacto;
+
+    if (rela_grupo == "1") {
+      nombre_contacto = "";
+      apellido_contacto = "";
+      celular_contacto = "";
+    } else {
+      nombre_contacto = nombreContactoFieldKey.currentState.value;
+      apellido_contacto = apellidoContactoFieldKey.currentState.value;
+      celular_contacto = celularContactoFieldKey.currentState.value;
+    }
+
     DateTime fecha_paciente;
 
     if (usuarioModel.usuario.paciente.fecha_nacimiento.toString() == "null") {
       fecha_paciente = currentfecha;
+    } else {
+      fecha_paciente = currentfecha;
     }
+
+    String pepe = fecha_paciente.toString();
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_personales";
@@ -535,7 +603,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       "nombre": nombre_paciente,
       "apellido": apellido_paciente,
       "dni": dni_paciente,
-      "fecha_nacimiento": fecha_paciente.toString(),
+      "fecha_nacimiento": pepe,
       "email": email_argument.toString(),
       "rela_genero": rela_genero,
       "rela_departamento": rela_depto,
@@ -581,14 +649,6 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       _isLoading = false;
     });
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
 }
 
 _alert_informe(context, message, colorNumber) {
@@ -601,84 +661,4 @@ _alert_informe(context, message, colorNumber) {
         textAlign: TextAlign.center,
         style: const TextStyle(color: Colors.white)),
   ));
-}
-
-List dataDepartamento;
-bool isDepto = false;
-List dataGenero;
-bool isGenero = false;
-List dataNivelEducativo;
-bool isNiveleducativo = false;
-List dataGrupoConviviente;
-bool isGrupoConviviente = false;
-
-getAllDepartamentos() async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos_patologias";
-  var response = await http.post(url, body: {"tipo": "1"});
-  var responseBody = json.decode(response.body);
-
-  if (response.statusCode == 200) {
-    if (responseBody['status'] == "Success") {
-      dataDepartamento = responseBody['data'];
-      isDepto = true;
-    } else {
-      print(responseBody['status']);
-    }
-  }
-}
-
-getAllGeneros() async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos_patologias";
-  var response = await http.post(url, body: {"tipo": "2"});
-  var responseBody = json.decode(response.body);
-
-  if (response.statusCode == 200) {
-    if (responseBody['status'] == "Success") {
-      dataGenero = responseBody['data'];
-      isGenero = true;
-    } else {
-      print(responseBody['status']);
-    }
-  }
-}
-
-getAllNivelesEducativos() async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos_patologias";
-  var response = await http.post(url, body: {"tipo": "3"});
-  var responseBody = json.decode(response.body);
-  if (response.statusCode == 200) {
-    if (responseBody['status'] == "Success") {
-      dataNivelEducativo = responseBody['data'];
-      isNiveleducativo = true;
-    } else {
-      print(responseBody['status']);
-    }
-  }
-}
-
-getAllGrupoConviviente() async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/deptos_generos_patologias";
-  var response = await http.post(url, body: {"tipo": "4"});
-  var responseBody = json.decode(response.body);
-  if (response.statusCode == 200) {
-    if (responseBody['status'] == "Success") {
-      dataGrupoConviviente = responseBody['data'];
-      isGrupoConviviente = true;
-    } else {
-      print(responseBody['status']);
-    }
-  }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

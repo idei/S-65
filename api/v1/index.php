@@ -120,6 +120,19 @@ Flight::route('POST /tipo_respuesta_conductual','tipo_respuesta_conductual');
 // Save Screening Nutricional
 Flight::route('POST /respuesta_screening_nutricional','respuesta_screening_nutricional');
 
+// Save Screening Nutricional
+Flight::route('POST /respuesta_screening_adlq','respuesta_screening_adlq');
+
+// Read tipo de eventos-preguntas nutricional
+Flight::route('POST /tipo_eventos_nutricional','tipo_eventos_nutricional');
+
+// Read tipo de eventos-preguntas animo
+Flight::route('POST /tipo_eventos_animo','tipo_eventos_animo');
+
+// Read tipo de eventos-preguntas animo
+Flight::route('POST /tipo_eventos_fisico','tipo_eventos_fisico');
+
+
 // Read tipo de respuesta quejas
 Flight::route('POST /tipo_respuesta_quejas','tipo_respuesta_quejas');
 
@@ -134,6 +147,9 @@ Flight::route('POST /tipo_respuesta_adlq','tipo_respuesta_adlq');
 
 // Read tipo de respuesta Salud Cerebral
 Flight::route('POST /tipo_respuesta_salud_cerebral','tipo_respuesta_salud_cerebral');
+
+// Read tipo de Get Salud Cerebral
+Flight::route('POST /respuesta_screening_cerebral','respuesta_screening_cerebral');
 
 // Register User
 Flight::route('POST /user_register','user_register');

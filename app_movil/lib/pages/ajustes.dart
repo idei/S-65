@@ -16,7 +16,6 @@ class AjustesPage extends StatefulWidget {
   _AjustesState createState() => _AjustesState();
 }
 
-final _formKey_ajustes = GlobalKey<FormState>();
 final _formKey_email = GlobalKey<FormState>();
 final _formKey_pass = GlobalKey<FormState>();
 
@@ -57,12 +56,11 @@ class _AjustesState extends State<AjustesPage> {
           )
         ],
       ),
-      body: Form(
-        key: _formKey_ajustes,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(children: <Widget>[
-            ElevatedButton(
+      body: Padding(
+        padding: const EdgeInsets.all(25.0),
+        child: ListView(children: <Widget>[
+          Center(
+            child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -77,10 +75,12 @@ class _AjustesState extends State<AjustesPage> {
                 )),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Center(
+            child: ElevatedButton(
               style: ElevatedButton.styleFrom(),
               onPressed: () {
                 Navigator.push(
@@ -95,8 +95,8 @@ class _AjustesState extends State<AjustesPage> {
                         Theme.of(context).textTheme.headline1.fontFamily,
                   ))),
             ),
-          ]),
-        ),
+          ),
+        ]),
       ),
     );
   }
@@ -115,7 +115,7 @@ class _AjustesState extends State<AjustesPage> {
     return Scaffold(
       key: UniqueKey(),
       appBar: AppBar(
-        leading: new IconButton(
+        leading: IconButton(
           icon: CircleAvatar(
             radius: MediaQuery.of(context).size.width / 30,
             backgroundColor: Colors.white,
@@ -161,20 +161,22 @@ class _AjustesState extends State<AjustesPage> {
             SizedBox(
               height: 20,
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  //primary: Color.fromRGBO(157, 19, 34, 1),
-                  ),
-              onPressed: () {
-                if (_formKey_email.currentState.validate()) {
-                  modificar_email(context);
-                }
-              },
-              child: Text('Modificar Correo',
-                  style: (TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                  ))),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    //primary: Color.fromRGBO(157, 19, 34, 1),
+                    ),
+                onPressed: () {
+                  if (_formKey_email.currentState.validate()) {
+                    modificar_email(context);
+                  }
+                },
+                child: Text('Modificar Correo',
+                    style: (TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ))),
+              ),
             ),
           ]),
         ),
@@ -257,21 +259,25 @@ class _AjustesState extends State<AjustesPage> {
                   SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
-                    onPressed: () {
-                      if (_formKey_pass.currentState.validate()) {
-                        modificar_pass(context);
-                        //Navigator.pushNamed(context, '/ajustes');
-                      }
-                    },
-                    child: Text('Modificar Contraseña',
-                        style: (TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                        ))),
+                  Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          //primary: Color.fromRGBO(157, 19, 34, 1),
+                          ),
+                      onPressed: () {
+                        if (_formKey_pass.currentState.validate()) {
+                          modificar_pass(context);
+                          //Navigator.pushNamed(context, '/ajustes');
+                        }
+                      },
+                      child: Text('Modificar Contraseña',
+                          style: (TextStyle(
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily,
+                          ))),
+                    ),
                   ),
                 ]))));
   }

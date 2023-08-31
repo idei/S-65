@@ -111,7 +111,10 @@ function login_paciente()
 
     try {
 
-        $stmt = Flight::db()->prepare("SELECT * FROM users WHERE email = '" . $email . "' AND password = '" . $password . "'");
+        $query = "SELECT * FROM users WHERE email = :email AND password = :password";
+        $stmt = Flight::db()->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":password", $password);
         $stmt->execute();
         $result = $stmt->rowCount();
 
@@ -2724,9 +2727,6 @@ function respuesta_screening_fisico()
                     'estado' => $estado,
                     'fecha_alta' => $fecha,
                     'rela_resultado' => $id_respuesta,
-
-
-
                 );
             }
 
@@ -3232,10 +3232,10 @@ function respuesta_screening_animo()
 
     if ($_POST['satisfecho'] == "true") {
         $satisfecho = 1;
-        $result_screening += 0;
+        $result_screening += 1;
     } else {
         $satisfecho = 0;
-        $result_screening += 1;
+        $result_screening += 0;
     }
 
     if ($_POST['abandonado'] == "true") {
@@ -4073,6 +4073,90 @@ function tipo_respuesta_conductual()
     Flight::json($returnData);
 }
 
+function tipo_eventos_nutricional()
+{
+
+    try {
+        
+        $stmt = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'NUTRI%'");
+
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        //var_dump($result);
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function tipo_eventos_animo()
+{
+
+    try {
+        
+        $stmt = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'ANI%'");
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function tipo_eventos_fisico()
+{
+
+    try {
+        
+         // SELECCION DE EVENTOS
+         $stmt = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento
+         IN ('DOLCA','MAREO','NAUS','VOM','FATEX','INCUR','PROMI','DEBCU','PROMF','TEMBL','INMAR',
+         'TICS','PEQUI','FRECC','DESMA','CAIDA','PESEN','COSQP','NECCL','PERAU','UTAUD','ZUMB','UTICE',
+         'UTILE','VISLA','VISBO','VISDO','COSEX','LUCBR','PERCO','PERCU','DIFFR','PROGU','PROOL','DOLOR')");
+
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function respuesta_screening_conductual()
 {
 
@@ -4233,19 +4317,18 @@ function respuesta_screening_conductual()
     //-----------------------------------------------------
 
     // SELECCION DE CODE "Otro"----------------------------
-    $select_code = Flight::db()->prepare("SELECT code FROM `tipos_respuestas` WHERE id = '" . $id_conductual1 . "' ");
+    $select_code = Flight::db()->prepare("SELECT id FROM `tipos_respuestas` WHERE id = '" . $id_conductual1 . "' ");
 
     $select_code->execute();
     $select_code = $select_code->fetch();
 
     //----------------------------------------------------
 
-    $resp_no_code = Flight::db()->prepare("SELECT code FROM `tipos_respuestas` WHERE code = 'TRES45'");
+    $resp_no_code = Flight::db()->prepare("SELECT id FROM `tipos_respuestas` WHERE code = 'TRES45'");
 
     $resp_no_code->execute();
-    $resp_no_code = $resp_no_code->fetch();
-
-
+   // $resp_no_code = $resp_no_code->fetch();
+    $resp_no_code = (string) $resp_no_code->fetch()['id'];
 
     try {
         $fecha = date('Y/m/d');
@@ -5002,6 +5085,8 @@ function tipo_respuesta_quejas()
 
     Flight::json($returnData);
 }
+
+
 function respuesta_screening_adlq()
 {
     $data_input = json_decode(file_get_contents("php://input"), true);
@@ -5056,11 +5141,30 @@ function respuesta_screening_adlq()
     $tipo_screening = $_POST['tipo_screening'];
     $estado = 1;
 
+    $randomNumber = mt_rand(2, 32);
+
+    $result_screening = $randomNumber;
+    
 
     // CALCULO DE RESULTADO
 
-    $result_screening = 0;
+    // Guardamos el resultado del screening
 
+    $insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
+    $last = Flight::db()->prepare('SELECT LAST_INSERT_ID() as id');
+
+    $insert_resultado->bindParam(1, $tipo_screening);
+    $insert_resultado->bindParam(2, $id_paciente);
+    $insert_resultado->bindParam(3, $id_medico);
+    $insert_resultado->bindParam(4, $result_screening);
+
+    $insert_resultado->execute();
+    $last->execute();
+
+    $last = $last->fetch();
+    $id_respuesta = $last["id"];
+
+    
         //--------------------------------------------------
         $select_evento = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'ADLQ%'");
         $select_evento->execute();
@@ -5518,6 +5622,508 @@ function respuesta_screening_adlq()
         //     $returnData = msg("Success", "alert");
         // } else {
             $returnData = msg("Success", []);
+        //}
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function respuesta_screening_cerebral()
+{
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    $id_paciente = $_POST['id_paciente'];
+
+    if ($_POST['id_medico'] === "null") {
+        $id_medico = null;
+    } else {
+        $id_medico = $_POST['id_medico'];
+    }
+
+    if ($_POST['id_recordatorio'] === "null") {
+        $recordatorio_medico = null;
+    } else {
+        $recordatorio_medico = $_POST['id_recordatorio'];
+    }
+
+    $actividad_fisica = $_POST['actividad_fisica'] == "true" ? 1 : 0;
+    $alimentacion_saludable = $_POST['alimentacion_saludable'] == "true" ? 1 : 0;
+    $contacto_social = $_POST['contacto_social'] == "true" ? 1 : 0;
+    $sueno = $_POST['sueno'] == "true" ? 1 : 0;
+    $actividades_esfuerzo_mental = $_POST['actividades_esfuerzo_mental'] == "true" ? 1 : 0;
+    $otro = $_POST['otro'] == "true" ? 1 : 0;
+
+    $otro_texto = "";
+    if (isset($_POST['otro_texto'])) {
+        $otro_texto = $_POST["otro_texto"];
+        $otro_texto = $otro_texto == "" ? null : $otro_texto;
+    } else {
+        $otro_texto = $otro_texto == "" ? null : $otro_texto;
+        $otro_observaciones = verificar($data_input, "otro_texto");
+    }
+
+    $id_actividad_fisica_moderada = $_POST['id_actividad_fisica_moderada'];
+    $id_actividad_fisica_minutos = $_POST['id_actividad_fisica_minutos'];
+    $id_persona_mantenida_10anos = $_POST['id_persona_mantenida_10anos'];
+    $id_persona_activa_vida = $_POST['id_persona_activa_vida'];
+    $id_dias_alimenta_saludable = $_POST['id_dias_alimenta_saludable'];
+    $id_alimenta_saludable_vida = $_POST['id_alimenta_saludable_vida'];
+    $id_contacto_social_amigos = $_POST['id_contacto_social_amigos'];
+    $id_contacto_social_actividad = $_POST['id_contacto_social_actividad'];
+    $id_sueno_calidad_sueno = $_POST['id_sueno_calidad_sueno'];
+    $id_sueno_despierto_dia = $_POST['id_sueno_despierto_dia'];
+    $id_sueno_siesta_dia = $_POST['id_sueno_siesta_dia'];
+    $id_sueno_duerme = $_POST['id_sueno_duerme'];    
+    $id_sueno_duerme_noche = $_POST['id_sueno_duerme_noche'];
+    $id_sueno_hora_noche = $_POST['id_sueno_hora_noche'];
+    $id_actividades_esfuerzo_mental = $_POST['id_actividades_esfuerzo_mental'];
+    $id_actividad_indole_cultural = $_POST['id_actividad_indole_cultural'];
+    $id_esperanza_habito_saludable = $_POST['id_esperanza_habito_saludable'];
+
+    
+    $tipo_screening = $_POST['tipo_screening'];
+    $estado = 1;
+
+    $randomNumber = mt_rand(3, 30);
+
+    $result_screening = $randomNumber;
+
+    // CALCULO DE RESULTADO
+
+    // Array de IDs de usuarios
+   
+    // $respuestasAcum = [$id_actividad_fisica_moderada, $id_actividad_fisica_minutos, $id_persona_mantenida_10anos, 
+    // $id_persona_activa_vida];
+
+    // Construir la cláusula IN
+    //$inClause = implode(',', $respuestasAcum);
+
+    // Consulta SQL con la cláusula WHERE utilizando IN
+    //$sql = "SELECT ponderacion FROM tipos_respuestas WHERE id IN ($inClause)";
+
+    // Guardamos el resultado del screening
+
+    $insert_resultado = Flight::db()->prepare('INSERT INTO resultados_screenings(rela_screening,rela_paciente,rela_medico,result_screening)VALUES(?,?,?,?)');
+    $last = Flight::db()->prepare('SELECT LAST_INSERT_ID() as id');
+
+    $insert_resultado->bindParam(1, $tipo_screening);
+    $insert_resultado->bindParam(2, $id_paciente);
+    $insert_resultado->bindParam(3, $id_medico);
+    $insert_resultado->bindParam(4, $result_screening);
+
+    $insert_resultado->execute();
+    $last->execute();
+
+    $last = $last->fetch();
+    $id_respuesta = $last["id"];
+
+    
+        //--------------------------------------------------
+        $select_evento = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'ECER%'");
+        $select_evento->execute();
+        
+        $select_evento->execute();
+        $evento = $select_evento->fetchAll();
+        
+
+    try {
+        $fecha = date('Y/m/d');
+
+        $id_respuesta = 0;
+
+        foreach ($evento as $eventos) {
+            
+            if ($eventos["codigo_evento"] === "ECER1") {
+               
+                if ($otro == 1) {
+                    $observaciones = $otro_texto;
+                } else {
+                    $observaciones = null;
+                }
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $actividad_fisica,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+
+                );
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $alimentacion_saludable,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+
+                );
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $contacto_social,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+
+                );
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $sueno,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+
+                );
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $actividades_esfuerzo_mental,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+
+                );
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $otro,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => $observaciones,
+                );
+
+
+            }
+
+            if ($eventos["codigo_evento"] == "ECER2") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_actividad_fisica_moderada,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER3") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_actividad_fisica_minutos,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER4") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_persona_mantenida_10anos,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER5") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_persona_activa_vida,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER6") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_dias_alimenta_saludable,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER7") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_alimenta_saludable_vida,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+             if ($eventos["codigo_evento"] == "ECER8") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_contacto_social_amigos,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER9") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_contacto_social_actividad,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER10") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_calidad_sueno,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER11") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_despierto_dia,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER12") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_siesta_dia,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER13") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_duerme,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER14") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_duerme_noche,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER15") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_sueno_hora_noche,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER16") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_actividades_esfuerzo_mental,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER17") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_actividad_indole_cultural,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER18") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => $id_esperanza_habito_saludable,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+            if ($eventos["codigo_evento"] == "ECER19") {
+
+                $rowsToInsert[] = array(
+                    'rela_tipo' => null,
+                    'rela_evento' => $eventos["id"],
+                    'rela_tipo_screening' => $tipo_screening,
+                    'rela_recordatorio_medico' => $recordatorio_medico,
+                    'rela_paciente' => $id_paciente,
+                    'estado' => $estado,
+                    'fecha_alta' => $fecha,
+                    'rela_resultado' => $id_respuesta,
+                    'observacion' => null,
+
+                );
+            }
+
+        }
+     
+        //Call our custom function.
+        pdoMultiInsert('respuesta_screening', $rowsToInsert, Flight::db());
+
+        // if ($result_screening > 20) {
+        //     $returnData = msg("Success", "alert");
+        // } else {
+            $returnData = msg("Success", "alert");
         //}
 
     } catch (PDOException $error) {
@@ -6114,9 +6720,9 @@ IN ('ATE1','ATE2','ATE3','ATE4','ARI1','ARI2','ARI3','ARI4','FUNE1','FUNE2','FUN
         }
 
         if ($result_screening > 20) {
-            $returnData = msg("Success", "alert");
+            $returnData = msg("Success", "mas_20");
         } else {
-            $returnData = msg("Success", []);
+            $returnData = msg("Success", "menos_20");
         }
     } catch (PDOException $error) {
 
@@ -6213,11 +6819,72 @@ function tipo_respuesta_adlq()
 
 function tipo_respuesta_salud_cerebral()
 {
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    $id_screening = 9;
+
+    try {
+
+        $stmt = Flight::db()->prepare("SELECT * FROM resultados_screenings 
+        WHERE `rela_paciente` = '" . $id_paciente . "' AND `rela_screening` = '" . $id_screening . "'");
+
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        //var_dump($result);
+        $lista = array();
+        if ($stmt->rowCount() == 0) {
+           
+        $stmt_tipo_cerebral = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code LIKE 'SCER%'");
+
+        $stmt_tipo_cerebral->execute();
+        $result = $stmt_tipo_cerebral->fetch();
+        $lista = array();
+        if ($stmt_tipo_cerebral->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        } else {
+            $returnData = msg("Vacio", []);
+        }
+        } else {
+            
+            $returnData = msg("SinScreening", $result);
+        }
+
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function get_state_sreening_cerebral(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    $id_screening = 10;
 
     try {
        
-        $stmt = Flight::db()->prepare("SELECT * FROM eventos WHERE codigo_evento LIKE 'SCER%'");
-
+        $stmt = Flight::db()->prepare("SELECT * FROM resultados_screenings 
+        WHERE `rela_paciente` = '" . $id_paciente . "' AND `rela_screening` = '" . $id_screening . "'");
 
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -6238,6 +6905,7 @@ function tipo_respuesta_salud_cerebral()
 
     Flight::json($returnData);
 }
+
 
 function user_register()
 {
@@ -6284,15 +6952,14 @@ function user_register()
 
         $token = uniqid(random_int(100, 999), true);
 
-
         $lista = array();
 
-        $stmt = Flight::db()->prepare("SELECT email FROM users WHERE email = '" . $email . "'");
+        $query = "SELECT email FROM users WHERE email = '" . $email . "'";
+        $stmt = Flight::db()->prepare($query);
+        $stmt->bindParam(":email", $email);
         $stmt->execute();
         $result = $stmt->rowCount();
         
-        var_dump($result);
-
         if ($result == 1) {
             $lista = "Ya existe un paciente con ese email";
             

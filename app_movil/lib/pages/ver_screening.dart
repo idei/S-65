@@ -217,13 +217,4 @@ class _VerScreeningState extends State<VerScreening> {
                   ),
                 ))));
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/');
-    }
-  }
 }

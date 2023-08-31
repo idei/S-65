@@ -1,16 +1,18 @@
+import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
+import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'ajustes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 var id_paciente;
 var id_medico;
 var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
+var email;
 
 class FormScreeningSintomas extends StatefulWidget {
   final pageName = 'screening_fisico';
@@ -25,18 +27,59 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   @override
   void initState() {
     super.initState();
-    _resetChecksFalse();
-    myController.addListener(_printLatestValue);
   }
 
   @override
   void dispose() {
-    myController.dispose();
     super.dispose();
   }
 
-  _printLatestValue() {
-    print("Second text field: ${myController.text}");
+  @override
+  Widget build(BuildContext context) {
+    getStringValuesSF();
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "SFMS",
+            });
+          },
+        ),
+        title: Text('Chequeo Físico',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          )
+        ],
+      ),
+      body: FutureBuilder(
+          future: getAllRespuestaFisico(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return ScreeningFisico();
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: "Cargando",
+                ),
+              );
+            }
+          }),
+    );
   }
 
   getStringValuesSF() async {
@@ -79,56 +122,6 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
     tipo_screening = jsonDate;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    getStringValuesSF();
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "SFMS",
-            });
-          },
-        ),
-        title: Text('Chequeo Físico',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          )
-        ],
-      ),
-      body: FutureBuilder(
-          future: delayTimer(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            print(snapshot.connectionState);
-
-            if (snapshot.hasData) {
-              return ScreeningFisico();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
-    );
-  }
-
   void choiceAction(String choice) {
     if (choice == Constants.Ajustes) {
       Navigator.pushNamed(context, '/ajustes');
@@ -138,159 +131,22 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   }
 }
 
-_resetChecksFalse() {
-  dolor_cabeza = false;
-  mareos = false;
-  nauceas = false;
-  vomito = false;
-  fatiga_excesiva = false;
-  urinaria = false;
-  problemas_instestinales = false;
+List respuestaFisico;
 
-// MOTOR
+Future<List> getAllRespuestaFisico() async {
+  var response;
 
-  debilidad_lado_cuerpo = false;
-  problemas_motricidad = false;
-  temblores = false;
-  inestabilidad_marcha = false;
-  tics_mov_extranos = false;
-  problemas_equilibrio = false;
-  choque_cosas = false;
-  desmayo = false;
-  caidas = false;
-
-// Sensibilidad
-
-  perdida_sensibilidad = false;
-  cosquilleo_piel = false;
-  ojos_claridad = false;
-  perdida_audicion = false;
-
-  utiliza_audifonos = false;
-  zumbido = false;
-  anteojo_cerca = false;
-  anteojo_lejos = false;
-  vision_lado = false;
-  vision_borrosa = false;
-  vision_doble = false;
-  cosas_no_existen = false;
-  sensibilidad_cosas_brillantes = false;
-  periodos_ceguera = false;
-  persibe_cosas_cuerpo = false;
-  dificultad_calor_frio = false;
-  problemas_gusto = false;
-  problemas_olfato = false;
-  dolor = false;
-}
-
-delayTimer() async {
-  await Future.delayed(Duration(milliseconds: 500));
-  return true;
-}
-
-var email;
-
-guardarDatosFisicos(var cant_check, BuildContext context) async {
   String URL_base = Env.URL_API;
-  var url = URL_base + "/respuesta_screening_fisico";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente.toString(),
-    "id_medico": id_medico.toString(),
-    "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening['data'].toString(),
-    "cantidad": cant_check.toString(),
-    "dolor_cabeza": dolor_cabeza.toString().toString(),
-    "mareos": mareos.toString(),
-    "nauceas": nauceas.toString(),
-    "vomito": vomito.toString(),
-    "fatiga_excesiva": fatiga_excesiva.toString(),
-    "urinaria": urinaria.toString(),
-    "problemas_instestinales": problemas_instestinales.toString(),
-    "debilidad_lado_cuerpo": debilidad_lado_cuerpo.toString(),
-    "problemas_motricidad": problemas_motricidad.toString(),
-    "temblores": temblores.toString(),
-    "inestabilidad_marcha": inestabilidad_marcha.toString(),
-    "tics_mov_extranos": tics_mov_extranos.toString(),
-    "problemas_equilibrio": problemas_equilibrio.toString(),
-    "choque_cosas": choque_cosas.toString(),
-    "desmayo": desmayo.toString(),
-    "caidas": caidas.toString(),
-    "perdida_sensibilidad": perdida_sensibilidad.toString(),
-    "cosquilleo_piel": cosquilleo_piel.toString(),
-    "ojos_claridad": ojos_claridad.toString(),
-    "perdida_audicion": perdida_audicion.toString(),
-    "utiliza_audifonos": utiliza_audifonos.toString(),
-    "zumbido": zumbido.toString(),
-    "anteojo_cerca": anteojo_cerca.toString(),
-    "anteojo_lejos": anteojo_lejos.toString(),
-    "vision_lado": vision_lado.toString(),
-    "vision_borrosa": vision_borrosa.toString(),
-    "vision_doble": vision_doble.toString(),
-    "cosas_no_existen": cosas_no_existen.toString(),
-    "sensibilidad_cosas_brillantes": sensibilidad_cosas_brillantes.toString(),
-    "periodos_ceguera": periodos_ceguera.toString(),
-    "persibe_cosas_cuerpo": persibe_cosas_cuerpo.toString(),
-    "dificultad_calor_frio": dificultad_calor_frio.toString(),
-    "problemas_gusto": problemas_gusto.toString(),
-    "problemas_olfato": problemas_olfato.toString(),
-    "dolor": dolor.toString(),
-    "cod_event_dolor_cabeza": cod_event_dolor_cabeza,
-    "cod_event_mareos": cod_event_mareos,
-    "cod_event_nauceas": cod_event_nauceas,
-    "cod_event_vomito": cod_event_vomito,
-    "cod_event_fatiga_excesiva": cod_event_fatiga_excesiva,
-    "cod_event_urinaria": cod_event_urinaria,
-    "cod_event_problemas_instestinales": cod_event_problemas_instestinales,
-    "cod_event_debilidad_lado_cuerpo": cod_event_debilidad_lado_cuerpo,
-    "cod_event_problemas_motricidad": cod_event_problemas_motricidad,
-    "cod_event_temblores": cod_event_temblores,
-    "cod_event_inestabilidad_marcha": cod_event_inestabilidad_marcha,
-    "cod_event_tics_mov_extranos": cod_event_tics_mov_extranos,
-    "cod_event_problemas_equilibrio": cod_event_problemas_equilibrio,
-    "cod_event_choque_cosas": cod_event_choque_cosas,
-    "cod_event_desmayo": cod_event_desmayo,
-    "cod_event_caidas": cod_event_caidas,
-    "cod_event_perdida_sensibilidad": cod_event_perdida_sensibilidad,
-    "cod_event_cosquilleo_piel": cod_event_cosquilleo_piel,
-    "cod_event_ojos_claridad": cod_event_ojos_claridad,
-    "cod_event_perdida_audicion": cod_event_perdida_audicion,
-    "cod_event_utiliza_audifonos": cod_event_utiliza_audifonos,
-    "cod_event_zumbido": cod_event_zumbido,
-    "cod_event_anteojo_cerca": cod_event_anteojo_cerca,
-    "cod_event_anteojo_lejos": cod_event_anteojo_lejos,
-    "cod_event_vision_lado": cod_event_vision_lado,
-    "cod_event_vision_borrosa": cod_event_vision_borrosa,
-    "cod_event_vision_doble": cod_event_vision_doble,
-    "cod_event_cosas_no_existen": cod_event_cosas_no_existen,
-    "cod_event_sensibilidad_cosas_brillantes":
-        cod_event_sensibilidad_cosas_brillantes,
-    "cod_event_periodos_ceguera": cod_event_periodos_ceguera,
-    "cod_event_persibe_cosas_cuerpo": cod_event_persibe_cosas_cuerpo,
-    "cod_event_dificultad_calor_frio": cod_event_dificultad_calor_frio,
-    "cod_event_problemas_gusto": cod_event_problemas_gusto,
-    "cod_event_problemas_olfato": cod_event_problemas_olfato,
-    "cod_event_dolor": cod_event_dolor
-  });
+  var url = URL_base + "/tipo_eventos_fisico";
 
-  var responseDecoder = json.decode(response.body);
+  response = await http.post(url, body: {});
 
-  if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
-    _resetChecksFalse();
-    if (cant_check > 3) {
-      //guardarDatosFisicos(cant_check, context);
-      _alertInforme(
-        context,
-        "Para tener en cuenta",
-        "Le sugerimos que consulte con su medico clínico sobre estos síntomas.",
-      );
-    } else {
-      Navigator.pushNamed(context, '/screening', arguments: {
-        "select_screening": "SFMS",
-      });
-      _scaffold_messenger(context, "Screening Registrado", 1);
-    }
+  var jsonData = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    return respuestaFisico = jsonData['data'];
   } else {
-    _alertInforme(context, "Error detectado", '${response.body}');
+    return null;
   }
 }
 
@@ -306,6 +162,61 @@ class ScreeningFisico extends StatefulWidget {
 class FisicoWidgetState extends State<ScreeningFisico> {
   final _formKey_screening_fisico = GlobalKey<FormState>();
 
+// FISICO
+
+  ValueNotifier<bool> valueNotifierDolorCabeza = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierMareos = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierNauceas = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierVomito = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierFatigaExcesiva = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierUrinaria = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierProblemasInstestinales =
+      ValueNotifier<bool>(false);
+
+// MOTOR
+
+  ValueNotifier<bool> valueNotifierDebilidadLadoCuerpo =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierProblemasMotricidad =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierTemblores = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierInestabilidadMarcha =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierTicsMovExtranos = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierProblemasEquilibrio =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierChoqueCosas = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierDesmayo = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierCaidas = ValueNotifier<bool>(false);
+
+// Sensibilidad
+
+  ValueNotifier<bool> valueNotifierPerdidaSensibilidad =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierCosquilleoPiel = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierOjosClaridad = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierPerdidaAudicion = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> valueNotifierUtilizaAudifonos =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierZumbido = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAnteojoCerca = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAnteojoLejos = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierVisionLado = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierVisionBorrosa = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierVisionDoble = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierCosasNoExisten = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierSensibilidadCosasBrillantes =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierPeriodosCeguera = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierPersibeCosasCuerpo =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierDificultadCalorFrio =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierProblemasGusto = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierProblemasOlfato = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierDolor = ValueNotifier<bool>(false);
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -316,177 +227,210 @@ class FisicoWidgetState extends State<ScreeningFisico> {
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            CheckDolorCabeza(),
+            CheckDolorCabeza(
+                valueNotifierDolorCabeza: valueNotifierDolorCabeza),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            CheckMareos(),
+            CheckMareos(valueNotifierMareos: valueNotifierMareos),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Nauseas(),
+            Nauseas(valueNotifierNauceas: valueNotifierNauceas),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Vomitos(),
+            Vomitos(valueNotifierVomito: valueNotifierVomito),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            FatigaExcesiva(),
+            FatigaExcesiva(
+                valueNotifierFatigaExcesiva: valueNotifierFatigaExcesiva),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            IncontinenciaUrinaria(),
+            IncontinenciaUrinaria(valueNotifierUrinaria: valueNotifierUrinaria),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemasInstestinales(),
+            ProblemasInstestinales(
+                valueNotifierProblemasInstestinales:
+                    valueNotifierProblemasInstestinales),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            DebilidadLadoCuerpo(),
+            DebilidadLadoCuerpo(
+                valueNotifierDebilidadLadoCuerpo:
+                    valueNotifierDebilidadLadoCuerpo),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemasMotricidadFina(),
+            ProblemasMotricidadFina(
+                valueNotifierProblemasMotricidad:
+                    valueNotifierProblemasMotricidad),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Temblores(),
+            Temblores(valueNotifierTemblores: valueNotifierTemblores),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            InestabilidadMarcha(),
+            InestabilidadMarcha(
+                valueNotifierInestabilidadMarcha:
+                    valueNotifierInestabilidadMarcha),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            TicsMovExtranos(),
+            TicsMovExtranos(
+                valueNotifierTicsMovExtranos: valueNotifierTicsMovExtranos),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemaEquilibrio(),
+            ProblemaEquilibrio(
+                valueNotifierProblemasEquilibrio:
+                    valueNotifierProblemasEquilibrio),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ConFrecCosas(),
+            ConFrecCosas(valueNotifierChoqueCosas: valueNotifierChoqueCosas),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            DesvanDesmayo(),
+            DesvanDesmayo(valueNotifierDesmayo: valueNotifierDesmayo),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Caidas(),
+            Caidas(valueNotifierCaidas: valueNotifierCaidas),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            PerdidaSensibilidad(),
+            PerdidaSensibilidad(
+                valueNotifierPerdidaSensibilidad:
+                    valueNotifierPerdidaSensibilidad),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            CosqSensaPiel(),
+            CosqSensaPiel(
+                valueNotifierCosquilleoPiel: valueNotifierCosquilleoPiel),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            NecesidadOjosClaridad(),
+            NecesidadOjosClaridad(
+                valueNotifierOjosClaridad: valueNotifierOjosClaridad),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            PerdidaAudicion(),
+            PerdidaAudicion(
+                valueNotifierPerdidaAudicion: valueNotifierPerdidaAudicion),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            UtilizaAudifonos(),
+            UtilizaAudifonos(
+                valueNotifierUtilizaAudifonos: valueNotifierUtilizaAudifonos),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Zumbido(),
+            Zumbido(valueNotifierZumbido: valueNotifierZumbido),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            UtilizaAnteojosCerca(),
+            UtilizaAnteojosCerca(
+                valueNotifierAnteojoCerca: valueNotifierAnteojoCerca),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            UtilizaAnteojosLejos(),
+            UtilizaAnteojosLejos(
+                valueNotifierAnteojoLejos: valueNotifierAnteojoLejos),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemaVisionLado(),
+            ProblemaVisionLado(
+                valueNotifierVisionLado: valueNotifierVisionLado),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            VisionBorrosa(),
+            VisionBorrosa(
+                valueNotifierVisionBorrosa: valueNotifierVisionBorrosa),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            VisionDoble(),
+            VisionDoble(valueNotifierVisionDoble: valueNotifierVisionDoble),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            VeCosasNoExisten(),
+            VeCosasNoExisten(
+                valueNotifierCosasNoExisten: valueNotifierCosasNoExisten),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            SensiLucesBrillantes(),
+            SensiLucesBrillantes(
+                valueNotifierSensibilidadCosasBrillantes:
+                    valueNotifierSensibilidadCosasBrillantes),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            PeriodosCortosCeguera(),
+            PeriodosCortosCeguera(
+                valueNotifierPeriodosCeguera: valueNotifierPeriodosCeguera),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            CosasPasanCuerpo(),
+            CosasPasanCuerpo(
+                valueNotifierPersibeCosasCuerpo:
+                    valueNotifierPersibeCosasCuerpo),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            DistinguirCalorFrio(),
+            DistinguirCalorFrio(
+                valueNotifierDificultadCalorFrio:
+                    valueNotifierDificultadCalorFrio),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemasGusto(),
+            ProblemasGusto(
+                valueNotifierProblemasGusto: valueNotifierProblemasGusto),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            ProblemasOlfato(),
+            ProblemasOlfato(
+                valueNotifierProblemasOlfato: valueNotifierProblemasOlfato),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
             Divider(height: 3.0, color: Colors.black),
-            Dolor(),
+            Dolor(valueNotifierDolor: valueNotifierDolor),
             Divider(height: 3.0, color: Colors.black),
             Padding(
               padding: EdgeInsets.all(18.0),
@@ -538,6 +482,126 @@ class FisicoWidgetState extends State<ScreeningFisico> {
     });
   }
 
+  guardarDatosFisicos(var cant_check, BuildContext context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_fisico";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "cantidad": cant_check.toString(),
+      "dolor_cabeza": valueNotifierDolorCabeza.value.toString(),
+      "mareos": valueNotifierMareos.value.toString(),
+      "nauceas": valueNotifierNauceas.value.toString(),
+      "vomito": valueNotifierVomito.value.toString(),
+      "fatiga_excesiva": valueNotifierFatigaExcesiva.value.toString(),
+      "urinaria": valueNotifierUrinaria.value.toString(),
+      "problemas_instestinales":
+          valueNotifierProblemasInstestinales.value.toString(),
+      "debilidad_lado_cuerpo":
+          valueNotifierDebilidadLadoCuerpo.value.toString(),
+      "problemas_motricidad": valueNotifierProblemasMotricidad.value.toString(),
+      "temblores": valueNotifierTemblores.value.toString(),
+      "inestabilidad_marcha": valueNotifierInestabilidadMarcha.value.toString(),
+      "tics_mov_extranos": valueNotifierTicsMovExtranos.value.toString(),
+      "problemas_equilibrio": valueNotifierProblemasEquilibrio.value.toString(),
+      "choque_cosas": valueNotifierChoqueCosas.value.toString(),
+      "desmayo": valueNotifierDesmayo.value.toString(),
+      "caidas": valueNotifierCaidas.value.toString(),
+      "perdida_sensibilidad": valueNotifierPerdidaSensibilidad.value.toString(),
+      "cosquilleo_piel": valueNotifierCosquilleoPiel.value.toString(),
+      "ojos_claridad": valueNotifierOjosClaridad.value.toString(),
+      "perdida_audicion": valueNotifierPerdidaAudicion.value.toString(),
+      "utiliza_audifonos": valueNotifierUtilizaAudifonos.value.toString(),
+      "zumbido": valueNotifierZumbido.value.toString(),
+      "anteojo_cerca": valueNotifierAnteojoCerca.value.toString(),
+      "anteojo_lejos": valueNotifierAnteojoLejos.value.toString(),
+      "vision_lado": valueNotifierVisionLado.value.toString(),
+      "vision_borrosa": valueNotifierVisionBorrosa.value.toString(),
+      "vision_doble": valueNotifierVisionDoble.value.toString(),
+      "cosas_no_existen": valueNotifierCosasNoExisten.value.toString(),
+      "sensibilidad_cosas_brillantes":
+          valueNotifierSensibilidadCosasBrillantes.value.toString(),
+      "periodos_ceguera": valueNotifierPeriodosCeguera.value.toString(),
+      "persibe_cosas_cuerpo": valueNotifierPersibeCosasCuerpo.value.toString(),
+      "dificultad_calor_frio":
+          valueNotifierDificultadCalorFrio.value.toString(),
+      "problemas_gusto": valueNotifierProblemasGusto.value.toString(),
+      "problemas_olfato": valueNotifierProblemasOlfato.value.toString(),
+      "dolor": valueNotifierDolor.value.toString(),
+      "cod_event_dolor_cabeza": cod_event_dolor_cabeza,
+      "cod_event_mareos": cod_event_mareos,
+      "cod_event_nauceas": cod_event_nauceas,
+      "cod_event_vomito": cod_event_vomito,
+      "cod_event_fatiga_excesiva": cod_event_fatiga_excesiva,
+      "cod_event_urinaria": cod_event_urinaria,
+      "cod_event_problemas_instestinales": cod_event_problemas_instestinales,
+      "cod_event_debilidad_lado_cuerpo": cod_event_debilidad_lado_cuerpo,
+      "cod_event_problemas_motricidad": cod_event_problemas_motricidad,
+      "cod_event_temblores": cod_event_temblores,
+      "cod_event_inestabilidad_marcha": cod_event_inestabilidad_marcha,
+      "cod_event_tics_mov_extranos": cod_event_tics_mov_extranos,
+      "cod_event_problemas_equilibrio": cod_event_problemas_equilibrio,
+      "cod_event_choque_cosas": cod_event_choque_cosas,
+      "cod_event_desmayo": cod_event_desmayo,
+      "cod_event_caidas": cod_event_caidas,
+      "cod_event_perdida_sensibilidad": cod_event_perdida_sensibilidad,
+      "cod_event_cosquilleo_piel": cod_event_cosquilleo_piel,
+      "cod_event_ojos_claridad": cod_event_ojos_claridad,
+      "cod_event_perdida_audicion": cod_event_perdida_audicion,
+      "cod_event_utiliza_audifonos": cod_event_utiliza_audifonos,
+      "cod_event_zumbido": cod_event_zumbido,
+      "cod_event_anteojo_cerca": cod_event_anteojo_cerca,
+      "cod_event_anteojo_lejos": cod_event_anteojo_lejos,
+      "cod_event_vision_lado": cod_event_vision_lado,
+      "cod_event_vision_borrosa": cod_event_vision_borrosa,
+      "cod_event_vision_doble": cod_event_vision_doble,
+      "cod_event_cosas_no_existen": cod_event_cosas_no_existen,
+      "cod_event_sensibilidad_cosas_brillantes":
+          cod_event_sensibilidad_cosas_brillantes,
+      "cod_event_periodos_ceguera": cod_event_periodos_ceguera,
+      "cod_event_persibe_cosas_cuerpo": cod_event_persibe_cosas_cuerpo,
+      "cod_event_dificultad_calor_frio": cod_event_dificultad_calor_frio,
+      "cod_event_problemas_gusto": cod_event_problemas_gusto,
+      "cod_event_problemas_olfato": cod_event_problemas_olfato,
+      "cod_event_dolor": cod_event_dolor
+    });
+
+    var responseDecoder = json.decode(response.body);
+
+    if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
+      if (cant_check > 3) {
+        showCustomAlert(
+          context,
+          "Para tener en cuenta",
+          "Le sugerimos que consulte con su medico clínico sobre estos síntomas.",
+          true,
+          () {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+              _scaffold_messenger(
+                  context, "Screening del Médico Respondido", 1);
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "SFMS",
+              });
+              _scaffold_messenger(context, "Screening Registrado", 1);
+            }
+          },
+        );
+      } else {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "SFMS",
+        });
+        _scaffold_messenger(context, "Screening Registrado", 1);
+      }
+    } else {
+      showCustomAlert(
+          context, "Error detectado", '${response.body}', true, () {});
+    }
+  }
+
   showDialogMessage() async {
     await Future.delayed(Duration(microseconds: 1));
     showDialog(
@@ -569,16 +633,6 @@ class FisicoWidgetState extends State<ScreeningFisico> {
   }
 }
 
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
-}
-
 _scaffold_messenger(context, message, colorNumber) {
   var color;
   colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
@@ -591,82 +645,9 @@ _scaffold_messenger(context, message, colorNumber) {
   ));
 }
 
-_alertInforme(context, title, descripcion) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-        onPressed: () {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-            _scaffold_messenger(context, "Screening del Médico Respondido", 1);
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "SFMS",
-            });
-            _scaffold_messenger(context, "Screening Registrado", 1);
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
 // Contador
 var cant_check = 0;
-// FISICO
-
-bool dolor_cabeza;
-bool mareos;
-bool nauceas;
-bool vomito;
-bool fatiga_excesiva;
-bool urinaria;
-bool problemas_instestinales;
-
-// MOTOR
-
-bool debilidad_lado_cuerpo;
-bool problemas_motricidad;
-bool temblores;
-bool inestabilidad_marcha;
-bool tics_mov_extranos;
-bool problemas_equilibrio;
-bool choque_cosas;
-bool desmayo;
-bool caidas;
-
-// Sensibilidad
-
-bool perdida_sensibilidad;
-bool cosquilleo_piel;
-bool ojos_claridad;
-bool perdida_audicion;
-
-bool utiliza_audifonos;
-bool zumbido;
-bool anteojo_cerca;
-bool anteojo_lejos;
-bool vision_lado;
-bool vision_borrosa;
-bool vision_doble;
-bool cosas_no_existen;
-bool sensibilidad_cosas_brillantes;
-bool periodos_ceguera;
-bool persibe_cosas_cuerpo;
-bool dificultad_calor_frio;
-bool problemas_gusto;
-bool problemas_olfato;
-bool dolor;
 
 String cod_event_dolor_cabeza = "DOLCA";
 String cod_event_mareos = 'MAREO';
@@ -705,58 +686,14 @@ String cod_event_problemas_gusto = 'PROGU';
 String cod_event_problemas_olfato = 'PROOL';
 String cod_event_dolor = 'DOLOR';
 
+//
+
 //-------------------------------------- DOLOR DE CABEZA -----------------------------------------------------
 
-class LabeledCheckboxDC extends StatelessWidget {
-  const LabeledCheckboxDC({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CheckDolorCabeza extends StatefulWidget {
-  CheckDolorCabeza({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierDolorCabeza;
+
+  CheckDolorCabeza({this.valueNotifierDolorCabeza});
 
   @override
   CheckCheckDolorCabezaWidgetState createState() =>
@@ -766,10 +703,11 @@ class CheckDolorCabeza extends StatefulWidget {
 class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDC(
-      label: 'Dolores de Cabeza',
+    return LabeledCheckboxGeneric(
+      label: respuestaFisico[0]['nombre_evento'],
+      //'Dolor de Cabeza',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: dolor_cabeza,
+      value: widget.valueNotifierDolorCabeza.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -777,11 +715,15 @@ class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
           } else {
             cant_check -= 1;
           }
-          debugPrint("cant_check: $cant_check");
-
-          dolor_cabeza = newValue;
+          widget.valueNotifierDolorCabeza.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
@@ -790,56 +732,10 @@ class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
 
 // --------------------------------- MAREOS ----------------------------------------------------
 
-class LabeledCheckboxMareos extends StatelessWidget {
-  const LabeledCheckboxMareos({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CheckMareos extends StatefulWidget {
-  CheckMareos({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierMareos;
+
+  CheckMareos({this.valueNotifierMareos});
 
   @override
   CheckCheckMareosWidgetState createState() => CheckCheckMareosWidgetState();
@@ -848,10 +744,11 @@ class CheckMareos extends StatefulWidget {
 class CheckCheckMareosWidgetState extends State<CheckMareos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxMareos(
-      label: 'Mareos',
+    return LabeledCheckboxGeneric(
+      label: respuestaFisico[1]['nombre_evento'],
+      //'Mareos',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: mareos,
+      value: widget.valueNotifierMareos.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -859,64 +756,25 @@ class CheckCheckMareosWidgetState extends State<CheckMareos> {
           } else {
             cant_check -= 1;
           }
-          mareos = newValue;
+          widget.valueNotifierMareos.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //-------------------------------------------Nauseas--------------------------------------------
 
-class LabeledCheckboxNauseas extends StatelessWidget {
-  const LabeledCheckboxNauseas({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Nauseas extends StatefulWidget {
-  Nauseas({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierNauceas;
+
+  Nauseas({this.valueNotifierNauceas});
 
   @override
   NauseasWidgetState createState() => NauseasWidgetState();
@@ -925,10 +783,11 @@ class Nauseas extends StatefulWidget {
 class NauseasWidgetState extends State<Nauseas> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxNauseas(
-      label: 'Nauseas',
+    return LabeledCheckboxGeneric(
+      //label: 'Nauseas',
+      label: respuestaFisico[2]['nombre_evento'],
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: nauceas,
+      value: widget.valueNotifierNauceas.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -936,64 +795,25 @@ class NauseasWidgetState extends State<Nauseas> {
           } else {
             cant_check -= 1;
           }
-          nauceas = newValue;
+          widget.valueNotifierNauceas.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //------------------------------------------ VOMITOS -------------------------------------------
 
-class LabeledCheckboxVom extends StatelessWidget {
-  const LabeledCheckboxVom({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Vomitos extends StatefulWidget {
-  Vomitos({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierVomito;
+
+  Vomitos({this.valueNotifierVomito});
 
   @override
   VomitosWidgetState createState() => VomitosWidgetState();
@@ -1002,10 +822,10 @@ class Vomitos extends StatefulWidget {
 class VomitosWidgetState extends State<Vomitos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVom(
+    return LabeledCheckboxGeneric(
       label: 'Vómitos',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: vomito,
+      value: widget.valueNotifierVomito.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1013,64 +833,25 @@ class VomitosWidgetState extends State<Vomitos> {
           } else {
             cant_check -= 1;
           }
-          vomito = newValue;
+          widget.valueNotifierVomito.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //------------------------------------------Fatiga excesiva ---------------------------------------
 
-class LabeledCheckboxFatExc extends StatelessWidget {
-  const LabeledCheckboxFatExc({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class FatigaExcesiva extends StatefulWidget {
-  FatigaExcesiva({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierFatigaExcesiva;
+
+  FatigaExcesiva({this.valueNotifierFatigaExcesiva});
 
   @override
   FatigaExcesivaWidgetState createState() => FatigaExcesivaWidgetState();
@@ -1079,10 +860,10 @@ class FatigaExcesiva extends StatefulWidget {
 class FatigaExcesivaWidgetState extends State<FatigaExcesiva> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxFatExc(
+    return LabeledCheckboxGeneric(
       label: 'Fatiga excesiva',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: fatiga_excesiva,
+      value: widget.valueNotifierFatigaExcesiva.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1090,64 +871,25 @@ class FatigaExcesivaWidgetState extends State<FatigaExcesiva> {
           } else {
             cant_check -= 1;
           }
-          fatiga_excesiva = newValue;
+          widget.valueNotifierFatigaExcesiva.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // ----------------------------------------Incontinencia urinaria---------------------------------------
 
-class LabeledCheckboxIU extends StatelessWidget {
-  const LabeledCheckboxIU({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class IncontinenciaUrinaria extends StatefulWidget {
-  IncontinenciaUrinaria({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierUrinaria;
+
+  IncontinenciaUrinaria({this.valueNotifierUrinaria});
 
   @override
   IncontinenciaUrinariaWidgetState createState() =>
@@ -1157,10 +899,10 @@ class IncontinenciaUrinaria extends StatefulWidget {
 class IncontinenciaUrinariaWidgetState extends State<IncontinenciaUrinaria> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxIU(
+    return LabeledCheckboxGeneric(
       label: 'Incontinencia urinaria',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: urinaria,
+      value: widget.valueNotifierUrinaria.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1168,64 +910,25 @@ class IncontinenciaUrinariaWidgetState extends State<IncontinenciaUrinaria> {
           } else {
             cant_check -= 1;
           }
-          urinaria = newValue;
+          widget.valueNotifierUrinaria.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // ----------------------------------------Problemas intestinales -----------------------------------
 
-class LabeledCheckboxProblemasIns extends StatelessWidget {
-  const LabeledCheckboxProblemasIns({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemasInstestinales extends StatefulWidget {
-  ProblemasInstestinales({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierProblemasInstestinales;
+
+  ProblemasInstestinales({this.valueNotifierProblemasInstestinales});
 
   @override
   ProblemasInstestinalesWidgetState createState() =>
@@ -1235,10 +938,10 @@ class ProblemasInstestinales extends StatefulWidget {
 class ProblemasInstestinalesWidgetState extends State<ProblemasInstestinales> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxProblemasIns(
+    return LabeledCheckboxGeneric(
       label: 'Problemas intestinales',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: problemas_instestinales,
+      value: widget.valueNotifierProblemasInstestinales.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1246,63 +949,25 @@ class ProblemasInstestinalesWidgetState extends State<ProblemasInstestinales> {
           } else {
             cant_check -= 1;
           }
-          problemas_instestinales = newValue;
+          widget.valueNotifierProblemasInstestinales.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // -----------------------------------------Debilidad de un lado del cuerpo -----------------------------------------------------
-class LabeledCheckboxDebilCuerpo extends StatelessWidget {
-  const LabeledCheckboxDebilCuerpo({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class DebilidadLadoCuerpo extends StatefulWidget {
-  DebilidadLadoCuerpo({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierDebilidadLadoCuerpo;
+
+  DebilidadLadoCuerpo({this.valueNotifierDebilidadLadoCuerpo});
 
   @override
   DebilidadLadoCuerpoWidgetState createState() =>
@@ -1312,10 +977,10 @@ class DebilidadLadoCuerpo extends StatefulWidget {
 class DebilidadLadoCuerpoWidgetState extends State<DebilidadLadoCuerpo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDebilCuerpo(
+    return LabeledCheckboxGeneric(
       label: 'Debilidad de un lado del cuerpo',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: debilidad_lado_cuerpo,
+      value: widget.valueNotifierDebilidadLadoCuerpo.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1323,64 +988,25 @@ class DebilidadLadoCuerpoWidgetState extends State<DebilidadLadoCuerpo> {
           } else {
             cant_check -= 1;
           }
-          debilidad_lado_cuerpo = newValue;
+          widget.valueNotifierDebilidadLadoCuerpo.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //-------------------------------------------- Problemas en la motricidad fina -----------------------------------------------------------
 
-class LabeledCheckboxPMF extends StatelessWidget {
-  const LabeledCheckboxPMF({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemasMotricidadFina extends StatefulWidget {
-  ProblemasMotricidadFina({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierProblemasMotricidad;
+
+  ProblemasMotricidadFina({this.valueNotifierProblemasMotricidad});
 
   @override
   ProblemasMotricidadFinaWidgetState createState() =>
@@ -1391,10 +1017,10 @@ class ProblemasMotricidadFinaWidgetState
     extends State<ProblemasMotricidadFina> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxPMF(
+    return LabeledCheckboxGeneric(
       label: 'Problemas en la motricidad fina',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: problemas_motricidad,
+      value: widget.valueNotifierProblemasMotricidad.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1402,63 +1028,25 @@ class ProblemasMotricidadFinaWidgetState
           } else {
             cant_check -= 1;
           }
-          problemas_motricidad = newValue;
+          widget.valueNotifierProblemasMotricidad.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // -------------------------------------------Temblores --------------------------------------------
-class LabeledCheckboxTemblores extends StatelessWidget {
-  const LabeledCheckboxTemblores({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Temblores extends StatefulWidget {
-  Temblores({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierTemblores;
+
+  Temblores({this.valueNotifierTemblores});
 
   @override
   TembloresWidgetState createState() => TembloresWidgetState();
@@ -1467,10 +1055,10 @@ class Temblores extends StatefulWidget {
 class TembloresWidgetState extends State<Temblores> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxTemblores(
+    return LabeledCheckboxGeneric(
       label: 'Temblores',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: temblores,
+      value: widget.valueNotifierTemblores.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1478,63 +1066,25 @@ class TembloresWidgetState extends State<Temblores> {
           } else {
             cant_check -= 1;
           }
-          temblores = newValue;
+          widget.valueNotifierTemblores.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // ------------------------------------------Inestabilidad en la marcha ---------------------------------------------------
-class LabeledCheckboxInestabilidadMarcha extends StatelessWidget {
-  const LabeledCheckboxInestabilidadMarcha({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class InestabilidadMarcha extends StatefulWidget {
-  InestabilidadMarcha({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierInestabilidadMarcha;
+
+  InestabilidadMarcha({this.valueNotifierInestabilidadMarcha});
 
   @override
   InestabilidadMarchaWidgetState createState() =>
@@ -1544,10 +1094,10 @@ class InestabilidadMarcha extends StatefulWidget {
 class InestabilidadMarchaWidgetState extends State<InestabilidadMarcha> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxInestabilidadMarcha(
+    return LabeledCheckboxGeneric(
       label: 'Inestabilidad en la marcha',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: inestabilidad_marcha,
+      value: widget.valueNotifierInestabilidadMarcha.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1555,63 +1105,24 @@ class InestabilidadMarchaWidgetState extends State<InestabilidadMarcha> {
           } else {
             cant_check -= 1;
           }
-          inestabilidad_marcha = newValue;
+          widget.valueNotifierInestabilidadMarcha.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 //-------------------------------------------- Tics o movimientos extraños---------------------------------------------------
 
-class LabeledCheckboxTicsMovEx extends StatelessWidget {
-  const LabeledCheckboxTicsMovEx({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class TicsMovExtranos extends StatefulWidget {
-  TicsMovExtranos({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierTicsMovExtranos;
+
+  TicsMovExtranos({this.valueNotifierTicsMovExtranos});
 
   @override
   TicsMovExtranosWidgetState createState() => TicsMovExtranosWidgetState();
@@ -1620,10 +1131,10 @@ class TicsMovExtranos extends StatefulWidget {
 class TicsMovExtranosWidgetState extends State<TicsMovExtranos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxTicsMovEx(
+    return LabeledCheckboxGeneric(
       label: 'Tics o movimientos extraños',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: tics_mov_extranos,
+      value: widget.valueNotifierTicsMovExtranos.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1631,63 +1142,24 @@ class TicsMovExtranosWidgetState extends State<TicsMovExtranos> {
           } else {
             cant_check -= 1;
           }
-          tics_mov_extranos = newValue;
+          widget.valueNotifierTicsMovExtranos.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 //------------------------------------------Problemas de equilibrio --------------------------------------------------
 
-class LabeledCheckboxProblemaEq extends StatelessWidget {
-  const LabeledCheckboxProblemaEq({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemaEquilibrio extends StatefulWidget {
-  ProblemaEquilibrio({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierProblemasEquilibrio;
+
+  ProblemaEquilibrio({this.valueNotifierProblemasEquilibrio});
 
   @override
   ProblemaEquiWidgetState createState() => ProblemaEquiWidgetState();
@@ -1696,10 +1168,10 @@ class ProblemaEquilibrio extends StatefulWidget {
 class ProblemaEquiWidgetState extends State<ProblemaEquilibrio> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxProblemaEq(
+    return LabeledCheckboxGeneric(
       label: 'Problemas de equilibrio',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: problemas_equilibrio,
+      value: widget.valueNotifierProblemasEquilibrio.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1707,63 +1179,24 @@ class ProblemaEquiWidgetState extends State<ProblemaEquilibrio> {
           } else {
             cant_check -= 1;
           }
-          problemas_equilibrio = newValue;
+          widget.valueNotifierProblemasEquilibrio.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 //-------------------------------------------- Con frecuencia se choca las cosas -------------------------------------------------
 
-class LabeledCheckboxFrecCosas extends StatelessWidget {
-  const LabeledCheckboxFrecCosas({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ConFrecCosas extends StatefulWidget {
-  ConFrecCosas({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierChoqueCosas;
+
+  ConFrecCosas({this.valueNotifierChoqueCosas});
 
   @override
   ConFrecWidgetState createState() => ConFrecWidgetState();
@@ -1772,10 +1205,10 @@ class ConFrecCosas extends StatefulWidget {
 class ConFrecWidgetState extends State<ConFrecCosas> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxFrecCosas(
+    return LabeledCheckboxGeneric(
       label: 'Con frecuencia se choca las cosas',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: choque_cosas,
+      value: widget.valueNotifierChoqueCosas.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1783,63 +1216,25 @@ class ConFrecWidgetState extends State<ConFrecCosas> {
           } else {
             cant_check -= 1;
           }
-          choque_cosas = newValue;
+          widget.valueNotifierChoqueCosas.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 // --------------------------------------------Desvanecimiento o desmayo ------------------------------------------------
-class LabeledCheckboxDesoDes extends StatelessWidget {
-  const LabeledCheckboxDesoDes({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class DesvanDesmayo extends StatefulWidget {
-  DesvanDesmayo({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierDesmayo;
+
+  DesvanDesmayo({this.valueNotifierDesmayo});
 
   @override
   DesvanDesWidgetState createState() => DesvanDesWidgetState();
@@ -1848,10 +1243,10 @@ class DesvanDesmayo extends StatefulWidget {
 class DesvanDesWidgetState extends State<DesvanDesmayo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDesoDes(
+    return LabeledCheckboxGeneric(
       label: 'Desvanecimiento o desmayo',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: desmayo,
+      value: widget.valueNotifierDesmayo.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1859,63 +1254,24 @@ class DesvanDesWidgetState extends State<DesvanDesmayo> {
           } else {
             cant_check -= 1;
           }
-          desmayo = newValue;
+          widget.valueNotifierDesmayo.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 // --------------------------------------------Caídas -------------------------------------------------
 
-class LabeledCheckboxCaidas extends StatelessWidget {
-  const LabeledCheckboxCaidas({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Caidas extends StatefulWidget {
-  Caidas({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierCaidas;
+
+  Caidas({this.valueNotifierCaidas});
 
   @override
   CaidasWidgetState createState() => CaidasWidgetState();
@@ -1924,10 +1280,10 @@ class Caidas extends StatefulWidget {
 class CaidasWidgetState extends State<Caidas> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxCaidas(
+    return LabeledCheckboxGeneric(
       label: 'Caídas',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: caidas,
+      value: widget.valueNotifierCaidas.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -1935,63 +1291,24 @@ class CaidasWidgetState extends State<Caidas> {
           } else {
             cant_check -= 1;
           }
-          caidas = newValue;
+          widget.valueNotifierCaidas.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 // --------------------------------------------Pérdida de sensibilidad -----------------------------------------
 
-class LabeledCheckboxPerdidaSensibilidad extends StatelessWidget {
-  const LabeledCheckboxPerdidaSensibilidad({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class PerdidaSensibilidad extends StatefulWidget {
-  PerdidaSensibilidad({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierPerdidaSensibilidad;
+
+  PerdidaSensibilidad({this.valueNotifierPerdidaSensibilidad});
 
   @override
   PerdidaSensibilidadWidgetState createState() =>
@@ -2001,10 +1318,10 @@ class PerdidaSensibilidad extends StatefulWidget {
 class PerdidaSensibilidadWidgetState extends State<PerdidaSensibilidad> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxPerdidaSensibilidad(
+    return LabeledCheckboxGeneric(
       label: 'Pérdida de sensibilidad',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: perdida_sensibilidad,
+      value: widget.valueNotifierPerdidaSensibilidad.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2012,63 +1329,24 @@ class PerdidaSensibilidadWidgetState extends State<PerdidaSensibilidad> {
           } else {
             cant_check -= 1;
           }
-          perdida_sensibilidad = newValue;
+          widget.valueNotifierPerdidaSensibilidad.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 // --------------------------------------------Cosquilleo o sensaciones extrañas en la piel ---------------------------------------------
 
-class LabeledCheckboxCosqSensaPiel extends StatelessWidget {
-  const LabeledCheckboxCosqSensaPiel({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CosqSensaPiel extends StatefulWidget {
-  CosqSensaPiel({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierCosquilleoPiel;
+
+  CosqSensaPiel({this.valueNotifierCosquilleoPiel});
 
   @override
   EsquizofreniaWidgetState createState() => EsquizofreniaWidgetState();
@@ -2077,10 +1355,10 @@ class CosqSensaPiel extends StatefulWidget {
 class EsquizofreniaWidgetState extends State<CosqSensaPiel> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxCosqSensaPiel(
+    return LabeledCheckboxGeneric(
       label: 'Cosquilleo o sensaciones extrañas en la piel',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: cosquilleo_piel,
+      value: widget.valueNotifierCosquilleoPiel.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2088,63 +1366,25 @@ class EsquizofreniaWidgetState extends State<CosqSensaPiel> {
           } else {
             cant_check -= 1;
           }
-          cosquilleo_piel = newValue;
+          widget.valueNotifierCosquilleoPiel.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Necesidad de entrecerrar los ojos o acercarse para ver con claridad ----------------------------
-class LabeledCheckboxEntreojos extends StatelessWidget {
-  const LabeledCheckboxEntreojos({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class NecesidadOjosClaridad extends StatefulWidget {
-  NecesidadOjosClaridad({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierOjosClaridad;
+
+  NecesidadOjosClaridad({this.valueNotifierOjosClaridad});
 
   @override
   NecesidadOjosClaridadWidgetState createState() =>
@@ -2154,11 +1394,11 @@ class NecesidadOjosClaridad extends StatefulWidget {
 class NecesidadOjosClaridadWidgetState extends State<NecesidadOjosClaridad> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxEntreojos(
+    return LabeledCheckboxGeneric(
       label:
           'Necesidad de entrecerrar los ojos o acercarse para ver con claridad.',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: ojos_claridad,
+      value: widget.valueNotifierOjosClaridad.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2166,63 +1406,24 @@ class NecesidadOjosClaridadWidgetState extends State<NecesidadOjosClaridad> {
           } else {
             cant_check -= 1;
           }
-          ojos_claridad = newValue;
+          widget.valueNotifierOjosClaridad.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 //---------------------------------------------Pérdida de audición ---------------------------------------------
 
-class LabeledCheckboxIntox extends StatelessWidget {
-  const LabeledCheckboxIntox({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class PerdidaAudicion extends StatefulWidget {
-  PerdidaAudicion({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierPerdidaAudicion;
+
+  PerdidaAudicion({this.valueNotifierPerdidaAudicion});
 
   @override
   PerdidaAudicionWidgetState createState() => PerdidaAudicionWidgetState();
@@ -2231,10 +1432,10 @@ class PerdidaAudicion extends StatefulWidget {
 class PerdidaAudicionWidgetState extends State<PerdidaAudicion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxIntox(
+    return LabeledCheckboxGeneric(
       label: 'Pérdida de audición',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: perdida_audicion,
+      value: widget.valueNotifierPerdidaAudicion.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2242,64 +1443,25 @@ class PerdidaAudicionWidgetState extends State<PerdidaAudicion> {
           } else {
             cant_check -= 1;
           }
-          perdida_audicion = newValue;
+          widget.valueNotifierPerdidaAudicion.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Utiliza audífonos ---------------------------------------------
 
-class LabeledCheckboxUtilizaAuidi extends StatelessWidget {
-  const LabeledCheckboxUtilizaAuidi({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class UtilizaAudifonos extends StatefulWidget {
-  UtilizaAudifonos({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierUtilizaAudifonos;
+
+  UtilizaAudifonos({this.valueNotifierUtilizaAudifonos});
 
   @override
   UtilizaAudiWidgetState createState() => UtilizaAudiWidgetState();
@@ -2308,10 +1470,10 @@ class UtilizaAudifonos extends StatefulWidget {
 class UtilizaAudiWidgetState extends State<UtilizaAudifonos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxUtilizaAuidi(
+    return LabeledCheckboxGeneric(
       label: 'Utiliza audífonos',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: utiliza_audifonos,
+      value: widget.valueNotifierUtilizaAudifonos.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2319,64 +1481,25 @@ class UtilizaAudiWidgetState extends State<UtilizaAudifonos> {
           } else {
             cant_check -= 1;
           }
-          utiliza_audifonos = newValue;
+          widget.valueNotifierUtilizaAudifonos.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Zumbido ---------------------------------------------
 
-class LabeledCheckboxZumbido extends StatelessWidget {
-  const LabeledCheckboxZumbido({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Zumbido extends StatefulWidget {
-  Zumbido({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierZumbido;
+
+  Zumbido({this.valueNotifierZumbido});
 
   @override
   ZumbidoWidgetState createState() => ZumbidoWidgetState();
@@ -2385,10 +1508,10 @@ class Zumbido extends StatefulWidget {
 class ZumbidoWidgetState extends State<Zumbido> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxZumbido(
+    return LabeledCheckboxGeneric(
       label: 'Zumbido',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: zumbido,
+      value: widget.valueNotifierZumbido.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2396,64 +1519,25 @@ class ZumbidoWidgetState extends State<Zumbido> {
           } else {
             cant_check -= 1;
           }
-          zumbido = newValue;
+          widget.valueNotifierZumbido.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Utiliza anteojos para ver de cerca ---------------------------------------------
 
-class LabeledCheckboxUtilizaAnteojosCerca extends StatelessWidget {
-  const LabeledCheckboxUtilizaAnteojosCerca({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class UtilizaAnteojosCerca extends StatefulWidget {
-  UtilizaAnteojosCerca({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierAnteojoCerca;
+
+  UtilizaAnteojosCerca({this.valueNotifierAnteojoCerca});
 
   @override
   UtilizaAnteojosCercaWidgetState createState() =>
@@ -2463,10 +1547,10 @@ class UtilizaAnteojosCerca extends StatefulWidget {
 class UtilizaAnteojosCercaWidgetState extends State<UtilizaAnteojosCerca> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxUtilizaAnteojosCerca(
+    return LabeledCheckboxGeneric(
       label: 'Utiliza anteojos para ver de cerca',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: anteojo_cerca,
+      value: widget.valueNotifierAnteojoCerca.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2474,64 +1558,25 @@ class UtilizaAnteojosCercaWidgetState extends State<UtilizaAnteojosCerca> {
           } else {
             cant_check -= 1;
           }
-          anteojo_cerca = newValue;
+          widget.valueNotifierAnteojoCerca.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Utiliza anteojos para ver de cerca ---------------------------------------------
 
-class LabeledCheckboxUtilizaAnteojosLejos extends StatelessWidget {
-  const LabeledCheckboxUtilizaAnteojosLejos({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class UtilizaAnteojosLejos extends StatefulWidget {
-  UtilizaAnteojosLejos({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierAnteojoLejos;
+
+  UtilizaAnteojosLejos({this.valueNotifierAnteojoLejos});
 
   @override
   UtilizaAnteojosLejosWidgetState createState() =>
@@ -2541,10 +1586,10 @@ class UtilizaAnteojosLejos extends StatefulWidget {
 class UtilizaAnteojosLejosWidgetState extends State<UtilizaAnteojosLejos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxUtilizaAnteojosLejos(
+    return LabeledCheckboxGeneric(
       label: 'Utiliza anteojos para ver de lejos',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: anteojo_lejos,
+      value: widget.valueNotifierAnteojoLejos.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2552,64 +1597,25 @@ class UtilizaAnteojosLejosWidgetState extends State<UtilizaAnteojosLejos> {
           } else {
             cant_check -= 1;
           }
-          anteojo_lejos = newValue;
+          widget.valueNotifierAnteojoLejos.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Problemas de visión de un lado ---------------------------------------------
 
-class LabeledCheckboxProbVisLado extends StatelessWidget {
-  const LabeledCheckboxProbVisLado({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemaVisionLado extends StatefulWidget {
-  ProblemaVisionLado({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierVisionLado;
+
+  ProblemaVisionLado({this.valueNotifierVisionLado});
 
   @override
   ProblemaVisionLadoWidgetState createState() =>
@@ -2619,10 +1625,10 @@ class ProblemaVisionLado extends StatefulWidget {
 class ProblemaVisionLadoWidgetState extends State<ProblemaVisionLado> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxProbVisLado(
+    return LabeledCheckboxGeneric(
       label: 'Problemas de visión de un lado',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: vision_lado,
+      value: widget.valueNotifierVisionLado.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2630,64 +1636,25 @@ class ProblemaVisionLadoWidgetState extends State<ProblemaVisionLado> {
           } else {
             cant_check -= 1;
           }
-          vision_lado = newValue;
+          widget.valueNotifierVisionLado.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Visión borrosa ---------------------------------------------
 
-class LabeledCheckboxVisionBorrosa extends StatelessWidget {
-  const LabeledCheckboxVisionBorrosa({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class VisionBorrosa extends StatefulWidget {
-  VisionBorrosa({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierVisionBorrosa;
+
+  VisionBorrosa({this.valueNotifierVisionBorrosa});
 
   @override
   VisionBorrosaWidgetState createState() => VisionBorrosaWidgetState();
@@ -2696,10 +1663,10 @@ class VisionBorrosa extends StatefulWidget {
 class VisionBorrosaWidgetState extends State<VisionBorrosa> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVisionBorrosa(
+    return LabeledCheckboxGeneric(
       label: 'Visión borrosa',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: vision_borrosa,
+      value: widget.valueNotifierVisionBorrosa.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2707,64 +1674,25 @@ class VisionBorrosaWidgetState extends State<VisionBorrosa> {
           } else {
             cant_check -= 1;
           }
-          vision_borrosa = newValue;
+          widget.valueNotifierVisionBorrosa.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Visión doble ---------------------------------------------
 
-class LabeledCheckboxVisionDoble extends StatelessWidget {
-  const LabeledCheckboxVisionDoble({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class VisionDoble extends StatefulWidget {
-  VisionDoble({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierVisionDoble;
+
+  VisionDoble({this.valueNotifierVisionDoble});
 
   @override
   VisionDobleWidgetState createState() => VisionDobleWidgetState();
@@ -2773,10 +1701,10 @@ class VisionDoble extends StatefulWidget {
 class VisionDobleWidgetState extends State<VisionDoble> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVisionDoble(
+    return LabeledCheckboxGeneric(
       label: 'Utiliza anteojos para ver de cerca',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: vision_doble,
+      value: widget.valueNotifierVisionDoble.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2784,64 +1712,25 @@ class VisionDobleWidgetState extends State<VisionDoble> {
           } else {
             cant_check -= 1;
           }
-          vision_doble = newValue;
+          widget.valueNotifierVisionDoble.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Ve cosas que no existen ---------------------------------------------
 
-class LabeledCheckboxVeCosasNoExisten extends StatelessWidget {
-  const LabeledCheckboxVeCosasNoExisten({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class VeCosasNoExisten extends StatefulWidget {
-  VeCosasNoExisten({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierCosasNoExisten;
+
+  VeCosasNoExisten({this.valueNotifierCosasNoExisten});
 
   @override
   VeCosasNoExistenWidgetState createState() => VeCosasNoExistenWidgetState();
@@ -2850,10 +1739,10 @@ class VeCosasNoExisten extends StatefulWidget {
 class VeCosasNoExistenWidgetState extends State<VeCosasNoExisten> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxVeCosasNoExisten(
+    return LabeledCheckboxGeneric(
       label: 'Ve cosas que no existen',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: cosas_no_existen,
+      value: widget.valueNotifierCosasNoExisten.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2861,64 +1750,25 @@ class VeCosasNoExistenWidgetState extends State<VeCosasNoExisten> {
           } else {
             cant_check -= 1;
           }
-          cosas_no_existen = newValue;
+          widget.valueNotifierCosasNoExisten.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Sensibilidad a las luces brillantes ---------------------------------------------
 
-class LabeledCheckboxSensiLucesBrillantes extends StatelessWidget {
-  const LabeledCheckboxSensiLucesBrillantes({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class SensiLucesBrillantes extends StatefulWidget {
-  SensiLucesBrillantes({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierSensibilidadCosasBrillantes;
+
+  SensiLucesBrillantes({this.valueNotifierSensibilidadCosasBrillantes});
 
   @override
   SensiLucesBrillantesWidgetState createState() =>
@@ -2928,10 +1778,10 @@ class SensiLucesBrillantes extends StatefulWidget {
 class SensiLucesBrillantesWidgetState extends State<SensiLucesBrillantes> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxSensiLucesBrillantes(
+    return LabeledCheckboxGeneric(
       label: 'Sensibilidad a las luces brillantes',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: sensibilidad_cosas_brillantes,
+      value: widget.valueNotifierSensibilidadCosasBrillantes.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -2939,64 +1789,25 @@ class SensiLucesBrillantesWidgetState extends State<SensiLucesBrillantes> {
           } else {
             cant_check -= 1;
           }
-          sensibilidad_cosas_brillantes = newValue;
+          widget.valueNotifierSensibilidadCosasBrillantes.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Periodos cortos de ceguera ---------------------------------------------
 
-class LabeledCheckboxPeriodosCortosCeguera extends StatelessWidget {
-  const LabeledCheckboxPeriodosCortosCeguera({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class PeriodosCortosCeguera extends StatefulWidget {
-  PeriodosCortosCeguera({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierPeriodosCeguera;
+
+  PeriodosCortosCeguera({this.valueNotifierPeriodosCeguera});
 
   @override
   PeriodosCortosCegueraWidgetState createState() =>
@@ -3006,10 +1817,10 @@ class PeriodosCortosCeguera extends StatefulWidget {
 class PeriodosCortosCegueraWidgetState extends State<PeriodosCortosCeguera> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxPeriodosCortosCeguera(
+    return LabeledCheckboxGeneric(
       label: 'Periodos cortos de ceguera',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: periodos_ceguera,
+      value: widget.valueNotifierPeriodosCeguera.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3017,64 +1828,25 @@ class PeriodosCortosCegueraWidgetState extends State<PeriodosCortosCeguera> {
           } else {
             cant_check -= 1;
           }
-          periodos_ceguera = newValue;
+          widget.valueNotifierPeriodosCeguera.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------No percibe cosas que pasan al lado de su cuerpo ---------------------------------------------
 
-class LabeledCheckboxCosasPasanCuerpo extends StatelessWidget {
-  const LabeledCheckboxCosasPasanCuerpo({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CosasPasanCuerpo extends StatefulWidget {
-  CosasPasanCuerpo({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierPersibeCosasCuerpo;
+
+  CosasPasanCuerpo({this.valueNotifierPersibeCosasCuerpo});
 
   @override
   CosasPasanCuerpoWidgetState createState() => CosasPasanCuerpoWidgetState();
@@ -3083,10 +1855,10 @@ class CosasPasanCuerpo extends StatefulWidget {
 class CosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxCosasPasanCuerpo(
+    return LabeledCheckboxGeneric(
       label: 'No percibe cosas que pasan al lado de su cuerpo',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: persibe_cosas_cuerpo,
+      value: widget.valueNotifierPersibeCosasCuerpo.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3094,64 +1866,25 @@ class CosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
           } else {
             cant_check -= 1;
           }
-          persibe_cosas_cuerpo = newValue;
+          widget.valueNotifierPersibeCosasCuerpo.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Dificultad para distinguir el calor del frío ---------------------------------------------
 
-class LabeledCheckboxDistinguirCalorFrio extends StatelessWidget {
-  const LabeledCheckboxDistinguirCalorFrio({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class DistinguirCalorFrio extends StatefulWidget {
-  DistinguirCalorFrio({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierDificultadCalorFrio;
+
+  DistinguirCalorFrio({this.valueNotifierDificultadCalorFrio});
 
   @override
   DistinguirCalorFrioWidgetState createState() =>
@@ -3161,10 +1894,10 @@ class DistinguirCalorFrio extends StatefulWidget {
 class DistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDistinguirCalorFrio(
+    return LabeledCheckboxGeneric(
       label: 'Dificultad para distinguir el calor del frío',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: dificultad_calor_frio,
+      value: widget.valueNotifierDificultadCalorFrio.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3172,64 +1905,25 @@ class DistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
           } else {
             cant_check -= 1;
           }
-          dificultad_calor_frio = newValue;
+          widget.valueNotifierDificultadCalorFrio.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Problemas de gusto ---------------------------------------------
 
-class LabeledCheckboxProblemasGusto extends StatelessWidget {
-  const LabeledCheckboxProblemasGusto({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemasGusto extends StatefulWidget {
-  ProblemasGusto({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierProblemasGusto;
+
+  ProblemasGusto({this.valueNotifierProblemasGusto});
 
   @override
   ProblemasGustoWidgetState createState() => ProblemasGustoWidgetState();
@@ -3238,10 +1932,10 @@ class ProblemasGusto extends StatefulWidget {
 class ProblemasGustoWidgetState extends State<ProblemasGusto> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxProblemasGusto(
+    return LabeledCheckboxGeneric(
       label: 'Problemas de gusto',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: problemas_gusto,
+      value: widget.valueNotifierProblemasGusto.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3249,64 +1943,25 @@ class ProblemasGustoWidgetState extends State<ProblemasGusto> {
           } else {
             cant_check -= 1;
           }
-          problemas_gusto = newValue;
+          widget.valueNotifierProblemasGusto.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Problemas de olfato ---------------------------------------------
 
-class LabeledCheckboxProblemasOlfato extends StatelessWidget {
-  const LabeledCheckboxProblemasOlfato({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProblemasOlfato extends StatefulWidget {
-  ProblemasOlfato({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierProblemasOlfato;
+
+  ProblemasOlfato({this.valueNotifierProblemasOlfato});
 
   @override
   ProblemasOlfatoWidgetState createState() => ProblemasOlfatoWidgetState();
@@ -3315,10 +1970,10 @@ class ProblemasOlfato extends StatefulWidget {
 class ProblemasOlfatoWidgetState extends State<ProblemasOlfato> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxProblemasOlfato(
+    return LabeledCheckboxGeneric(
       label: 'Problemas de olfato',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: problemas_olfato,
+      value: widget.valueNotifierProblemasOlfato.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3326,64 +1981,25 @@ class ProblemasOlfatoWidgetState extends State<ProblemasOlfato> {
           } else {
             cant_check -= 1;
           }
-          problemas_olfato = newValue;
+          widget.valueNotifierProblemasOlfato.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }
 
 //---------------------------------------------Dolor ---------------------------------------------
 
-class LabeledCheckboxDolor extends StatelessWidget {
-  const LabeledCheckboxDolor({
-    this.label,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String label;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                value: value,
-                onChanged: (bool newValue) {
-                  onChanged(newValue);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Dolor extends StatefulWidget {
-  Dolor({Key key}) : super(key: key);
+  final ValueNotifier<bool> valueNotifierDolor;
+
+  Dolor({this.valueNotifierDolor});
 
   @override
   DolorWidgetState createState() => DolorWidgetState();
@@ -3392,10 +2008,10 @@ class Dolor extends StatefulWidget {
 class DolorWidgetState extends State<Dolor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxDolor(
+    return LabeledCheckboxGeneric(
       label: 'Dolor',
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: dolor,
+      value: widget.valueNotifierDolor.value,
       onChanged: (bool newValue) {
         setState(() {
           if (newValue == true) {
@@ -3403,9 +2019,15 @@ class DolorWidgetState extends State<Dolor> {
           } else {
             cant_check -= 1;
           }
-          dolor = newValue;
+          widget.valueNotifierDolor.value = newValue;
         });
       },
+      textStyle: TextStyle(
+        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      checkboxScale: 1.5,
     );
   }
 }

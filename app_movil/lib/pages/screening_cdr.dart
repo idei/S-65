@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/opciones_navbar.dart';
+import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,46 +20,6 @@ var email;
 var screening_recordatorio;
 
 class _ScreeningCDRState extends State<ScreeningCDR> {
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
-    print(email);
-
-    Map parametros = ModalRoute.of(context).settings.arguments;
-
-    get_tiposcreening(parametros["tipo_screening"]);
-
-    if (parametros["bandera"] == "recordatorio") {
-      screening_recordatorio = true;
-      id_recordatorio = parametros["id_recordatorio"];
-      id_paciente = id_paciente;
-      id_medico = parametros["id_medico"];
-      tipo_screening = parametros["tipo_screening"];
-    } else {
-      if (parametros["bandera"] == "screening_nuevo") {
-        screening_recordatorio = false;
-        id_paciente = id_paciente;
-        id_recordatorio = null;
-        id_medico = null;
-        //tipo_screening = parametros["tipo_screening"];
-      }
-    }
-  }
-
-  get_tiposcreening(var codigo_screening) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
-      "codigo_screening": codigo_screening,
-    });
-    print(response);
-    var jsonDate = json.decode(response.body);
-    print(jsonDate);
-    tipo_screening = jsonDate;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -367,6 +327,46 @@ class _ScreeningCDRState extends State<ScreeningCDR> {
     );
   }
 
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email_prefer = prefs.getString("email_prefer");
+    email = email_prefer;
+    id_paciente = prefs.getInt("id_paciente");
+    print(email);
+
+    Map parametros = ModalRoute.of(context).settings.arguments;
+
+    get_tiposcreening(parametros["tipo_screening"]);
+
+    if (parametros["bandera"] == "recordatorio") {
+      screening_recordatorio = true;
+      id_recordatorio = parametros["id_recordatorio"];
+      id_paciente = id_paciente;
+      id_medico = parametros["id_medico"];
+      tipo_screening = parametros["tipo_screening"];
+    } else {
+      if (parametros["bandera"] == "screening_nuevo") {
+        screening_recordatorio = false;
+        id_paciente = id_paciente;
+        id_recordatorio = null;
+        id_medico = null;
+        //tipo_screening = parametros["tipo_screening"];
+      }
+    }
+  }
+
+  get_tiposcreening(var codigo_screening) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_tipo_screening";
+    var response = await http.post(url, body: {
+      "codigo_screening": codigo_screening,
+    });
+    print(response);
+    var jsonDate = json.decode(response.body);
+    print(jsonDate);
+    tipo_screening = jsonDate;
+  }
+
   bool _isLoading = false;
   void _startLoading() async {
     setState(() {
@@ -445,72 +445,78 @@ Future<List> getAllRespuesta(var estado) async {
   }
 }
 
-var data;
-
 guardar_datos(BuildContext context) async {
-  if (memoria == null) loginToast("Debe responder los item de memoria");
+  if (memoria == null) {
+    loginToast("Debe responder los item de memoria");
+    return;
+  }
 
-  if (orientacion == null) loginToast("Debe responder los item de orientacion");
+  if (orientacion == null) {
+    loginToast("Debe responder los item de orientacion");
+    return;
+  }
 
-  if (juicio_res_problema == null)
+  if (juicio_res_problema == null) {
     loginToast("Debe responder los item de juicio y resolucion de problemas");
+    return;
+  }
 
-  if (vida_social == null) loginToast("Debe responder los item de vida social");
+  if (vida_social == null) {
+    loginToast("Debe responder los item de vida social");
+    return;
+  }
 
-  if (hogar == null) loginToast("Debe responder los item de Orientación");
+  if (hogar == null) {
+    loginToast("Debe responder los item de Orientación");
+    return;
+  }
 
   if (cuid_personal == null) {
     loginToast("Debe responder los item de Cuidado Personal");
+    return;
   }
 
-  if (memoria != null &&
-      orientacion != null &&
-      juicio_res_problema != null &&
-      vida_social != null &&
-      hogar != null &&
-      cuid_personal != null) {
-    showDialogMessage(context);
+  showDialogMessage(context);
 
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/respuesta_screening_cdr";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-      "id_medico": id_medico.toString(),
-      "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening['data'].toString(),
-      "memoria": memoria,
-      "orientacion": orientacion,
-      "juicio_res_problema": juicio_res_problema,
-      "vida_social": vida_social,
-      "hogar": hogar,
-      "cuid_personal": cuid_personal,
-    });
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/respuesta_screening_cdr";
+  var response = await http.post(url, body: {
+    "id_paciente": id_paciente.toString(),
+    "id_medico": id_medico.toString(),
+    "id_recordatorio": id_recordatorio.toString(),
+    "tipo_screening": tipo_screening['data'].toString(),
+    "memoria": memoria,
+    "orientacion": orientacion,
+    "juicio_res_problema": juicio_res_problema,
+    "vida_social": vida_social,
+    "hogar": hogar,
+    "cuid_personal": cuid_personal,
+  });
 
-    var responseDecoder = json.decode(response.body);
+  var responseDecoder = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      _resetChecksNull();
+  if (response.statusCode == 200) {
+    _resetChecksNull();
 
-      if (responseDecoder['data'] == "Alert") {
-        _alert_informe(
-          context,
-          "Para tener en cuenta",
-          "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-        );
-      } else {
-        if (screening_recordatorio == true) {
-          Navigator.pushNamed(context, '/recordatorio');
-          _alertInforme(context, "Screening Respondido", '');
-        } else {
-          Navigator.pushNamed(context, '/screening', arguments: {
-            "select_screening": "CDR",
-          });
-          _alertInforme(context, "Screening Respondido", '');
-        }
-      }
+    if (responseDecoder['data'] == "Alert") {
+      _alert_informe(
+        context,
+        "Para tener en cuenta",
+        "Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+      );
     } else {
-      _alertInforme(context, "Error detectado", '${responseDecoder}');
+      if (screening_recordatorio == true) {
+        Navigator.pushNamed(context, '/recordatorio');
+        _alertInforme(context, "Screening Respondido", '');
+      } else {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "CDR",
+        });
+        _alertInforme(context, "Screening Respondido", '');
+      }
     }
+  } else {
+    _alertInforme(context, "Error detectado", '${responseDecoder}');
   }
 }
 

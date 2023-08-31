@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/menu.dart';
 import 'package:provider/provider.dart';
 import '../models/medicamento_model.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,10 @@ class _MedicamentoState extends State<MedicamentoPage> {
   var email_argument;
   var usuarioModel;
   var id_paciente;
+  double sizeIconEditar;
+  double sizeIconDelete;
+  double radiusIconEditar;
+  double radiusIconDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +33,19 @@ class _MedicamentoState extends State<MedicamentoPage> {
 
     email_argument = usuarioModel.usuario.emailUser;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
+
+    if (isTablet) {
+      sizeIconEditar = 35.0;
+      sizeIconDelete = 35.0;
+      radiusIconEditar = 28.0;
+      radiusIconDelete = 28.0;
+    } else {
+      sizeIconEditar = 16.0;
+      sizeIconDelete = 16.0;
+      radiusIconEditar = 26.0;
+      radiusIconDelete = 26.0;
+    }
+
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -63,6 +81,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                 leading: Icon(
                                   Icons.arrow_right_rounded,
                                   color: Colors.blue,
+                                  size: 38.0,
                                 ),
                                 title: Text(data.nombre_comercial,
                                     style: TextStyle(
@@ -79,14 +98,14 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                             .fontFamily)),
                                 trailing: Wrap(children: [
                                   CircleAvatar(
-                                    radius:
-                                        MediaQuery.of(context).size.width / 22,
+                                    radius: MediaQuery.of(context).size.width /
+                                        radiusIconEditar,
                                     backgroundColor: Colors.blue,
                                     child: IconButton(
                                       icon: Icon(
                                         Icons.edit,
                                         color: Colors.white,
-                                        size: 20,
+                                        size: sizeIconEditar,
                                       ),
                                       onPressed: () {
                                         _showAlertDialog(
@@ -101,13 +120,13 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     width: 25,
                                   ),
                                   CircleAvatar(
-                                    radius:
-                                        MediaQuery.of(context).size.width / 22,
+                                    radius: MediaQuery.of(context).size.width /
+                                        radiusIconDelete,
                                     backgroundColor: Colors.red,
                                     child: IconButton(
                                       icon: Icon(
                                         Icons.delete,
-                                        size: 20,
+                                        size: sizeIconDelete,
                                       ),
                                       color: Colors.white,
                                       onPressed: () {
@@ -305,14 +324,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
           style: const TextStyle(color: Colors.white)),
     ));
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
 }
 
 class _isLoadingIcon extends StatelessWidget {
@@ -331,13 +342,4 @@ class _isLoadingIcon extends StatelessWidget {
       child: const CircularProgressIndicator(color: Colors.blue),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }
