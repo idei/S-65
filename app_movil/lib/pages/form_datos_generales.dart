@@ -63,9 +63,9 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   void initState() {
     super.initState();
     Provider.of<UsuarioServices>(context, listen: false).loadData(context);
-    rela_departamento = '1';
-    rela_genero = '1';
-    rela_nivel_instruccion = '1';
+    rela_departamento = '';
+    rela_genero = '';
+    rela_nivel_instruccion = '';
     rela_grupo_conviviente = '';
   }
 
@@ -93,6 +93,21 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       } else {
         _showAdditionalFieldsNotifier.value = true;
       }
+    }
+
+    //-----------------------
+
+    if (rela_departamento == "") {
+      rela_departamento = usuarioModel.usuario.paciente.rela_departamento;
+    }
+
+    if (rela_genero == "") {
+      rela_genero = usuarioModel.usuario.paciente.rela_genero;
+    }
+
+    if (rela_nivel_instruccion == "") {
+      rela_nivel_instruccion =
+          usuarioModel.usuario.paciente.rela_nivel_instruccion;
     }
 
     rela_users = usuarioModel.usuario.paciente.rela_users;
@@ -166,22 +181,6 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                 provider5.formDataList.map(
               (item) {
                 if (provider5.isLoadingGrupos) {
-                  // if (provider.usuario.paciente.rela_grupo_conviviente !=
-                  //     "null") {
-                  //   rela_grupo_conviviente =
-                  //       provider.usuario.paciente.rela_grupo_conviviente;
-                  //   if (rela_grupo_conviviente == '1') {
-                  //     _showAdditionalFieldsNotifier.value = false;
-                  //   } else {
-                  //     _showAdditionalFieldsNotifier.value = true;
-                  //   }
-                  // }
-
-                  // if (rela_grupo_conviviente == '1') {
-                  //   _showAdditionalFieldsNotifier.value = false;
-                  // } else {
-                  //   _showAdditionalFieldsNotifier.value = true;
-                  // }
                   return DropdownMenuItem<String>(
                     value: item.idGrupo.toString(),
                     child: Text(item.nombreGrupo),

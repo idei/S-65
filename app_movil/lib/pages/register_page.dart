@@ -286,7 +286,6 @@ class _FormRegisterState extends State<RegisterPage> {
   }
 
   Widget _crearPassword() {
-    passwordNuevo.clear();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
@@ -313,9 +312,7 @@ class _FormRegisterState extends State<RegisterPage> {
     );
   }
 
-//modificar
   Widget _repetirPassword() {
-    passwordRepetido.clear();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(

@@ -77,7 +77,13 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
           child: FutureBuilder<List<AntecedenteFamiliaresModel>>(
             future: fetchAntecedentesFamiliares(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              } else if (snapshot.hasData) {
                 return ListView(
                   children: ListTile.divideTiles(
                     color: Colors.black26,
@@ -104,34 +110,79 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                   ).toList(),
                 );
               } else {
-                if (!isLoading) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: Positioned(
-                      child: _isLoadingIcon(),
-                    ),
-                  );
-                } else {
-                  return Container(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ListTile(
-                          title: Text(
-                        'No tiene antecedentes familiares',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily),
-                      )),
-                    ],
-                  ));
-                }
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'No tiene antecedentes familiares',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
+                ));
               }
+
+              // if (snapshot.hasData) {
+              //   return ListView(
+              //     children: ListTile.divideTiles(
+              //       color: Colors.black26,
+              //       tiles: snapshot.data
+              //           .map((data) => ListTile(
+              //                 title: GestureDetector(
+              //                   onTap: () {},
+              //                   child: ListTile(
+              //                     leading: Icon(
+              //                       Icons.arrow_right_rounded,
+              //                       color: Colors.blue,
+              //                       size: 30,
+              //                     ),
+              //                     title: Text(data.antecedenteDescripcion,
+              //                         style: TextStyle(
+              //                             fontFamily: Theme.of(context)
+              //                                 .textTheme
+              //                                 .headline1
+              //                                 .fontFamily)),
+              //                   ),
+              //                 ),
+              //               ))
+              //           .toList(),
+              //     ).toList(),
+              //   );
+              // } else {
+              //   if (!isLoading) {
+              //     return Container(
+              //       alignment: Alignment.center,
+              //       child: Positioned(
+              //         child: _isLoadingIcon(),
+              //       ),
+              //     );
+              //   } else {
+              //     return Container(
+              //         child: Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         ListTile(
+              //             title: Text(
+              //           'No tiene antecedentes familiares',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.black87,
+              //               fontFamily: Theme.of(context)
+              //                   .textTheme
+              //                   .headline1
+              //                   .fontFamily),
+              //         )),
+              //       ],
+              //     ));
+              //   }
+              // }
             },
           ),
         ),

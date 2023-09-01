@@ -6,7 +6,6 @@ import 'package:app_salud/services/nivel_educativo_service.dart';
 import 'package:app_salud/services/session_service.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:app_salud/routes/routes.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,12 +17,6 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Set the system navigation bar color
-    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    //   systemNavigationBarColor:
-    //       Color.fromRGBO(30, 20, 108, 1), // Change this color as needed
-    // ));
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => new UsuarioServices()),

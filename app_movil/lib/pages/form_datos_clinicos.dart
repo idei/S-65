@@ -199,7 +199,6 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _presion_baja,
                     keyboardType: TextInputType.number,
                     maxLength: 2, // Establecer el número máximo de caracteres
-                    //decoration: InputDecoration(labelText: 'Presión Baja'),
                     decoration: InputDecoration(
                       hintText: '65',
                     ),
@@ -218,7 +217,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     children: [
                       Column(
                         children: [
-                          Text("Pulso ",
+                          Text("Pulso (por minuto)",
                               style: TextStyle(
                                   fontSize: 17,
                                   fontFamily: Theme.of(context)
@@ -248,7 +247,11 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   ),
                   TextFormField(
                     controller: _pulso,
+                    maxLength: 3,
                     keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '80',
+                    ),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor ingrese el pulso';

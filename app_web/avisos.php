@@ -288,7 +288,8 @@ $id_medico = $_SESSION["id_medico"];
                 fecha_limite: document.getElementById("fecha_limite").value,
                 id_medico: <?php echo $id_medico; ?>,
                 arreglo_opcion_select: arreglo_opcion_select,
-                opcion_check: check_genero.toString()
+                opcion_check: check_genero.toString(),
+                id_paciente: "22"
             };
 
             $.ajax({

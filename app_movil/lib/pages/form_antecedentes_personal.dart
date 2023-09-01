@@ -12,6 +12,8 @@ class FormAntecedentesPersonales extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
+var email;
+
 class _FormpruebaState extends State<FormAntecedentesPersonales> {
   final myController = TextEditingController();
 
@@ -32,10 +34,10 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
     //email = parametros["email"];
     //email = "fabricio@gmail.com";
 
-    read_datos_paciente(context);
+    //read_datos_paciente(context);
 
     return FutureBuilder(
-        future: read_datos_paciente(context),
+        future: read_datos_paciente(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           print(snapshot.connectionState);
 
@@ -65,83 +67,99 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
           }
         });
   }
-}
 
-Widget texto(String entrada) {
-  return Text(
-    entrada,
-    style: new TextStyle(
-        fontSize: 12.0,
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontFamily: "Roboto"),
-  );
-}
+  read_datos_paciente() async {
+    await getStringValuesSF();
 
-var email;
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/user_read_antc_personales";
+    var response = await http.post(url, body: {
+      "email": email,
+      "cod_event_retraso": cod_event_retraso,
+      "cod_event_desorden": cod_event_desorden,
+      "cod_event_deficit": cod_event_deficit,
+      "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
+      "cod_event_perdidas": cod_event_perdidas,
+      "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
+      "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
+      "cod_event_infecciones": cod_event_infecciones,
+      "cod_event_toxinas": cod_event_toxinas,
+      "cod_event_acv": cod_event_acv,
+      "cod_event_demencia": cod_event_demencia,
+      "cod_event_parkinson": cod_event_parkinson,
+      "cod_event_epilepsia": cod_event_epilepsia,
+      "cod_event_esclerosis": cod_event_esclerosis,
+      "cod_event_huntington": cod_event_huntington,
+      "cod_event_depresion": cod_event_depresion,
+      "cod_event_trastorno": cod_event_trastorno,
+      "cod_event_esquizofrenia": cod_event_esquizofrenia,
+      "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
+      "cod_event_intoxicaciones": cod_event_intoxicaciones,
+    });
 
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email");
-  email = email_prefer;
-  print(email);
-}
+    var responseData = json.decode(response.body);
 
-guardar_datos(BuildContext context) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/save_antec_personales";
-  var response = await http.post(url, body: {
-    "email": email,
-    "retraso": valueNotifierRetrasoMental.value.toString(),
-    "desorden": valueNotifierDesorden.value.toString(),
-    "deficit": valueNotifierDeficit.value.toString(),
-    "lesiones_cabeza": valueNotifierLesiones_cabeza.value.toString(),
-    "perdidas": valueNotifierPerdidas.value.toString(),
-    "accidentes_caidas": valueNotifierAccidentes_caidas.value.toString(),
-    "lesiones_espalda": valueNotifierLesiones_espalda.value.toString(),
-    "infecciones": valueNotifierInfecciones.value.toString(),
-    "toxinas": valueNotifierToxinas.value.toString(),
-    "acv": valueNotifierAcv.value.toString(),
-    "demencia": valueNotifierDemencia.value.toString(),
-    "parkinson": valueNotifierParkinson.value.toString(),
-    "epilepsia": valueNotifierEpilepsia.value.toString(),
-    "esclerosis": valueNotifierEsclerosis.value.toString(),
-    "huntington": valueNotifierHuntington.value.toString(),
-    "depresion": valueNotifierDepresion.value.toString(),
-    "trastorno": valueNotifierTrastorno.value.toString(),
-    "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
-    "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
-    "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
-    "cod_event_retraso": cod_event_retraso,
-    "cod_event_desorden": cod_event_desorden,
-    "cod_event_deficit": cod_event_deficit,
-    "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
-    "cod_event_perdidas": cod_event_perdidas,
-    "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
-    "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
-    "cod_event_infecciones": cod_event_infecciones,
-    "cod_event_toxinas": cod_event_toxinas,
-    "cod_event_acv": cod_event_acv,
-    "cod_event_demencia": cod_event_demencia,
-    "cod_event_parkinson": cod_event_parkinson,
-    "cod_event_epilepsia": cod_event_epilepsia,
-    "cod_event_esclerosis": cod_event_esclerosis,
-    "cod_event_huntington": cod_event_huntington,
-    "cod_event_depresion": cod_event_depresion,
-    "cod_event_trastorno": cod_event_trastorno,
-    "cod_event_esquizofrenia": cod_event_esquizofrenia,
-    "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
-    "cod_event_intoxicaciones": cod_event_intoxicaciones,
-  });
+    if (responseData["status"] == "Success") {
+      var data = responseData['data'];
 
-  var responseDecoder = json.decode(response.body);
-  if (response.statusCode == 200) {
-    if (responseDecoder["status"] == "Success") {
-      _alert_informe(context, "Antecedentes Guardados", 1);
-      Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
+      valueNotifierRetrasoMental.value = data["retraso"] == "1" ? true : false;
+
+      valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
+
+      valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
+
+      valueNotifierLesiones_cabeza.value =
+          data["lesiones_cabeza"] == "1" ? true : false;
+
+      valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
+
+      valueNotifierAccidentes_caidas.value =
+          data["accidentes_caidas"] == "1" ? true : false;
+
+      valueNotifierLesiones_espalda.value =
+          data["lesiones_espalda"] == "1" ? true : false;
+
+      valueNotifierInfecciones.value =
+          data["infecciones"] == "1" ? true : false;
+
+      valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
+
+      valueNotifierAcv.value = data["acv"] == "1" ? true : false;
+
+      valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
+
+      valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
+
+      valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
+
+      valueNotifierEsclerosis.value = data["esclerosis"] == "1" ? true : false;
+
+      valueNotifierHuntington.value = data["huntington"] == "1" ? true : false;
+
+      valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
+
+      valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
+
+      valueNotifierEsquizofrenia.value =
+          data["esquizofrenia"] == "1" ? true : false;
+
+      valueNotifierEnfermedad_desorden.value =
+          data["enfermedad_desorden"] == "1" ? true : false;
+
+      valueNotifierIntoxicaciones.value =
+          data["intoxicaciones"] == "1" ? true : false;
+    } else {
+      _alert_informe(context, "No se pudieron leer los datos", 2);
     }
-  } else {
-    _alert_informe(context, "Error al guardar Antecendentes", 2);
+
+    return true;
+  }
+
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email_prefer = prefs.getString("email");
+    email = email_prefer;
+    print(email);
   }
 }
 
@@ -155,92 +173,6 @@ _alert_informe(context, message, colorNumber) {
         textAlign: TextAlign.center,
         style: const TextStyle(color: Colors.white)),
   ));
-}
-
-read_datos_paciente(BuildContext context) async {
-  await getStringValuesSF();
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/user_read_antc_personales";
-  var response = await http.post(url, body: {
-    "email": email,
-    "cod_event_retraso": cod_event_retraso,
-    "cod_event_desorden": cod_event_desorden,
-    "cod_event_deficit": cod_event_deficit,
-    "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
-    "cod_event_perdidas": cod_event_perdidas,
-    "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
-    "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
-    "cod_event_infecciones": cod_event_infecciones,
-    "cod_event_toxinas": cod_event_toxinas,
-    "cod_event_acv": cod_event_acv,
-    "cod_event_demencia": cod_event_demencia,
-    "cod_event_parkinson": cod_event_parkinson,
-    "cod_event_epilepsia": cod_event_epilepsia,
-    "cod_event_esclerosis": cod_event_esclerosis,
-    "cod_event_huntington": cod_event_huntington,
-    "cod_event_depresion": cod_event_depresion,
-    "cod_event_trastorno": cod_event_trastorno,
-    "cod_event_esquizofrenia": cod_event_esquizofrenia,
-    "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
-    "cod_event_intoxicaciones": cod_event_intoxicaciones,
-  });
-
-  var responseData = json.decode(response.body);
-
-  if (responseData["status"] == "Success") {
-    var data = responseData['data'];
-
-    valueNotifierRetrasoMental.value = data["retraso"] == "1" ? true : false;
-
-    valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
-
-    valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
-
-    valueNotifierLesiones_cabeza.value =
-        data["lesiones_cabeza"] == "1" ? true : false;
-
-    valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
-
-    valueNotifierAccidentes_caidas.value =
-        data["accidentes_caidas"] == "1" ? true : false;
-
-    valueNotifierLesiones_espalda.value =
-        data["lesiones_espalda"] == "1" ? true : false;
-
-    valueNotifierInfecciones.value = data["infecciones"] == "1" ? true : false;
-
-    valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
-
-    valueNotifierAcv.value = data["acv"] == "1" ? true : false;
-
-    valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
-
-    valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
-
-    valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
-
-    valueNotifierEsclerosis.value = data["esclerosis"] == "1" ? true : false;
-
-    valueNotifierHuntington.value = data["huntington"] == "1" ? true : false;
-
-    valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
-
-    valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
-
-    valueNotifierEsquizofrenia.value =
-        data["esquizofrenia"] == "1" ? true : false;
-
-    valueNotifierEnfermedad_desorden.value =
-        data["enfermedad_desorden"] == "1" ? true : false;
-
-    valueNotifierIntoxicaciones.value =
-        data["intoxicaciones"] == "1" ? true : false;
-  } else {
-    _alert_informe(context, "No se pudieron leer los datos", 2);
-  }
-
-  return true;
 }
 
 //----------------------------------------ANTECEDENTES PERSONALES ------------------------------------------
@@ -328,13 +260,63 @@ class AntecedentesWidgetState extends State<Antecedentes> {
         ));
   }
 
-  // void choiceAction(String choice) {
-  //   if (choice == Constants.Ajustes) {
-  //     Navigator.pushNamed(context, '/ajustes');
-  //   } else if (choice == Constants.Salir) {
-  //     Navigator.pushNamed(context, '/');
-  //   }
-  // }
+  guardar_datos(BuildContext context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/save_antec_personales";
+    var response = await http.post(url, body: {
+      "email": email,
+      "retraso": valueNotifierRetrasoMental.value.toString(),
+      "desorden": valueNotifierDesorden.value.toString(),
+      "deficit": valueNotifierDeficit.value.toString(),
+      "lesiones_cabeza": valueNotifierLesiones_cabeza.value.toString(),
+      "perdidas": valueNotifierPerdidas.value.toString(),
+      "accidentes_caidas": valueNotifierAccidentes_caidas.value.toString(),
+      "lesiones_espalda": valueNotifierLesiones_espalda.value.toString(),
+      "infecciones": valueNotifierInfecciones.value.toString(),
+      "toxinas": valueNotifierToxinas.value.toString(),
+      "acv": valueNotifierAcv.value.toString(),
+      "demencia": valueNotifierDemencia.value.toString(),
+      "parkinson": valueNotifierParkinson.value.toString(),
+      "epilepsia": valueNotifierEpilepsia.value.toString(),
+      "esclerosis": valueNotifierEsclerosis.value.toString(),
+      "huntington": valueNotifierHuntington.value.toString(),
+      "depresion": valueNotifierDepresion.value.toString(),
+      "trastorno": valueNotifierTrastorno.value.toString(),
+      "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
+      "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
+      "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
+      "cod_event_retraso": cod_event_retraso,
+      "cod_event_desorden": cod_event_desorden,
+      "cod_event_deficit": cod_event_deficit,
+      "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
+      "cod_event_perdidas": cod_event_perdidas,
+      "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
+      "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
+      "cod_event_infecciones": cod_event_infecciones,
+      "cod_event_toxinas": cod_event_toxinas,
+      "cod_event_acv": cod_event_acv,
+      "cod_event_demencia": cod_event_demencia,
+      "cod_event_parkinson": cod_event_parkinson,
+      "cod_event_epilepsia": cod_event_epilepsia,
+      "cod_event_esclerosis": cod_event_esclerosis,
+      "cod_event_huntington": cod_event_huntington,
+      "cod_event_depresion": cod_event_depresion,
+      "cod_event_trastorno": cod_event_trastorno,
+      "cod_event_esquizofrenia": cod_event_esquizofrenia,
+      "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
+      "cod_event_intoxicaciones": cod_event_intoxicaciones,
+    });
+
+    var responseDecoder = json.decode(response.body);
+    if (response.statusCode == 200) {
+      if (responseDecoder["status"] == "Success") {
+        _alert_informe(context, "Antecedentes Guardados", 1);
+        Navigator.of(context).pushReplacementNamed('/antecedentes_personales');
+      }
+    } else {
+      _alert_informe(context, "Error al guardar Antecendentes", 2);
+    }
+  }
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------

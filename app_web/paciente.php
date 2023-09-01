@@ -271,8 +271,9 @@ $rutaRaiz = Env::$_URL_API;
 
 
       $.ajax(settings).done(function (response) {
-            if (response['status'] == "Success") {
-              document.getElementById('loading-indicator').style.display = 'none';
+
+        if (response['status'] == "Success") {
+          document.getElementById('loading-indicator').style.display = 'none';
 
           var response = response['data'];
           var nombre = "Nombre y Apellido: " + response['nombre'] + " " + response['apellido']

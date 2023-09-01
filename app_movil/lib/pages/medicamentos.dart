@@ -71,7 +71,13 @@ class _MedicamentoState extends State<MedicamentoPage> {
           child: FutureBuilder<List<MedicamentoModel>>(
             future: read_medicamentos(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              } else if (snapshot.hasData) {
                 return ListView(
                   children: ListTile.divideTiles(
                     color: Colors.black26,
@@ -145,33 +151,124 @@ class _MedicamentoState extends State<MedicamentoPage> {
                   ).toList(),
                 );
               } else {
-                if (!isLoading) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: Positioned(
-                      child: _isLoadingIcon(),
-                    ),
-                  );
-                } else {
-                  return Container(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ListTile(
-                          title: Text(
-                        'No tiene medicamentos registrados',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily),
-                      )),
-                    ],
-                  ));
-                }
+                return Container(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                        title: Text(
+                      'No tiene medicamentos registrados',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    )),
+                  ],
+                ));
               }
+
+              // if (snapshot.hasData) {
+              //   return ListView(
+              //     children: ListTile.divideTiles(
+              //       color: Colors.black26,
+              //       tiles: snapshot.data
+              //           .map((data) => ListTile(
+              //                 title: ListTile(
+              //                   leading: Icon(
+              //                     Icons.arrow_right_rounded,
+              //                     color: Colors.blue,
+              //                     size: 38.0,
+              //                   ),
+              //                   title: Text(data.nombre_comercial,
+              //                       style: TextStyle(
+              //                           overflow: TextOverflow.clip,
+              //                           fontFamily: Theme.of(context)
+              //                               .textTheme
+              //                               .headline1
+              //                               .fontFamily)),
+              //                   subtitle: Text(data.dosis_frecuencia,
+              //                       style: TextStyle(
+              //                           fontFamily: Theme.of(context)
+              //                               .textTheme
+              //                               .headline1
+              //                               .fontFamily)),
+              //                   trailing: Wrap(children: [
+              //                     CircleAvatar(
+              //                       radius: MediaQuery.of(context).size.width /
+              //                           radiusIconEditar,
+              //                       backgroundColor: Colors.blue,
+              //                       child: IconButton(
+              //                         icon: Icon(
+              //                           Icons.edit,
+              //                           color: Colors.white,
+              //                           size: sizeIconEditar,
+              //                         ),
+              //                         onPressed: () {
+              //                           _showAlertDialog(
+              //                             int.parse(data.id_medicamento),
+              //                             data.dosis_frecuencia,
+              //                             1,
+              //                           );
+              //                         },
+              //                       ),
+              //                     ),
+              //                     SizedBox(
+              //                       width: 25,
+              //                     ),
+              //                     CircleAvatar(
+              //                       radius: MediaQuery.of(context).size.width /
+              //                           radiusIconDelete,
+              //                       backgroundColor: Colors.red,
+              //                       child: IconButton(
+              //                         icon: Icon(
+              //                           Icons.delete,
+              //                           size: sizeIconDelete,
+              //                         ),
+              //                         color: Colors.white,
+              //                         onPressed: () {
+              //                           _showAlertDialog(
+              //                             int.parse(data.id_medicamento),
+              //                             data.dosis_frecuencia,
+              //                             2,
+              //                           );
+              //                         },
+              //                       ),
+              //                     ),
+              //                   ]),
+              //                 ),
+              //               ))
+              //           .toList(),
+              //     ).toList(),
+              //   );
+              // } else {
+              //   if (!isLoading) {
+              //     return Container(
+              //       alignment: Alignment.center,
+              //       child: Positioned(
+              //         child: _isLoadingIcon(),
+              //       ),
+              //     );
+              //   } else {
+              //     return Container(
+              //         child: Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         ListTile(
+              //             title: Text(
+              //           'No tiene medicamentos registrados',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               fontFamily: Theme.of(context)
+              //                   .textTheme
+              //                   .headline1
+              //                   .fontFamily),
+              //         )),
+              //       ],
+              //     ));
+              //   }
+              // }
             },
           ),
         ),

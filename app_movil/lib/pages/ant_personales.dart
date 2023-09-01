@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AntecedentesPersonalesModel {
   String antecedenteDescripcion;
@@ -77,7 +76,13 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
         child: FutureBuilder<List<AntecedentesPersonalesModel>>(
           future: fetchAntecedentesPersonales(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: "Cargando",
+                ),
+              );
+            } else if (snapshot.hasData) {
               return Hero(
                 tag: "icono",
                 child: ListView(
@@ -106,34 +111,79 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                 ),
               );
             } else {
-              if (!isLoading) {
-                return Container(
-                  alignment: Alignment.center,
-                  child: Positioned(
-                    child: _isLoadingIcon(),
-                    //bottom: 40,
-                    //left: size.width * 0.5 - 30,
-                  ),
-                );
-              } else {
-                return Container(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ListTile(
-                        title: Text(
-                      'No tiene antecedentes personales',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    )),
-                  ],
-                ));
-              }
+              return Container(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ListTile(
+                      title: Text(
+                    'No tiene antecedentes personales',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  )),
+                ],
+              ));
             }
+
+            // if (snapshot.hasData) {
+            //   return Hero(
+            //     tag: "icono",
+            //     child: ListView(
+            //       children: ListTile.divideTiles(
+            //         color: Colors.black26,
+            //         tiles: snapshot.data
+            //             .map((data) => ListTile(
+            //                   title: GestureDetector(
+            //                     onTap: () {},
+            //                     child: ListTile(
+            //                       leading: Icon(
+            //                         Icons.arrow_right_rounded,
+            //                         color: Colors.blue,
+            //                       ),
+            //                       title: Text(data.antecedenteDescripcion,
+            //                           style: TextStyle(
+            //                               fontFamily: Theme.of(context)
+            //                                   .textTheme
+            //                                   .headline1
+            //                                   .fontFamily)),
+            //                     ),
+            //                   ),
+            //                 ))
+            //             .toList(),
+            //       ).toList(),
+            //     ),
+            //   );
+            // } else {
+            //   if (!isLoading) {
+            //     return Container(
+            //       alignment: Alignment.center,
+            //       child: Positioned(
+            //         child: _isLoadingIcon(),
+            //       ),
+            //     );
+            //   } else {
+            //     return Container(
+            //         child: Column(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         ListTile(
+            //             title: Text(
+            //           'No tiene antecedentes personales',
+            //           textAlign: TextAlign.center,
+            //           style: TextStyle(
+            //               fontWeight: FontWeight.bold,
+            //               color: Colors.black87,
+            //               fontFamily:
+            //                   Theme.of(context).textTheme.headline1.fontFamily),
+            //         )),
+            //       ],
+            //     ));
+            //   }
+            // }
           },
         ),
       ),
@@ -171,14 +221,6 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     );
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      print('Salir');
-    }
-  }
-
   Future<List<AntecedentesPersonalesModel>>
       fetchAntecedentesPersonales() async {
     String URL_base = Env.URL_API;
@@ -193,12 +235,6 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
         listAntecPersonales
             .add(AntecedentesPersonalesModel.fromJson(antecedentes));
       }
-
-      // final items = json.decode(response.body).cast<Map<String, dynamic>>();
-
-      // listAntecPersonales = items.map<AntecedentesPersonalesModel>((json) {
-      //   return AntecedentesPersonalesModel.fromJson(json);
-      // }).toList();
 
       return listAntecPersonales;
     } else {
@@ -224,13 +260,4 @@ class _isLoadingIcon extends StatelessWidget {
       child: const CircularProgressIndicator(color: Colors.blue),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

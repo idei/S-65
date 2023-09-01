@@ -36,8 +36,6 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
     return FutureBuilder(
         future: timer(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
           if (snapshot.hasData) {
             return Recordatorios(context);
           } else {
@@ -66,43 +64,51 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
 
   Widget Recordatorios(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Recordatorio Personal',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-        ),
-        body: Form(
-            key: _formKey_ver_recordatorio,
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  Text("$descripcion"),
-                  SizedBox(
-                    height: 20,
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(45, 175, 168, 1),
+        title: Text('Recordatorio Personal',
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            )),
+      ),
+      body: Card(
+        shadowColor: Color.fromRGBO(45, 175, 168, 1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        margin: EdgeInsets.all(15),
+        elevation: 10,
+        child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(children: <Widget>[
+              Text("$descripcion"),
+              SizedBox(
+                height: 20,
+              ),
+              Text("Fecha: $fecha_limite "),
+              SizedBox(
+                height: 40,
+              ),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromRGBO(45, 175, 168, 1),
+                    padding: EdgeInsets.all(20),
                   ),
-                  Text("Fecha: $fecha_limite "),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        //primary: Color.fromRGBO(157, 19, 34, 1),
-                        ),
-                    onPressed: () {
-                      update_estado_recordartorio();
-                      Navigator.of(context)
-                          .pushReplacementNamed('/recordatorio');
-                    },
-                    child: Text(
-                      'Hecho',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      ),
+                  onPressed: () {
+                    update_estado_recordartorio();
+                    Navigator.of(context).pushReplacementNamed('/recordatorio');
+                  },
+                  child: Text(
+                    'Hecho',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                     ),
                   ),
-                ]))));
+                ),
+              ),
+            ])),
+      ),
+    );
   }
 
   update_estado_recordartorio() async {

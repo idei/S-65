@@ -138,8 +138,7 @@ $rutaRaiz = Env::$_URL_API;
             response['data'].forEach(element => {
               var fechaPaciente = element['fecha_nacimiento'];
 
-              console.log(element['fecha_nacimiento']);
-              edadPaciente = parseInt(fechaActual.getFullYear()) - parseInt(fechaPaciente.substr(-4));
+              edadPaciente = parseInt(fechaActual.getFullYear()) - parseInt(fechaPaciente);
 
               tabla.innerHTML += `
               <tr>

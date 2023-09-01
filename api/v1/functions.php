@@ -986,7 +986,8 @@ function read_datos_personales()
 
 
 
-        $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
+        $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja 
+        ,pulso, peso, circunferencia_cintura, consume_alcohol,
         consume_marihuana, otras_drogas, fuma_tabaco 
         FROM datos_clinicos 
         WHERE rela_paciente = '" . $id_paciente . "' AND estado_clinico = 1");
@@ -6845,7 +6846,7 @@ function tipo_respuesta_salud_cerebral()
         $stmt_tipo_cerebral = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code LIKE 'SCER%'");
 
         $stmt_tipo_cerebral->execute();
-        $result = $stmt_tipo_cerebral->fetch();
+        $result = $stmt_tipo_cerebral->fetchAll();
         $lista = array();
         if ($stmt_tipo_cerebral->rowCount() > 0) {
             foreach ($result as $results) {
@@ -6954,7 +6955,7 @@ function user_register()
 
         $lista = array();
 
-        $query = "SELECT email FROM users WHERE email = '" . $email . "'";
+        $query = "SELECT email FROM users WHERE email = :email";
         $stmt = Flight::db()->prepare($query);
         $stmt->bindParam(":email", $email);
         $stmt->execute();
@@ -7011,7 +7012,7 @@ function user_register()
                     );
                     $returnData = msg("Success", $lista);
                 } else {
-                    $returnData = msg("Success", "No se puedo realizar el registro");
+                    $returnData = msg("Success", "No se pudo realizar el registro");
                 }
             }
         }
@@ -9043,8 +9044,33 @@ function create_avisos()
 
                     $stmt->execute();
 
-                    $returnData = msg("Success", []);
+                    //---------------------
+                    $query = "SELECT * FROM `pacientes` WHERE rela_departamento = '".$departamentos."'";
+                    $select_pacientes_deptos = Flight::db()->prepare($query);
+                    $select_pacientes_deptos->execute();
+                    $paciente_array= $select_pacientes_deptos->fetchAll();
+
+                    foreach ($paciente_array as $pacientes_arrays) {
+                        $estado_aviso = 1;
+                        $estado_leido = 1;
+        
+                        $stmt = Flight::db()->prepare('INSERT INTO usuarios_avisos(rela_aviso,rela_paciente,estado_aviso,rela_medico,estado_leido) 
+                        VALUES(?, ?, ?, ?, ?)');
+                        $stmt->bindParam(1, $id_aviso);
+                        $stmt->bindParam(2, $pacientes_arrays['id']);
+                        $stmt->bindParam(3, $estado_aviso);
+                        $stmt->bindParam(4, $id_medico);
+                        $stmt->bindParam(5, $estado_leido);
+        
+        
+                        $stmt->execute();
+                    }
+                   
+                    //----------------------
+
+                    
                 }
+                $returnData = msg("Success", []);
                 break;
 
             case 2:
@@ -9062,6 +9088,31 @@ function create_avisos()
                 $stmt->bindParam(2, $opcion_check);
 
                 $stmt->execute();
+
+                //---------------------
+                $query = "SELECT * FROM `pacientes` WHERE rela_genero = '".$opcion_check."'";
+                $select_pacientes_generos = Flight::db()->prepare($query);
+                $select_pacientes_generos->execute();
+                $paciente_array= $select_pacientes_generos->fetchAll();
+
+                foreach ($paciente_array as $pacientes_arrays) {
+                    $estado_aviso = 1;
+                    $estado_leido = 1;
+    
+                    $stmt = Flight::db()->prepare('INSERT INTO usuarios_avisos(rela_aviso,rela_paciente,estado_aviso,rela_medico,estado_leido) 
+                    VALUES(?, ?, ?, ?, ?)');
+                    $stmt->bindParam(1, $id_aviso);
+                    $stmt->bindParam(2, $pacientes_arrays['id']);
+                    $stmt->bindParam(3, $estado_aviso);
+                    $stmt->bindParam(4, $id_medico);
+                    $stmt->bindParam(5, $estado_leido);
+    
+    
+                    $stmt->execute();
+                }
+               
+                //----------------------
+               
 
                 $returnData = msg("Success", []);
 
@@ -9103,8 +9154,24 @@ function create_avisos()
 
                     $stmt->execute();
 
-                    $returnData = msg("Success", []);
+                    //$returnData = msg("Success", []);
                 }
+
+                $estado_aviso = 1;
+                $estado_leido = 1;
+
+                $stmt = Flight::db()->prepare('INSERT INTO usuarios_avisos(rela_aviso,rela_paciente,estado_aviso,rela_medico,estado_leido) 
+                VALUES(?, ?, ?, ?, ?)');
+                $stmt->bindParam(1, $id_aviso);
+                $stmt->bindParam(2, $id_paciente);
+                $stmt->bindParam(3, $estado_aviso);
+                $stmt->bindParam(4, $id_medico);
+                $stmt->bindParam(5, $estado_leido);
+
+
+                $stmt->execute();
+
+                $returnData = msg("Success", []);
                 break;
 
             default:
@@ -9113,6 +9180,7 @@ function create_avisos()
                 exit;
                 break;
         }
+
     } catch (PDOException $error) {
 
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
