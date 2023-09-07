@@ -85,44 +85,54 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ÁNIMO",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/screening', arguments: {
+                "select_screening": "ÁNIMO",
+              });
+            },
           ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/screening', arguments: {
-              "select_screening": "ÁNIMO",
-            });
-          },
+          title: Text('Chequeo de Ánimo',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              )),
         ),
-        title: Text('Chequeo de Ánimo',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            )),
+        body: FutureBuilder(
+            future: getAllRespuestaNutricional(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              print(snapshot.connectionState);
+              if (snapshot.hasData) {
+                return ScreeningAnimo();
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
       ),
-      body: FutureBuilder(
-          future: getAllRespuestaNutricional(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            print(snapshot.connectionState);
-            if (snapshot.hasData) {
-              return ScreeningAnimo();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
     );
   }
 

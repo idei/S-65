@@ -115,14 +115,14 @@ guardar_datos(BuildContext context) async {
     "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
     "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
     "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
-    "cancer": valueNotifierCancer.toString(),
-    "cirujia": valueNotifierCirujia.toString(),
-    "trasplante": valueNotifierTrasplante.toString(),
-    "hipotiroidismo": valueNotifierHipotiroidismo.toString(),
-    "cardiologico": valueNotifierCardiologico.toString(),
-    "diabetes": valueNotifierDiabetes.toString(),
-    "hipertension": valueNotifierHipertension.toString(),
-    "colesterol": valueNotifierColesterol.toString(),
+    "cancer": valueNotifierCancer.value.toString(),
+    "cirujia": valueNotifierCirujia.value.toString(),
+    "trasplante": valueNotifierTrasplante.value.toString(),
+    "hipotiroidismo": valueNotifierHipotiroidismo.value.toString(),
+    "cardiologico": valueNotifierCardiologico.value.toString(),
+    "diabetes": valueNotifierDiabetes.value.toString(),
+    "hipertension": valueNotifierHipertension.value.toString(),
+    "colesterol": valueNotifierColesterol.value.toString(),
     "cod_event_retraso": cod_event_retraso,
     "cod_event_desorden": cod_event_desorden,
     "cod_event_deficit": cod_event_deficit,
@@ -393,22 +393,25 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
                 HipertensionArterial(),
                 SizedBox(height: 30),
                 Colesterol(),
-                SizedBox(height: 30),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: () {
-                    guardar_datos(context);
-                  },
-                  child: Text(
-                    'Guardar Antecedentes',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
+                SizedBox(height: 50),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: () {
+                      guardar_datos(context);
+                    },
+                    child: Text(
+                      'Guardar Antecedentes',
+                      style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
                     ),
                   ),
                 ),
+                SizedBox(height: 30),
               ],
             ),
           ),

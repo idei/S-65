@@ -127,49 +127,49 @@ class _ListMedicosState extends State<ListMedicos>
           } else {
             return Column(
               children: [
-                // AnimatedBuilder(
-                //   animation: _animationController,
-                //   builder: (BuildContext context, Widget child) {
-                //     return SlideTransition(
-                //       position: _slideAnimation,
-                //       child: _isCardVisible
-                //           ? Card(
-                //               child: Column(
-                //                 children: [
-                //                   Container(
-                //                     height: 60,
-                //                     width: double.infinity,
-                //                     child: Center(
-                //                       child: Text(
-                //                         'Tiene una solicitud de la Dra Estefania Lucero',
-                //                         style: TextStyle(fontSize: 16),
-                //                       ),
-                //                     ),
-                //                   ),
-                //                   SizedBox(height: 5),
-                //                   Row(
-                //                     mainAxisAlignment: MainAxisAlignment.center,
-                //                     children: [
-                //                       ElevatedButton(
-                //                         onPressed: _handleAccept,
-                //                         child: Text('Aceptar'),
-                //                       ),
-                //                       SizedBox(width: 10),
-                //                       ElevatedButton(
-                //                         onPressed: _handleCancel,
-                //                         child: Text('Denegar'),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   SizedBox(height: 5),
-                //                 ],
-                //               ),
-                //             )
-                //           : SizedBox(),
-                //     );
-                //   },
-                // ),
-                // SizedBox(height: 5),
+                AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (BuildContext context, Widget child) {
+                    return SlideTransition(
+                      position: _slideAnimation,
+                      child: _isCardVisible
+                          ? Card(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 60,
+                                    width: double.infinity,
+                                    child: Center(
+                                      child: Text(
+                                        'Tiene una solicitud de la Dra Estefania Lucero',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: _handleAccept,
+                                        child: Text('Aceptar'),
+                                      ),
+                                      SizedBox(width: 10),
+                                      ElevatedButton(
+                                        onPressed: _handleCancel,
+                                        child: Text('Denegar'),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 5),
+                                ],
+                              ),
+                            )
+                          : SizedBox(),
+                    );
+                  },
+                ),
+                SizedBox(height: 5),
                 Expanded(
                   child: ListView(
                     children: ListTile.divideTiles(
@@ -180,8 +180,9 @@ class _ListMedicosState extends State<ListMedicos>
                                   onTap: () {},
                                   child: ListTile(
                                     leading: Icon(
-                                      Icons.arrow_right_rounded,
+                                      Icons.circle,
                                       color: Colors.blue,
+                                      size: 15,
                                     ),
                                     title: Text(
                                         data.nombre_medico +

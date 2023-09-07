@@ -108,6 +108,14 @@ class _LoginPage extends State<LoginPage> {
 
         authProvider.login();
 
+        await Provider.of<DepartamentoServices>(context, listen: false)
+            .loadDepartamentos();
+        await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
+        await Provider.of<NivelEducativoService>(context, listen: false)
+            .loadNivelEducativo();
+        await Provider.of<GrupoConvivienteServices>(context, listen: false)
+            .loadGrupoConviviente();
+
         if (estado_users == "2" && responseBody['status'] == "Success") {
           set_preference();
           Navigator.pushNamed(
@@ -239,14 +247,6 @@ class _LoginPage extends State<LoginPage> {
     });
 
     await fetchLogin();
-
-    await Provider.of<DepartamentoServices>(context, listen: false)
-        .loadDepartamentos();
-    await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
-    await Provider.of<NivelEducativoService>(context, listen: false)
-        .loadNivelEducativo();
-    await Provider.of<GrupoConvivienteServices>(context, listen: false)
-        .loadGrupoConviviente();
 
     setState(() {
       _isLoading = false;

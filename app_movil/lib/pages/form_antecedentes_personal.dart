@@ -240,20 +240,25 @@ class AntecedentesWidgetState extends State<Antecedentes> {
                 Esquizofrenia(),
                 EnfermedadDesordenGrave(),
                 Intoxicaciones(),
-                SizedBox(height: 30),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
+                SizedBox(height: 50),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: () {
+                      guardar_datos(context);
+                    },
+                    child: Text('Guardar Antecedentes',
+                        style: TextStyle(
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily,
+                            fontWeight: FontWeight.bold)),
                   ),
-                  onPressed: () {
-                    guardar_datos(context);
-                  },
-                  child: Text('Guardar Antecedentes',
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontWeight: FontWeight.bold)),
                 ),
+                SizedBox(height: 30),
               ],
             ),
           ),

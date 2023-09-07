@@ -31,50 +31,74 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        alert_screenings_generico(context, "Cuestionario Conductual",
-            " Tómese su tiempo para responder de la mejor manera "));
   }
 
   @override
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "CONDUC",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "CONDUC",
+              });
+            },
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          },
+          title: Text('Chequeo de Conducta',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
         ),
-        title: Text('Chequeo de Conducta',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-      ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ColumnWidgetConductual();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+        body: SingleChildScrollView(
+          child: FutureBuilder(
+              future: getAllRespuesta(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    alignment: Alignment.center,
+                    child: _isLoadingIcon(),
+                  );
+                } else if (snapshot.hasData) {
+                  return ColumnWidgetConductual();
+                } else {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'Error',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      )),
+                    ],
+                  ));
+                }
+              }),
         ),
       ),
     );
@@ -143,6 +167,24 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   }
 }
 
+class _isLoadingIcon extends StatelessWidget {
+  const _isLoadingIcon({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+      child: const CircularProgressIndicator(color: Colors.blue),
+    );
+  }
+}
+
 class ColumnWidgetConductual extends StatefulWidget {
   const ColumnWidgetConductual({
     Key key,
@@ -153,6 +195,15 @@ class ColumnWidgetConductual extends StatefulWidget {
 }
 
 class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        alert_screenings_generico(context, "Cuestionario Conductual",
+            " Tómese su tiempo para responder de la mejor manera "));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
@@ -910,7 +961,7 @@ class Conductual1WidgetState extends State<Conductual1> {
         GenericRadioList(
           items: itemsConductualOtro,
           groupValue: id_conductual1,
-          heightContainer: 170.0,
+          heightContainer: 190.0,
           onChanged: (val) {
             setState(() {
               debugPrint('VAL = $val');

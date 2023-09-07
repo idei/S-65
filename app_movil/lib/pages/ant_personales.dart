@@ -92,17 +92,21 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
                         .map((data) => ListTile(
                               title: GestureDetector(
                                 onTap: () {},
-                                child: ListTile(
-                                  leading: Icon(
-                                    Icons.arrow_right_rounded,
-                                    color: Colors.blue,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    leading: Icon(
+                                      Icons.circle,
+                                      color: Colors.blue,
+                                      size: 10.0,
+                                    ),
+                                    title: Text(data.antecedenteDescripcion,
+                                        style: TextStyle(
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily)),
                                   ),
-                                  title: Text(data.antecedenteDescripcion,
-                                      style: TextStyle(
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
                                 ),
                               ),
                             ))

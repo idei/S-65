@@ -38,47 +38,57 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "SFMS",
-            });
-          },
-        ),
-        title: Text('Chequeo Físico',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "SFMS",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "SFMS",
+              });
             },
-          )
-        ],
+          ),
+          title: Text('Chequeo Físico',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            )
+          ],
+        ),
+        body: FutureBuilder(
+            future: getAllRespuestaFisico(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                return ScreeningFisico();
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
       ),
-      body: FutureBuilder(
-          future: getAllRespuestaFisico(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ScreeningFisico();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
     );
   }
 

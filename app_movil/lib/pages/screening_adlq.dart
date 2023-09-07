@@ -28,66 +28,83 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ADLQ",
+        });
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "ADLQ",
-            });
-          },
-        ),
-        title: Text('Chequeo de Actividades de la Vida Diaria',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "ADLQ",
+              });
             },
           ),
-        ],
-      ),
-      body: FutureBuilder(
-        future: getAllRespuestasADLQ(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                semanticsLabel: "Cargando",
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Container(
-              child: Center(
-                child: Text("Error: ${snapshot.error}"),
-              ),
-            );
-          } else if (snapshot.hasData) {
-            return ColumnWidgetAlimentacion();
-          } else {
-            return Container(
-              child: Center(
-                child: Text("No hay datos disponibles."),
-              ),
-            );
-          }
-        },
+          title: Text('Chequeo de Actividades de la Vida Diaria',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: getAllRespuestasADLQ(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return ColumnWidgetAlimentacion();
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: "Cargando",
+                ),
+              );
+            }
+            // if (snapshot.connectionState == ConnectionState.waiting) {
+            //   return Center(
+            //     child: CircularProgressIndicator(
+            //       semanticsLabel: "Cargando",
+            //     ),
+            //   );
+            // } else if (snapshot.hasError) {
+            //   return Container(
+            //     child: Center(
+            //       child: Text("Error: ${snapshot.error}"),
+            //     ),
+            //   );
+            // } else if (snapshot.hasData) {
+            //   return ColumnWidgetAlimentacion();
+            // } else {
+            //   return Container(
+            //     child: Center(
+            //       child: Text("No hay datos disponibles."),
+            //     ),
+            //   );
+            // }
+          },
+        ),
       ),
     );
   }
@@ -215,11 +232,17 @@ class ColumnWidgetAlimentacion extends StatefulWidget {
 class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
         context,
         "Chequeo Actividades de la Vida Diaria",
         "El ADLQ es un cuestionario de ACTIVIDADES DE LA VIDA DIARIA que idealmente debe ser respondida por un familiar cercano, cuidador o persona de referencia para poder informar adecuadamente sobre el desenvolvimiento de la persona en diferentes aspectos de la vida diaria al momento actual. Consigna: seleccione la opción que mejor describa a la persona al día de la fecha"));
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -277,7 +300,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(10),
-                  child: Text('Vestido',
+                  child: Text('Vestirse',
                       style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -543,7 +566,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
                             Theme.of(context).textTheme.headline1.fontFamily),
                   ),
                 ),
-                AspectoPersonal(),
+                MantenimientoHogar(),
               ],
             ),
           ),
@@ -1156,7 +1179,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
               )),
         ),
         Padding(
-          padding: EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(8.0),
         ),
       ]),
     );
@@ -1346,7 +1369,7 @@ class AlimentacionWidgetState extends State<Alimentarse> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1851,7 +1874,7 @@ class MantenimientoHogarWidgetState extends State<MantenimientoHogar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 310,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1963,7 +1986,7 @@ class LavadoRopaWidgetState extends State<LavadoRopa> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 250,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2017,7 +2040,7 @@ class EmpleoWidgetState extends State<Empleo> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 430,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2074,7 +2097,7 @@ class RecreacionWidgetState extends State<Recreacion> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 450,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2130,7 +2153,7 @@ class ReunionesWidgetState extends State<Reuniones> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2186,7 +2209,7 @@ class ViajesWidgetState extends State<Viajes> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2242,7 +2265,7 @@ class ComprarComidaWidgetState extends State<ComprarComida> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 370,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2298,7 +2321,7 @@ class ManejoEfectivoWidgetState extends State<ManejoEfectivo> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2354,7 +2377,7 @@ class ManejoFinanzasWidgetState extends State<ManejoFinanzas> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 480,
+      height: 450,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2411,7 +2434,7 @@ class TransportePublicoWidgetState extends State<TransportePublico> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2467,7 +2490,7 @@ class ConducirWidgetState extends State<Conducir> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2523,7 +2546,7 @@ class MovilidadBarrioWidgetState extends State<MovilidadBarrio> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2580,7 +2603,7 @@ class ViajarFueraAmbienteWidgetState extends State<ViajarFueraAmbiente> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2636,7 +2659,7 @@ class UsoTelefonoWidgetState extends State<UsoTelefono> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2747,7 +2770,7 @@ class ComprensionWidgetState extends State<Comprension> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2802,7 +2825,7 @@ class LecturaWidgetState extends State<Lectura> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2857,7 +2880,7 @@ class EscrituraWidgetState extends State<Escritura> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

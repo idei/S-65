@@ -4,8 +4,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
 import '../widgets/alert_informe.dart';
 
 var id_paciente;
@@ -34,6 +32,51 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   void dispose() {
     myController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    getStringValuesSF();
+
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "RNUTRI",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "RNUTRI",
+              });
+            },
+          ),
+          title: Text('Riesgo Nutricional',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+        ),
+        body: FutureBuilder(
+            future: getAllRespuestaNutricional(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                return FormNutricional();
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
+      ),
+    );
   }
 
   getStringValuesSF() async {
@@ -74,46 +117,6 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
     var jsonDate = json.decode(response.body);
 
     tipo_screening = jsonDate;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    @override
-    void dispose() {
-      super.dispose();
-    }
-
-    getStringValuesSF();
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "RNUTRI",
-            });
-          },
-        ),
-        title: Text('Riesgo Nutricional',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-      ),
-      body: FutureBuilder(
-          future: getAllRespuestaNutricional(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return FormNutricional();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
-    );
   }
 
   showDialogMessage() async {

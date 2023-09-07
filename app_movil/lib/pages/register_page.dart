@@ -12,6 +12,7 @@ import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 final emailPaciente = TextEditingController();
 final passwordNuevo = TextEditingController();
@@ -34,7 +35,6 @@ class _FormRegisterState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    _formKey_registrar.currentState?.reset();
     emailPaciente.clear();
     passwordNuevo.clear();
     nombrePaciente.clear();
@@ -137,6 +137,24 @@ class _FormRegisterState extends State<RegisterPage> {
     }
   }
 
+  void _mostrarPDF(BuildContext context) {
+    SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        width: MediaQuery.of(context)
+            .size
+            .width, // Asegura que el contenedor tenga el ancho de la pantalla
+
+        child: PDFView(
+          filePath:
+              'assets/pdf/terminos.pdf', // Reemplaza con la ruta de tu archivo PDF
+          enableSwipe: true,
+          swipeHorizontal: true,
+        ),
+      ),
+    );
+  }
+
   loginToast(String toast) {
     return Fluttertoast.showToast(
         msg: toast,
@@ -161,7 +179,13 @@ class _FormRegisterState extends State<RegisterPage> {
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.underline,
               fontSize: 15,
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily))
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      // ElevatedButton(
+      //   onPressed: () {
+      //     _mostrarPDF(context);
+      //   },
+      //   child: Text('Abrir Términos y Condiciones'),
+      // )
     ]);
   }
 

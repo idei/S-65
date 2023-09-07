@@ -26,6 +26,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
   double sizeIconDelete;
   double radiusIconEditar;
   double radiusIconDelete;
+  double radiusCircle;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +36,17 @@ class _MedicamentoState extends State<MedicamentoPage> {
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     if (isTablet) {
-      sizeIconEditar = 35.0;
-      sizeIconDelete = 35.0;
+      sizeIconEditar = 30.0;
+      sizeIconDelete = 30.0;
       radiusIconEditar = 28.0;
       radiusIconDelete = 28.0;
+      radiusCircle = 0.032;
     } else {
       sizeIconEditar = 16.0;
       sizeIconDelete = 16.0;
       radiusIconEditar = 26.0;
       radiusIconDelete = 26.0;
+      radiusCircle = 0.04;
     }
 
     return Scaffold(
@@ -80,75 +83,123 @@ class _MedicamentoState extends State<MedicamentoPage> {
               } else if (snapshot.hasData) {
                 return ListView(
                   children: ListTile.divideTiles(
-                    color: Colors.black26,
-                    tiles: snapshot.data
-                        .map((data) => ListTile(
-                              title: ListTile(
-                                leading: Icon(
-                                  Icons.arrow_right_rounded,
-                                  color: Colors.blue,
-                                  size: 38.0,
-                                ),
-                                title: Text(data.nombre_comercial,
-                                    style: TextStyle(
-                                        overflow: TextOverflow.clip,
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily)),
-                                subtitle: Text(data.dosis_frecuencia,
-                                    style: TextStyle(
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily)),
-                                trailing: Wrap(children: [
-                                  CircleAvatar(
-                                    radius: MediaQuery.of(context).size.width /
-                                        radiusIconEditar,
-                                    backgroundColor: Colors.blue,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
-                                        size: sizeIconEditar,
-                                      ),
-                                      onPressed: () {
-                                        _showAlertDialog(
-                                          int.parse(data.id_medicamento),
-                                          data.dosis_frecuencia,
-                                          1,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 25,
-                                  ),
-                                  CircleAvatar(
-                                    radius: MediaQuery.of(context).size.width /
-                                        radiusIconDelete,
-                                    backgroundColor: Colors.red,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        size: sizeIconDelete,
-                                      ),
+                      color: Colors.black26,
+                      tiles: snapshot.data.map(
+                        (data) => Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: ListTile(
+                            title: Text(data.nombre_comercial,
+                                style: TextStyle(
+                                    overflow: TextOverflow.clip,
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            subtitle: Text(data.dosis_frecuencia,
+                                style: TextStyle(
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                            trailing: Wrap(children: [
+                              // CircleAvatar(
+                              //   radius: MediaQuery.of(context).size.width /
+                              //       radiusIconEditar,
+                              //   backgroundColor: Colors.blue,
+                              //   child: IconButton(
+                              //     icon: Icon(
+                              //       Icons.edit,
+                              //       color: Colors.white,
+                              //       size: sizeIconEditar,
+                              //     ),
+                              //     onPressed: () {
+                              //       _showAlertDialog(
+                              //         int.parse(data.id_medicamento),
+                              //         data.dosis_frecuencia,
+                              //         1,
+                              //       );
+                              //     },
+                              //   ),
+                              // ),
+                              CircleAvatar(
+                                radius: MediaQuery.of(context).size.width *
+                                    radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
+                                backgroundColor: Colors.blue,
+                                child: FractionallySizedBox(
+                                  widthFactor:
+                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                  heightFactor:
+                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.edit,
                                       color: Colors.white,
-                                      onPressed: () {
-                                        _showAlertDialog(
-                                          int.parse(data.id_medicamento),
-                                          data.dosis_frecuencia,
-                                          2,
-                                        );
-                                      },
+                                      size:
+                                          sizeIconEditar, // Ajusta el tamaño del icono según tus necesidades
                                     ),
+                                    onPressed: () {
+                                      _showAlertDialog(
+                                        int.parse(data.id_medicamento),
+                                        data.dosis_frecuencia,
+                                        1,
+                                      );
+                                    },
                                   ),
-                                ]),
+                                ),
                               ),
-                            ))
-                        .toList(),
-                  ).toList(),
+                              SizedBox(
+                                width: 25,
+                              ),
+                              CircleAvatar(
+                                radius: MediaQuery.of(context).size.width *
+                                    radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
+                                backgroundColor: Colors.red,
+                                child: FractionallySizedBox(
+                                  widthFactor:
+                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                  heightFactor:
+                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                      size:
+                                          sizeIconDelete, // Ajusta el tamaño del icono según tus necesidades
+                                    ),
+                                    onPressed: () {
+                                      _showAlertDialog(
+                                        int.parse(data.id_medicamento),
+                                        data.dosis_frecuencia,
+                                        2,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              //-------------------
+                              // CircleAvatar(
+                              //   radius: MediaQuery.of(context).size.width /
+                              //       radiusIconDelete,
+                              //   backgroundColor: Colors.red,
+                              //   child: IconButton(
+                              //     icon: Icon(
+                              //       Icons.delete,
+                              //       size: sizeIconDelete,
+                              //     ),
+                              //     color: Colors.white,
+                              //     onPressed: () {
+                              //       _showAlertDialog(
+                              //         int.parse(data.id_medicamento),
+                              //         data.dosis_frecuencia,
+                              //         2,
+                              //       );
+                              //     },
+                              //   ),
+                              // ),
+                            ]),
+                          ),
+                        ),
+                      )).toList(),
                 );
               } else {
                 return Container(
@@ -420,23 +471,5 @@ class _MedicamentoState extends State<MedicamentoPage> {
           textAlign: TextAlign.center,
           style: const TextStyle(color: Colors.white)),
     ));
-  }
-}
-
-class _isLoadingIcon extends StatelessWidget {
-  const _isLoadingIcon({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-      child: const CircularProgressIndicator(color: Colors.blue),
-    );
   }
 }

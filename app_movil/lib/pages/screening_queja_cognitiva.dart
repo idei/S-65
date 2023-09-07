@@ -5,8 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
 import '../widgets/opciones_navbar.dart';
 
 class ScreeningBPage extends StatefulWidget {
@@ -43,47 +41,57 @@ class _ScreeningBState extends State<ScreeningBPage> {
 
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Cuestionario de Quejas Cognitivas - QCQ',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "QCQ",
-            });
-          },
-        ),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "QCQ",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Cuestionario de Quejas Cognitivas - QCQ',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "QCQ",
+              });
             },
           ),
-        ],
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+            future: getAllRespuestaQC(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                return ScreeningQCQ();
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
       ),
-      body: FutureBuilder(
-          future: getAllRespuestaQC(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ScreeningQCQ();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
     );
   }
 

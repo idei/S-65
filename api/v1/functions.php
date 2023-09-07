@@ -109,11 +109,14 @@ function login_paciente()
         $password = verificar($data_input, "password");
     }
 
+    // Limpiar los espacios en blanco
+    $emailLimpio = trim($email);
+
     try {
 
         $query = "SELECT * FROM users WHERE email = :email AND password = :password";
         $stmt = Flight::db()->prepare($query);
-        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":email", $emailLimpio);
         $stmt->bindParam(":password", $password);
         $stmt->execute();
         $result = $stmt->rowCount();
@@ -6952,6 +6955,9 @@ function user_register()
     try {
 
         $token = uniqid(random_int(100, 999), true);
+
+        // Limpiar los espacios en blanco
+         $email = trim($email);
 
         $lista = array();
 
