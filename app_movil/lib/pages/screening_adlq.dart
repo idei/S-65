@@ -82,27 +82,6 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
                 ),
               );
             }
-            // if (snapshot.connectionState == ConnectionState.waiting) {
-            //   return Center(
-            //     child: CircularProgressIndicator(
-            //       semanticsLabel: "Cargando",
-            //     ),
-            //   );
-            // } else if (snapshot.hasError) {
-            //   return Container(
-            //     child: Center(
-            //       child: Text("Error: ${snapshot.error}"),
-            //     ),
-            //   );
-            // } else if (snapshot.hasData) {
-            //   return ColumnWidgetAlimentacion();
-            // } else {
-            //   return Container(
-            //     child: Center(
-            //       child: Text("No hay datos disponibles."),
-            //     ),
-            //   );
-            // }
           },
         ),
       ),

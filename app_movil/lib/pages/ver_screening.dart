@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:app_salud/pages/form_datos_generales.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -71,6 +70,13 @@ class _VerScreeningState extends State<VerScreening> {
       }
     }
 
+    if (codigo == "ADLQ") {
+      titulo = "de Actividad de la Vida Diaria";
+      if (double.parse(result_screening) > 1) {
+        mensaje = "A tener en cuenta: Sería bueno que consulte con su médico.";
+      }
+    }
+
     if (codigo == "RNUTRI") {
       titulo = "de Nutrición";
       if (double.parse(result_screening) <= 2) {
@@ -139,71 +145,68 @@ class _VerScreeningState extends State<VerScreening> {
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
-      body: Form(
-        key: _formKey_ver_screening,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            margin: EdgeInsets.all(15),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: ListView(children: <Widget>[
-                Center(
-                  child: Text(
-                    'Resultado Obtenido',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                        fontSize: 25),
-                  ),
-                ),
-                Divider(height: 3.0, color: Colors.black),
-                SizedBox(
-                  height: 30,
-                ),
-                Text(
-                  'Tipo: $nombre',
+      body: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: ListView(children: <Widget>[
+              Center(
+                child: Text(
+                  'Resultado Obtenido',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
-                      fontSize: 20),
+                      fontSize: 25),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text("Fecha: $fecha ",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                        fontSize: 20)),
-                SizedBox(
-                  height: 30,
-                ),
-                Text("Puntuación: $result_screening ",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                        fontSize: 20)),
-                SizedBox(
-                  height: 30,
-                ),
-                Text("$mensaje ",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                        fontSize: 20)),
-                SizedBox(
-                  height: 30,
-                ),
-              ]),
-            ),
+              ),
+              Divider(height: 3.0, color: Colors.black),
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                'Tipo: $nombre',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily,
+                    fontSize: 20),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text("Fecha: $fecha ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 20)),
+              SizedBox(
+                height: 30,
+              ),
+              Text("Puntuación: $result_screening ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 20)),
+              SizedBox(
+                height: 30,
+              ),
+              Text("$mensaje ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontSize: 20)),
+              SizedBox(
+                height: 30,
+              ),
+            ]),
           ),
         ),
       ),

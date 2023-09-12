@@ -12,7 +12,6 @@ import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 final emailPaciente = TextEditingController();
 final passwordNuevo = TextEditingController();
@@ -135,24 +134,6 @@ class _FormRegisterState extends State<RegisterPage> {
         loginToast(error.toString());
       }
     }
-  }
-
-  void _mostrarPDF(BuildContext context) {
-    SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context)
-            .size
-            .width, // Asegura que el contenedor tenga el ancho de la pantalla
-
-        child: PDFView(
-          filePath:
-              'assets/pdf/terminos.pdf', // Reemplaza con la ruta de tu archivo PDF
-          enableSwipe: true,
-          swipeHorizontal: true,
-        ),
-      ),
-    );
   }
 
   loginToast(String toast) {

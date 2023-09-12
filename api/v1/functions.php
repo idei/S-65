@@ -217,7 +217,9 @@ function read_pacientes()
         $id_medicos = $id_medicos["id"];
 
         $smt = Flight::db()->prepare("select pacientes.id, dni, nombre, apellido, fecha_nacimiento FROM `pacientes` 
-        INNER JOIN medicos_pacientes WHERE rela_medico = '" . $id_medicos . "'");
+        INNER JOIN medicos_pacientes 
+        ON medicos_pacientes.rela_paciente = pacientes.id
+        WHERE rela_medico = '" . $id_medicos . "'");
         $smt->execute();
 
         if ($smt->rowCount() > 0) {
@@ -1001,12 +1003,35 @@ function read_datos_personales()
         if ($select_data_clinica->rowCount() > 0) {
             $select_data_clinica = $select_data_clinica->fetch();
 
-            $presion_alta = $select_data_clinica["presion_alta"];
-            $presion_baja = $select_data_clinica["presion_baja"];
-            $pulso = $select_data_clinica["pulso"];
-            $peso = $select_data_clinica["peso"];
-            $circunferencia_cintura = $select_data_clinica["circunferencia_cintura"];
+            $data_clinica = array(
+            "presion_alta" => $select_data_clinica["presion_alta"],
+            "presion_baja" => $select_data_clinica["presion_baja"],
+            "pulso" => $select_data_clinica["pulso"],
+            "peso" => $select_data_clinica["peso"],
+            "circunferencia_cintura" => $select_data_clinica["circunferencia_cintura"]
+            );
+
+            foreach ($data_clinica as $key => $value) {
+                if (empty($value)) {
+                    $data_clinica[$key] = "Sin Datos";
+                }else{
+                    $data_clinica[$key] = $value;
+                }
+            }
+            
+            $presion_alta = $data_clinica["presion_alta"];
+            $presion_baja = $data_clinica["presion_baja"];
+            $pulso = $data_clinica["pulso"];
+            $peso = $data_clinica["peso"];
+            $circunferencia_cintura = $data_clinica["circunferencia_cintura"];
+
             switch ($select_data_clinica["consume_alcohol"]) {
+                case 1:
+                    $consume_alcohol = "Si";
+                    break;
+                case 2:
+                        $consume_alcohol = "No";
+                    break;
                 case 902:
                     $consume_alcohol = "A veces (una vez al mes)";
                     break;
@@ -1018,6 +1043,12 @@ function read_datos_personales()
                     break;
             }
             switch ($select_data_clinica["consume_marihuana"]) {
+                case 1:
+                $consume_marihuana = "Si";
+                break;
+                case 2:
+                    $consume_marihuana = "No";
+                break;
                 case 902:
                     $consume_marihuana = "A veces (una vez al mes)";
                     break;
@@ -1029,6 +1060,12 @@ function read_datos_personales()
                     break;
             }
             switch ($select_data_clinica["otras_drogas"]) {
+                case 1:
+                    $otras_drogas = "Si";
+                    break;
+                case 2:
+                        $otras_drogas = "No";
+                    break;
                 case 902:
                     $otras_drogas = "A veces (una vez al mes)";
                     break;
@@ -1040,6 +1077,12 @@ function read_datos_personales()
                     break;
             }
             switch ($select_data_clinica["fuma_tabaco"]) {
+                case 1:
+                    $fuma_tabaco = "Si";
+                    break;
+                case 2:
+                        $fuma_tabaco = "No";
+                    break;
                 case 902:
                     $fuma_tabaco = "A veces (una vez al mes)";
                     break;

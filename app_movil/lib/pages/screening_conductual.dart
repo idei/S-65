@@ -68,37 +68,38 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
         ),
-        body: SingleChildScrollView(
-          child: FutureBuilder(
-              future: getAllRespuesta(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: _isLoadingIcon(),
-                  );
-                } else if (snapshot.hasData) {
-                  return ColumnWidgetConductual();
-                } else {
-                  return Container(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ListTile(
-                          title: Text(
-                        'Error',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily),
-                      )),
-                    ],
-                  ));
-                }
-              }),
+        body: Center(
+          child: SingleChildScrollView(
+            child: FutureBuilder(
+                future: getAllRespuesta(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ColumnWidgetConductual();
+                  } else {
+                    return Container(
+                      alignment: Alignment.center,
+                      child: _isLoadingIcon(),
+                    );
+                    // return Container(
+                    //     child: Column(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     ListTile(
+                    //         title: Text(
+                    //       'Error',
+                    //       textAlign: TextAlign.center,
+                    //       style: TextStyle(
+                    //           fontWeight: FontWeight.bold,
+                    //           fontFamily: Theme.of(context)
+                    //               .textTheme
+                    //               .headline1
+                    //               .fontFamily),
+                    //     )),
+                    //   ],
+                    // ));
+                  }
+                }),
+          ),
         ),
       ),
     );

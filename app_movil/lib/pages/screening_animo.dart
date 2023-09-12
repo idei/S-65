@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/LabeledCheckboxGeneric.dart';
@@ -347,21 +348,17 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
 
       if (responseDecoder['status'] == "Success") {
         if (int.parse(responseDecoder['data']) >= 9) {
-          showCustomAlert(
+          _alert_informe(
             context,
             "Para tener en cuenta",
             "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
-            screening_recordatorio,
-            () {},
           );
         } else {
           if (int.parse(responseDecoder['data']) < 9) {
-            showCustomAlert(
+            _alert_informe(
               context,
               "Para tener en cuenta",
               "En este momento no presenta sintomatología del estado del ánimo que requiera una consulta con especialista. Sin embargo, le sugerimos seguir controlando su estado de ánimo periódicamente.",
-              screening_recordatorio,
-              () {},
             );
           } else {
             if (screening_recordatorio == true) {
@@ -375,14 +372,39 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
         }
       }
     } else {
-      showCustomAlert(
+      _alert_informe(
         context,
         "Error al guardar",
         response.body,
-        screening_recordatorio,
-        () {},
       );
     }
+  }
+
+  _alert_informe(context, title, descripcion) async {
+    Alert(
+      context: context,
+      title: title,
+      desc: descripcion,
+      alertAnimation: FadeAlertAnimation,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Entendido",
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+          onPressed: () {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "ÁNIMO",
+              });
+            }
+          },
+          width: 120,
+        )
+      ],
+    ).show();
   }
 
   bool _isLoading = false;

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/screening_model.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 
 class ScreeningPage extends StatefulWidget {
@@ -15,6 +17,8 @@ final _formKey_screening = GlobalKey<_ScreeningState>();
 var select_screening;
 var titulo;
 bool isLoading = false;
+var usuarioModel;
+var id_paciente;
 
 class _ScreeningState extends State<ScreeningPage> {
   @override
@@ -34,12 +38,13 @@ class _ScreeningState extends State<ScreeningPage> {
 
     titulo = setTitulo(select_screening);
 
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+
     return WillPopScope(
       onWillPop: () async {
-        // Personaliza aquí el comportamiento al presionar el botón de retroceso del dispositivo.
-        // Puedes realizar alguna acción, como mostrar un diálogo de confirmación antes de salir de la pantalla.
         Navigator.pushNamed(context, '/menu_chequeo');
-        return true; // Si el usuario cierra el diálogo sin seleccionar, no saldrá.
+        return true;
       },
       child: Scaffold(
           appBar: AppBar(
@@ -136,9 +141,8 @@ class _ScreeningState extends State<ScreeningPage> {
                       ],
                     ));
                   }
-                  return Container(
-                    alignment: Alignment.center,
-                    child: _isLoadingIcon(),
+                  return Center(
+                    child: CircularProgressIndicator(),
                   );
                 }
                 // }
@@ -254,17 +258,14 @@ class _ScreeningState extends State<ScreeningPage> {
 
   List<ScreeningModel> recordatorios_items;
   var data;
-  var email_argument;
-  var id_paciente;
 
   Future<List<ScreeningModel>> read_screenings() async {
-    await getStringValuesSF();
     List<ScreeningModel> list_sreenings = [];
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_screenings";
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
+      "id_paciente": id_paciente,
       "select_screening": select_screening,
     });
     data = json.decode(response.body);
@@ -279,31 +280,5 @@ class _ScreeningState extends State<ScreeningPage> {
       isLoading = true;
       return null;
     }
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = await prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    id_paciente = await prefs.getInt("id_paciente");
-    print(email_argument);
-  }
-}
-
-class _isLoadingIcon extends StatelessWidget {
-  const _isLoadingIcon({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-      child: const CircularProgressIndicator(color: Colors.blue),
-    );
   }
 }

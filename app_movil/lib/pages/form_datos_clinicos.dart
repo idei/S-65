@@ -1,14 +1,12 @@
-import 'package:app_salud/pages/screening_diabetes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-String email;
 
 class FormDatosClinicos extends StatefulWidget {
   final pageName = '/form_datos_clinicos';
@@ -29,16 +27,13 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   final _peso_corporal = TextEditingController();
   final _altura = TextEditingController();
 
-  // @override
-  // void setState(VoidCallback fn) {
-  //   getStringValuesSF();
-  // }
+  var usuarioModel;
+  var id_paciente;
 
   @override
   void initState() {
     super.initState();
     getAllRespuesta();
-    getStringValuesSF();
   }
 
   @override
@@ -54,12 +49,8 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
   @override
   Widget build(BuildContext context) {
-    Map parametros = ModalRoute.of(context).settings.arguments;
-    if (parametros != null) {
-      email_prefer = parametros['email'];
-    } else {
-      getStringValuesSF();
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
         appBar: AppBar(
@@ -758,17 +749,6 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
       child: child,
     ),
   );
-}
-
-String email_prefer;
-var id_paciente;
-
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  email_prefer = prefs.getString("email_prefer");
-  id_paciente = prefs.getInt("id_paciente");
-  print("email_prefer");
-  print(email_prefer);
 }
 
 String descri_informe = "";

@@ -504,46 +504,46 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              margin: EdgeInsets.all(10),
-              elevation: 10,
-              child: ClipRRect(
-                // Los bordes del contenido del card se cortan usando BorderRadius
-                borderRadius: BorderRadius.circular(15),
+          // Card(
+          //     shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(15)),
+          //     margin: EdgeInsets.all(10),
+          //     elevation: 10,
+          //     child: ClipRRect(
+          //       // Los bordes del contenido del card se cortan usando BorderRadius
+          //       borderRadius: BorderRadius.circular(15),
 
-                // EL widget hijo que será recortado segun la propiedad anterior
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                    ),
-                    CustomDivider(
-                      text: 'Orientación',
-                      color: Colors.indigoAccent,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                    ),
-                    Container(
-                      width: 320,
-                      child: Text(
-                        '¿Tiene dificultades para decir con precisión su edad actual?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                    ),
-                    Orientacion4(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              )),
+          //       // EL widget hijo que será recortado segun la propiedad anterior
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: <Widget>[
+          //           Padding(
+          //             padding: EdgeInsets.all(8.0),
+          //           ),
+          //           CustomDivider(
+          //             text: 'Orientación',
+          //             color: Colors.indigoAccent,
+          //           ),
+          //           Padding(
+          //             padding: EdgeInsets.all(8.0),
+          //           ),
+          //           Container(
+          //             width: 320,
+          //             child: Text(
+          //               '¿Tiene dificultades para decir con precisión su edad actual?',
+          //               style: TextStyle(
+          //                 fontWeight: FontWeight.bold,
+          //                 fontSize: 18.0,
+          //               ),
+          //             ),
+          //           ),
+          //           Orientacion4(),
+          //           SizedBox(
+          //             height: 20,
+          //           ),
+          //         ],
+          //       ),
+          //     )),
 
           Card(
               shape: RoundedRectangleBorder(
