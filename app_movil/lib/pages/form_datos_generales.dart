@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
+import '../widgets/alert_informe.dart';
 import 'env.dart';
 
 var email_argument;
@@ -53,6 +54,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   var apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
   var celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
   var isGrupoConviviente;
+  var bandera;
 
   TextEditingController _dateController = TextEditingController();
 
@@ -108,6 +110,18 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     if (rela_nivel_instruccion == "") {
       rela_nivel_instruccion =
           usuarioModel.usuario.paciente.rela_nivel_instruccion;
+    }
+
+    if (rela_grupo_conviviente == "" &&
+        rela_departamento == "" &&
+        rela_genero == "" &&
+        rela_departamento == "" &&
+        bandera == true) {
+      bandera = false;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => alert_screenings_generico(context, "Usted ya esta registrado",
+            "A continuación se le piden algunos datos personales para terminar de completar su ficha personal"),
+      );
     }
 
     rela_users = usuarioModel.usuario.paciente.rela_users;

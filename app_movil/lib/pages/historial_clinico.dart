@@ -1,13 +1,16 @@
+import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:open_file/open_file.dart' as open_file;
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:http/http.dart' as http;
+import '../models/datos_clinicos_model.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -16,6 +19,8 @@ TextEditingController password_nuevo = TextEditingController();
 String email_set_shared;
 bool _isLoading = false;
 bool _isEnabled = true;
+var usuarioModel;
+var id_paciente;
 
 class HistorialClinico extends StatefulWidget {
   @override
@@ -27,6 +32,10 @@ final _formKey_historial_clinico = GlobalKey<FormState>();
 class _AjustesState extends State<HistorialClinico> {
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -48,40 +57,199 @@ class _AjustesState extends State<HistorialClinico> {
                 fontWeight: FontWeight.bold,
               )),
         ),
-        body: Form(
-            key: _formKey_historial_clinico,
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(children: <Widget>[
-                  ElevatedButton.icon(
-                    icon: _isLoading
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            child: const CircularProgressIndicator(),
-                          )
-                        : const Icon(Icons.download),
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                    ),
-                    onPressed: () {
-                      _isLoading ? null : _startLoading();
-                    },
-                    label: Text(
-                        _isLoading
-                            ? 'Cargando...'
-                            : 'Exportar Historial Clínico',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .headline1
-                                .fontFamily)),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ]))));
+        body:
+            // Column(
+            //   children: [
+            FutureBuilder<List<DatosClinicos>>(
+                future: read_datos_clinicos(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView(
+                      children: ListTile.divideTiles(
+                        color: Colors.black,
+                        tiles: snapshot.data
+                            .map((data) => ListTile(
+                                  title: GestureDetector(
+                                      onTap: () {
+                                        // Navigator.of(context).pushNamed(
+                                        //     '/ver_recordatorio_personal',
+                                        //     arguments: {
+                                        //       "id_recordatorio":
+                                        //           data.id_recordatorio,
+                                        //       "id_paciente": data.id_paciente,
+                                        //       "descripcion": data.descripcion,
+                                        //       "fecha_limite": data.fecha_limite,
+                                        //       "estado_recordatorio":
+                                        //           data.estado_recordatorio,
+                                        //       "estado": estado,
+                                        //     });
+                                      },
+                                      child: CardDinamic(data)),
+                                ))
+                            .toList(),
+                      ).toList(),
+                    );
+                  } else {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return Container(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ListTile(
+                              title: Text(
+                            'No tiene datos clínicos',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily),
+                          )),
+                        ],
+                      ));
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        semanticsLabel: "Cargando",
+                      ),
+                    );
+                  }
+                }
+                //}
+                ),
+        // Padding(
+        //     padding: const EdgeInsets.all(16.0),
+        //     child: ListView(children: <Widget>[
+        //       ElevatedButton.icon(
+        //         icon: _isLoading
+        //             ? Padding(
+        //                 padding: const EdgeInsets.symmetric(
+        //                     horizontal: 10, vertical: 5),
+        //                 child: const CircularProgressIndicator(),
+        //               )
+        //             : const Icon(Icons.download),
+        //         style: ElevatedButton.styleFrom(
+        //           primary: Theme.of(context).primaryColor,
+        //         ),
+        //         onPressed: () {
+        //           _isLoading ? null : _startLoading();
+        //         },
+        //         label: Text(
+        //             _isLoading
+        //                 ? 'Cargando...'
+        //                 : 'Exportar Historial Clínico',
+        //             style: TextStyle(
+        //                 color: Colors.white,
+        //                 fontFamily: Theme.of(context)
+        //                     .textTheme
+        //                     .headline1
+        //                     .fontFamily)),
+        //       ),
+        //       SizedBox(
+        //         height: 20,
+        //       ),
+        //     ])),
+        //],
+        //)
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _isLoading ? null : _startLoading();
+          },
+          child: IconButton(
+            icon: _isLoading
+                ? Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: const CircularProgressIndicator(),
+                  )
+                : const Icon(Icons.download_sharp, color: Colors.white),
+            // onPressed: () {
+            //   Navigator.pushNamed(context, '/ver_datos_clinicos');
+            // },
+          ),
+        ));
+  }
+
+  var color;
+  var font_bold;
+  var estado;
+
+  Widget CardDinamic(data) {
+    // final now = DateTime.now();
+    // var dia;
+    // var mes;
+
+    // if (now.day < 10) {
+    //   dia = '0' + now.day.toString();
+    // } else {
+    //   dia = now.day.toString();
+    // }
+
+    // if (now.month < 10) {
+    //   mes = '0' + now.month.toString();
+    // } else {
+    //   mes = now.month.toString();
+    // }
+
+    // String formatter = now.year.toString() + "-" + mes + "-" + dia;
+    // print(formatter);
+    // DateTime fecha_limite1 = DateTime.parse(formatter);
+    // DateTime fecha_limite = DateTime.parse(data.fecha_limite);
+
+    // final difference = fecha_limite.difference(fecha_limite1).inDays;
+    // print(difference);
+
+    // if (difference < 0) {
+    //   color = Colors.red;
+    //   font_bold = FontWeight.bold;
+    // } else if (difference == 1) {
+    //   color = Colors.yellow;
+    //   font_bold = FontWeight.bold;
+    // } else if (difference > 1) {
+    //   color = Colors.green;
+    //   font_bold = FontWeight.bold;
+    // }
+
+    return Card(
+      child: ListTile(
+        leading: Container(
+          width: 90,
+          height: 30,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              data.fecha_alta,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        title: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/ver_datos_clinicos',
+                  arguments: {"id_dato_clinico": data.id});
+            },
+            child: Text("Ver"),
+          ),
+        ),
+        // title: Text(data.descripcion.toUpperCase(),
+        //     maxLines: 4,
+        //     style: TextStyle(
+        //         fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+        // subtitle: Text(data.fecha_limite,
+        //     style: TextStyle(
+        //         fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      ),
+    );
   }
 
   void _startLoading() async {
@@ -105,16 +273,7 @@ class _AjustesState extends State<HistorialClinico> {
   }
 }
 
-String email_prefer;
-var id_paciente;
-
 getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  email_prefer = prefs.getString("email_prefer");
-  id_paciente = prefs.getInt("id_paciente");
-  print(email_prefer);
-
-  // //Obtengo datos clinicos del paciente
   await read_datos_clinicos();
   await read_respuesta();
 }
@@ -131,7 +290,7 @@ read_respuesta() async {
 
 var data;
 
-read_datos_clinicos() async {
+Future<List<DatosClinicos>> read_datos_clinicos() async {
   String URL_base = Env.URL_API;
   var url = URL_base + "/datos_clinicos";
 
@@ -139,14 +298,23 @@ read_datos_clinicos() async {
     "id_paciente": id_paciente.toString(),
   });
 
-  var responseDecoder = json.decode(response.body);
+  var responseDecoder;
 
   if (response.statusCode == 200) {
+    responseDecoder = json.decode(response.body);
+
     if (responseDecoder['status'] == "Success") {
-      data = responseDecoder['data'];
+      final List<DatosClinicos> listDatosClinicos = [];
+
+      for (var datoClinico in responseDecoder['data']) {
+        listDatosClinicos.add(DatosClinicos.fromJson(datoClinico));
+      }
+      return listDatosClinicos;
+    } else {
+      return null;
     }
   } else {
-    data = responseDecoder['status'];
+    throw Exception('Error al obtener JSON');
   }
 }
 

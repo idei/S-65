@@ -777,114 +777,84 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   }
 
   guardarDatosConductual(BuildContext context) async {
-    if (id_conductual1 == null)
-      loginToast("Debe responder todas las preguntas");
+    List<dynamic> conductuales = [
+      id_conductual1,
+      id_conductual2,
+      id_conductual3,
+      id_conductual4,
+      id_conductual5,
+      id_conductual6,
+      id_conductual7,
+      id_conductual8,
+      id_conductual9,
+      id_conductual10,
+      id_conductual11,
+      id_conductual12,
+      id_conductual13,
+    ];
 
-    if (id_conductual2 == null)
-      loginToast("Debe responder todas las preguntas");
+    for (var conductual in conductuales) {
+      if (conductual == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
 
-    if (id_conductual3 == null)
-      loginToast("Debe responder todas las preguntas");
+    showDialogMessage(context);
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_conductual";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "id_conductual1": id_conductual1,
+      "observaciones": otro.text,
+      "id_conductual2": id_conductual2,
+      "id_conductual3": id_conductual3,
+      "id_conductual4": id_conductual4,
+      "id_conductual5": id_conductual5,
+      "id_conductual6": id_conductual6,
+      "id_conductual7": id_conductual7,
+      "id_conductual8": id_conductual8,
+      "id_conductual9": id_conductual9,
+      "id_conductual10": id_conductual10,
+      "id_conductual11": id_conductual11,
+      "id_conductual12": id_conductual12,
+      "id_conductual13": id_conductual13,
+    });
 
-    if (id_conductual4 == null)
-      loginToast("Debe responder todas las preguntas");
+    var data = json.decode(response.body);
 
-    if (id_conductual5 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual6 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual7 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual8 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual9 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual10 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual11 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual12 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual13 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual1 != null &&
-        id_conductual2 != null &&
-        id_conductual3 != null &&
-        id_conductual4 != null &&
-        id_conductual5 != null &&
-        id_conductual6 != null &&
-        id_conductual7 != null &&
-        id_conductual8 != null &&
-        id_conductual9 != null &&
-        id_conductual10 != null &&
-        id_conductual11 != null &&
-        id_conductual12 != null &&
-        id_conductual13 != null) {
-      showDialogMessage(context);
-      String URL_base = Env.URL_API;
-      var url = URL_base + "/respuesta_screening_conductual";
-      var response = await http.post(url, body: {
-        "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico.toString(),
-        "id_recordatorio": id_recordatorio.toString(),
-        "tipo_screening": tipo_screening['data'].toString(),
-        "id_conductual1": id_conductual1,
-        "observaciones": otro.text,
-        "id_conductual2": id_conductual2,
-        "id_conductual3": id_conductual3,
-        "id_conductual4": id_conductual4,
-        "id_conductual5": id_conductual5,
-        "id_conductual6": id_conductual6,
-        "id_conductual7": id_conductual7,
-        "id_conductual8": id_conductual8,
-        "id_conductual9": id_conductual9,
-        "id_conductual10": id_conductual10,
-        "id_conductual11": id_conductual11,
-        "id_conductual12": id_conductual12,
-        "id_conductual13": id_conductual13,
-      });
-
-      var data = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        if (data['data'] == "alert") {
-          _alert_informe(
-            context,
-            "Para tener en cuenta",
-            "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-          );
-        } else {
-          if (data['status'] == "Success") {
-            if (screening_recordatorio == true) {
-              Navigator.pushNamed(context, '/recordatorio');
-            } else {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "CONDUC",
-              });
-            }
+    if (response.statusCode == 200) {
+      if (data['data'] == "alert") {
+        _alert_informe(
+          context,
+          "Para tener en cuenta",
+          "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+        );
+      } else {
+        if (data['status'] == "Success") {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "CONDUC",
+            });
           }
         }
       }
     }
   }
+}
 
-  loginToast(String toast) {
-    return Fluttertoast.showToast(
-        msg: toast,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white);
-  }
+loginToast(String toast) {
+  return Fluttertoast.showToast(
+      msg: toast,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white);
 }
 
 //------------***************

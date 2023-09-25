@@ -417,17 +417,24 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   SizedBox(height: 15),
                   CardGenerico(ConsumeOtrasDrogas(), "¿Consume otras drogas?"),
                   SizedBox(height: 15),
-                  ElevatedButton(
+                  ElevatedButton.icon(
+                    icon: _isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: const CircularProgressIndicator(),
+                          )
+                        : const Icon(Icons.save_alt),
                     style: ElevatedButton.styleFrom(elevation: 8),
                     onPressed: () {
-                      if (_formKey_datos_clinicos.currentState.validate()) {
-                        verification(context);
-                        if (estado_verification == true) {
-                          guardar_datos();
-                        }
+                      if (_formKey_datos_clinicos.currentState.validate() &&
+                          !_isLoading) {
+                        _startLoading();
+                      } else {
+                        null;
                       }
                     },
-                    child: Text(
+                    label: Text(
                       'Guardar Datos Clínicos',
                       style: TextStyle(
                         fontFamily:
@@ -440,6 +447,19 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
             ),
           ),
         ));
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await guardar_datos();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   getAllRespuesta() async {

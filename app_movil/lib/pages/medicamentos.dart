@@ -12,8 +12,6 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-List<MedicamentoModel> listMedicamentos;
-
 TextEditingController dosis_frecuencia = TextEditingController();
 
 class _MedicamentoState extends State<MedicamentoPage> {

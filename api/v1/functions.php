@@ -883,15 +883,59 @@ function read_datos_clinicos()
         $id_users = $id_users["id"];
 
 
-        $select_data_clinica = Flight::db()->prepare("SELECT presion_alta,presion_baja ,pulso, peso, circunferencia_cintura, consume_alcohol,
-    consume_marihuana, otras_drogas, fuma_tabaco, fecha_alta, talla 
-    FROM datos_clinicos 
-    WHERE rela_paciente = '" . $id_paciente . "'");
+        $select_data_clinica = Flight::db()->prepare("SELECT *
+        FROM datos_clinicos 
+        WHERE rela_paciente = '" . $id_paciente . "'");
 
         $select_data_clinica->execute();
 
         if ($select_data_clinica->rowCount() > 0) {
             $result = $select_data_clinica->fetchAll();
+
+            $returnData = msg("Success", $result);
+        } else {
+
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function read_datos_clinicos_paciente()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['id_dato_clinico'])) {
+        $id_dato_clinico = $_POST["id_dato_clinico"];
+    } else {
+        $id_dato_clinico = verificar($data_input, "id_dato_clinico");
+    }
+
+
+    try {
+        
+        $select_data_clinica = Flight::db()->prepare("SELECT *
+        FROM datos_clinicos 
+        WHERE rela_paciente = :id_paciente AND id = :id_dato_clinico");
+
+        $select_data_clinica->execute([
+            'id_paciente' => $id_paciente,
+            'id_dato_clinico' => $id_dato_clinico,
+        ]);
+
+        if ($select_data_clinica->rowCount() > 0) {
+            $result = $select_data_clinica->fetch();
 
             $returnData = msg("Success", $result);
         } else {
@@ -6926,7 +6970,7 @@ function get_state_sreening_cerebral(){
         $id_paciente = verificar($data_input, "id_paciente");
     }
 
-    $id_screening = 10;
+    $id_screening = 9;
 
     try {
        
@@ -8803,7 +8847,7 @@ function read_list_medicos()
     }
 
     try {
-        $stmt = Flight::db()->prepare("SELECT medicos.id, nombre, apellido, especialidad, matricula  
+    $stmt = Flight::db()->prepare("SELECT medicos.id, nombre, apellido, especialidad,estado_habilitacion, matricula  
     FROM medicos_pacientes 
     INNER JOIN medicos 
     ON medicos_pacientes.rela_medico = medicos.id
@@ -8828,6 +8872,52 @@ function read_list_medicos()
     }
 
     Flight::json($returnData);
+}
+
+function update_estado_habilitacion_medico(){
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    if (isset($_POST['id_paciente'])) {
+        $id_paciente = $_POST["id_paciente"];
+    } else {
+        $id_paciente = verificar($data_input, "id_paciente");
+    }
+
+    if (isset($_POST['id_medico'])) {
+        $id_medico = $_POST["id_medico"];
+    } else {
+        $id_medico = verificar($data_input, "id_medico");
+    }
+
+    if (isset($_POST['estado_paciente_medico'])) {
+        $estado_paciente_medico = $_POST["estado_paciente_medico"];
+    } else {
+        $estado_paciente_medico = verificar($data_input, "estado_paciente_medico");
+    }
+
+    try {
+        $data = [
+            'id_paciente' => $id_paciente,
+            'id_medico' => $id_medico,
+            'estado_paciente_medico' => $estado_paciente_medico,
+        ];
+        $update_estado_habilitacion = Flight::db()->prepare("UPDATE medicos_pacientes
+                    SET estado_habilitacion=:estado_paciente_medico
+                    WHERE rela_paciente=:id_paciente and rela_medico=:id_medico");
+    
+        $update_estado_habilitacion->execute($data);
+
+        $returnData = msg("Success", []);
+
+    } catch (PDOException $error) {
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+
+    }
+    
+    Flight::json($returnData);
+
 }
 
 function consult_preference()

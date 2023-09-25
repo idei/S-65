@@ -3,19 +3,9 @@ import 'package:flutter_device_type/flutter_device_type.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../models/antecedentes_personales_model.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-
-class AntecedentesPersonalesModel {
-  String antecedenteDescripcion;
-
-  AntecedentesPersonalesModel({this.antecedenteDescripcion});
-
-  factory AntecedentesPersonalesModel.fromJson(Map<String, dynamic> json) {
-    return AntecedentesPersonalesModel(
-        antecedenteDescripcion: json['nombre_evento']);
-  }
-}
 
 class AntecedentesPerPage extends StatefulWidget {
   @override

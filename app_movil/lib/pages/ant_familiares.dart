@@ -3,19 +3,9 @@ import 'package:flutter_device_type/flutter_device_type.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../models/antecedentes_familiares_model.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-
-class AntecedenteFamiliaresModel {
-  String antecedenteDescripcion;
-
-  AntecedenteFamiliaresModel({this.antecedenteDescripcion});
-
-  factory AntecedenteFamiliaresModel.fromJson(Map<String, dynamic> json) {
-    return AntecedenteFamiliaresModel(
-        antecedenteDescripcion: json['nombre_evento']);
-  }
-}
 
 class AntecedentesFamiliarPage extends StatefulWidget {
   @override

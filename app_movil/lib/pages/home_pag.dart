@@ -20,9 +20,6 @@ class _FormpruebaState extends State<HomePage> {
         key: UniqueKey(),
         future: test_datos(),
         builder: (BuildContext context, snapshot) {
-          print(snapshot.connectionState);
-          print(snapshot.hasData);
-          print(snapshot.data);
           if (snapshot.hasData != null) {
             if (ruta_incial == null) {
               return HomeInicio();

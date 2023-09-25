@@ -1,8 +1,9 @@
 import 'package:app_salud/models/medico_model.dart';
+import 'package:app_salud/pages/screening_adlq.dart';
 import 'package:app_salud/services/medico_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/usuario_services.dart';
 import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 import 'dart:convert';
@@ -14,7 +15,7 @@ String apellido_medico;
 var especialidad;
 var matricula;
 var rela_medico;
-var medicoModel;
+var usuarioModel;
 
 class ListMedicos extends StatefulWidget {
   @override
@@ -25,11 +26,12 @@ final _formKey_list_medicos = GlobalKey<_ListMedicosState>();
 List<MedicoModel> medicos_items;
 bool _isLoading = false;
 
+bool _isCardVisible = false;
+
 class _ListMedicosState extends State<ListMedicos>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<Offset> _slideAnimation;
-  bool _isCardVisible = true;
 
   @override
   void initState() {
@@ -48,31 +50,43 @@ class _ListMedicosState extends State<ListMedicos>
     ));
   }
 
-  void _handleAccept() {
-    _animationController.forward().then((value) {
-      setState(() {
-        // Actualizar el estado para eliminar el Card después de la animación
-        _isCardVisible = false;
-      });
+  void _handleAccept(String id_medico) async {
+    bool resultado = await update_estado_habilitacion("2", id_medico);
 
+    if (resultado) {
       _alert_informe(context, "Médico vinculado correctamente", 1);
-    });
+
+      _animationController.forward().then((value) {
+        setState(() {
+          _isCardVisible = false;
+        });
+      });
+    } else {
+      _alert_informe(context, "No se puede vincular el Médico", 2);
+    }
   }
 
-  void _handleCancel() {
-    _animationController.forward().then((value) {
-      setState(() {
-        // Actualizar el estado para eliminar el Card después de la animación
-        _isCardVisible = false;
-      });
+  void _handleCancel(String id_medico) async {
+    bool resultado = await update_estado_habilitacion("0", id_medico);
 
-      _alert_informe(context, "Se rechazó la vinculación", 2);
-    });
+    if (resultado) {
+      _alert_informe(context, "Médico rechazado correctamente", 1);
+
+      _animationController.forward().then((value) {
+        setState(() {
+          _isCardVisible = false;
+        });
+      });
+    } else {
+      _alert_informe(context, "No se rechazó la vinculación", 2);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    medicoModel = Provider.of<MedicoServices>(context);
+    usuarioModel = Provider.of<UsuarioServices>(context);
+
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
       appBar: AppBar(
@@ -140,23 +154,35 @@ class _ListMedicosState extends State<ListMedicos>
                                     height: 60,
                                     width: double.infinity,
                                     child: Center(
-                                      child: Text(
-                                        'Tiene una solicitud de la Dra Estefania Lucero',
-                                        style: TextStyle(fontSize: 16),
+                                        child: ListView(
+                                      children: ListTile.divideTiles(
+                                        color: Colors.black,
+                                        tiles: snapshot.data
+                                            .where((element) =>
+                                                element.estado_habilitacion ==
+                                                "1")
+                                            .map((element) {
+                                          id_medico = element.rela_medico;
+                                          return Text(element.apellido_medico);
+                                        }),
                                       ),
-                                    ),
+                                    )),
                                   ),
                                   SizedBox(height: 5),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       ElevatedButton(
-                                        onPressed: _handleAccept,
+                                        onPressed: () {
+                                          _handleAccept(id_medico);
+                                        },
                                         child: Text('Aceptar'),
                                       ),
                                       SizedBox(width: 10),
                                       ElevatedButton(
-                                        onPressed: _handleCancel,
+                                        onPressed: () {
+                                          _handleCancel(id_medico);
+                                        },
                                         child: Text('Denegar'),
                                       ),
                                     ],
@@ -175,6 +201,7 @@ class _ListMedicosState extends State<ListMedicos>
                     children: ListTile.divideTiles(
                       color: Colors.black,
                       tiles: snapshot.data
+                          .where((data) => data.estado_habilitacion == "2")
                           .map((data) => ListTile(
                                 title: GestureDetector(
                                   onTap: () {},
@@ -255,6 +282,27 @@ class _ListMedicosState extends State<ListMedicos>
     ));
   }
 
+  update_estado_habilitacion(String estado, String id_medico) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/update_estado_habilitacion_medico";
+    var response = await http.post(
+      url,
+      body: {
+        "id_paciente": id_paciente.toString(),
+        "id_medico": id_medico,
+        "estado_paciente_medico": estado,
+      },
+    );
+
+    var responseDecode = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   void choiceAction(String choice) {
     if (choice == Constants.Ajustes) {
       Navigator.pushNamed(context, '/ajustes');
@@ -264,14 +312,7 @@ class _ListMedicosState extends State<ListMedicos>
   }
 }
 
-get_preference() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  id_paciente = prefs.getInt("id_paciente");
-}
-
 Future<List<MedicoModel>> fetchMedicos() async {
-  await get_preference();
-
   String URL_base = Env.URL_API;
   var url = URL_base + "/read_list_medicos";
   var response = await http.post(
@@ -286,9 +327,20 @@ Future<List<MedicoModel>> fetchMedicos() async {
   if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
     final List<MedicoModel> medicos_items = [];
 
-    for (var medicamentos in responseDecode['data']) {
-      medicos_items.add(MedicoModel.fromJson(medicamentos));
+    for (var medicos in responseDecode['data']) {
+      medicos_items.add(MedicoModel.fromJson(medicos));
     }
+
+    bool buscarPorNombreMedico(List<MedicoModel> listaMedicos) {
+      return listaMedicos.any((medico) => medico.estado_habilitacion == "1");
+    }
+
+    if (buscarPorNombreMedico(medicos_items)) {
+      _isCardVisible = true;
+    } else {
+      _isCardVisible = false;
+    }
+
     return medicos_items;
   } else {
     _isLoading = true;

@@ -22,6 +22,9 @@ Flight::route('POST /antecedentes_personales', 'read_antecedentes_personales');
 // Read Datos Clinicos
 Flight::route('POST /datos_clinicos', 'read_datos_clinicos');
 
+// Read Datos Clinicos
+Flight::route('POST /read_datos_clinicos_paciente', 'read_datos_clinicos_paciente');
+
 // Read Datos Personales
 Flight::route('POST /datos_personales', 'read_datos_personales');
 
@@ -186,6 +189,10 @@ Flight::route('POST /respuesta','respuesta');
 
 // Read Respuestas
 Flight::route('POST /read_list_medicos','read_list_medicos');
+
+// Read Respuestas
+Flight::route('POST /update_estado_habilitacion_medico','update_estado_habilitacion_medico');
+
 
 // Consult Preference
 Flight::route('POST /consult_preference','consult_preference');

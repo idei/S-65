@@ -959,122 +959,84 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
   }
 
   guardarDatosSaludCerebral(BuildContext context) async {
-    if (id_actividad_fisica_moderada == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividad_fisica_minutos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_persona_mantenida_10anos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_persona_activa_vida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_dias_alimenta_saludable == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_alimenta_saludable_vida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_contacto_social_amigos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_contacto_social_actividad == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_calidad_sueno == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_despierto_dia == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_siesta_dia == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_duerme == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_duerme_noche == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_hora_noche == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividades_esfuerzo_mental == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividad_indole_cultural == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_esperanza_habito_saludable == null)
-      loginToast("Debe responder todas las preguntas");
+    List<dynamic> ids_cerebrales = [
+      id_actividad_fisica_moderada,
+      id_actividad_fisica_minutos,
+      id_persona_mantenida_10anos,
+      id_persona_activa_vida,
+      id_dias_alimenta_saludable,
+      id_alimenta_saludable_vida,
+      id_contacto_social_amigos,
+      id_contacto_social_actividad,
+      id_sueno_calidad_sueno,
+      id_sueno_despierto_dia,
+      id_sueno_siesta_dia,
+      id_sueno_duerme,
+      id_sueno_duerme_noche,
+      id_sueno_hora_noche,
+      id_actividades_esfuerzo_mental,
+      id_actividad_indole_cultural,
+      id_esperanza_habito_saludable,
+    ];
 
-    if (id_actividad_fisica_moderada != null &&
-        id_actividad_fisica_minutos != null &&
-        id_persona_mantenida_10anos != null &&
-        id_persona_activa_vida != null &&
-        id_dias_alimenta_saludable != null &&
-        id_alimenta_saludable_vida != null &&
-        id_contacto_social_amigos != null &&
-        id_contacto_social_actividad != null &&
-        id_sueno_calidad_sueno != null &&
-        id_sueno_despierto_dia != null &&
-        id_sueno_siesta_dia != null &&
-        id_sueno_duerme != null &&
-        id_sueno_hora_noche != null &&
-        id_sueno_duerme_noche != null &&
-        id_actividades_esfuerzo_mental != null &&
-        id_actividad_indole_cultural != null &&
-        id_esperanza_habito_saludable != null) {
-      showDialogMessage(context);
-      String URL_base = Env.URL_API;
-      var url = URL_base + "/respuesta_screening_cerebral";
-      var response = await http.post(url, body: {
-        "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico.toString(),
-        "id_recordatorio": id_recordatorio.toString(),
-        "tipo_screening": tipo_screening['data'].toString(),
-        "actividad_fisica": valueNotifierActividadFisica.value.toString(),
-        "alimentacion_saludable":
-            valueNotifierAlimentacionSaludable.value.toString(),
-        "contacto_social": valueNotifierContactoSocial.value.toString(),
-        "sueno": valueNotifierSueno.value.toString(),
-        "actividades_esfuerzo_mental":
-            valueNotifierActividadEsfuerzoMental.value.toString(),
-        "otro": valueNotifierOtro.value.toString(),
-        "otro_texto": key_otro_controller.currentState.value,
-        "otro_habito_texto": otro_habito_controller.text.toString(),
-        "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
-        "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
-        "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
-        "id_persona_activa_vida": id_persona_activa_vida.toString(),
-        "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
-        "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
-        "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
-        "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
-        "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
-        "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
-        "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
-        "id_sueno_duerme": id_sueno_duerme.toString(),
-        "id_sueno_duerme_noche": id_sueno_duerme_noche.toString(),
-        "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
-        "id_actividades_esfuerzo_mental":
-            id_actividades_esfuerzo_mental.toString(),
-        "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
-        "id_esperanza_habito_saludable":
-            id_esperanza_habito_saludable.toString()
-      });
+    for (var variable in ids_cerebrales) {
+      if (variable == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
 
-      var data = json.decode(response.body);
+    showDialogMessage(context);
 
-      if (response.statusCode == 200) {
-        if (data['data'] == "alert") {
-          showCustomAlert(
-            context,
-            "Screening Terminado",
-            "",
-            true,
-            () {
-              _scaffold_messenger(context, "Screening Registrado", 1);
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_cerebral";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "actividad_fisica": valueNotifierActividadFisica.value.toString(),
+      "alimentacion_saludable":
+          valueNotifierAlimentacionSaludable.value.toString(),
+      "contacto_social": valueNotifierContactoSocial.value.toString(),
+      "sueno": valueNotifierSueno.value.toString(),
+      "actividades_esfuerzo_mental":
+          valueNotifierActividadEsfuerzoMental.value.toString(),
+      "otro": valueNotifierOtro.value.toString(),
+      "otro_texto": key_otro_controller.currentState.value,
+      "otro_habito_texto": otro_habito_controller.text.toString(),
+      "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
+      "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
+      "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
+      "id_persona_activa_vida": id_persona_activa_vida.toString(),
+      "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
+      "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
+      "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
+      "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
+      "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
+      "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
+      "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
+      "id_sueno_duerme": id_sueno_duerme.toString(),
+      "id_sueno_duerme_noche": id_sueno_duerme_noche.toString(),
+      "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
+      "id_actividades_esfuerzo_mental":
+          id_actividades_esfuerzo_mental.toString(),
+      "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
+      "id_esperanza_habito_saludable": id_esperanza_habito_saludable.toString()
+    });
 
-              if (screening_recordatorio == true) {
-                Navigator.pushNamed(context, '/recordatorio');
-              } else {
-                Navigator.pushNamed(context, '/screening', arguments: {
-                  "select_screening": "SCER",
-                });
-              }
-            },
-          );
-        } else {
-          _scaffold_messenger(context, "Screening Registrado", 1);
+    var data = json.decode(response.body);
 
-          if (data['status'] == "Success") {
+    if (response.statusCode == 200) {
+      if (data['data'] == "alert") {
+        showCustomAlert(
+          context,
+          "Screening Terminado",
+          "",
+          true,
+          () {
+            _scaffold_messenger(context, "Screening Registrado", 1);
+
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
             } else {
@@ -1082,11 +1044,23 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 "select_screening": "SCER",
               });
             }
+          },
+        );
+      } else {
+        _scaffold_messenger(context, "Screening Registrado", 1);
+
+        if (data['status'] == "Success") {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            Navigator.pushNamed(context, '/screening', arguments: {
+              "select_screening": "SCER",
+            });
           }
         }
-      } else {
-        _scaffold_messenger(context, "No se pudo guardar el chequeo", 2);
       }
+    } else {
+      _scaffold_messenger(context, "No se pudo guardar el chequeo", 2);
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
-import 'package:app_salud/pages/form_datos_generales.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 
 import 'env.dart';
@@ -118,16 +117,15 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                 SizedBox(
                   height: 40,
                 ),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          minimumSize: Size(100, 50),
-                          primary: Color.fromRGBO(45, 175, 168, 1)),
-                      onPressed: () {
-                        if (rela_estado_recordatorio != "3") {
+                if (rela_estado_recordatorio != "3")
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(100, 50),
+                            primary: Color.fromRGBO(45, 175, 168, 1)),
+                        onPressed: () {
                           if (tipo_screening == "SFMS") {
                             Navigator.of(context).pushReplacementNamed(
                                 '/screening_fisico',
@@ -232,15 +230,30 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                                   "bandera": "recordatorio"
                                 });
                           }
-                        } else {
-                          _alert_informe(
-                              context, "Este Screening ya fue respondido", 1);
-                        }
-                      },
-                      child: Text('Ir a Screening'),
-                    ),
-                  ],
-                )
+                        },
+                        child: Text('Ir a Screening'),
+                      ),
+                    ],
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(100, 50), primary: Colors.red),
+                        onPressed: () {},
+                        child: Text(
+                          "Este Screening ya lo realizaste",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white, // Cambia este color a rojo
+                            // Otros estilos de texto como fontSize, fontWeight, etc., si es necesario.
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 // : Container(
                 //     width: 50, // Ancho del contenedor
                 //     height: 40, // Alto del contenedor

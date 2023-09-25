@@ -39,101 +39,113 @@ class _AvisosState extends State<Avisos> {
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
       ),
-      body: FutureBuilder<List<AvisosModel>>(
-          future: read_avisos(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView(
-                children: ListTile.divideTiles(
-                  color: Colors.black,
-                  tiles: snapshot.data
-                      .map((data) => ListTile(
-                            title: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushNamed(
-                                    '/ver_aviso_general',
-                                    arguments: {
-                                      "id_aviso": data.id_aviso,
-                                      "id_paciente": data.id_paciente,
-                                      "descripcion": data.descripcion,
-                                      "fecha_limite": data.fecha_limite,
-                                      "url_imagen": data.url_imagen,
-                                      "rela_estado": data.estado_leido,
-                                      "rela_creador": data.rela_creador,
-                                      "rela_medico": data.rela_medico
-                                    });
-                              },
-                              child: Card(
-                                child: ListTile(
-                                  leading: Container(
-                                    width: 90,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        data.fecha_limite,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Aquí puedes realizar la lógica de actualización de datos, como volver a cargar los recordatorios desde la base de datos o la API.
+          // Luego, llama a setState() para reconstruir la UI con los nuevos datos.
+          setState(() {
+            read_avisos();
+            // Tu lógica de actualización de datos aquí
+          });
+        },
+        child: FutureBuilder<List<AvisosModel>>(
+            future: read_avisos(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children: ListTile.divideTiles(
+                    color: Colors.black,
+                    tiles: snapshot.data
+                        .map((data) => ListTile(
+                              title: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(
+                                      '/ver_aviso_general',
+                                      arguments: {
+                                        "id_aviso": data.id_aviso,
+                                        "id_paciente": data.id_paciente,
+                                        "descripcion": data.descripcion,
+                                        "fecha_limite": data.fecha_limite,
+                                        "url_imagen": data.url_imagen,
+                                        "rela_estado": data.estado_leido,
+                                        "rela_creador": data.rela_creador,
+                                        "rela_medico": data.rela_medico
+                                      });
+                                },
+                                child: Card(
+                                  child: ListTile(
+                                    leading: Container(
+                                      width: 90,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          data.fecha_limite,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
+                                    // leading: Icon(
+                                    //   Icons.calendar_today,
+                                    //   color: Colors.blue,
+                                    // ),
+                                    title: Text(data.descripcion.toUpperCase(),
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily)),
+                                    subtitle: Text(data.fecha_limite,
+                                        style: TextStyle(
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily)),
                                   ),
-                                  // leading: Icon(
-                                  //   Icons.calendar_today,
-                                  //   color: Colors.blue,
-                                  // ),
-                                  title: Text(data.descripcion.toUpperCase(),
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
-                                  subtitle: Text(data.fecha_limite,
-                                      style: TextStyle(
-                                          fontFamily: Theme.of(context)
-                                              .textTheme
-                                              .headline1
-                                              .fontFamily)),
                                 ),
                               ),
-                            ),
-                          ))
-                      .toList(),
-                ).toList(),
-              );
-            } else {
-              if (!_isLoading) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: "Cargando",
-                  ),
+                            ))
+                        .toList(),
+                  ).toList(),
                 );
               } else {
-                return Container(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ListTile(
-                        title: Text(
-                      'No tiene avisos',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    )),
-                  ],
-                ));
+                if (!_isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      semanticsLabel: "Cargando",
+                    ),
+                  );
+                } else {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'No tiene avisos',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      )),
+                    ],
+                  ));
+                }
               }
-            }
-          }),
+            }),
+      ),
     );
   }
 

@@ -285,7 +285,11 @@ read_datos_paciente() async {
 
       completer.complete(true);
     } else {
-      completer.completeError("Error en la respuesta");
+      if (responseData["status"] == "Vacio") {
+        completer.complete(true);
+      } else {
+        completer.completeError("Error en la respuesta");
+      }
     }
   } else {
     completer.completeError("Error en la solicitud");

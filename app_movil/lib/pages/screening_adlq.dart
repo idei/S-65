@@ -1178,51 +1178,89 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
   }
 
   guardarDatosADLQ() async {
-    if (id_alimentacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
-    if (id_arreglos_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_aspecto_personal == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_bano == null) loginToast("Debe responder todas las preguntas");
-    if (id_comprar_comida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_comprension == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_conducir == null) loginToast("Debe responder todas las preguntas");
-    if (id_conversacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_cuidado_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_empleo == null) loginToast("Debe responder todas las preguntas");
-    if (id_escritura == null) loginToast("Debe responder todas las preguntas");
-    if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
-    if (id_lavado_ropa == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_lectura == null) loginToast("Debe responder todas las preguntas");
-    if (id_manejo_efectivo == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_manejo_finanzas == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_mantenimiento_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_movilidad_barrio == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
-    if (id_prepara_comida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
-    if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
-    if (id_tomar_medicacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_transporte_publico == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_uso_telefono == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_viaje_fuera_ambiente == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_viajes == null) loginToast("Debe responder todas las preguntas");
+    List<dynamic> variables = [
+      id_alimentacion,
+      id_vestimenta,
+      id_arreglos_hogar,
+      id_aspecto_personal,
+      id_bano,
+      id_comprar_comida,
+      id_comprension,
+      id_conducir,
+      id_conversacion,
+      id_cuidado_hogar,
+      id_empleo,
+      id_escritura,
+      id_evacuacion,
+      id_lavado_ropa,
+      id_lectura,
+      id_manejo_efectivo,
+      id_manejo_finanzas,
+      id_mantenimiento_hogar,
+      id_movilidad_barrio,
+      id_poner_mesa,
+      id_prepara_comida,
+      id_recreacion,
+      id_reuniones,
+      id_tomar_medicacion,
+      id_transporte_publico,
+      id_uso_telefono,
+      id_viaje_fuera_ambiente,
+      id_viajes,
+    ];
+
+    for (var variable in variables) {
+      if (variable == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
+
+    // if (id_alimentacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
+    // if (id_arreglos_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_aspecto_personal == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_bano == null) loginToast("Debe responder todas las preguntas");
+    // if (id_comprar_comida == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_comprension == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_conducir == null) loginToast("Debe responder todas las preguntas");
+    // if (id_conversacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_cuidado_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_empleo == null) loginToast("Debe responder todas las preguntas");
+    // if (id_escritura == null) loginToast("Debe responder todas las preguntas");
+    // if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
+    // if (id_lavado_ropa == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_lectura == null) loginToast("Debe responder todas las preguntas");
+    // if (id_manejo_efectivo == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_manejo_finanzas == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_mantenimiento_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_movilidad_barrio == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
+    // if (id_prepara_comida == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
+    // if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
+    // if (id_tomar_medicacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_transporte_publico == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_uso_telefono == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_viaje_fuera_ambiente == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_viajes == null) loginToast("Debe responder todas las preguntas");
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_adlq";
@@ -1965,14 +2003,15 @@ class LavadoRopaWidgetState extends State<LavadoRopa> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 250,
+      height: 300,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasADLQ
-            .map((list) => list['code'] == "ADLQ48" ||
+            .map((list) => list['code'] == "ADLQ47" ||
+                    list['code'] == "ADLQ48" ||
                     list['code'] == "ADLQ49" ||
                     list['code'] == "ADLQ50" ||
                     list['code'] == "ADLQ600"

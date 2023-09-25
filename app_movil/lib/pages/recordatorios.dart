@@ -46,84 +46,89 @@ class _RecordatorioState extends State<RecordatorioPage> {
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
       ),
-      body: FutureBuilder<List<RecordatoriosModel>>(
-          future: read_recordatorios(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView(
-                children: ListTile.divideTiles(
-                  color: Colors.black,
-                  tiles: snapshot.data
-                      .map((data) => ListTile(
-                            title: GestureDetector(
-                                onTap: () {
-                                  if (data.estado_recordatorio == "0") {
-                                    Navigator.of(context).pushNamed(
-                                        '/ver_recordatorio_personal',
-                                        arguments: {
-                                          "id_recordatorio":
-                                              data.id_recordatorio,
-                                          "id_paciente": data.id_paciente,
-                                          "descripcion": data.descripcion,
-                                          "fecha_limite": data.fecha_limite,
-                                          "estado_recordatorio":
-                                              data.estado_recordatorio,
-                                        });
-                                  } else {
-                                    Navigator.of(context).pushNamed(
-                                        '/ver_recordatorio_screening',
-                                        arguments: {
-                                          "id_recordatorio":
-                                              data.id_recordatorio,
-                                          "id_paciente": data.id_paciente,
-                                          "descripcion": data.descripcion,
-                                          "fecha_limite": data.fecha_limite,
-                                          "estado_recordatorio":
-                                              data.estado_recordatorio,
-                                        });
-                                  }
-                                },
-                                child: CardDinamic(data)),
-                          ))
-                      .toList(),
-                ).toList(),
-              );
-            } else {
-              // if (!_isLoading) {
-              //   return Center(
-              //     child: CircularProgressIndicator(
-              //       semanticsLabel: "Cargando",
-              //     ),
-              //   );
-              // } else {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Container(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ListTile(
-                        title: Text(
-                      'No tiene recordatorios',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    )),
-                  ],
-                ));
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Aquí puedes realizar la lógica de actualización de datos, como volver a cargar los recordatorios desde la base de datos o la API.
+          // Luego, llama a setState() para reconstruir la UI con los nuevos datos.
+          setState(() {
+            read_recordatorios();
+            // Tu lógica de actualización de datos aquí
+          });
+        },
+        child: FutureBuilder<List<RecordatoriosModel>>(
+            future: read_recordatorios(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children: ListTile.divideTiles(
+                    color: Colors.black,
+                    tiles: snapshot.data
+                        .map((data) => ListTile(
+                              title: GestureDetector(
+                                  onTap: () {
+                                    if (data.estado_recordatorio == "0") {
+                                      Navigator.of(context).pushNamed(
+                                          '/ver_recordatorio_personal',
+                                          arguments: {
+                                            "id_recordatorio":
+                                                data.id_recordatorio,
+                                            "id_paciente": data.id_paciente,
+                                            "descripcion": data.descripcion,
+                                            "fecha_limite": data.fecha_limite,
+                                            "estado_recordatorio":
+                                                data.estado_recordatorio,
+                                            "estado": estado,
+                                          });
+                                    } else {
+                                      Navigator.of(context).pushNamed(
+                                          '/ver_recordatorio_screening',
+                                          arguments: {
+                                            "id_recordatorio":
+                                                data.id_recordatorio,
+                                            "id_paciente": data.id_paciente,
+                                            "descripcion": data.descripcion,
+                                            "fecha_limite": data.fecha_limite,
+                                            "estado_recordatorio":
+                                                data.estado_recordatorio,
+                                          });
+                                    }
+                                  },
+                                  child: CardDinamic(data)),
+                            ))
+                        .toList(),
+                  ).toList(),
+                );
+              } else {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'No tiene recordatorios',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      )),
+                    ],
+                  ));
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
               }
-
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
             }
-          }
-          //}
-          ),
+            //}
+            ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(45, 175, 168, 1),
         onPressed: () {},
@@ -139,6 +144,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
 
   var color;
   var font_bold;
+  var estado;
 
   Widget CardDinamic(data) {
     final now = DateTime.now();
@@ -197,6 +203,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
           ),
         ),
         title: Text(data.descripcion.toUpperCase(),
+            maxLines: 4,
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
         subtitle: Text(data.fecha_limite,

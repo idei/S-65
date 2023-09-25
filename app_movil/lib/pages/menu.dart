@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/list_medicos.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
@@ -49,7 +48,7 @@ class _FormMenuState extends State<MenuPage> {
         bool confirmExit = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('¿Quieres salir de la aplicación?'),
+            title: Text('¿Quieres cerrar sesión?'),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false), // No salir
