@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/opciones_navbar.dart';
 
 var id_paciente;
 String nombre_medico;

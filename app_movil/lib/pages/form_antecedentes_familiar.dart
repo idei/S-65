@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FormAntecedentesFamiliares extends StatefulWidget {
   final pageName = 'form_antecedentes_familiares';
@@ -15,6 +14,8 @@ class FormAntecedentesFamiliares extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
+var email;
+
 class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   final myController = TextEditingController();
   var usuarioModel;
@@ -22,7 +23,6 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   @override
   void initState() {
     super.initState();
-    getStringValuesSF();
   }
 
   @override
@@ -34,6 +34,7 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
+    email = usuarioModel.usuario.emailUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,16 +87,6 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
           }),
     );
   }
-}
-
-var email;
-
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email");
-  //var estado_clinico_prefer = prefs.getString("estado_clinico");
-  email = email_prefer;
-  print(email);
 }
 
 var response = null;
@@ -173,8 +164,6 @@ guardar_datos(BuildContext context) async {
 }
 
 read_datos_paciente() async {
-  await getStringValuesSF();
-
   final completer = Completer<dynamic>();
 
   String URL_base = Env.URL_API;
@@ -323,15 +312,6 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
   final _formKey_antecedentes_familiares = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    var email_prefer;
-    Map parametros = ModalRoute.of(context).settings.arguments;
-
-    if (parametros != null) {
-      email_prefer = parametros['email'];
-    } else {
-      getStringValuesSF();
-    }
-
     return Form(
       key: _formKey_antecedentes_familiares,
       child: Padding(

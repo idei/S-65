@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import '../widgets/opciones_navbar.dart';
 import '../widgets/alert_informe.dart';
 import 'env.dart';
@@ -13,6 +14,7 @@ var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
 var email;
+var usuarioModel;
 
 class ScreeningADLQPage extends StatefulWidget {
   @override
@@ -106,10 +108,9 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

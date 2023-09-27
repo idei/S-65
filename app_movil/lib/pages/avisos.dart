@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../models/avisos_model.dart';
+import '../services/usuario_services.dart';
 import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 
@@ -13,11 +14,16 @@ class Avisos extends StatefulWidget {
 
 List<AvisosModel> avisos_items;
 bool _isLoading = false;
+var usuarioModel;
+var id_paciente_argument;
 
 class _AvisosState extends State<Avisos> {
   var responseDecode;
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente_argument = usuarioModel.usuario.paciente.id_paciente;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(45, 175, 168, 1),
@@ -213,10 +219,7 @@ class _AvisosState extends State<Avisos> {
     }
   }
 
-  var id_paciente_argument;
-
   Future<List<AvisosModel>> read_avisos() async {
-    await getStringValuesSF();
     String URL_base = Env.URL_API;
     var url = URL_base + "/avisos_paciente";
     var response = await http.post(url, body: {
@@ -236,13 +239,6 @@ class _AvisosState extends State<Avisos> {
       _isLoading = true;
       return null;
     }
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var paciente_prefer = await prefs.getInt("id_paciente");
-    id_paciente_argument = paciente_prefer;
-    print(id_paciente_argument);
   }
 
   void choiceAction(String choice) {

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ScreeningCerebral extends StatefulWidget {
   @override
@@ -23,8 +24,8 @@ var id_paciente;
 var id_medico;
 var tipo_screening;
 var id_recordatorio;
-var email;
 var screening_recordatorio;
+var usuarioModel;
 
 class _ScreeningCerebralState extends State<ScreeningCerebral> {
   @override
@@ -118,8 +119,8 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

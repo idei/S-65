@@ -4,7 +4,6 @@ TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
-String email_set_shared;
 
 class VerScreening extends StatefulWidget {
   @override

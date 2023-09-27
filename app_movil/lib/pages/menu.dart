@@ -2,7 +2,6 @@ import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/session_service.dart';
 
@@ -56,10 +55,6 @@ class _FormMenuState extends State<MenuPage> {
               ),
               TextButton(
                 onPressed: () async {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  prefs.remove('email_prefer');
-
                   authProvider.logout();
 
                   Navigator.pushNamed(context, '/');
@@ -360,10 +355,6 @@ class _FormMenuState extends State<MenuPage> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    prefs.remove('email_prefer');
-
                                     authProvider.logout();
 
                                     Navigator.pushNamed(context, '/');
@@ -373,13 +364,6 @@ class _FormMenuState extends State<MenuPage> {
                               ],
                             ),
                           );
-                          // SharedPreferences prefs =
-                          //     await SharedPreferences.getInstance();
-                          // prefs.remove('email_prefer');
-
-                          // authProvider.logout();
-
-                          // Navigator.pushNamed(context, '/');
                         },
                         child: Column(
                           children: [
@@ -407,13 +391,6 @@ class _FormMenuState extends State<MenuPage> {
             ),
           )),
     );
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    email_prefer = prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
   }
 
   Widget texto(String entrada) {

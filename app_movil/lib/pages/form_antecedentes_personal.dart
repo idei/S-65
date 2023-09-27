@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FormAntecedentesPersonales extends StatefulWidget {
   final pageName = 'form_antecedentes_personales';
@@ -14,6 +14,7 @@ class FormAntecedentesPersonales extends StatefulWidget {
 }
 
 var email;
+var usuarioModel;
 
 class _FormpruebaState extends State<FormAntecedentesPersonales> {
   final myController = TextEditingController();
@@ -31,6 +32,8 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
 
   @override
   Widget build(BuildContext context) {
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    email = usuarioModel.usuario.emailUser;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -92,8 +95,6 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
   }
 
   read_datos_paciente() async {
-    await getStringValuesSF();
-
     final completer = Completer<dynamic>();
 
     String URL_base = Env.URL_API;
@@ -191,13 +192,6 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
     }
     //return true;
     return completer.future;
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email");
-    email = email_prefer;
-    print(email);
   }
 }
 

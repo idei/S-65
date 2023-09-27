@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/usuario_services.dart';
 import '../widgets/alert_informe.dart';
 
 var id_paciente;
@@ -12,6 +14,7 @@ var tipo_screening;
 var id_recordatorio;
 var email;
 var screening_recordatorio;
+var usuarioModel;
 
 class ScreeningNutricional extends StatefulWidget {
   final pageName = 'screening_nutricional';
@@ -80,11 +83,9 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
-    print(email);
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

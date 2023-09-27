@@ -416,7 +416,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   CardGenerico(ConsumeMarihuana(), "¿Fuma Marihuana?"),
                   SizedBox(height: 15),
                   CardGenerico(ConsumeOtrasDrogas(), "¿Consume otras drogas?"),
-                  SizedBox(height: 15),
+                  SizedBox(height: 25),
                   ElevatedButton.icon(
                     icon: _isLoading
                         ? Padding(
@@ -525,8 +525,13 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
     if (response.statusCode == 200) {
       if (data["status"] == "Success") {
-        _alert_clinicos(
-            context, "Informacion para tener en cuenta", descri_informe, 2);
+        if (descri_informe == "") {
+          _alert_clinicos(
+              context, "Informacion para tener en cuenta", descri_informe, 2);
+        } else {
+          _alert_clinicos(context, "Sus datos clínicos fueron guardados",
+              descri_informe, 2);
+        }
       } else {
         loginToast("Error al guardar la información");
       }
@@ -874,7 +879,7 @@ class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
@@ -986,7 +991,7 @@ class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -1098,7 +1103,7 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -1209,7 +1214,7 @@ class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import '../widgets/opciones_navbar.dart';
 
 class ScreeningBPage extends StatefulWidget {
@@ -20,6 +21,8 @@ var id_recordatorio;
 
 var email;
 var screening_recordatorio;
+
+var usuarioModel;
 
 List dataScreeningQC = [];
 
@@ -113,11 +116,9 @@ class _ScreeningBState extends State<ScreeningBPage> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
-    print(email);
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

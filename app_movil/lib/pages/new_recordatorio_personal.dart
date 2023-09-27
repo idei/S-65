@@ -3,12 +3,12 @@ import 'package:http/http.dart' as http;
 import 'env.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 TextEditingController fecha_limite = TextEditingController();
 TextEditingController titulo = TextEditingController();
 var email;
+var usuarioModel;
 
 class RecordatorioPersonal extends StatefulWidget {
   @override
@@ -125,16 +125,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
   }
 }
 
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email");
-
-  email = email_prefer;
-  print(email);
-}
-
 guardar_datos(context) async {
-  await getStringValuesSF();
   String URL_base = Env.URL_API;
   var url = URL_base + "/new_recordatorio_personal";
   var response = await http.post(url, body: {

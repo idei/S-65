@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:app_salud/pages/env.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/usuario_services.dart';
 
@@ -238,14 +237,9 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   }
 
   getStringValuesSF(UsuarioServices usuarioServices) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = await prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    id_paciente = await prefs.getInt("id_paciente");
-    print(email_argument);
-    if (usuarioServices.existeUsuarioModel) {
-      email_argument = usuarioServices.usuario.emailUser;
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email_argument = usuarioModel.usuario.emailUser;
   }
 
   _alert_informe(context, message, colorNumber) {

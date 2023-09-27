@@ -376,7 +376,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                           color: Color.fromARGB(134, 190, 218, 241),
                           child: Center(
                             child: Text(
-                              'GRUPO CONVIVIENTE',
+                              'CONTACTO DE ASISTENCIA',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,

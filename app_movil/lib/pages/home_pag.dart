@@ -55,13 +55,15 @@ class _FormpruebaState extends State<HomePage> {
 
 Future test_datos() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String get_ruta = await prefs.getString("email_prefer");
-  if (get_ruta == null) {
-    return ruta_incial = null;
-  } else {
-    await Future.delayed(const Duration(seconds: 2));
-    return ruta_incial = '/menu';
-  }
+  prefs.clear();
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // String get_ruta = await prefs.getString("email_prefer");
+  // if (get_ruta == null) {
+  //   return ruta_incial = null;
+  // } else {
+  //   await Future.delayed(const Duration(seconds: 2));
+  //   return ruta_incial = '/menu';
+  // }
 }
 
 class HomeInicio extends StatefulWidget {

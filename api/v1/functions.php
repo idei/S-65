@@ -952,7 +952,7 @@ function read_datos_clinicos_paciente()
 function respuesta_datos_clinicos()
 {
     try {
-        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES49','TRES50','TRES51')");
+        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES49','TRES50','TRES51')");
         $stmt->execute();
         $result = $stmt->fetchAll();
         $lista = array();

@@ -12,7 +12,6 @@ TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
-String email_set_shared;
 
 class VerAvisoGeneral extends StatefulWidget {
   @override
@@ -116,11 +115,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
       print(data);
     }
   }
-
-  // getStringValuesSF() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   id_paciente = prefs.getInt("id_paciente");
-  // }
 
   Widget Avisos(BuildContext context) {
     return Scaffold(
@@ -283,9 +277,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
       "estado_leido": estado_aviso.toString(),
     });
 
-    print(response.body);
     var data = json.decode(response.body);
-    print(data);
   }
 }
 

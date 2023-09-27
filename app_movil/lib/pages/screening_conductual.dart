@@ -1,11 +1,14 @@
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_salud/pages/env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import '../services/usuario_services.dart';
 
 class ScreeningConductualPage extends StatefulWidget {
   @override
@@ -26,6 +29,7 @@ var screening_recordatorio;
 List itemsConductual;
 List itemsConductualOtro;
 bool otroVisible = false;
+var usuarioModel;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
   @override
@@ -106,10 +110,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

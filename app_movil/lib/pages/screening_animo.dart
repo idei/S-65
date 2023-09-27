@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../services/usuario_services.dart';
 import '../widgets/LabeledCheckboxGeneric.dart';
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'env.dart';
@@ -16,6 +16,7 @@ var id_recordatorio;
 var screening_recordatorio;
 var email;
 List respuestaAnimo;
+var usuarioModel;
 
 class FormScreeningAnimo extends StatefulWidget {
   @override
@@ -44,10 +45,9 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

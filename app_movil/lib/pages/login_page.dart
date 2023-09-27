@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 import '../services/session_service.dart';
 import 'recuperar_contras.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -117,7 +116,6 @@ class _LoginPage extends State<LoginPage> {
             .loadGrupoConviviente();
 
         if (estado_users == "2" && responseBody['status'] == "Success") {
-          set_preference();
           Navigator.pushNamed(
             context,
             '/menu',
@@ -138,14 +136,6 @@ class _LoginPage extends State<LoginPage> {
     } else {
       _alert_informe(context, "Error: " + responseBody['request'], 2);
     }
-  }
-
-  set_preference() async {
-    await consult_preference();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setInt("id_paciente", int.parse(id_paciente));
-    prefs.setString("email", email.text);
   }
 
   consult_preference() async {

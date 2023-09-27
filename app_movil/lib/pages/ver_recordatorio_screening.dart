@@ -1,7 +1,6 @@
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
-
 import 'env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -10,7 +9,6 @@ TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
-String email_set_shared;
 
 class VerRecordatorio extends StatefulWidget {
   @override
