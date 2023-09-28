@@ -56,6 +56,9 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   var isGrupoConviviente;
   var bandera;
 
+  DateTime currentFechaProvider;
+  DateTime fechaSelect;
+
   TextEditingController _dateController = TextEditingController();
 
   ValueNotifier<bool> _showAdditionalFieldsNotifier =
@@ -127,6 +130,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     rela_users = usuarioModel.usuario.paciente.rela_users;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
     email_argument = usuarioModel.usuario.emailUser;
+    currentFechaProvider = usuarioModel.usuario.paciente.fecha_nacimiento;
 
     isGrupoConviviente;
     int changedCount = 0;
@@ -294,17 +298,29 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                           format: DateFormat('yyyy-MM-dd'),
                           onShowPicker: (context, currentValue) {
                             return showDatePicker(
-                                locale: const Locale("es", "ES"),
-                                context: context,
-                                firstDate: DateTime(1900),
-                                initialDate: currentValue ?? DateTime.now(),
-                                lastDate: DateTime(2100));
+                                    // ... otras propiedades ...
+                                    initialDate:
+                                        currentFechaProvider ?? DateTime.now(),
+                                    context: context,
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime(2100))
+                                .then((selectedDate) {
+                              if (selectedDate != null) {
+                                setState(() {
+                                  currentFechaProvider = selectedDate;
+                                  fechaSelect = selectedDate;
+                                });
+                                return selectedDate;
+                              }
+                              return currentValue;
+                            });
                           },
                           validator: (date) =>
                               date == null ? 'Invalid date' : null,
                           onChanged: (value) => setState(() {
-                            currentfecha = value;
-                            //_dateController.text = value.toString();
+                            currentFechaProvider = value;
+                            fechaSelect = value;
+
                             value = value;
                             changedCount++;
                           }),
@@ -601,10 +617,16 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     DateTime fecha_paciente;
 
     if (usuarioModel.usuario.paciente.fecha_nacimiento.toString() == "null") {
-      fecha_paciente = currentfecha;
+      fecha_paciente = fechaSelect;
     } else {
-      fecha_paciente = currentfecha;
+      if (fechaSelect == null) {
+        fecha_paciente = currentFechaProvider;
+      } else {
+        fecha_paciente = fechaSelect;
+      }
     }
+
+    print(fechaSelect);
 
     String pepe = fecha_paciente.toString();
 

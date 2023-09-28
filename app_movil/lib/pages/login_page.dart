@@ -37,45 +37,51 @@ class _LoginPage extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: UniqueKey(),
-        body: Form(
-          key: _formKey_ingresar,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                child: Column(children: <Widget>[
-                  Container(
-                    child: Image.asset('assets/logo1.png'),
-                    height: 110.0,
-                  ),
-                  InputEmailWidget(),
-                  SizedBox(height: 30),
-                  InputPasswordWidget(),
-                  SizedBox(height: 30),
-                  ButtonIniciarSesion(context),
-                  SizedBox(height: 10),
-                  GestureDetector(
-                      child: Text("¿Olvido la contraseña?",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              fontSize: 15,
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily)),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    RecuperarPage()));
-                      }),
-                  SizedBox(height: 20),
-                  ButtonRegresar(context),
-                ]),
-              )
-            ],
+        body: WillPopScope(
+          onWillPop: () async {
+            Navigator.pushNamed(context, '/');
+            return true;
+          },
+          child: Form(
+            key: _formKey_ingresar,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: Column(children: <Widget>[
+                    Container(
+                      child: Image.asset('assets/logo1.png'),
+                      height: 110.0,
+                    ),
+                    InputEmailWidget(),
+                    SizedBox(height: 30),
+                    InputPasswordWidget(),
+                    SizedBox(height: 30),
+                    ButtonIniciarSesion(context),
+                    SizedBox(height: 10),
+                    GestureDetector(
+                        child: Text("¿Olvido la contraseña?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                                fontSize: 15,
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      RecuperarPage()));
+                        }),
+                    SizedBox(height: 20),
+                    ButtonRegresar(context),
+                  ]),
+                )
+              ],
+            ),
           ),
         ));
   }

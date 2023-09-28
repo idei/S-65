@@ -57,7 +57,7 @@ class _FormMenuState extends State<MenuPage> {
                 onPressed: () async {
                   authProvider.logout();
 
-                  Navigator.pushNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, '/');
                 },
                 child: Text('Sí'),
               ),

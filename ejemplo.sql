@@ -1,62 +1,97 @@
+SELECT DISTINCT CEDENTE_NOMBRE, 
+CESIONARIO_NOMBRE, 
+SIPPERS47_CANT_CUOTAS,
+SP01_MOTIVO1.SIPPERS01_VALOR
+               MOTIVO_1,
+           SP01_MOTIVO2.SIPPERS01_VALOR
+               MOTIVO_2,
+           SP01_MOTIVO3.SIPPERS01_VALOR
+               MOTIVO_3, 
+               SIP_PERS_47.SIPPERS47_OBSERVACION,
+           SIP_PERS_47.ID_SIPPERS47,
+           SIP_PERS_47.SIPPERS47_FBAJA,
+           SIP_PERS_47.RELA_SIPPERS45_CEDENTE
+               RELA_SIPPERS45_CEDENTE,
+           SIP_PERS_47.RELA_SIPPERS45_CESIONARIO
+               RELA_SIPPERS45_CESIONARIO,
+           SIP_PERS_47.RELA_SIPPERS06
+               RELA_SIPPERS06,
+           SIP_PERS_47.SIPPERS47_FECHA
+               SIPPERS47_FECHA,
+           SP45_CEDENTE.RELA_SIPPERS15
+               CEDENTE_RELA_SIPPERS05,
+           SP45_CESIONARIOS.RELA_SIPPERS15
+               CESIONARIO_RELA_SIPPERS05,
+           SP45_CESIONARIOS.RELA_SOCUSUA01_ALTA
+               RELA_SOCUSUA01_ALTA
+      FROM SIP_PERS_47
+           JOIN SIP_PERS_45 SP45_CEDENTE
+              ON SP45_CEDENTE.ID_SIPPERS45 =
+                 SIP_PERS_47.RELA_SIPPERS45_CEDENTE
+           JOIN (
+               SELECT SP06_CEDENTE.SIPPERS06_RAZSOC CEDENTE_NOMBRE,SP06_CEDENTE.RELA_SIPPERS15 AS RELA_SIPPERS15_SUB
+               FROM SIP_PERS_45 SP45_CEDENTE
+               JOIN SIP_PERS_06 SP06_CEDENTE
+               ON SP06_CEDENTE.RELA_SIPPERS15 = SP45_CEDENTE.RELA_SIPPERS15
+               
+               UNION ALL
+             
+               SELECT SP05_CEDENTE.SIPPERS05_APELLIDO
+               || ' '
+               || SP05_CEDENTE.SIPPERS05_NOMBRE CEDENTE_NOMBRE,SP05_CEDENTE.RELA_SIPPERS15 AS RELA_SIPPERS15_SUB
+               FROM SIP_PERS_45 SP45_CEDENTE
+               JOIN SIP_PERS_05 SP05_CEDENTE
+               ON SP05_CEDENTE.RELA_SIPPERS15 = SP45_CEDENTE.RELA_SIPPERS15
+               ) CONSULTA_CEDENTES
+              ON CONSULTA_CEDENTES.RELA_SIPPERS15_SUB = SP45_CEDENTE.RELA_SIPPERS15
+           
+            JOIN SIP_PERS_45 SP45_CESIONARIOS
+              ON SP45_CESIONARIOS.ID_SIPPERS45 =
+                 SIP_PERS_47.RELA_SIPPERS45_CESIONARIO
+                 
+           JOIN ( 
+               SELECT SP06_CESIONARIO.SIPPERS06_RAZSOC CESIONARIO_NOMBRE,SP06_CESIONARIO.RELA_SIPPERS15 AS RELA_SIPPERS15_SUB
+               FROM SIP_PERS_45 SP45_CESIONARIO
+               JOIN SIP_PERS_06 SP06_CESIONARIO
+               ON SP06_CESIONARIO.RELA_SIPPERS15 = SP45_CESIONARIO.RELA_SIPPERS15
+               
+               UNION ALL
+             
+               SELECT SP05_CESIONARIO.SIPPERS05_APELLIDO
+               || ' '
+               || SP05_CESIONARIO.SIPPERS05_NOMBRE CESIONARIO_NOMBRE,SP05_CESIONARIO.RELA_SIPPERS15 AS RELA_SIPPERS15_SUB
+               FROM SIP_PERS_45 SP45_CESIONARIO
+               JOIN SIP_PERS_05 SP05_CESIONARIO
+               ON SP05_CESIONARIO.RELA_SIPPERS15 = SP45_CESIONARIO.RELA_SIPPERS15
+               ) CONSULTA_CESIONARIOS
+              ON CONSULTA_CESIONARIOS.RELA_SIPPERS15_SUB = SP45_CESIONARIOS.RELA_SIPPERS15
+           
+           LEFT JOIN
+           (SELECT *
+              FROM SIP_PERS_51
+                   JOIN SIP_PERS_01
+                       ON ID_SIPPERS01 = SIP_PERS_51.RELA_SIPPERS01
+             WHERE SIPPERS01_CODE = 'CES03' OR SIPPERS01_CODE = 'CES04')
+           SP01_MOTIVO1
+               ON SP01_MOTIVO1.RELA_SIPPERS47 = SIP_PERS_47.ID_SIPPERS47
+           --
+           LEFT JOIN
+           (SELECT *
+              FROM SIP_PERS_51
+                   JOIN SIP_PERS_01
+                       ON ID_SIPPERS01 = SIP_PERS_51.RELA_SIPPERS01
+             WHERE SIPPERS01_CODE = 'CES05' OR SIPPERS01_CODE = 'CES06')
+           SP01_MOTIVO2
+               ON SP01_MOTIVO2.RELA_SIPPERS47 = SIP_PERS_47.ID_SIPPERS47
+ 
+           LEFT JOIN
+           (SELECT *
+              FROM SIP_PERS_51
+                   JOIN SIP_PERS_01
+                       ON ID_SIPPERS01 = SIP_PERS_51.RELA_SIPPERS01
+             WHERE    SIPPERS01_CODE = 'CES07'
+                   OR SIPPERS01_CODE = 'CES08'
+                   OR SIPPERS01_CODE = 'CES09') SP01_MOTIVO3
+               ON SP01_MOTIVO3.RELA_SIPPERS47 = SIP_PERS_47.ID_SIPPERS47
 
-INSERT INTO `tipos_respuestas` (`respuesta`, `code`, `ponderacion`) VALUES
-('Actividad Física', 'SCER01', 0.0),
-('Alimentación Saludable', 'SCER02', 0.0),
-('Contacto Social', 'SCER03', 0.0),
-('Sueño', 'SCER04', 0.0),
-('Actividades que implican esfuerzo mental', 'SCER05', 0.0),
-('No hago ejercicio físico', 'SCER06', 0.0),
-('Hago ejercicio físico sólo UNA vez a la semana.', 'SCER07', 0.0),
-('Hago ejercicio físico dos veces por semana', 'SCER08', 0.0),
-('Hago ejercicio físico MÁS de dos veces por semana', 'SCER09', 0.0),
-('Hago ejercicio físico TODOS LOS DÍAS', 'SCER10', 0.0),
-('0 minutos por semana', 'SCER11', 0.0),
-('30 minutos por semana', 'SCER12', 0.0),
-('1 hora por semana', 'SCER13', 0.0),
-('2 horas por semana', 'SCER14', 0.0),
-('Más de 2 horas por semana', 'SCER15', 0.0),
-('No, he sido predominantemente sedentario durante los últimos 10 años.', 'SCER16', 0.0),
-('He sido periódicamente (por período) activo físicamente durante los últimos 10 años.', 'SCER17', 0.0),
-('He sido predominantemente activo físicamente durante los últimos 10 años.', 'SCER18', 0.0),
-('He sido definitivamente activo físicamente durante los últimos 10 años.', 'SCER19', 0.0),
-('No, he sido predominantemente sedentario durante mi vida.', 'SCER20', 0.0),
-('He sido periódicamente (por período) activo físicamente durante mi vida.', 'SCER21', 0.0),
-('He sido predominantemente activo físicamente durante mi vida.', 'SCER22', 0.0),
-('He sido definitivamente activo físicamente durante mi vida.', 'SCER23', 0.0),
-('No me alimento de forma saludable.', 'SCER24', 0.0),
-('Me alimento de forma saludable sólo UNA vez a la semana.', 'SCER25', 0.0),
-('Me alimento de forma saludable dos veces por semana.', 'SCER26', 0.0),
-('Me alimento de forma saludable MÁS de dos veces por semana.', 'SCER27', 0.0),
-('Me alimento de forma saludable TODOS LOS DÍAS.', 'SCER28', 0.0),
-('No, me he alimentado predominantemente de forma poco saludable.', 'SCER29', 0.0),
-('Me he alimentado saludablemete de forma periódica durante mi vida.', 'SCER30', 0.0),
-('Me he alimentado predominantemente de forma saludable durante mi vida.', 'SCER31', 0.0),
-('Me he alimentado definitivamente de forma saludable durante mi vida.', 'SCER32', 0.0),
-('No tengo contacto con amigos.', 'SCER33', 0.0),
-('Tengo escaso contacto con amigos (pocas veces al mes).', 'SCER34', 0.0),
-('Tengo contacto con amigos semanalmente.', 'SCER35', 0.0),
-('Tengo contacto con amigos diariamente.', 'SCER36', 0.0),
-('No tengo contacto con familiares.', 'SCER37', 0.0),
-('Tengo escaso contacto con familiares (pocas veces al mes).', 'SCER39', 0.0),
-('Tengo contacto con familiares semanalmente.', 'SCER40', 0.0),
-('Tengo contacto con familiares diariamente.', 'SCER41', 0.0),
-('No realizo ningún tipo de actividad fuera de mi casa.', 'SCER42', 0.0),
-('Tengo escasa participación en actividades sociales, culturales, grupales y/o comunitaria.', 'SCER43', 0.0),
-('Tengo participación en actividades sociales, culturales, grupales y/o comunitaria semanalmente.', 'SCER44', 0.0),
-('Tengo participación en actividades sociales, culturales, grupales y/o comunitaria diariamente.', 'SCER45', 0.0),
-('Menos de 5 horas por noche.', 'SCER46', 0.0),
-('Entre 5 y 6 horas por noche.', 'SCER47', 0.0),
-('Entre 7 y 8 horas por noche\r\n', 'SCER48', 0.0),
-('Más de 8 horas por noche.', 'SCER49', 0.0),
-('No hago ningún tipo de actividad que implique un esfuerzo mental.', 'SCER50', 0.0),
-('Hago actividades que implican un esfuerzo mental sólo UNA vez a la semana.', 'SCER51', 0.0),
-('Hago actividades que implican un esfuerzo mental DOS veces por semana.', 'SCER52', 0.0),
-('Hago actividades que implican un esfuerzo mental MÁS de dos veces por semana.', 'SCER53', 0.0),
-('Hago actividades que implican un esfuerzo mental TODOS LOS DÍAS.', 'SCER54', 0.0),
-('No hago ningún tipo de actividad de índole cultura y/o artístico.', 'SCER55', 0.0),
-('No hago ningún tipo de actividad de índole cultura y/o artístico, PERO ME GUSTARÍA HACERLAS.', 'SCER56', 0.0),
-('Hago actividades de índole cultura y/o artístico con POCA FRECUENCIA.', 'SCER57', 0.0),
-('Hago actividades  de índole cultura y/o artístico SEMANALMENTE.', 'SCER58', 0.0),
-('Hago actividades  de índole cultura y/o artístico con MUCHA FRECUENTEMENTE.', 'SCER59', 0.0),
-('Si', 'SCER60', 0.0),
-('No', 'SCER61', 0.0);
+WHERE SIP_PERS_47.RELA_SIPPERS06=505052 and SIPPERS47_FBAJA IS null;

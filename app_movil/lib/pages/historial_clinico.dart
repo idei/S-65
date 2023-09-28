@@ -70,21 +70,9 @@ class _AjustesState extends State<HistorialClinico> {
                         tiles: snapshot.data
                             .map((data) => ListTile(
                                   title: GestureDetector(
-                                      onTap: () {
-                                        // Navigator.of(context).pushNamed(
-                                        //     '/ver_recordatorio_personal',
-                                        //     arguments: {
-                                        //       "id_recordatorio":
-                                        //           data.id_recordatorio,
-                                        //       "id_paciente": data.id_paciente,
-                                        //       "descripcion": data.descripcion,
-                                        //       "fecha_limite": data.fecha_limite,
-                                        //       "estado_recordatorio":
-                                        //           data.estado_recordatorio,
-                                        //       "estado": estado,
-                                        //     });
-                                      },
-                                      child: CardDinamic(data)),
+                                    onTap: () {},
+                                    child: CardDinamic(data),
+                                  ),
                                 ))
                             .toList(),
                       ).toList(),
@@ -221,15 +209,17 @@ class _AjustesState extends State<HistorialClinico> {
             color: color,
             borderRadius: BorderRadius.circular(5),
           ),
-          child: Center(
-            child: Text(
-              data.fecha_alta,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+          child: Row(
+            children: [
+              Text(
+                data.fecha_alta,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+            ],
           ),
         ),
         title: Center(

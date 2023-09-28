@@ -5,6 +5,7 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:app_salud/pages/env.dart';
 import 'package:provider/provider.dart';
 
+import '../models/medicamentos_model.dart';
 import '../services/usuario_services.dart';
 
 class MedicamentoAddPage extends StatefulWidget {
@@ -253,48 +254,4 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
           style: const TextStyle(color: Colors.white)),
     ));
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
-}
-
-class Medicamentos_database {
-  String dosis_frecuencia;
-  String nombre_comercial;
-  String presentacion;
-  var rela_paciente;
-  var rela_medicamento;
-  var id_medicamento;
-
-  Medicamentos_database(
-      {this.dosis_frecuencia,
-      this.rela_paciente,
-      this.rela_medicamento,
-      this.id_medicamento,
-      this.nombre_comercial,
-      this.presentacion});
-
-  factory Medicamentos_database.fromJson(Map<String, dynamic> json) {
-    return Medicamentos_database(
-        id_medicamento: json['id_medicamento'],
-        dosis_frecuencia: json['dosis_frecuencia'],
-        rela_paciente: json['rela_paciente'],
-        rela_medicamento: json['rela_medicamento'],
-        nombre_comercial: json['nombre_comercial'],
-        presentacion: json['presentacion']);
-  }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }
