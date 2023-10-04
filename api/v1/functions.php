@@ -243,6 +243,54 @@ function read_pacientes()
     Flight::json($returnData);
 }
 
+function solicitud_medico_paciente()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $dni = verificar($data_input, "dni_paciente");
+    //$mensaje = verificar($data_input, "mensaje_paciente");
+
+    if (isset($_POST['mensaje_paciente'])) {
+        $mensaje = $_POST["mensaje_paciente"];
+    } else {
+        $mensaje = verificar($data_input, "mensaje_paciente");
+    }
+
+    $id_medico = verificar($data_input, "id_medico");
+    $estado_habilitacion = '1';
+
+    try {
+      
+            $select_dni_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE dni = '" . $dni . "'");
+            $select_dni_paciente->execute();
+
+            if ($select_dni_paciente->rowCount() > 0) {
+                $id_paciente = $select_dni_paciente->fetch();
+            $id_paciente = $id_paciente["id"];
+
+            $insert_resultado = Flight::db()->prepare('INSERT INTO medicos_pacientes(rela_paciente,rela_medico,estado_habilitacion,mensaje)VALUES(?,?,?,?)');
+
+            $insert_resultado->bindParam(1, $id_paciente);
+            $insert_resultado->bindParam(2, $id_medico);
+            $insert_resultado->bindParam(3, $estado_habilitacion);
+            $insert_resultado->bindParam(4, $mensaje);
+
+            $insert_resultado->execute();
+
+            $returnData = msg("Success", []);
+        } else {
+
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function read_antecedentes_familiares()
 {
 

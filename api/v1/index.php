@@ -13,6 +13,10 @@ Flight::route('POST /login', 'login_doctor');
 // Read Pacientes  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 
+// Solicutud a Pacientes  ----------------------------------------------------------
+Flight::route('POST /solicitud_medico_paciente', 'solicitud_medico_paciente');
+
+
 // Read Antecedentes Familiares
 Flight::route('POST /antecedentes_familiares', 'read_antecedentes_familiares');
 
