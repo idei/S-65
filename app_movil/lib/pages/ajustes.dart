@@ -42,24 +42,13 @@ class _AjustesState extends State<AjustesPage> {
             style: TextStyle(
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          )
-        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: ListView(children: <Widget>[
-          Center(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(children: <Widget>[
+          Container(
+            width: double.infinity, // Ancho completo
+
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -79,7 +68,9 @@ class _AjustesState extends State<AjustesPage> {
           SizedBox(
             height: 20,
           ),
-          Center(
+          Container(
+            width: double.infinity, // Ancho completo
+
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(),
               onPressed: () {
@@ -99,15 +90,6 @@ class _AjustesState extends State<AjustesPage> {
         ]),
       ),
     );
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      email_argument.remove();
-      Navigator.pushNamed(context, '/');
-    }
   }
 
   Widget ModificarEmail(BuildContext context) {
@@ -211,19 +193,6 @@ class _AjustesState extends State<AjustesPage> {
               style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ],
         ),
         body: Form(
             key: _formKey_pass,

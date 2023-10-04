@@ -403,22 +403,23 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                         ),
                         SizedBox(height: 10.0),
                         DropdownButtonFormField<String>(
-                            key: relaGrupoFieldKey,
-                            hint: Text("Relación con Paciente"),
-                            value: rela_grupo_conviviente.isNotEmpty
-                                ? rela_grupo_conviviente
-                                : null,
-                            items: myDropdownMenuItemsGrupoConvivencia,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                rela_grupo_conviviente = newValue;
-                                if (newValue == "1") {
-                                  _showAdditionalFieldsNotifier.value = false;
-                                } else {
-                                  _showAdditionalFieldsNotifier.value = true;
-                                }
-                              });
-                            }),
+                          key: relaGrupoFieldKey,
+                          hint: Text("Relación con Paciente"),
+                          value: rela_grupo_conviviente.isNotEmpty
+                              ? rela_grupo_conviviente
+                              : null,
+                          items: myDropdownMenuItemsGrupoConvivencia,
+                          onChanged: (String newValue) {
+                            setState(() {
+                              rela_grupo_conviviente = newValue;
+                              if (newValue == "1") {
+                                _showAdditionalFieldsNotifier.value = false;
+                              } else {
+                                _showAdditionalFieldsNotifier.value = true;
+                              }
+                            });
+                          },
+                        ),
                         SizedBox(height: 10.0),
                         ValueListenableBuilder<bool>(
                           valueListenable: _showAdditionalFieldsNotifier,
@@ -532,11 +533,18 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                                       .fontFamily),
                             ),
                             onPressed: () {
-                              if (formKey_datos_personales.currentState
-                                      .validate() &&
-                                  !_isLoading) {
-                                _startLoading(usuarioModel);
+                              if (relaGrupoFieldKey.currentState.value !=
+                                  null) {
+                                if (formKey_datos_personales.currentState
+                                        .validate() &&
+                                    !_isLoading) {
+                                  _startLoading(usuarioModel);
+                                } else {
+                                  null;
+                                }
                               } else {
+                                _alert_informe(context,
+                                    "Seleccione el Contacto de Asistencia", 2);
                                 null;
                               }
                             },
@@ -684,16 +692,16 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       _isLoading = false;
     });
   }
-}
 
-_alert_informe(context, message, colorNumber) {
-  var color;
-  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
 
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    backgroundColor: color,
-    content: Text(message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white)),
-  ));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
+  }
 }

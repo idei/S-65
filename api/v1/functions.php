@@ -885,7 +885,7 @@ function read_datos_clinicos()
 
         $select_data_clinica = Flight::db()->prepare("SELECT *
         FROM datos_clinicos 
-        WHERE rela_paciente = '" . $id_paciente . "'");
+        WHERE rela_paciente = '" . $id_paciente . "' ORDER BY fecha_alta DESC");
 
         $select_data_clinica->execute();
 
@@ -1640,7 +1640,7 @@ function read_recordatorios()
         WHERE rela_estado_recordatorio != 1 AND rela_paciente = '" . $id_paciente . "'
         UNION ALL
         SELECT id,descripcion,fecha_limite,rela_estado_recordatorio,rela_paciente FROM recordatorios_medicos
-        WHERE rela_estado_recordatorio != 1 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite ASC");
+        WHERE rela_estado_recordatorio != 1 AND rela_paciente = '" . $id_paciente . "' ORDER BY fecha_limite DESC");
 
         $stmt->execute();
 
@@ -2180,7 +2180,11 @@ function save_medicamento()
         $id_medicamento = verificar($data_input, "id_medicamento");
     }
 
-    $dosis_frecuencia =  0; // Se define una frecuencia por defecto de valor 0
+    if (isset($_POST['dosis_frecuencia'])) {
+        $dosis_frecuencia = $_POST["dosis_frecuencia"];
+    } else {
+        $dosis_frecuencia = verificar($data_input, "dosis_frecuencia");
+    }
 
     try {
         $stmt = Flight::db()->prepare('INSERT INTO medicamento_paciente(dosis_frecuencia,rela_paciente,rela_medicamento) VALUES(?, ?, ?)');

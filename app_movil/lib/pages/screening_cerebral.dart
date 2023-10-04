@@ -17,6 +17,7 @@ class ScreeningCerebral extends StatefulWidget {
 //final _formKey_cerebral = GlobalKey<_ScreeningCerebralState>();
 
 TextEditingController otro_habito_controller = TextEditingController();
+TextEditingController key_otro_controller = TextEditingController();
 
 List itemsRespuestasSaludCerebral;
 
@@ -126,21 +127,27 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
 
     get_tiposcreening("SCER");
 
-    if (parametros["bandera"] == "recordatorio") {
-      screening_recordatorio = true;
-      id_recordatorio = parametros["id_recordatorio"];
-      id_paciente = id_paciente;
-      id_medico = parametros["id_medico"];
-      tipo_screening = parametros["tipo_screening"];
-    } else {
-      if (parametros["bandera"] == "screening_nuevo") {
-        screening_recordatorio = false;
-        id_paciente = id_paciente;
-        id_recordatorio = null;
-        id_medico = null;
-        //tipo_screening = parametros["tipo_screening"];
-      }
-    }
+    tipo_screening = parametros["select_screening"];
+
+    screening_recordatorio = false;
+    id_recordatorio = null;
+    id_medico = null;
+
+    // if (parametros["bandera"] == "recordatorio") {
+    //   screening_recordatorio = true;
+    //   id_recordatorio = parametros["id_recordatorio"];
+    //   id_paciente = id_paciente;
+    //   id_medico = parametros["id_medico"];
+    //   tipo_screening = parametros["tipo_screening"];
+    // } else {
+    //   if (parametros["bandera"] == "screening_nuevo") {
+    //     screening_recordatorio = false;
+    //     id_paciente = id_paciente;
+    //     id_recordatorio = null;
+    //     id_medico = null;
+    //     //tipo_screening = parametros["tipo_screening"];
+    //   }
+    // }
   }
 
   get_tiposcreening(var codigo_screening) async {
@@ -1004,7 +1011,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
       "actividades_esfuerzo_mental":
           valueNotifierActividadEsfuerzoMental.value.toString(),
       "otro": valueNotifierOtro.value.toString(),
-      "otro_texto": key_otro_controller.currentState.value,
+      "otro_texto": key_otro_controller.text.toString(),
       "otro_habito_texto": otro_habito_controller.text.toString(),
       "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
       "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
@@ -1039,7 +1046,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
             _scaffold_messenger(context, "Screening Registrado", 1);
 
             if (screening_recordatorio == true) {
-              Navigator.pushNamed(context, '/recordatorio');
+              Navigator.pushNamed(context, '/menu_chequeo');
             } else {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "SCER",
@@ -1052,7 +1059,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
 
         if (data['status'] == "Success") {
           if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
+            Navigator.pushNamed(context, '/menu_chequeo');
           } else {
             Navigator.pushNamed(context, '/screening', arguments: {
               "select_screening": "SCER",
@@ -1283,8 +1290,6 @@ class CheckActividadEsfuerzoMentalWidgetState
 
 //-------------------------------------- Otro -----------------------------------------------------
 
-var key_otro_controller = GlobalKey<FormFieldState<String>>();
-
 class Otro extends StatefulWidget {
   final ValueNotifier<bool> valueNotifierOtro;
   final ValueNotifier<bool> showAdditionalFieldsNotifier;
@@ -1335,8 +1340,7 @@ class CheckOtroWidgetState extends State<Otro> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(children: [
                       TextFormField(
-                        key: key_otro_controller,
-                        initialValue: "",
+                        controller: key_otro_controller,
                         decoration: InputDecoration(
                             labelText: '¿Qué otro hábito? ',
                             labelStyle: TextStyle(

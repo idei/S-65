@@ -29,6 +29,7 @@ List itemsConductual;
 List itemsConductualOtro;
 bool otroVisible = false;
 var usuarioModel;
+var _isPaciente = true;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
   @override
@@ -211,35 +212,38 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
         Widget>[
-      Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(20),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: Text('¿Qué parentesco tiene con (nombre del usuario)?',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
+      if (!_isPaciente)
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(20),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                        '¿Qué parentesco tiene con (nombre del usuario)?',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily)),
+                  ),
                 ),
-              ),
 
-              Conductual1(),
+                Conductual1(),
 
-              // Usamos Container para el contenedor de la descripción
-            ],
+                // Usamos Container para el contenedor de la descripción
+              ],
+            ),
           ),
         ),
-      ),
       Divider(height: 5.0, color: Colors.black),
       Padding(
         padding: EdgeInsets.all(8.0),
@@ -779,6 +783,10 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   }
 
   guardarDatosConductual(BuildContext context) async {
+    if (id_conductual1 == null && _isLoading) {
+      id_conductual1 = "";
+    }
+
     List<dynamic> conductuales = [
       id_conductual1,
       id_conductual2,

@@ -359,7 +359,13 @@ class _FormMenuState extends State<MenuPage> {
 
                                     Navigator.pushNamed(context, '/');
                                   },
-                                  child: Text('Sí'),
+                                  child: Text(
+                                    'Sí',
+                                    style: TextStyle(
+                                      color: Colors
+                                          .green, // Cambia el color del texto a rojo
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

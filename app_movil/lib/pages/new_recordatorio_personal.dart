@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-TextEditingController fecha_limite = TextEditingController();
-TextEditingController titulo = TextEditingController();
 var email;
 var usuarioModel;
 
@@ -18,6 +18,16 @@ class RecordatorioPersonal extends StatefulWidget {
 final _formKey_recuperar = GlobalKey<FormState>();
 
 class _RecuperarState extends State<RecordatorioPersonal> {
+  TextEditingController fechaLimiteController = TextEditingController();
+  TextEditingController tituloController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fechaLimiteController.text = '';
+    tituloController.text = '';
+  }
+
   @override
   Widget build(BuildContext context2) {
     final format = DateFormat("yyyy-MM-dd");
@@ -25,6 +35,9 @@ class _RecuperarState extends State<RecordatorioPersonal> {
 
     DateTime value = DateTime.now();
     int changedCount = 0;
+
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    email = usuarioModel.usuario.emailUser;
 
     return Scaffold(
         appBar: AppBar(
@@ -53,7 +66,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                                 .headline1
                                 .fontFamily)),
                     TextFormField(
-                      controller: titulo,
+                      controller: tituloController,
                       validator: (value) {
                         if (value.isEmpty || value.length == 0) {
                           return 'Por favor ingrese título';
@@ -77,7 +90,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                                 .headline1
                                 .fontFamily)),
                     DateTimeField(
-                      controller: fecha_limite,
+                      controller: fechaLimiteController,
                       format: format,
                       onShowPicker: (context, currentValue) {
                         return showDatePicker(
@@ -123,36 +136,37 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                   ]))),
         ));
   }
-}
 
-guardar_datos(context) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/new_recordatorio_personal";
-  var response = await http.post(url, body: {
-    "email": email,
-    "titulo": titulo.text,
-    "fecha_limite": fecha_limite.text,
-  });
+  guardar_datos(context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/new_recordatorio_personal";
+    var response = await http.post(url, body: {
+      "email": email,
+      "titulo": tituloController.text,
+      "fecha_limite": fechaLimiteController.text,
+    });
 
-  var responseDecode = jsonDecode(response.body);
+    var responseDecode = jsonDecode(response.body);
 
-  if (response.statusCode == 200 && responseDecode['status'] == "Success") {
-    _alert_informe(context, "Recordatorio creado correctamente", 1);
-    Navigator.of(context).pushReplacementNamed('/recordatorio');
-  } else {
-    _alert_informe(context, "Error al guardar: ${responseDecode['status']}", 2);
-    Navigator.of(context).pushReplacementNamed('/recordatorio');
+    if (response.statusCode == 200 && responseDecode['status'] == "Success") {
+      _alert_informe(context, "Recordatorio creado correctamente", 1);
+      Navigator.of(context).pushReplacementNamed('/recordatorio');
+    } else {
+      _alert_informe(
+          context, "Error al guardar: ${responseDecode['status']}", 2);
+      Navigator.of(context).pushReplacementNamed('/recordatorio');
+    }
   }
-}
 
-_alert_informe(context, message, colorNumber) {
-  var color;
-  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
 
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    backgroundColor: color,
-    content: Text(message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white)),
-  ));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
+  }
 }

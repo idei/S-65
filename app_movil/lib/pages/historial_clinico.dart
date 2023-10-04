@@ -1,5 +1,5 @@
-import 'package:app_salud/models/usuario_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -60,53 +60,63 @@ class _AjustesState extends State<HistorialClinico> {
         body:
             // Column(
             //   children: [
-            FutureBuilder<List<DatosClinicos>>(
-                future: read_datos_clinicos(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView(
-                      children: ListTile.divideTiles(
-                        color: Colors.black,
-                        tiles: snapshot.data
-                            .map((data) => ListTile(
-                                  title: GestureDetector(
-                                    onTap: () {},
-                                    child: CardDinamic(data),
-                                  ),
-                                ))
-                            .toList(),
-                      ).toList(),
-                    );
-                  } else {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return Container(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ListTile(
-                              title: Text(
-                            'No tiene datos clínicos',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                                fontFamily: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .fontFamily),
-                          )),
-                        ],
-                      ));
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(
-                        semanticsLabel: "Cargando",
-                      ),
-                    );
+            RefreshIndicator(
+          onRefresh: () async {
+            // Aquí puedes realizar la lógica de actualización de datos, como volver a cargar los recordatorios desde la base de datos o la API.
+            // Luego, llama a setState() para reconstruir la UI con los nuevos datos.
+            setState(() {
+              read_datos_clinicos();
+              // Tu lógica de actualización de datos aquí
+            });
+          },
+          child: FutureBuilder<List<DatosClinicos>>(
+              future: read_datos_clinicos(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView(
+                    children: ListTile.divideTiles(
+                      color: Colors.black,
+                      tiles: snapshot.data
+                          .map((data) => ListTile(
+                                title: GestureDetector(
+                                  onTap: () {},
+                                  child: CardDinamic(data),
+                                ),
+                              ))
+                          .toList(),
+                    ).toList(),
+                  );
+                } else {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Container(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ListTile(
+                            title: Text(
+                          'No tiene datos clínicos',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
+                        )),
+                      ],
+                    ));
                   }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      semanticsLabel: "Cargando",
+                    ),
+                  );
                 }
-                //}
-                ),
+              }
+              //}
+              ),
+        ),
         // Padding(
         //     padding: const EdgeInsets.all(16.0),
         //     child: ListView(children: <Widget>[
@@ -200,44 +210,113 @@ class _AjustesState extends State<HistorialClinico> {
     //   font_bold = FontWeight.bold;
     // }
 
+    String fechaDesdeBD = data
+        .fecha_alta; // Fecha en formato 'Y-M-D' obtenida de la base de datos
+    DateTime fecha =
+        DateTime.parse(fechaDesdeBD); // Convierte la cadena a DateTime
+    String fechaFormateada =
+        DateFormat('dd-MM-yyyy').format(fecha); // Formatea la fecha
+
     return Card(
       child: ListTile(
-        leading: Container(
-          width: 90,
-          height: 30,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Row(
-            children: [
-              Text(
-                data.fecha_alta,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Alinea los elementos a los extremos
+
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                fechaFormateada,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(
+                    14), // Ajusta el valor según tus preferencias
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  data.presion_alta,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14, // Tamaño de fuente según tus preferencias
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(
+                    14), // Ajusta el valor según tus preferencias
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  data.presion_baja,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14, // Tamaño de fuente según tus preferencias
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(
+                    14), // Ajusta el valor según tus preferencias
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  data.circunferencia_cintura,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14, // Tamaño de fuente según tus preferencias
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(
+                    14), // Ajusta el valor según tus preferencias
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  data.pulso,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14, // Tamaño de fuente según tus preferencias
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/ver_datos_clinicos',
+                      arguments: {"id_dato_clinico": data.id});
+                },
+                child: Text("Ver"),
+              ),
+            ),
+          ],
         ),
-        title: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/ver_datos_clinicos',
-                  arguments: {"id_dato_clinico": data.id});
-            },
-            child: Text("Ver"),
-          ),
-        ),
-        // title: Text(data.descripcion.toUpperCase(),
-        //     maxLines: 4,
-        //     style: TextStyle(
-        //         fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-        // subtitle: Text(data.fecha_limite,
-        //     style: TextStyle(
-        //         fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
     );
   }

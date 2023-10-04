@@ -1064,7 +1064,7 @@ class _ConsumeMarihuanaState extends State<ConsumeMarihuana> {
           },
         ),
         if (_mostrarOpcion && _opcionSeleccionadaMarihuana != null)
-          Opcion_Consume_Tabaco()
+          Opcion_Consume_Marihuana()
       ],
     );
   }
@@ -1095,6 +1095,7 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
 
   @override
   void initState() {
+    super.initState();
     getAllRespuesta();
   }
 
