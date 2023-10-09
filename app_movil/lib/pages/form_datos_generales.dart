@@ -533,19 +533,42 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                                       .fontFamily),
                             ),
                             onPressed: () {
-                              if (relaGrupoFieldKey.currentState.value !=
+                              if (relaDeptoFieldKey.currentState.value !=
                                   null) {
-                                if (formKey_datos_personales.currentState
-                                        .validate() &&
-                                    !_isLoading) {
-                                  _startLoading(usuarioModel);
-                                } else {
-                                  null;
-                                }
+                              } else {
+                                _alert_informe(
+                                    context, "Seleccione el Departamento", 2);
+                                return;
+                              }
+
+                              if (relaGeneroFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(
+                                    context, "Seleccione el Género", 2);
+                                return;
+                              }
+
+                              if (relaNivelFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(context,
+                                    "Seleccione el Nivel Educativo", 2);
+                                return;
+                              }
+
+                              if (relaDeptoFieldKey.currentState.value !=
+                                  null) {
                               } else {
                                 _alert_informe(context,
                                     "Seleccione el Contacto de Asistencia", 2);
-                                null;
+                                return;
+                              }
+
+                              if (formKey_datos_personales.currentState
+                                      .validate() &&
+                                  !_isLoading) {
+                                _startLoading(usuarioModel);
                               }
                             },
                             label: Text('Guardar Datos',

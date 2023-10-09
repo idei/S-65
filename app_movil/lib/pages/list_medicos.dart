@@ -163,7 +163,40 @@ class _ListMedicosState extends State<ListMedicos>
                                                 "1")
                                             .map((element) {
                                           id_medico = element.rela_medico;
-                                          return Text(element.apellido_medico);
+                                          return Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Card(
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text("Apellido y Nombre: " +
+                                                            element
+                                                                .nombre_medico),
+                                                        SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        Text(element
+                                                            .apellido_medico),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text("Especialidad: " +
+                                                            element
+                                                                .especialidad),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         }),
                                       ),
                                     )),
@@ -300,14 +333,6 @@ class _ListMedicosState extends State<ListMedicos>
       return true;
     } else {
       return false;
-    }
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
     }
   }
 }

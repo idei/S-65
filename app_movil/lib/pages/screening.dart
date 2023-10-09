@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_time_patterns.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -75,47 +77,19 @@ class _ScreeningState extends State<ScreeningPage> {
                       tiles: snapshot.data
                           .map((data) => ListTile(
                                 title: GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).pushNamed(
-                                        '/ver_screening',
-                                        arguments: {
-                                          "id_paciente": data.id_paciente,
-                                          "nombre": data.nombre,
-                                          "fecha": data.fecha,
-                                          "result_screening":
-                                              data.result_screening,
-                                          "codigo": data.codigo,
-                                        });
-                                  },
-                                  child: Card(
-                                    child: ListTile(
-                                      leading: Container(
-                                        width: 90,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            data.fecha,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      title: Text(data.nombre),
-                                      subtitle: Text("Puntuación:  " +
-                                          data.result_screening.toString() +
-                                          " Fecha: " +
-                                          data.fecha),
-                                    ),
-                                  ),
-                                ),
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          '/ver_screening',
+                                          arguments: {
+                                            "id_paciente": data.id_paciente,
+                                            "nombre": data.nombre,
+                                            "fecha": data.fecha,
+                                            "result_screening":
+                                                data.result_screening,
+                                            "codigo": data.codigo,
+                                          });
+                                    },
+                                    child: screening_card(data)),
                               ))
                           .toList(),
                     ).toList(),
@@ -226,6 +200,43 @@ class _ScreeningState extends State<ScreeningPage> {
                   //   });
                 }),
           )),
+    );
+  }
+
+  Widget screening_card(var data) {
+    String fechaTexto = data.fecha; // Formato "yyyy-MM-dd"
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fechaTexto);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    String fechaFormateada = dateFormatSalida.format(fechaEntrada);
+
+    return Card(
+      child: ListTile(
+        leading: Container(
+          width: 90,
+          height: 30,
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              fechaFormateada,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        title: Text(data.nombre),
+        subtitle: Text("Puntuación:  " +
+            data.result_screening.toString() +
+            " Fecha: " +
+            data.fecha),
+      ),
     );
   }
 

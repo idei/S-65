@@ -15,6 +15,7 @@ var id_recordatorio;
 var screening_recordatorio;
 var email;
 var usuarioModel;
+var cant_check = 0;
 
 class FormScreeningSintomas extends StatefulWidget {
   final pageName = 'screening_fisico';
@@ -29,6 +30,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   @override
   void initState() {
     super.initState();
+    cant_check = 0;
   }
 
   @override
@@ -656,8 +658,6 @@ _scaffold_messenger(context, message, colorNumber) {
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-// Contador
-var cant_check = 0;
 
 String cod_event_dolor_cabeza = "DOLCA";
 String cod_event_mareos = 'MAREO';

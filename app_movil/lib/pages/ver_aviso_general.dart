@@ -153,7 +153,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                     ListTile(
                       leading: Icon(
-                        Icons.arrow_right_rounded,
+                        Icons.wifi_1_bar_rounded,
                         size: 30,
                       ),
                       title: Text('Aviso: ' + '$descripcion'.toUpperCase(),

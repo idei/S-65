@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/avisos_model.dart';
 import '../services/usuario_services.dart';
@@ -64,60 +65,21 @@ class _AvisosState extends State<Avisos> {
                     tiles: snapshot.data
                         .map((data) => ListTile(
                               title: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(
-                                      '/ver_aviso_general',
-                                      arguments: {
-                                        "id_aviso": data.id_aviso,
-                                        "id_paciente": data.id_paciente,
-                                        "descripcion": data.descripcion,
-                                        "fecha_limite": data.fecha_limite,
-                                        "url_imagen": data.url_imagen,
-                                        "rela_estado": data.estado_leido,
-                                        "rela_creador": data.rela_creador,
-                                        "rela_medico": data.rela_medico
-                                      });
-                                },
-                                child: Card(
-                                  child: ListTile(
-                                    leading: Container(
-                                      width: 90,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          data.fecha_limite,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // leading: Icon(
-                                    //   Icons.calendar_today,
-                                    //   color: Colors.blue,
-                                    // ),
-                                    title: Text(data.descripcion.toUpperCase(),
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                            fontFamily: Theme.of(context)
-                                                .textTheme
-                                                .headline1
-                                                .fontFamily)),
-                                    subtitle: Text(data.fecha_limite,
-                                        style: TextStyle(
-                                            fontFamily: Theme.of(context)
-                                                .textTheme
-                                                .headline1
-                                                .fontFamily)),
-                                  ),
-                                ),
-                              ),
+                                  onTap: () {
+                                    Navigator.of(context).pushNamed(
+                                        '/ver_aviso_general',
+                                        arguments: {
+                                          "id_aviso": data.id_aviso,
+                                          "id_paciente": data.id_paciente,
+                                          "descripcion": data.descripcion,
+                                          "fecha_limite": fechaFormateada,
+                                          "url_imagen": data.url_imagen,
+                                          "rela_estado": data.estado_leido,
+                                          "rela_creador": data.rela_creador,
+                                          "rela_medico": data.rela_medico
+                                        });
+                                  },
+                                  child: Aviso(data)),
                             ))
                         .toList(),
                   ).toList(),
@@ -151,6 +113,51 @@ class _AvisosState extends State<Avisos> {
                 }
               }
             }),
+      ),
+    );
+  }
+
+  String fechaFormateada;
+
+  Widget Aviso(var data) {
+    String fechaTexto = data.fecha_limite; // Formato "yyyy-MM-dd"
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fechaTexto);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
+
+    return Card(
+      child: ListTile(
+        leading: Container(
+          width: 90,
+          height: 30,
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              fechaFormateada,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        // leading: Icon(
+        //   Icons.calendar_today,
+        //   color: Colors.blue,
+        // ),
+        title: Text(data.descripcion.toUpperCase(),
+            maxLines: 2,
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+        subtitle: Text(fechaFormateada,
+            style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
     );
   }

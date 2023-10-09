@@ -34,12 +34,18 @@ class _FormRegisterState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    emailPaciente.clear();
-    passwordNuevo.clear();
-    nombrePaciente.clear();
-    apellidoPaciente.clear();
-    passwordRepetido.clear();
-    dni.clear();
+    // emailPaciente.clear();
+    // passwordNuevo.clear();
+    // nombrePaciente.clear();
+    // apellidoPaciente.clear();
+    // passwordRepetido.clear();
+    // dni.clear();
+    emailPaciente.text = '';
+    passwordNuevo.text = '';
+    nombrePaciente.text = '';
+    apellidoPaciente.text = '';
+    passwordRepetido.text = '';
+    dni.text = '';
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
+import 'package:intl/intl.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -64,6 +65,8 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
     return true;
   }
 
+  String fechaFormateada;
+
   Widget Recordatorios(BuildContext context) {
     final now = DateTime.now();
     var dia;
@@ -88,6 +91,12 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
 
     final difference = fecha_limite2.difference(fecha_limite1).inDays;
     print(difference);
+
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fecha_limite);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
 
     if (difference < 0) {
       estado_text = "Vencido";
@@ -121,11 +130,11 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("$descripcion"),
+                        Text("Título: $descripcion"),
                         SizedBox(
                           height: 20,
                         ),
-                        Text("Fecha: $fecha_limite "),
+                        Text("Fecha Límite: $fechaFormateada "),
                         SizedBox(
                           height: 20,
                         ),

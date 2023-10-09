@@ -3366,8 +3366,6 @@ function respuesta_screening_animo()
         $recordatorio_medico = verificar($data_input, "id_recordatorio");
     }
 
-   
-
 
     $estado = 1;
 
@@ -3375,10 +3373,10 @@ function respuesta_screening_animo()
 
     if ($_POST['satisfecho'] == "true") {
         $satisfecho = 1;
-        $result_screening += 1;
+        $result_screening += 0;
     } else {
         $satisfecho = 0;
-        $result_screening += 0;
+        $result_screening += 1;
     }
 
     if ($_POST['abandonado'] == "true") {
@@ -3506,7 +3504,6 @@ function respuesta_screening_animo()
     $insert_resultado->bindParam(3, $id_medico);
     $insert_resultado->bindParam(4, $result_screening);
 
-    $respuestabool = $insert_resultado->execute();
     $last->execute();
 
     $last = $last->fetch();
@@ -3710,7 +3707,7 @@ function respuesta_screening_animo()
 
             if ($eventos["codigo_evento"] == $cod_event_energia) {
                 $rowsToInsert[] = array(
-                    'rela_tipo' => $cod_event_energia,
+                    'rela_tipo' => $energia,
                     'rela_evento' => $eventos["id"],
                     'rela_tipo_screening' => $tipo_screening,
                     'rela_recordatorio_medico' => $recordatorio_medico,
@@ -7105,9 +7102,23 @@ function user_register()
         $stmt->bindParam(":email", $email);
         $stmt->execute();
         $result = $stmt->rowCount();
+
+
+        $query = "SELECT * FROM pacientes WHERE dni = :dni";
+        $stmt_dni = Flight::db()->prepare($query);
+        $stmt_dni->bindParam(":dni", $dni);
+        $stmt_dni->execute();
+        $result_dni = $stmt_dni->rowCount();
+
+        if ($result_dni > 0) {
+        
+        $returnData = msg("Vacio", "Ya existe un paciente con ese DNI");
+        Flight::json($returnData);
+        exit;
+        }
         
         if ($result == 1) {
-            $lista = "Ya existe un paciente con ese email";
+            $lista = "Ya existe un paciente con ese EMAIL";
             
             $returnData = msg("Vacio", $lista);
 

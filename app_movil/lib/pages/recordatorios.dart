@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/recordatorio_model.dart';
 import '../services/usuario_services.dart';
@@ -145,6 +146,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
   var color;
   var font_bold;
   var estado;
+  String fechaFormateada;
 
   Widget CardDinamic(data) {
     final now = DateTime.now();
@@ -163,13 +165,20 @@ class _RecordatorioState extends State<RecordatorioPage> {
       mes = now.month.toString();
     }
 
-    String formatter = now.year.toString() + "-" + mes + "-" + dia;
-    print(formatter);
-    DateTime fecha_limite1 = DateTime.parse(formatter);
-    DateTime fecha_limite = DateTime.parse(data.fecha_limite);
+    DateFormat dateFormatActual = DateFormat("yyyy-MM-dd");
 
-    final difference = fecha_limite.difference(fecha_limite1).inDays;
+    String fechaTexto = now.year.toString() + "-" + mes + "-" + dia;
+    DateTime fecha_actual = dateFormatActual.parse(fechaTexto);
+
+    String fechabasedatos = data.fecha_limite; // Formato "yyyy-MM-dd"
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fechabasedatos);
+
+    final difference = fechaEntrada.difference(fecha_actual).inDays;
     print(difference);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
 
     if (difference < 0) {
       color = Colors.red;
@@ -193,7 +202,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
           ),
           child: Center(
             child: Text(
-              data.fecha_limite,
+              fechaFormateada,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 15,
@@ -206,7 +215,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
             maxLines: 4,
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-        subtitle: Text(data.fecha_limite,
+        subtitle: Text(fechaFormateada,
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),

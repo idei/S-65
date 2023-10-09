@@ -1,6 +1,7 @@
 import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
+import 'package:intl/intl.dart';
 import 'env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -26,6 +27,8 @@ var descripcion;
 var widget_boton;
 final isTablet = Device.get().isTablet;
 var radiusAvatar;
+var fecha_limite;
+var fechaFormateada;
 
 class _VerRecordatorioState extends State<VerRecordatorio> {
   @override
@@ -36,6 +39,13 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     rela_estado_recordatorio = parametros["estado_recordatorio"];
     tipo_screening = parametros["tipo_screening"];
     descripcion = parametros["descripcion"];
+    fecha_limite = parametros["fecha_limite"];
+
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fecha_limite);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
 
     getRecordatorioMedico(id_recordatorio);
 
@@ -108,6 +118,15 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                 //Text("Screening $tipo_screening: "),
                 Text(
                   "Estimado paciente le envio para que complete el siguiente Screening de $nombre_screening ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Text(
+                  "Fecha Límite: $fechaFormateada ",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -229,7 +248,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                                 });
                           }
                         },
-                        child: Text('Ir a Screening'),
+                        child: Text('Ir a Chequeo'),
                       ),
                     ],
                   )
