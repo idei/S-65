@@ -13,8 +13,11 @@ Flight::route('POST /login', 'login_doctor');
 // Read Pacientes  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 
-// Read Pacientes  ----------------------------------------------------------
+// Read TODOS Pacientes  ----------------------------------------------------------
 Flight::route('POST /list_pacientes', 'list_pacientes');
+
+// Read Pacientes  ----------------------------------------------------------
+Flight::route('POST /estado_solicitud_medico_paciente', 'estado_solicitud_medico_paciente');
 
 // Solicutud a Pacientes  ----------------------------------------------------------
 Flight::route('POST /solicitud_medico_paciente', 'solicitud_medico_paciente');

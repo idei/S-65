@@ -272,6 +272,40 @@ function list_pacientes()
     Flight::json($returnData);
 }
 
+function estado_solicitud_medico_paciente()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $id_medico = verificar($data_input, "id_medico");
+
+    try {
+
+        $smt = Flight::db()->prepare("SELECT pacientes.id,nombre,apellido,dni,estado_habilitacion
+        FROM `pacientes` LEFT JOIN medicos_pacientes ON medicos_pacientes.rela_paciente = pacientes.id
+        where rela_medico = '" . $id_medico . "' and estado_users = 2");
+        $smt->execute();
+
+        if ($smt->rowCount() > 0) {
+            $result = $smt->fetchAll();
+
+            foreach ($result as $results) {
+                $data[] = $results;
+            }
+
+            $returnData = msg("Success", $data);
+        } else {
+
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function solicitud_medico_paciente()
 {
 
