@@ -1,5 +1,6 @@
-import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
+import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
@@ -14,6 +15,7 @@ var id_recordatorio;
 var email;
 var screening_recordatorio;
 var usuarioModel;
+List itemsRespuestasNutricion = [];
 
 class ScreeningNutricional extends StatefulWidget {
   final pageName = 'screening_nutricional';
@@ -150,9 +152,28 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   }
 }
 
+Future getAllRespuestaNutricional() async {
+  await getAllEventosNutricional();
+
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_respuesta_animo";
+  var response = await http.post(url, body: {});
+
+  var jsonDate = json.decode(response.body);
+
+  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+    //setState(() {
+    itemsRespuestasNutricion = jsonDate['data'];
+    //});
+    return true;
+  } else {
+    return false;
+  }
+}
+
 List respuestaNutricional;
 
-Future<List> getAllRespuestaNutricional() async {
+Future<List> getAllEventosNutricional() async {
   var response;
 
   String URL_base = Env.URL_API;
@@ -179,103 +200,101 @@ class FormNutricional extends StatefulWidget {
 }
 
 class _FormNutricionalState extends State<FormNutricional> {
-  //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-  ValueNotifier<bool> valueNotifierNutri1 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri2 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri3 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri4 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri5 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri6 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri7 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri8 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri81 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri9 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri91 = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNutri10 = ValueNotifier<bool>(false);
-
   @override
   Widget build(BuildContext context) {
-    return Form(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Nutri1(valueNotifierNutri1: valueNotifierNutri1),
+            Nutri1(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri2(valueNotifierNutri2: valueNotifierNutri2),
+
+            Nutri2(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri3(valueNotifierNutri3: valueNotifierNutri3),
+
+            Nutri3(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri4(valueNotifierNutri4: valueNotifierNutri4),
+
+            Nutri4(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri5(valueNotifierNutri5: valueNotifierNutri5),
+
+            Nutri5(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri6(valueNotifierNutri6: valueNotifierNutri6),
+
+            Nutri6(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri7(valueNotifierNutri7: valueNotifierNutri7),
+
+            Nutri7(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri8(valueNotifierNutri8: valueNotifierNutri8),
+
+            Nutri8(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri81(valueNotifierNutri81: valueNotifierNutri81),
+
+            // Nutri81(),
+            // Padding(
+            //   padding: EdgeInsets.all(8.0),
+            // ),
+            //
+            Nutri9(),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri9(valueNotifierNutri9: valueNotifierNutri9),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-            ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri91(valueNotifierNutri91: valueNotifierNutri91),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-            ),
-            Divider(height: 5.0, color: Colors.black),
-            Nutri10(valueNotifierNutri10: valueNotifierNutri10),
+
+            // Nutri91(),
+            // Padding(
+            //   padding: EdgeInsets.all(8.0),
+            // ),
+            //
+            Nutri10(),
             Divider(height: 10.0, color: Colors.black),
             Padding(
               padding: EdgeInsets.all(15.0),
             ),
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  guardarDatos(context);
-                },
-                child: Text(
-                  'GUARDAR',
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                  ),
+              child: ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
+                style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
                 ),
+                onPressed: () => !_isLoading ? _startLoading() : null,
+                label: Text('GUARDAR',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontWeight: FontWeight.bold,
+                    )),
               ),
+            ),
+            SizedBox(
+              width: 10,
             ),
           ],
         ),
@@ -283,7 +302,45 @@ class _FormNutricionalState extends State<FormNutricional> {
     );
   }
 
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardarDatos(context);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   guardarDatos(BuildContext context) async {
+    List<dynamic> ids_nutricional = [
+      id_nutri1,
+      id_nutri2,
+      id_nutri3,
+      id_nutri4,
+      id_nutri5,
+      id_nutri6,
+      id_nutri7,
+      id_nutri8,
+      //id_nutri81,
+      id_nutri9,
+      //id_nutri91,
+      id_nutri10,
+    ];
+
+    for (var variable in ids_nutricional) {
+      if (variable == null) {
+        alert_informe_scaffold(
+            context, "Debe responder todas las preguntas", 2);
+        return; // Salir de la función
+      }
+    }
+
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_nutricional";
     var response = await http.post(url, body: {
@@ -291,18 +348,18 @@ class _FormNutricionalState extends State<FormNutricional> {
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
       "tipo_screening": tipo_screening['data'].toString(),
-      "nutri1": valueNotifierNutri1.value.toString(),
-      "nutri2": valueNotifierNutri2.value.toString(),
-      "nutri3": valueNotifierNutri3.value.toString(),
-      "nutri4": valueNotifierNutri4.value.toString(),
-      "nutri5": valueNotifierNutri5.value.toString(),
-      "nutri6": valueNotifierNutri6.value.toString(),
-      "nutri7": valueNotifierNutri7.value.toString(),
-      "nutri8": valueNotifierNutri8.value.toString(),
-      "nutri81": valueNotifierNutri81.value.toString(),
-      "nutri9": valueNotifierNutri9.value.toString(),
-      "nutri91": valueNotifierNutri91.value.toString(),
-      "nutri10": valueNotifierNutri10.value.toString(),
+      "nutri1": id_nutri1.toString(),
+      "nutri2": id_nutri2.toString(),
+      "nutri3": id_nutri3.toString(),
+      "nutri4": id_nutri4.toString(),
+      "nutri5": id_nutri5.toString(),
+      "nutri6": id_nutri6.toString(),
+      "nutri7": id_nutri7.toString(),
+      "nutri8": id_nutri8.toString(),
+      //"nutri81": id_nutri81.toString(),
+      "nutri9": id_nutri9.toString(),
+      //"nutri91": id_nutri91.toString(),
+      "nutri10": id_nutri10.toString(),
       "cod_event_nutri1": cod_event_nutri1,
       "cod_event_nutri2": cod_event_nutri2,
       "cod_event_nutri3": cod_event_nutri3,
@@ -345,6 +402,37 @@ class _FormNutricionalState extends State<FormNutricional> {
       }
     }
   }
+
+  showDialogMessage() async {
+    if (!_isLoading) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Container(
+                height: 80,
+                width: 80,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Guardando Información",
+                      style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+  }
 }
 
 //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
@@ -365,10 +453,6 @@ String cod_event_nutri10 = 'NUTRI10';
 //-------------------------------------- NUTRICIONAL 1 -----------------------------------------------------
 
 class Nutri1 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri1;
-
-  Nutri1({this.valueNotifierNutri1});
-
   @override
   CheckNutri1WidgetState createState() => CheckNutri1WidgetState();
 }
@@ -376,22 +460,78 @@ class Nutri1 extends StatefulWidget {
 class CheckNutri1WidgetState extends State<Nutri1> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[0]["nombre_evento"],
-      // '¿Tiene una enfermedad o malestar que le ha hecho cambiar el tipo y/o cantidad de alimento que come?',
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri1.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri1.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[0]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri1Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri1Opcion *******************
+
+var id_nutri1;
+
+class Nutri1Opcion extends StatefulWidget {
+  @override
+  Nutri1OpcionWidgetState createState() => Nutri1OpcionWidgetState();
+}
+
+class Nutri1OpcionWidgetState extends State<Nutri1Opcion> {
+  @override
+  void initState() {
+    id_nutri1 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri1,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri1 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -401,10 +541,6 @@ class CheckNutri1WidgetState extends State<Nutri1> {
 // --------------------------------- NUTRI 2 ----------------------------------------------------
 
 class Nutri2 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri2;
-
-  Nutri2({this.valueNotifierNutri2});
-
   @override
   CheckNutri2WidgetState createState() => CheckNutri2WidgetState();
 }
@@ -412,21 +548,78 @@ class Nutri2 extends StatefulWidget {
 class CheckNutri2WidgetState extends State<Nutri2> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[1]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri2.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri2.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[1]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri2Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri2Opcion *******************
+
+var id_nutri2;
+
+class Nutri2Opcion extends StatefulWidget {
+  @override
+  Nutri2OpcionWidgetState createState() => Nutri2OpcionWidgetState();
+}
+
+class Nutri2OpcionWidgetState extends State<Nutri2Opcion> {
+  @override
+  void initState() {
+    id_nutri2 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri2,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri2 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -434,32 +627,85 @@ class CheckNutri2WidgetState extends State<Nutri2> {
 //-------------------------------------------NUTRI 3--------------------------------------------
 
 class Nutri3 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri3;
-
-  Nutri3({this.valueNotifierNutri3});
-
   @override
-  Nutri3WidgetState createState() => Nutri3WidgetState();
+  CheckNutri3WidgetState createState() => CheckNutri3WidgetState();
 }
 
-class Nutri3WidgetState extends State<Nutri3> {
+class CheckNutri3WidgetState extends State<Nutri3> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[2]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri3.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri3.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[2]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri3Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri3Opcion *******************
+
+var id_nutri3;
+
+class Nutri3Opcion extends StatefulWidget {
+  @override
+  Nutri3OpcionWidgetState createState() => Nutri3OpcionWidgetState();
+}
+
+class Nutri3OpcionWidgetState extends State<Nutri3Opcion> {
+  @override
+  void initState() {
+    id_nutri3 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri3,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri3 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -467,32 +713,85 @@ class Nutri3WidgetState extends State<Nutri3> {
 //------------------------------------------ NUTRI 4 -------------------------------------------
 
 class Nutri4 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri4;
-
-  Nutri4({this.valueNotifierNutri4});
-
   @override
-  Nutri4WidgetState createState() => Nutri4WidgetState();
+  CheckNutri4WidgetState createState() => CheckNutri4WidgetState();
 }
 
-class Nutri4WidgetState extends State<Nutri4> {
+class CheckNutri4WidgetState extends State<Nutri4> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[3]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri4.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri4.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[3]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri4Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri4Opcion *******************
+
+var id_nutri4;
+
+class Nutri4Opcion extends StatefulWidget {
+  @override
+  Nutri4OpcionWidgetState createState() => Nutri4OpcionWidgetState();
+}
+
+class Nutri4OpcionWidgetState extends State<Nutri4Opcion> {
+  @override
+  void initState() {
+    id_nutri4 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri4,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri4 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -500,32 +799,85 @@ class Nutri4WidgetState extends State<Nutri4> {
 //------------------------------------------NUTRI 5 ---------------------------------------
 
 class Nutri5 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri5;
-
-  Nutri5({this.valueNotifierNutri5});
-
   @override
-  Nutri5WidgetState createState() => Nutri5WidgetState();
+  CheckNutri5WidgetState createState() => CheckNutri5WidgetState();
 }
 
-class Nutri5WidgetState extends State<Nutri5> {
+class CheckNutri5WidgetState extends State<Nutri5> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[4]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri5.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri5.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[4]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri5Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri5Opcion *******************
+
+var id_nutri5;
+
+class Nutri5Opcion extends StatefulWidget {
+  @override
+  Nutri5OpcionWidgetState createState() => Nutri5OpcionWidgetState();
+}
+
+class Nutri5OpcionWidgetState extends State<Nutri5Opcion> {
+  @override
+  void initState() {
+    id_nutri5 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri5,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri5 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -533,32 +885,85 @@ class Nutri5WidgetState extends State<Nutri5> {
 // ----------------------------------------NUTRI 6---------------------------------------
 
 class Nutri6 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri6;
-
-  Nutri6({this.valueNotifierNutri6});
-
   @override
-  Nutri6WidgetState createState() => Nutri6WidgetState();
+  CheckNutri6WidgetState createState() => CheckNutri6WidgetState();
 }
 
-class Nutri6WidgetState extends State<Nutri6> {
+class CheckNutri6WidgetState extends State<Nutri6> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[5]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri6.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri6.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[5]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri6Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri6Opcion *******************
+
+var id_nutri6;
+
+class Nutri6Opcion extends StatefulWidget {
+  @override
+  Nutri6OpcionWidgetState createState() => Nutri6OpcionWidgetState();
+}
+
+class Nutri6OpcionWidgetState extends State<Nutri6Opcion> {
+  @override
+  void initState() {
+    id_nutri6 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri6,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri6 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -566,32 +971,85 @@ class Nutri6WidgetState extends State<Nutri6> {
 // ---------------------------------------- NUTRI 7 -----------------------------------
 
 class Nutri7 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri7;
-
-  Nutri7({this.valueNotifierNutri7});
-
   @override
-  Nutri7WidgetState createState() => Nutri7WidgetState();
+  CheckNutri7WidgetState createState() => CheckNutri7WidgetState();
 }
 
-class Nutri7WidgetState extends State<Nutri7> {
+class CheckNutri7WidgetState extends State<Nutri7> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[6]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri7.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri7.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[6]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri7Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri7Opcion *******************
+
+var id_nutri7;
+
+class Nutri7Opcion extends StatefulWidget {
+  @override
+  Nutri7OpcionWidgetState createState() => Nutri7OpcionWidgetState();
+}
+
+class Nutri7OpcionWidgetState extends State<Nutri7Opcion> {
+  @override
+  void initState() {
+    id_nutri7 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri7,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri7 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -599,32 +1057,85 @@ class Nutri7WidgetState extends State<Nutri7> {
 // -----------------------------------------NUTRI 8 -----------------------------------------------------
 
 class Nutri8 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri8;
-
-  Nutri8({this.valueNotifierNutri8});
-
   @override
-  Nutri8WidgetState createState() => Nutri8WidgetState();
+  CheckNutri8WidgetState createState() => CheckNutri8WidgetState();
 }
 
-class Nutri8WidgetState extends State<Nutri8> {
+class CheckNutri8WidgetState extends State<Nutri8> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[7]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri8.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri8.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[7]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri8Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri8Opcion *******************
+
+var id_nutri8;
+
+class Nutri8Opcion extends StatefulWidget {
+  @override
+  Nutri8OpcionWidgetState createState() => Nutri8OpcionWidgetState();
+}
+
+class Nutri8OpcionWidgetState extends State<Nutri8Opcion> {
+  @override
+  void initState() {
+    id_nutri8 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri8,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri8 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -632,32 +1143,85 @@ class Nutri8WidgetState extends State<Nutri8> {
 // -----------------------------------------NUTRI 8.1 -----------------------------------------------------
 
 class Nutri81 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri81;
-
-  Nutri81({this.valueNotifierNutri81});
-
   @override
-  Nutri81WidgetState createState() => Nutri81WidgetState();
+  CheckNutri81WidgetState createState() => CheckNutri81WidgetState();
 }
 
-class Nutri81WidgetState extends State<Nutri81> {
+class CheckNutri81WidgetState extends State<Nutri81> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[10]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri81.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri81.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[0]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri81Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri81Opcion *******************
+
+var id_nutri81;
+
+class Nutri81Opcion extends StatefulWidget {
+  @override
+  Nutri81OpcionWidgetState createState() => Nutri81OpcionWidgetState();
+}
+
+class Nutri81OpcionWidgetState extends State<Nutri81Opcion> {
+  @override
+  void initState() {
+    id_nutri81 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri81,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri81 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -665,32 +1229,85 @@ class Nutri81WidgetState extends State<Nutri81> {
 //-------------------------------------------- NUTRI 9 -----------------------------------------------------------
 
 class Nutri9 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri9;
-
-  Nutri9({this.valueNotifierNutri9});
-
   @override
-  Nutri9WidgetState createState() => Nutri9WidgetState();
+  CheckNutri9WidgetState createState() => CheckNutri9WidgetState();
 }
 
-class Nutri9WidgetState extends State<Nutri9> {
+class CheckNutri9WidgetState extends State<Nutri9> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[8]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri9.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri9.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[8]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri9Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri9Opcion *******************
+
+var id_nutri9;
+
+class Nutri9Opcion extends StatefulWidget {
+  @override
+  Nutri9OpcionWidgetState createState() => Nutri9OpcionWidgetState();
+}
+
+class Nutri9OpcionWidgetState extends State<Nutri9Opcion> {
+  @override
+  void initState() {
+    id_nutri9 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri9,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri9 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -698,32 +1315,85 @@ class Nutri9WidgetState extends State<Nutri9> {
 //-------------------------------------------- NUTRI 9.1 -----------------------------------------------------------
 
 class Nutri91 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri91;
-
-  Nutri91({this.valueNotifierNutri91});
-
   @override
-  Nutri91WidgetState createState() => Nutri91WidgetState();
+  CheckNutri91WidgetState createState() => CheckNutri91WidgetState();
 }
 
-class Nutri91WidgetState extends State<Nutri91> {
+class CheckNutri91WidgetState extends State<Nutri91> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[11]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri91.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri91.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[0]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri91Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri91Opcion *******************
+
+var id_nutri91;
+
+class Nutri91Opcion extends StatefulWidget {
+  @override
+  Nutri91OpcionWidgetState createState() => Nutri91OpcionWidgetState();
+}
+
+class Nutri91OpcionWidgetState extends State<Nutri91Opcion> {
+  @override
+  void initState() {
+    id_nutri91 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri91,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri91 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -731,32 +1401,85 @@ class Nutri91WidgetState extends State<Nutri91> {
 // -------------------------------------------NUTRI 10 --------------------------------------------
 
 class Nutri10 extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierNutri10;
-
-  Nutri10({this.valueNotifierNutri10});
-
   @override
-  Nutri10WidgetState createState() => Nutri10WidgetState();
+  CheckNutri10WidgetState createState() => CheckNutri10WidgetState();
 }
 
-class Nutri10WidgetState extends State<Nutri10> {
+class CheckNutri10WidgetState extends State<Nutri10> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaNutricional[9]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      value: widget.valueNotifierNutri10.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierNutri10.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                respuestaNutricional[9]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Nutri10Opcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// Nutri10Opcion *******************
+
+var id_nutri10;
+
+class Nutri10Opcion extends StatefulWidget {
+  @override
+  Nutri10OpcionWidgetState createState() => Nutri10OpcionWidgetState();
+}
+
+class Nutri10OpcionWidgetState extends State<Nutri10Opcion> {
+  @override
+  void initState() {
+    id_nutri10 = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasNutricion
+            .map((list) => RadioListTile(
+                  groupValue: id_nutri10,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nutri10 = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }

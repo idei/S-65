@@ -152,10 +152,6 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
                   child:
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                     ListTile(
-                      leading: Icon(
-                        Icons.wifi_1_bar_rounded,
-                        size: 30,
-                      ),
                       title: Text('Aviso: ' + '$descripcion'.toUpperCase(),
                           style: TextStyle(
                               fontFamily: Theme.of(context)

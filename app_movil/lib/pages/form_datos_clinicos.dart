@@ -525,7 +525,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
     if (response.statusCode == 200) {
       if (data["status"] == "Success") {
-        if (descri_informe == "") {
+        if (descri_informe != "") {
           _alert_clinicos(
               context, "Informacion para tener en cuenta", descri_informe, 2);
         } else {
@@ -742,6 +742,7 @@ _alert_informe(context, message, colorNumber) {
 
 _alert_clinicos(context, title, descripcion, number) async {
   Alert(
+    closeFunction: () {},
     context: context,
     title: title,
     desc: descripcion,

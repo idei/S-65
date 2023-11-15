@@ -65,9 +65,6 @@ $rutaRaiz = Env::$_URL_API;
               <div id="mensaje">
               </div>
               
-              <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')"><i class="fa fa-plus" aria-hidden="true"></i></button>
-
-
             </div>
             <!-- /.card-header -->
             <div class="card-body table-responsive p-0" style="height: 600px;">
@@ -269,39 +266,7 @@ $rutaRaiz = Env::$_URL_API;
 
 </body>
 
-<!-- Modal Nuevo Paciente-->
-<div class="modal fade" id="nuevoPacienteModal" tabindex="-1" role="dialog" aria-labelledby="nuevoPacienteModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Nueva Solicitud <abbr title="Envia una solicitud al paciente"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div id="modal_nuevo_anuncio" class="modal-body">
-        <div id="formulario">
-        <form action="" method="post">
-          <div class="form-group">
-          <label for="dni-text" class="col-form-label">Dni:</label>
-          <input class="form-control" id="dni_paciente" type="number" value="">
-          </div>
-          <div class="form-group">
-            <label for="descripcion-text" class="col-form-label">Mensaje(Opcional):</label>
-            <textarea class="form-control" id="mensaje_paciente"></textarea>
-          </div>
-        </form>
-        </div>
-        <div id="mensajeResultado"></div>
-      </div>
-      <div class="modal-footer">
-        <button id="button_enviar" type="button" class="btn btn-primary" onclick="envio_solicitud()">Enviar</button>
-        <button id="button_ok" data-dismiss="modal" type="button" class="btn btn-primary" style="display: none;">Entendido</button>
 
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 

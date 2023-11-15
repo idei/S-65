@@ -243,6 +243,35 @@ function read_pacientes()
     Flight::json($returnData);
 }
 
+function list_pacientes()
+{
+
+    try {
+
+        $smt = Flight::db()->prepare("select * FROM `pacientes`");
+        $smt->execute();
+
+        if ($smt->rowCount() > 0) {
+            $result = $smt->fetchAll();
+
+            foreach ($result as $results) {
+                $data[] = $results;
+            }
+
+
+            $returnData = msg("Success", $data);
+        } else {
+
+            $returnData = msg("Vacio", []);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
 function solicitud_medico_paciente()
 {
 
@@ -1477,9 +1506,9 @@ function read_recordatorio_medicos()
         $stmt = Flight::db()->prepare("SELECT medicos.id id_medico, medicos.nombre, medicos.apellido, medicos.dni, medicos.matricula, tipo_screening.nombre nombre_screening, tipo_screening.codigo codigo_screening
         FROM recordatorios_medicos 
         JOIN users ON users.id = recordatorios_medicos.rela_medico 
-        JOIN medicos ON medicos.rela_users = users.id
+        JOIN medicos ON medicos.id = recordatorios_medicos.rela_medico
         JOIN tipo_screening ON tipo_screening.id = recordatorios_medicos.rela_screening 
-        WHERE recordatorios_medicos.id ='" . $id_recordatorio . "'");
+        WHERE recordatorios_medicos.id = '" . $id_recordatorio . "'");
 
         $stmt->execute();
 
@@ -2735,75 +2764,75 @@ function respuesta_screening_fisico()
 
 
     //--------------------------------------------------
-    $dolor_cabeza = $_POST['dolor_cabeza'] == "true" ? 1 : 0;
+    $dolor_cabeza = $_POST['dolor_cabeza'] == "977" ? 1 : 0;
 
-    $mareos = $_POST['mareos'] == "true" ? 1 : 0;
+    $mareos = $_POST['mareos'] == "977" ? 1 : 0;
 
-    $nauceas = $_POST['nauceas'] == "true" ? 1 : 0;
+    $nauceas = $_POST['nauceas'] == "977" ? 1 : 0;
 
-    $vomito = $_POST['vomito'] == "true" ? 1 : 0;
+    $vomito = $_POST['vomito'] == "977" ? 1 : 0;
 
-    $fatiga_excesiva = $_POST['fatiga_excesiva'] == "true" ? 1 : 0;
+    $fatiga_excesiva = $_POST['fatiga_excesiva'] == "977" ? 1 : 0;
 
-    $urinaria = $_POST['urinaria'] == "true" ? 1 : 0;
+    $urinaria = $_POST['urinaria'] == "977" ? 1 : 0;
 
-    $problemas_instestinales = $_POST['problemas_instestinales'] == "true" ? 1 : 0;
+    $problemas_instestinales = $_POST['problemas_instestinales'] == "977" ? 1 : 0;
 
-    $debilidad_lado_cuerpo = $_POST['debilidad_lado_cuerpo'] == "true" ? 1 : 0;
+    $debilidad_lado_cuerpo = $_POST['debilidad_lado_cuerpo'] == "977" ? 1 : 0;
 
-    $problemas_motricidad = $_POST['problemas_motricidad'] == "true" ? 1 : 0;
+    $problemas_motricidad = $_POST['problemas_motricidad'] == "977" ? 1 : 0;
 
-    $temblores = $_POST['temblores'] == "true" ? 1 : 0;
+    $temblores = $_POST['temblores'] == "977" ? 1 : 0;
 
-    $inestabilidad_marcha = $_POST['inestabilidad_marcha'] == "true" ? 1 : 0;
+    $inestabilidad_marcha = $_POST['inestabilidad_marcha'] == "977" ? 1 : 0;
 
-    $tics_mov_extranos = $_POST['tics_mov_extranos'] == "true" ? 1 : 0;
+    $tics_mov_extranos = $_POST['tics_mov_extranos'] == "977" ? 1 : 0;
 
-    $problemas_equilibrio = $_POST['problemas_equilibrio'] == "true" ? 1 : 0;
+    $problemas_equilibrio = $_POST['problemas_equilibrio'] == "977" ? 1 : 0;
 
-    $choque_cosas = $_POST['choque_cosas'] == "true" ? 1 : 0;
+    $choque_cosas = $_POST['choque_cosas'] == "977" ? 1 : 0;
 
-    $desmayo = $_POST['desmayo'] == "true" ? 1 : 0;
+    $desmayo = $_POST['desmayo'] == "977" ? 1 : 0;
 
-    $caidas = $_POST['caidas'] == "true" ? 1 : 0;
+    $caidas = $_POST['caidas'] == "977" ? 1 : 0;
 
-    $perdida_sensibilidad = $_POST['perdida_sensibilidad'] == "true" ? 1 : 0;
+    $perdida_sensibilidad = $_POST['perdida_sensibilidad'] == "977" ? 1 : 0;
 
-    $cosquilleo_piel = $_POST['cosquilleo_piel'] == "true" ? 1 : 0;
+    $cosquilleo_piel = $_POST['cosquilleo_piel'] == "977" ? 1 : 0;
 
-    $ojos_claridad = $_POST['ojos_claridad'] == "true" ? 1 : 0;
+    $ojos_claridad = $_POST['ojos_claridad'] == "977" ? 1 : 0;
 
-    $perdida_audicion = $_POST['perdida_audicion'] == "true" ? 1 : 0;
+    $perdida_audicion = $_POST['perdida_audicion'] == "977" ? 1 : 0;
 
-    $utiliza_audifonos = $_POST['utiliza_audifonos'] == "true" ? 1 : 0;
+    $utiliza_audifonos = $_POST['utiliza_audifonos'] == "977" ? 1 : 0;
 
-    $zumbido = $_POST['zumbido'] == "true" ? 1 : 0;
+    $zumbido = $_POST['zumbido'] == "977" ? 1 : 0;
 
-    $anteojo_cerca = $_POST['anteojo_cerca'] == "true" ? 1 : 0;
+    $anteojo_cerca = $_POST['anteojo_cerca'] == "977" ? 1 : 0;
 
-    $anteojo_lejos = $_POST['anteojo_lejos'] == "true" ? 1 : 0;
+    $anteojo_lejos = $_POST['anteojo_lejos'] == "977" ? 1 : 0;
 
-    $vision_lado = $_POST['vision_lado'] == "true" ? 1 : 0;
+    $vision_lado = $_POST['vision_lado'] == "977" ? 1 : 0;
 
-    $vision_borrosa = $_POST['vision_borrosa'] == "true" ? 1 : 0;
+    $vision_borrosa = $_POST['vision_borrosa'] == "977" ? 1 : 0;
 
-    $vision_doble = $_POST['vision_doble'] == "true" ? 1 : 0;
+    $vision_doble = $_POST['vision_doble'] == "977" ? 1 : 0;
 
-    $cosas_no_existen = $_POST['cosas_no_existen'] == "true" ? 1 : 0;
+    $cosas_no_existen = $_POST['cosas_no_existen'] == "977" ? 1 : 0;
 
-    $sensibilidad_cosas_brillantes = $_POST['sensibilidad_cosas_brillantes'] == "true" ? 1 : 0;
+    $sensibilidad_cosas_brillantes = $_POST['sensibilidad_cosas_brillantes'] == "977" ? 1 : 0;
 
-    $periodos_ceguera = $_POST['periodos_ceguera'] == "true" ? 1 : 0;
+    $periodos_ceguera = $_POST['periodos_ceguera'] == "977" ? 1 : 0;
 
-    $persibe_cosas_cuerpo = $_POST['persibe_cosas_cuerpo'] == "true" ? 1 : 0;
+    $persibe_cosas_cuerpo = $_POST['persibe_cosas_cuerpo'] == "977" ? 1 : 0;
 
-    $dificultad_calor_frio = $_POST['dificultad_calor_frio'] == "true" ? 1 : 0;
+    $dificultad_calor_frio = $_POST['dificultad_calor_frio'] == "977" ? 1 : 0;
 
-    $problemas_gusto = $_POST['problemas_gusto'] == "true" ? 1 : 0;
+    $problemas_gusto = $_POST['problemas_gusto'] == "977" ? 1 : 0;
 
-    $problemas_olfato = $_POST['problemas_olfato'] == "true" ? 1 : 0;
+    $problemas_olfato = $_POST['problemas_olfato'] == "977" ? 1 : 0;
 
-    $dolor = $_POST['dolor'] == "true" ? 1 : 0;
+    $dolor = $_POST['dolor'] == "977" ? 1 : 0;
 
 
     $cod_event_dolor_cabeza = $_POST['cod_event_dolor_cabeza'];
@@ -3371,127 +3400,155 @@ function respuesta_screening_animo()
 
     $result_screening = 0;
 
-    if ($_POST['satisfecho'] == "true") {
-        $satisfecho = 1;
-        $result_screening += 0;
+    // 1
+    if (isset($_POST['satisfecho'])) {
+        $satisfecho = $_POST["satisfecho"];
+        if ($satisfecho == "978") {
+            $result_screening += 1;
+        }
     } else {
-        $satisfecho = 0;
-        $result_screening += 1;
+        $satisfecho = verificar($data_input, "satisfecho");
     }
 
-    if ($_POST['abandonado'] == "true") {
-        $abandonado = 1;
-        $result_screening += 1;
+    // 2
+    if (isset($_POST['abandonado'])) {
+        $abandonado = $_POST["abandonado"];
+        if ($abandonado == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $abandonado = 0;
-        $result_screening += 0;
+        $abandonado = verificar($data_input, "abandonado");
     }
 
-    if ($_POST['vacia'] == "true") {
-        $vacia = 1;
-        $result_screening += 1;
+    // 3
+    if (isset($_POST['vacia'])) {
+        $vacia = $_POST["vacia"];
+        if ($vacia == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $vacia = 0;
-        $result_screening += 0;
+        $vacia = verificar($data_input, "vacia");
     }
 
-    if ($_POST['aburrida'] == "true") {
-        $aburrida = 1;
-        $result_screening += 1;
+    // 4
+    if (isset($_POST['aburrida'])) {
+        $aburrida = $_POST["aburrida"];
+        if ($abandonado == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $aburrida = 0;
-        $result_screening += 0;
+        $aburrida = verificar($data_input, "aburrida");
     }
 
-    if ($_POST['humor'] == "true") {
-        $humor = 1;
-        $result_screening += 0;
+    // 5
+    if (isset($_POST['humor'])) {
+        $humor = $_POST["humor"];
+        if ($humor == "978") {
+            $result_screening += 1;
+        }
     } else {
-        $humor = 0;
-        $result_screening += 1;
+        $humor = verificar($data_input, "humor");
     }
 
-
-    if ($_POST['temor'] == "true") {
-        $temor = 1;
-        $result_screening += 1;
+    // 6
+    if (isset($_POST['temor'])) {
+        $temor = $_POST["temor"];
+        if ($temor == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $temor = 0;
-        $result_screening += 0;
+        $temor = verificar($data_input, "temor");
+    }
+    
+    //  7
+    if (isset($_POST['feliz'])) {
+        $feliz = $_POST["feliz"];
+        if ($feliz == "978") {
+            $result_screening += 1;
+        }
+    } else {
+        $feliz = verificar($data_input, "feliz");
     }
 
-    if ($_POST['feliz'] == "true") {
-        $feliz = 1;
-        $result_screening += 0;
+    // 8
+    if (isset($_POST['desamparado'])) {
+        $desamparado = $_POST["desamparado"];
+        
+        if ($desamparado == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $feliz = 0;
-        $result_screening += 1;
+        $desamparado = verificar($data_input, "desamparado");
+    }
+    // 9
+    if (isset($_POST['prefiere'])) {
+        $prefiere = $_POST["prefiere"];
+        if ($prefiere == "977") {
+            $result_screening += 1;
+        }
+    } else {
+        $prefiere = verificar($data_input, "prefiere");
+    }
+    
+    // 10
+    if (isset($_POST['memoria'])) {
+        $memoria = $_POST["memoria"];
+        if ($memoria == "977") {
+            $result_screening += 1;
+        }
+    } else {
+        $memoria = verificar($data_input, "memoria");
     }
 
-
-    if ($_POST['desamparado'] == "true") {
-        $desamparado = 1;
-        $result_screening += 1;
+    // 11
+    if (isset($_POST['estar_vivo'])) {
+        $estar_vivo = $_POST["estar_vivo"];
+        if ($estar_vivo == "978") {
+            $result_screening += 1;
+        }
     } else {
-        $desamparado = 0;
-        $result_screening += 0;
+        $estar_vivo = verificar($data_input, "estar_vivo");
     }
 
-    if ($_POST['prefiere'] == "true") {
-        $prefiere = 1;
-        $result_screening += 1;
+    // 12
+    if (isset($_POST['inutil'])) {
+        $inutil = $_POST["inutil"];
+        if ($inutil == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $prefiere = 0;
-        $result_screening += 0;
+        $inutil = verificar($data_input, "inutil");
     }
 
-    if ($_POST['memoria'] == "true") {
-        $memoria = 1;
-        $result_screening += 1;
+    // 13
+    if (isset($_POST['energia'])) {
+        $energia = $_POST["energia"];
+        if ($energia == "978") {
+            $result_screening += 1;
+        }
     } else {
-        $memoria = 0;
-        $result_screening += 0;
+        $energia = verificar($data_input, "energia");
     }
 
-    if ($_POST['estar_vivo'] == "true") {
-        $estar_vivo = 1;
-        $result_screening += 0;
+    // 14
+
+    if (isset($_POST['situacion'])) {
+        $situacion = $_POST["situacion"];
+        if ($situacion == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $estar_vivo = 0;
-        $result_screening += 1;
+        $situacion = verificar($data_input, "situacion");
     }
-
-
-    if ($_POST['inutil'] == "true") {
-        $inutil = 1;
-        $result_screening += 1;
+    
+    // 15
+    if (isset($_POST['situacion_mejor'])) {
+        $situacion_mejor = $_POST["situacion_mejor"];
+        if ($situacion_mejor == "977") {
+            $result_screening += 1;
+        }
     } else {
-        $inutil = 0;
-        $result_screening += 0;
-    }
-
-    if ($_POST['energia'] == "true") {
-        $energia = 1;
-        $result_screening += 0;
-    } else {
-        $energia = 0;
-        $result_screening += 1;
-    }
-
-    if ($_POST['situacion'] == "true") {
-        $situacion = 1;
-        $result_screening += 1;
-    } else {
-        $situacion = 0;
-        $result_screening += 0;
-    }
-
-    if ($_POST['situacion_mejor'] == "true") {
-        $situacion_mejor = 1;
-        $result_screening += 1;
-    } else {
-        $situacion_mejor = 0;
-        $result_screening += 0;
+        $situacion_mejor = verificar($data_input, "situacion_mejor");
     }
 
     // Guardamos el resultado del screening
@@ -3504,13 +3561,13 @@ function respuesta_screening_animo()
     $insert_resultado->bindParam(3, $id_medico);
     $insert_resultado->bindParam(4, $result_screening);
 
+    $insert_resultado->execute();
+
     $last->execute();
 
+    $id_respuesta = $insert_resultado->fetch();
     $last = $last->fetch();
     $id_respuesta = $last["id"];
-
-    // Flight::json("salida". $respuestabool );
-    // exit;
     //--------------------------------------------------
 
 
@@ -4827,35 +4884,35 @@ function respuesta_screening_nutricional()
     $result_screening = 0;
 
 
-    if ($_POST['nutri1'] == "true") {
+    if ($_POST['nutri1'] == "977") {
         $nutri1 = 1;
         $result_screening += 2;
     } else {
         $nutri1 = 0;
     }
 
-    if ($_POST['nutri2'] == "true") {
+    if ($_POST['nutri2'] == "977") {
         $nutri2 = 1;
         $result_screening += 3;
     } else {
         $nutri2 = 0;
     }
 
-    if ($_POST['nutri3'] == "true") {
+    if ($_POST['nutri3'] == "977") {
         $nutri3 = 1;
         $result_screening += 2;
     } else {
         $nutri3 = 0;
     }
 
-    if ($_POST['nutri4'] == "true") {
+    if ($_POST['nutri4'] == "977") {
         $nutri4 = 1;
         $result_screening += 2;
     } else {
         $nutri4 = 0;
     }
 
-    if ($_POST['nutri5'] == "true") {
+    if ($_POST['nutri5'] == "977") {
         $nutri5 = 1;
         $result_screening += 2;
     } else {
@@ -4863,49 +4920,49 @@ function respuesta_screening_nutricional()
     }
 
 
-    if ($_POST['nutri6'] == "true") {
+    if ($_POST['nutri6'] == "977") {
         $nutri6 = 1;
         $result_screening += 4;
     } else {
         $nutri6 = 0;
     }
 
-    if ($_POST['nutri7'] == "true") {
+    if ($_POST['nutri7'] == "977") {
         $nutri7 = 1;
         $result_screening += 1;
     } else {
         $nutri7 = 0;
     }
 
-    if ($_POST['nutri8'] == "true") {
+    if ($_POST['nutri8'] == "977") {
         $nutri8 = 1;
         $result_screening += 1;
     } else {
         $nutri8 = 0;
     }
 
-    if ($_POST['nutri81'] == "true") {
-        $nutri81 = 1;
-        $result_screening += 1;
-    } else {
-        $nutri81 = 0;
-    }
+    // if ($_POST['nutri81'] == "977") {
+    //     $nutri81 = 1;
+    //     $result_screening += 1;
+    // } else {
+    //     $nutri81 = 0;
+    // }
 
-    if ($_POST['nutri9'] == "true") {
+    if ($_POST['nutri9'] == "977") {
         $nutri9 = 1;
         $result_screening += 2;
     } else {
         $nutri9 = 0;
     }
 
-    if ($_POST['nutri91'] == "true") {
-        $nutri91 = 1;
-        $result_screening += 2;
-    } else {
-        $nutri91 = 0;
-    }
+    // if ($_POST['nutri91'] == "977") {
+    //     $nutri91 = 1;
+    //     $result_screening += 2;
+    // } else {
+    //     $nutri91 = 0;
+    // }
 
-    if ($_POST['nutri10'] == "true") {
+    if ($_POST['nutri10'] == "977") {
         $nutri10 = 1;
         $result_screening += 2;
     } else {
@@ -4970,21 +5027,21 @@ function respuesta_screening_nutricional()
     } else {
         $cod_event_nutri8 = verificar($data_input, "cod_event_nutri8");
     }
-    if (isset($_POST['cod_event_nutri81'])) {
-        $cod_event_nutri81 = $_POST["cod_event_nutri81"];
-    } else {
-        $cod_event_nutri81 = verificar($data_input, "cod_event_nutri81");
-    }
+    // if (isset($_POST['cod_event_nutri81'])) {
+    //     $cod_event_nutri81 = $_POST["cod_event_nutri81"];
+    // } else {
+    //     $cod_event_nutri81 = verificar($data_input, "cod_event_nutri81");
+    // }
     if (isset($_POST['cod_event_nutri9'])) {
         $cod_event_nutri9 = $_POST["cod_event_nutri9"];
     } else {
         $cod_event_nutri9 = verificar($data_input, "cod_event_nutri9");
     }
-    if (isset($_POST['cod_event_nutri91'])) {
-        $cod_event_nutri91 = $_POST["cod_event_nutri91"];
-    } else {
-        $cod_event_nutri91 = verificar($data_input, "cod_event_nutri91");
-    }
+    // if (isset($_POST['cod_event_nutri91'])) {
+    //     $cod_event_nutri91 = $_POST["cod_event_nutri91"];
+    // } else {
+    //     $cod_event_nutri91 = verificar($data_input, "cod_event_nutri91");
+    // }
     if (isset($_POST['cod_event_nutri10'])) {
         $cod_event_nutri10 = $_POST["cod_event_nutri10"];
     } else {
@@ -5112,18 +5169,18 @@ function respuesta_screening_nutricional()
                 );
             }
 
-            if ($eventos["codigo_evento"] == $cod_event_nutri81) {
-                $rowsToInsert[] = array(
-                    'rela_tipo' => $nutri81,
-                    'rela_evento' => $eventos["id"],
-                    'rela_tipo_screening' => $tipo_screening,
-                    'rela_recordatorio_medico' => $recordatorio_medico,
-                    'rela_paciente' => $id_paciente,
-                    'estado' => $estado,
-                    'fecha_alta' => $fecha,
-                    'rela_resultado' => $id_respuesta,
-                );
-            }
+            // if ($eventos["codigo_evento"] == $cod_event_nutri81) {
+            //     $rowsToInsert[] = array(
+            //         'rela_tipo' => $nutri81,
+            //         'rela_evento' => $eventos["id"],
+            //         'rela_tipo_screening' => $tipo_screening,
+            //         'rela_recordatorio_medico' => $recordatorio_medico,
+            //         'rela_paciente' => $id_paciente,
+            //         'estado' => $estado,
+            //         'fecha_alta' => $fecha,
+            //         'rela_resultado' => $id_respuesta,
+            //     );
+            // }
 
             if ($eventos["codigo_evento"] == $cod_event_nutri9) {
                 $rowsToInsert[] = array(
@@ -5138,18 +5195,18 @@ function respuesta_screening_nutricional()
                 );
             }
 
-            if ($eventos["codigo_evento"] == $cod_event_nutri91) {
-                $rowsToInsert[] = array(
-                    'rela_tipo' => $nutri91,
-                    'rela_evento' => $eventos["id"],
-                    'rela_tipo_screening' => $tipo_screening,
-                    'rela_recordatorio_medico' => $recordatorio_medico,
-                    'rela_paciente' => $id_paciente,
-                    'estado' => $estado,
-                    'fecha_alta' => $fecha,
-                    'rela_resultado' => $id_respuesta,
-                );
-            }
+            // if ($eventos["codigo_evento"] == $cod_event_nutri91) {
+            //     $rowsToInsert[] = array(
+            //         'rela_tipo' => $nutri91,
+            //         'rela_evento' => $eventos["id"],
+            //         'rela_tipo_screening' => $tipo_screening,
+            //         'rela_recordatorio_medico' => $recordatorio_medico,
+            //         'rela_paciente' => $id_paciente,
+            //         'estado' => $estado,
+            //         'fecha_alta' => $fecha,
+            //         'rela_resultado' => $id_respuesta,
+            //     );
+            // }
 
             if ($eventos["codigo_evento"] == $cod_event_nutri10) {
                 $rowsToInsert[] = array(
@@ -5209,6 +5266,27 @@ function tipo_respuesta_quejas()
 {
     try {
         $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('TRES3','TRES7','TRES8','TRES10','TRES9')");
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $lista = array();
+        if ($stmt->rowCount() > 0) {
+            foreach ($result as $results) {
+                $lista[] = $results;
+            }
+            $returnData = msg("Success", $lista);
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function tipo_respuesta_animo()
+{
+    try {
+        $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('SCER60','SCER61')");
         $stmt->execute();
         $result = $stmt->fetchAll();
         $lista = array();

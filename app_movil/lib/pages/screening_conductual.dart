@@ -834,24 +834,21 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       "id_conductual13": id_conductual13,
     });
 
-    var data = json.decode(response.body);
-
     if (response.statusCode == 200) {
-      if (data['data'] == "alert") {
-        _alert_informe(
-          context,
-          "Para tener en cuenta",
-          "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
-        );
-      } else {
-        if (data['status'] == "Success") {
-          if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/recordatorio');
-          } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          }
+      var data = json.decode(response.body);
+      if (data['status'] == "Success") {
+        if (data['data'] == "alert") {
+          _alert_informe(
+            context,
+            "Para tener en cuenta",
+            "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
+          );
+        } else {
+          _alert_informe(
+            context,
+            "Resultado:",
+            "No se presentaron resultados que indiquen algún problema.",
+          );
         }
       }
     }

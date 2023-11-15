@@ -6,6 +6,7 @@ import 'package:app_salud/pages/env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
+import '../widgets/CustomDivider.dart';
 import '../widgets/opciones_navbar.dart';
 
 class ScreeningBPage extends StatefulWidget {
@@ -1294,50 +1295,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
             padding: EdgeInsets.all(4.0),
           ),
         ]),
-      ),
-    );
-  }
-}
-
-class CustomDivider extends StatefulWidget {
-  var text;
-  var color;
-
-  CustomDivider({this.text, this.color});
-
-  @override
-  State<CustomDivider> createState() => _CustomDividerState();
-}
-
-class _CustomDividerState extends State<CustomDivider> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          Expanded(
-              child: Divider(
-            thickness: 5,
-            color: widget.color,
-          )),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              widget.text,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-              child: Divider(
-            thickness: 5,
-            color: widget.color,
-          )),
-        ],
       ),
     );
   }

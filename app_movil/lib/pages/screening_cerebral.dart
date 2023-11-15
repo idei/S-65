@@ -1033,9 +1033,11 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
       "id_esperanza_habito_saludable": id_esperanza_habito_saludable.toString()
     });
 
-    var data = json.decode(response.body);
+    var data;
 
     if (response.statusCode == 200) {
+      data = json.decode(response.body);
+
       if (data['data'] == "alert") {
         showCustomAlert(
           context,
@@ -1046,11 +1048,12 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
             _scaffold_messenger(context, "Screening Registrado", 1);
 
             if (screening_recordatorio == true) {
-              Navigator.pushNamed(context, '/menu_chequeo');
+              Navigator.pushNamed(context, '/recordatorio');
             } else {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "SCER",
-              });
+              // Navigator.pushNamed(context, '/screening', arguments: {
+              //   "select_screening": "SCER",
+              // });
+              Navigator.pushNamed(context, '/menu_chequeo');
             }
           },
         );
@@ -1059,11 +1062,12 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
 
         if (data['status'] == "Success") {
           if (screening_recordatorio == true) {
-            Navigator.pushNamed(context, '/menu_chequeo');
+            Navigator.pushNamed(context, '/recordatorio');
           } else {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "SCER",
-            });
+            // Navigator.pushNamed(context, '/screening', arguments: {
+            //   "select_screening": "SCER",
+            // });
+            Navigator.pushNamed(context, '/menu_chequeo');
           }
         }
       }

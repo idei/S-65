@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
@@ -18,6 +19,7 @@ var result_screening;
 var mensaje = "";
 var codigo;
 var titulo;
+var fechaFormateada;
 
 class _VerScreeningState extends State<VerScreening> {
   @override
@@ -29,11 +31,19 @@ class _VerScreeningState extends State<VerScreening> {
     result_screening = parametros["result_screening"];
     codigo = parametros["codigo"];
 
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fecha);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
+
     if (codigo == "SFMS") {
       titulo = "Físico";
       if (double.parse(result_screening) > 3) {
         mensaje =
             "A tener en cuenta: Le sugerimos que consulte con su médico clínico sobre estos síntomas.";
+      } else {
+        mensaje = "Resultado: Su estado de Ánimo es bueno.";
       }
     }
 
@@ -41,7 +51,12 @@ class _VerScreeningState extends State<VerScreening> {
       titulo = "de Cognición";
       if (double.parse(result_screening) > 20) {
         mensaje =
-            "Sería bueno que consulte con su médico clínico o neurólogo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.";
+            "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurólogo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.";
+      }
+
+      if (double.parse(result_screening) < 20) {
+        mensaje =
+            "Resultado: En este momento no presenta quejas cognitivas significativas. Continue estimulando sus funciones cognitivas, como la memoria, con actividades desafiantes para su cerebro.";
       }
     }
 
@@ -51,13 +66,21 @@ class _VerScreeningState extends State<VerScreening> {
         mensaje =
             "A tener en cuenta: Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ";
       }
+
+      if (double.parse(result_screening) < 9) {
+        mensaje =
+            "Resultado: En este momento no presenta sintomatología del estado del ánimo que requiera una consulta con especialista. Sin embargo, le sugerimos seguir controlando su estado de ánimo periódicamente.";
+      }
     }
 
     if (codigo == "CONDUC") {
       titulo = "Conductual";
       if (double.parse(result_screening) > 4) {
         mensaje =
-            "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.";
+            "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.";
+      } else {
+        mensaje =
+            "Resultado: No se presentaron resultados que indiquen algún problema.";
       }
     }
 
@@ -65,7 +88,7 @@ class _VerScreeningState extends State<VerScreening> {
       titulo = "de CDR";
       if (double.parse(result_screening) > 1) {
         mensaje =
-            "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurologo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.";
+            "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.";
       }
     }
 
@@ -178,7 +201,7 @@ class _VerScreeningState extends State<VerScreening> {
               SizedBox(
                 height: 20,
               ),
-              Text("Fecha: $fecha ",
+              Text("Fecha: $fechaFormateada ",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontFamily:

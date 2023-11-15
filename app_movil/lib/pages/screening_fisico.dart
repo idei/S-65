@@ -1,10 +1,12 @@
-import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
 import 'package:app_salud/widgets/alert_informe.dart';
+import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
+import '../widgets/CustomDivider.dart';
 import 'env.dart';
 import 'ajustes.dart';
 
@@ -16,6 +18,7 @@ var screening_recordatorio;
 var email;
 var usuarioModel;
 var cant_check = 0;
+List itemsRespuestasFisico = [];
 
 class FormScreeningSintomas extends StatefulWidget {
   final pageName = 'screening_fisico';
@@ -31,6 +34,13 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   void initState() {
     super.initState();
     cant_check = 0;
+    WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
+          context,
+          "Cuestionario Físico",
+          "¿Usted presentó alguno de los siguientes sintomas en los últimos 6 meses?",
+          true,
+          () => Navigator.pop(context),
+        ));
   }
 
   @override
@@ -143,9 +153,28 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   }
 }
 
+Future getAllRespuestaFisico() async {
+  await getAllEventosFisico();
+
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_respuesta_animo";
+  var response = await http.post(url, body: {});
+
+  var jsonDate = json.decode(response.body);
+
+  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+    //setState(() {
+    itemsRespuestasFisico = jsonDate['data'];
+    //});
+    return true;
+  } else {
+    return false;
+  }
+}
+
 List respuestaFisico;
 
-Future<List> getAllRespuestaFisico() async {
+Future<List> getAllEventosFisico() async {
   var response;
 
   String URL_base = Env.URL_API;
@@ -174,276 +203,154 @@ class ScreeningFisico extends StatefulWidget {
 class FisicoWidgetState extends State<ScreeningFisico> {
   final _formKey_screening_fisico = GlobalKey<FormState>();
 
-// FISICO
-
-  ValueNotifier<bool> valueNotifierDolorCabeza = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierMareos = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierNauceas = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierVomito = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierFatigaExcesiva = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierUrinaria = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierProblemasInstestinales =
-      ValueNotifier<bool>(false);
-
-// MOTOR
-
-  ValueNotifier<bool> valueNotifierDebilidadLadoCuerpo =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierProblemasMotricidad =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierTemblores = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierInestabilidadMarcha =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierTicsMovExtranos = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierProblemasEquilibrio =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierChoqueCosas = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierDesmayo = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierCaidas = ValueNotifier<bool>(false);
-
-// Sensibilidad
-
-  ValueNotifier<bool> valueNotifierPerdidaSensibilidad =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierCosquilleoPiel = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierOjosClaridad = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierPerdidaAudicion = ValueNotifier<bool>(false);
-
-  ValueNotifier<bool> valueNotifierUtilizaAudifonos =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierZumbido = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierAnteojoCerca = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierAnteojoLejos = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierVisionLado = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierVisionBorrosa = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierVisionDoble = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierCosasNoExisten = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierSensibilidadCosasBrillantes =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierPeriodosCeguera = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierPersibeCosasCuerpo =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierDificultadCalorFrio =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierProblemasGusto = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierProblemasOlfato = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierDolor = ValueNotifier<bool>(false);
-
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey_screening_fisico,
-      child: Card(
-        child: ListView(
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(1.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
               padding: EdgeInsets.all(8.0),
             ),
-            CheckDolorCabeza(
-                valueNotifierDolorCabeza: valueNotifierDolorCabeza),
+            DolorCabeza(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            CheckMareos(valueNotifierMareos: valueNotifierMareos),
+            Mareos(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Nauseas(valueNotifierNauceas: valueNotifierNauceas),
+            Nauseas(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Vomitos(valueNotifierVomito: valueNotifierVomito),
+            Vomitos(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            FatigaExcesiva(
-                valueNotifierFatigaExcesiva: valueNotifierFatigaExcesiva),
+            FatigaExcesiva(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            IncontinenciaUrinaria(valueNotifierUrinaria: valueNotifierUrinaria),
+            IncontineciaUrinaria(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemasInstestinales(
-                valueNotifierProblemasInstestinales:
-                    valueNotifierProblemasInstestinales),
+            ProblemasIntestinales(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            DebilidadLadoCuerpo(
-                valueNotifierDebilidadLadoCuerpo:
-                    valueNotifierDebilidadLadoCuerpo),
+            DebilidadLadoCuerpo(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemasMotricidadFina(
-                valueNotifierProblemasMotricidad:
-                    valueNotifierProblemasMotricidad),
+            ProblemasMotricidadFina(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Temblores(valueNotifierTemblores: valueNotifierTemblores),
+            Temblores(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            InestabilidadMarcha(
-                valueNotifierInestabilidadMarcha:
-                    valueNotifierInestabilidadMarcha),
+            InestabilidadMarcha(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            TicsMovExtranos(
-                valueNotifierTicsMovExtranos: valueNotifierTicsMovExtranos),
+            TicsMovExtranos(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemaEquilibrio(
-                valueNotifierProblemasEquilibrio:
-                    valueNotifierProblemasEquilibrio),
+            ProblemasEquilibrio(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ConFrecCosas(valueNotifierChoqueCosas: valueNotifierChoqueCosas),
+            ConFrecuenciaGolpea(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            DesvanDesmayo(valueNotifierDesmayo: valueNotifierDesmayo),
+            DesvanecimientoDesmayo(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Caidas(valueNotifierCaidas: valueNotifierCaidas),
+            Caidas(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            PerdidaSensibilidad(
-                valueNotifierPerdidaSensibilidad:
-                    valueNotifierPerdidaSensibilidad),
+            PerdidaSencibilidad(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            CosqSensaPiel(
-                valueNotifierCosquilleoPiel: valueNotifierCosquilleoPiel),
+            CosquilleoSensacionPiel(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            NecesidadOjosClaridad(
-                valueNotifierOjosClaridad: valueNotifierOjosClaridad),
+            NecesidadOjosClaridad(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            PerdidaAudicion(
-                valueNotifierPerdidaAudicion: valueNotifierPerdidaAudicion),
+            PerdidadAudicion(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            UtilizaAudifonos(
-                valueNotifierUtilizaAudifonos: valueNotifierUtilizaAudifonos),
+            UtilizaAudifonos(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Zumbido(valueNotifierZumbido: valueNotifierZumbido),
+            Zumbido(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            UtilizaAnteojosCerca(
-                valueNotifierAnteojoCerca: valueNotifierAnteojoCerca),
+            UtilizaAnteojosCerca(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            UtilizaAnteojosLejos(
-                valueNotifierAnteojoLejos: valueNotifierAnteojoLejos),
+            UtilizaAnteojosLejos(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemaVisionLado(
-                valueNotifierVisionLado: valueNotifierVisionLado),
+            ProblemasVisionLado(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            VisionBorrosa(
-                valueNotifierVisionBorrosa: valueNotifierVisionBorrosa),
+            VisionBorrosa(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            VisionDoble(valueNotifierVisionDoble: valueNotifierVisionDoble),
+            VisionDoble(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            VeCosasNoExisten(
-                valueNotifierCosasNoExisten: valueNotifierCosasNoExisten),
+            VeCosasNoExisten(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            SensiLucesBrillantes(
-                valueNotifierSensibilidadCosasBrillantes:
-                    valueNotifierSensibilidadCosasBrillantes),
+            SensibilidadLuz(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            PeriodosCortosCeguera(
-                valueNotifierPeriodosCeguera: valueNotifierPeriodosCeguera),
+            PeriodosCortosCeguera(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            CosasPasanCuerpo(
-                valueNotifierPersibeCosasCuerpo:
-                    valueNotifierPersibeCosasCuerpo),
+            CosasPasanCuerpo(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            DistinguirCalorFrio(
-                valueNotifierDificultadCalorFrio:
-                    valueNotifierDificultadCalorFrio),
+            DistinguirCalorFrio(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemasGusto(
-                valueNotifierProblemasGusto: valueNotifierProblemasGusto),
+            ProblemasGusto(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            ProblemasOlfato(
-                valueNotifierProblemasOlfato: valueNotifierProblemasOlfato),
+            ProblemaOlfato(),
             Padding(
               padding: EdgeInsets.all(5.0),
             ),
-            Divider(height: 3.0, color: Colors.black),
-            Dolor(valueNotifierDolor: valueNotifierDolor),
-            Divider(height: 3.0, color: Colors.black),
+            Dolor(),
             Padding(
               padding: EdgeInsets.all(18.0),
             ),
@@ -495,6 +402,59 @@ class FisicoWidgetState extends State<ScreeningFisico> {
   }
 
   guardarDatosFisicos(var cant_check, BuildContext context) async {
+    List<dynamic> ids_fisico = [
+      id_dolor_cabeza,
+      id_mareos,
+      id_nauseas,
+      id_vomito,
+      id_fatiga_excesiva,
+      id_incontinencia_urinaria,
+      id_problemas_intestinales,
+      id_debilidad_lado_cuerpo,
+      id_problema_motricidad_fina,
+      id_temblores,
+      id_inestabilidad_marcha,
+      id_tics_mov_extranos,
+      id_problema_equilibrio,
+      id_frecuencia_choca_golpea,
+      id_desvanecimiento_desmayo,
+      id_caidas,
+      id_perdida_sencibilidad,
+      id_cosquilleo_sensacion_piel,
+      id_necesidad_ojos_claridad,
+      id_perdidad_audicion,
+      id_utiliza_audifonos,
+      id_zumbido,
+      id_utiliza_anteojos_cerca,
+      id_utiliza_anteojos_lejos,
+      id_problemas_vision_lado,
+      id_vision_borrosa,
+      id_vision_doble,
+      id_cosas_no_existen,
+      id_sensibildad_luz,
+      id_periodo_ceguera,
+      id_cosas_pasan_cuerpo,
+      id_distinguir_calor_frio,
+      id_problema_gusto,
+      id_problema_olfato,
+      id_dolor,
+    ];
+
+    for (var variable in ids_fisico) {
+      if (variable == null) {
+        alert_informe_scaffold(
+            context, "Debe responder todas las preguntas", 2);
+        _isLoading = false;
+        return; // Salir de la función
+      }
+    }
+
+    for (var variable_si in ids_fisico) {
+      if (variable_si == "977") {
+        cant_check += 1;
+      }
+    }
+
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_fisico";
     var response = await http.post(url, body: {
@@ -503,45 +463,41 @@ class FisicoWidgetState extends State<ScreeningFisico> {
       "id_recordatorio": id_recordatorio.toString(),
       "tipo_screening": tipo_screening['data'].toString(),
       "cantidad": cant_check.toString(),
-      "dolor_cabeza": valueNotifierDolorCabeza.value.toString(),
-      "mareos": valueNotifierMareos.value.toString(),
-      "nauceas": valueNotifierNauceas.value.toString(),
-      "vomito": valueNotifierVomito.value.toString(),
-      "fatiga_excesiva": valueNotifierFatigaExcesiva.value.toString(),
-      "urinaria": valueNotifierUrinaria.value.toString(),
-      "problemas_instestinales":
-          valueNotifierProblemasInstestinales.value.toString(),
-      "debilidad_lado_cuerpo":
-          valueNotifierDebilidadLadoCuerpo.value.toString(),
-      "problemas_motricidad": valueNotifierProblemasMotricidad.value.toString(),
-      "temblores": valueNotifierTemblores.value.toString(),
-      "inestabilidad_marcha": valueNotifierInestabilidadMarcha.value.toString(),
-      "tics_mov_extranos": valueNotifierTicsMovExtranos.value.toString(),
-      "problemas_equilibrio": valueNotifierProblemasEquilibrio.value.toString(),
-      "choque_cosas": valueNotifierChoqueCosas.value.toString(),
-      "desmayo": valueNotifierDesmayo.value.toString(),
-      "caidas": valueNotifierCaidas.value.toString(),
-      "perdida_sensibilidad": valueNotifierPerdidaSensibilidad.value.toString(),
-      "cosquilleo_piel": valueNotifierCosquilleoPiel.value.toString(),
-      "ojos_claridad": valueNotifierOjosClaridad.value.toString(),
-      "perdida_audicion": valueNotifierPerdidaAudicion.value.toString(),
-      "utiliza_audifonos": valueNotifierUtilizaAudifonos.value.toString(),
-      "zumbido": valueNotifierZumbido.value.toString(),
-      "anteojo_cerca": valueNotifierAnteojoCerca.value.toString(),
-      "anteojo_lejos": valueNotifierAnteojoLejos.value.toString(),
-      "vision_lado": valueNotifierVisionLado.value.toString(),
-      "vision_borrosa": valueNotifierVisionBorrosa.value.toString(),
-      "vision_doble": valueNotifierVisionDoble.value.toString(),
-      "cosas_no_existen": valueNotifierCosasNoExisten.value.toString(),
-      "sensibilidad_cosas_brillantes":
-          valueNotifierSensibilidadCosasBrillantes.value.toString(),
-      "periodos_ceguera": valueNotifierPeriodosCeguera.value.toString(),
-      "persibe_cosas_cuerpo": valueNotifierPersibeCosasCuerpo.value.toString(),
-      "dificultad_calor_frio":
-          valueNotifierDificultadCalorFrio.value.toString(),
-      "problemas_gusto": valueNotifierProblemasGusto.value.toString(),
-      "problemas_olfato": valueNotifierProblemasOlfato.value.toString(),
-      "dolor": valueNotifierDolor.value.toString(),
+      "dolor_cabeza": id_dolor_cabeza.toString(),
+      "mareos": id_mareos.toString(),
+      "nauceas": id_nauseas.toString(),
+      "vomito": id_vomito.toString(),
+      "fatiga_excesiva": id_fatiga_excesiva.toString(),
+      "urinaria": id_incontinencia_urinaria.toString(),
+      "problemas_instestinales": id_problemas_intestinales.toString(),
+      "debilidad_lado_cuerpo": id_debilidad_lado_cuerpo.toString(),
+      "problemas_motricidad": id_problema_motricidad_fina.toString(),
+      "temblores": id_temblores.toString(),
+      "inestabilidad_marcha": id_inestabilidad_marcha.toString(),
+      "tics_mov_extranos": id_tics_mov_extranos.toString(),
+      "problemas_equilibrio": id_problema_equilibrio.toString(),
+      "choque_cosas": id_frecuencia_choca_golpea.toString(),
+      "desmayo": id_desvanecimiento_desmayo.toString(),
+      "caidas": id_caidas.toString(),
+      "perdida_sensibilidad": id_perdida_sencibilidad.toString(),
+      "cosquilleo_piel": id_cosquilleo_sensacion_piel.toString(),
+      "ojos_claridad": id_necesidad_ojos_claridad.toString(),
+      "perdida_audicion": id_perdidad_audicion.toString(),
+      "utiliza_audifonos": id_utiliza_audifonos.toString(),
+      "zumbido": id_zumbido.toString(),
+      "anteojo_cerca": id_utiliza_anteojos_cerca.toString(),
+      "anteojo_lejos": id_utiliza_anteojos_lejos.toString(),
+      "vision_lado": id_problemas_vision_lado.toString(),
+      "vision_borrosa": id_vision_borrosa.toString(),
+      "vision_doble": id_vision_doble.toString(),
+      "cosas_no_existen": id_cosas_no_existen.toString(),
+      "sensibilidad_cosas_brillantes": id_sensibildad_luz.toString(),
+      "periodos_ceguera": id_periodo_ceguera.toString(),
+      "persibe_cosas_cuerpo": id_cosas_pasan_cuerpo.toString(),
+      "dificultad_calor_frio": id_distinguir_calor_frio.toString(),
+      "problemas_gusto": id_problema_gusto.toString(),
+      "problemas_olfato": id_problema_olfato.toString(),
+      "dolor": id_dolor.toString(),
       "cod_event_dolor_cabeza": cod_event_dolor_cabeza,
       "cod_event_mareos": cod_event_mareos,
       "cod_event_nauceas": cod_event_nauceas,
@@ -603,10 +559,24 @@ class FisicoWidgetState extends State<ScreeningFisico> {
           },
         );
       } else {
-        Navigator.pushNamed(context, '/screening', arguments: {
-          "select_screening": "SFMS",
-        });
-        _scaffold_messenger(context, "Screening Registrado", 1);
+        showCustomAlert(
+          context,
+          "Resultado",
+          "Su estado de Ánimo es bueno.",
+          true,
+          () {
+            if (screening_recordatorio == true) {
+              Navigator.pushNamed(context, '/recordatorio');
+              _scaffold_messenger(
+                  context, "Screening del Médico Respondido", 1);
+            } else {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "SFMS",
+              });
+              _scaffold_messenger(context, "Screening Registrado", 1);
+            }
+          },
+        );
       }
     } else {
       showCustomAlert(
@@ -615,33 +585,34 @@ class FisicoWidgetState extends State<ScreeningFisico> {
   }
 
   showDialogMessage() async {
-    await Future.delayed(Duration(microseconds: 1));
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            child: Container(
-              height: 80,
-              width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Guardando Información",
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
+    if (!_isLoading) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Container(
+                height: 80,
+                width: 80,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 10,
                     ),
-                  )
-                ],
+                    Text(
+                      "Guardando Información",
+                      style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          });
+    }
   }
 }
 
@@ -700,40 +671,96 @@ String cod_event_dolor = 'DOLOR';
 
 //-------------------------------------- DOLOR DE CABEZA -----------------------------------------------------
 
-class CheckDolorCabeza extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierDolorCabeza;
-
-  CheckDolorCabeza({this.valueNotifierDolorCabeza});
-
+class DolorCabeza extends StatefulWidget {
   @override
-  CheckCheckDolorCabezaWidgetState createState() =>
-      CheckCheckDolorCabezaWidgetState();
+  CheckDolorCabezaWidgetState createState() => CheckDolorCabezaWidgetState();
 }
 
-class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
+class CheckDolorCabezaWidgetState extends State<DolorCabeza> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaFisico[0]['nombre_evento'],
-      //'Dolor de Cabeza',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDolorCabeza.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierDolorCabeza.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[0]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            DolorCabezaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// DolorCabezaOpcion *******************
+
+var id_dolor_cabeza;
+
+class DolorCabezaOpcion extends StatefulWidget {
+  @override
+  DolorCabezaOpcionWidgetState createState() => DolorCabezaOpcionWidgetState();
+}
+
+class DolorCabezaOpcionWidgetState extends State<DolorCabezaOpcion> {
+  @override
+  void initState() {
+    id_dolor_cabeza = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_dolor_cabeza,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_dolor_cabeza = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -742,39 +769,96 @@ class CheckCheckDolorCabezaWidgetState extends State<CheckDolorCabeza> {
 
 // --------------------------------- MAREOS ----------------------------------------------------
 
-class CheckMareos extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierMareos;
-
-  CheckMareos({this.valueNotifierMareos});
-
+class Mareos extends StatefulWidget {
   @override
-  CheckCheckMareosWidgetState createState() => CheckCheckMareosWidgetState();
+  CheckMareosWidgetState createState() => CheckMareosWidgetState();
 }
 
-class CheckCheckMareosWidgetState extends State<CheckMareos> {
+class CheckMareosWidgetState extends State<Mareos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaFisico[1]['nombre_evento'],
-      //'Mareos',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierMareos.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierMareos.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[1]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            MareoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// MareoOpcion *******************
+
+var id_mareos;
+
+class MareoOpcion extends StatefulWidget {
+  @override
+  MareoOpcionWidgetState createState() => MareoOpcionWidgetState();
+}
+
+class MareoOpcionWidgetState extends State<MareoOpcion> {
+  @override
+  void initState() {
+    id_mareos = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_mareos,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_mareos = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -782,76 +866,190 @@ class CheckCheckMareosWidgetState extends State<CheckMareos> {
 //-------------------------------------------Nauseas--------------------------------------------
 
 class Nauseas extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierNauceas;
-
-  Nauseas({this.valueNotifierNauceas});
-
   @override
-  NauseasWidgetState createState() => NauseasWidgetState();
+  CheckNauseasWidgetState createState() => CheckNauseasWidgetState();
 }
 
-class NauseasWidgetState extends State<Nauseas> {
+class CheckNauseasWidgetState extends State<Nauseas> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      //label: 'Nauseas',
-      label: respuestaFisico[2]['nombre_evento'],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierNauceas.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierNauceas.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[2]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            NauseasOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
 
+// NauseasOpcion *******************
+
+var id_nauseas;
+
+class NauseasOpcion extends StatefulWidget {
+  @override
+  NauseasOpcionWidgetState createState() => NauseasOpcionWidgetState();
+}
+
+class NauseasOpcionWidgetState extends State<NauseasOpcion> {
+  @override
+  void initState() {
+    id_nauseas = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_nauseas,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_nauseas = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
 //------------------------------------------ VOMITOS -------------------------------------------
 
 class Vomitos extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierVomito;
-
-  Vomitos({this.valueNotifierVomito});
-
   @override
-  VomitosWidgetState createState() => VomitosWidgetState();
+  CheckVomitosWidgetState createState() => CheckVomitosWidgetState();
 }
 
-class VomitosWidgetState extends State<Vomitos> {
+class CheckVomitosWidgetState extends State<Vomitos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Vómitos',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierVomito.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierVomito.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[3]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            VomitosOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// VomitosOpcion *******************
+
+var id_vomito;
+
+class VomitosOpcion extends StatefulWidget {
+  @override
+  VomitosOpcionWidgetState createState() => VomitosOpcionWidgetState();
+}
+
+class VomitosOpcionWidgetState extends State<VomitosOpcion> {
+  @override
+  void initState() {
+    id_vomito = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_vomito,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_vomito = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -859,115 +1057,296 @@ class VomitosWidgetState extends State<Vomitos> {
 //------------------------------------------Fatiga excesiva ---------------------------------------
 
 class FatigaExcesiva extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierFatigaExcesiva;
-
-  FatigaExcesiva({this.valueNotifierFatigaExcesiva});
-
   @override
-  FatigaExcesivaWidgetState createState() => FatigaExcesivaWidgetState();
+  CheckFatigaExcesivaWidgetState createState() =>
+      CheckFatigaExcesivaWidgetState();
 }
 
-class FatigaExcesivaWidgetState extends State<FatigaExcesiva> {
+class CheckFatigaExcesivaWidgetState extends State<FatigaExcesiva> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Fatiga excesiva',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierFatigaExcesiva.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierFatigaExcesiva.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[4]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            FatigaExcesivaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// FatigaExcesivaOpcion *******************
+
+var id_fatiga_excesiva;
+
+class FatigaExcesivaOpcion extends StatefulWidget {
+  @override
+  FatigaExcesivaOpcionWidgetState createState() =>
+      FatigaExcesivaOpcionWidgetState();
+}
+
+class FatigaExcesivaOpcionWidgetState extends State<FatigaExcesivaOpcion> {
+  @override
+  void initState() {
+    id_fatiga_excesiva = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_fatiga_excesiva,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_fatiga_excesiva = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 // ----------------------------------------Incontinencia urinaria---------------------------------------
 
-class IncontinenciaUrinaria extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierUrinaria;
-
-  IncontinenciaUrinaria({this.valueNotifierUrinaria});
-
+class IncontineciaUrinaria extends StatefulWidget {
   @override
-  IncontinenciaUrinariaWidgetState createState() =>
-      IncontinenciaUrinariaWidgetState();
+  CheckIncontineciaUrinariaWidgetState createState() =>
+      CheckIncontineciaUrinariaWidgetState();
 }
 
-class IncontinenciaUrinariaWidgetState extends State<IncontinenciaUrinaria> {
+class CheckIncontineciaUrinariaWidgetState extends State<IncontineciaUrinaria> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Incontinencia urinaria',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierUrinaria.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierUrinaria.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[5]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            IncontineciaUrinariaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// IncontineciaUrinariaOpcion *******************
+
+var id_incontinencia_urinaria;
+
+class IncontineciaUrinariaOpcion extends StatefulWidget {
+  @override
+  IncontineciaUrinariaOpcionWidgetState createState() =>
+      IncontineciaUrinariaOpcionWidgetState();
+}
+
+class IncontineciaUrinariaOpcionWidgetState
+    extends State<IncontineciaUrinariaOpcion> {
+  @override
+  void initState() {
+    id_incontinencia_urinaria = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_incontinencia_urinaria,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_incontinencia_urinaria = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 // ----------------------------------------Problemas intestinales -----------------------------------
 
-class ProblemasInstestinales extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierProblemasInstestinales;
-
-  ProblemasInstestinales({this.valueNotifierProblemasInstestinales});
-
+class ProblemasIntestinales extends StatefulWidget {
   @override
-  ProblemasInstestinalesWidgetState createState() =>
-      ProblemasInstestinalesWidgetState();
+  CheckProblemasIntestinalesWidgetState createState() =>
+      CheckProblemasIntestinalesWidgetState();
 }
 
-class ProblemasInstestinalesWidgetState extends State<ProblemasInstestinales> {
+class CheckProblemasIntestinalesWidgetState
+    extends State<ProblemasIntestinales> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas intestinales',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierProblemasInstestinales.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierProblemasInstestinales.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Físico',
+              color: Colors.lightGreen,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[6]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemasIntestinalesOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// ProblemasIntestinalesOpcion *******************
+
+var id_problemas_intestinales;
+
+class ProblemasIntestinalesOpcion extends StatefulWidget {
+  @override
+  ProblemasIntestinalesOpcionWidgetState createState() =>
+      ProblemasIntestinalesOpcionWidgetState();
+}
+
+class ProblemasIntestinalesOpcionWidgetState
+    extends State<ProblemasIntestinalesOpcion> {
+  @override
+  void initState() {
+    id_problemas_intestinales = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problemas_intestinales,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problemas_intestinales = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -975,116 +1354,292 @@ class ProblemasInstestinalesWidgetState extends State<ProblemasInstestinales> {
 // -----------------------------------------Debilidad de un lado del cuerpo -----------------------------------------------------
 
 class DebilidadLadoCuerpo extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierDebilidadLadoCuerpo;
-
-  DebilidadLadoCuerpo({this.valueNotifierDebilidadLadoCuerpo});
-
   @override
-  DebilidadLadoCuerpoWidgetState createState() =>
-      DebilidadLadoCuerpoWidgetState();
+  CheckDebilidadLadoCuerpoWidgetState createState() =>
+      CheckDebilidadLadoCuerpoWidgetState();
 }
 
-class DebilidadLadoCuerpoWidgetState extends State<DebilidadLadoCuerpo> {
+class CheckDebilidadLadoCuerpoWidgetState extends State<DebilidadLadoCuerpo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Debilidad de un lado del cuerpo',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDebilidadLadoCuerpo.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierDebilidadLadoCuerpo.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[7]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            DebilidadLadoCuerpoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
 
+// DebilidadLadoCuerpoOpcion *******************
+
+var id_debilidad_lado_cuerpo;
+
+class DebilidadLadoCuerpoOpcion extends StatefulWidget {
+  @override
+  DebilidadLadoCuerpoOpcionWidgetState createState() =>
+      DebilidadLadoCuerpoOpcionWidgetState();
+}
+
+class DebilidadLadoCuerpoOpcionWidgetState
+    extends State<DebilidadLadoCuerpoOpcion> {
+  @override
+  void initState() {
+    id_debilidad_lado_cuerpo = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_debilidad_lado_cuerpo,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_debilidad_lado_cuerpo = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
 //-------------------------------------------- Problemas en la motricidad fina -----------------------------------------------------------
 
 class ProblemasMotricidadFina extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierProblemasMotricidad;
-
-  ProblemasMotricidadFina({this.valueNotifierProblemasMotricidad});
-
   @override
-  ProblemasMotricidadFinaWidgetState createState() =>
-      ProblemasMotricidadFinaWidgetState();
+  CheckProblemasMotricidadFinaWidgetState createState() =>
+      CheckProblemasMotricidadFinaWidgetState();
 }
 
-class ProblemasMotricidadFinaWidgetState
+class CheckProblemasMotricidadFinaWidgetState
     extends State<ProblemasMotricidadFina> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas en la motricidad fina',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierProblemasMotricidad.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierProblemasMotricidad.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.deepPurple,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[8]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemasMotricidadFinaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
 
+// ProblemasMotricidadFinaOpcion *******************
+
+var id_problema_motricidad_fina;
+
+class ProblemasMotricidadFinaOpcion extends StatefulWidget {
+  @override
+  ProblemasMotricidadFinaOpcionWidgetState createState() =>
+      ProblemasMotricidadFinaOpcionWidgetState();
+}
+
+class ProblemasMotricidadFinaOpcionWidgetState
+    extends State<ProblemasMotricidadFinaOpcion> {
+  @override
+  void initState() {
+    id_problema_motricidad_fina = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problema_motricidad_fina,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problema_motricidad_fina = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
 // -------------------------------------------Temblores --------------------------------------------
 
 class Temblores extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierTemblores;
-
-  Temblores({this.valueNotifierTemblores});
-
   @override
-  TembloresWidgetState createState() => TembloresWidgetState();
+  CheckTembloresWidgetState createState() => CheckTembloresWidgetState();
 }
 
-class TembloresWidgetState extends State<Temblores> {
+class CheckTembloresWidgetState extends State<Temblores> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Temblores',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierTemblores.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierTemblores.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[9]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            TembloresOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// TembloresOpcion *******************
+
+var id_temblores;
+
+class TembloresOpcion extends StatefulWidget {
+  @override
+  TembloresOpcionWidgetState createState() => TembloresOpcionWidgetState();
+}
+
+class TembloresOpcionWidgetState extends State<TembloresOpcion> {
+  @override
+  void initState() {
+    id_temblores = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_temblores,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_temblores = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1092,299 +1647,788 @@ class TembloresWidgetState extends State<Temblores> {
 // ------------------------------------------Inestabilidad en la marcha ---------------------------------------------------
 
 class InestabilidadMarcha extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierInestabilidadMarcha;
-
-  InestabilidadMarcha({this.valueNotifierInestabilidadMarcha});
-
   @override
-  InestabilidadMarchaWidgetState createState() =>
-      InestabilidadMarchaWidgetState();
+  CheckInestabilidadMarchaWidgetState createState() =>
+      CheckInestabilidadMarchaWidgetState();
 }
 
-class InestabilidadMarchaWidgetState extends State<InestabilidadMarcha> {
+class CheckInestabilidadMarchaWidgetState extends State<InestabilidadMarcha> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Inestabilidad en la marcha',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierInestabilidadMarcha.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierInestabilidadMarcha.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[10]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            InestabilidadMarchaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// InestabilidadMarchaOpcion *******************
+
+var id_inestabilidad_marcha;
+
+class InestabilidadMarchaOpcion extends StatefulWidget {
+  @override
+  InestabilidadMarchaOpcionWidgetState createState() =>
+      InestabilidadMarchaOpcionWidgetState();
+}
+
+class InestabilidadMarchaOpcionWidgetState
+    extends State<InestabilidadMarchaOpcion> {
+  @override
+  void initState() {
+    id_inestabilidad_marcha = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_inestabilidad_marcha,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_inestabilidad_marcha = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 //-------------------------------------------- Tics o movimientos extraños---------------------------------------------------
 
 class TicsMovExtranos extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierTicsMovExtranos;
-
-  TicsMovExtranos({this.valueNotifierTicsMovExtranos});
-
   @override
-  TicsMovExtranosWidgetState createState() => TicsMovExtranosWidgetState();
+  CheckTicsMovExtranosWidgetState createState() =>
+      CheckTicsMovExtranosWidgetState();
 }
 
-class TicsMovExtranosWidgetState extends State<TicsMovExtranos> {
+class CheckTicsMovExtranosWidgetState extends State<TicsMovExtranos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Tics o movimientos extraños',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierTicsMovExtranos.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierTicsMovExtranos.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[11]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            TicsMovExtranosOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
+
+// TicsMovExtranosOpcion *******************
+
+var id_tics_mov_extranos;
+
+class TicsMovExtranosOpcion extends StatefulWidget {
+  @override
+  TicsMovExtranosOpcionWidgetState createState() =>
+      TicsMovExtranosOpcionWidgetState();
+}
+
+class TicsMovExtranosOpcionWidgetState extends State<TicsMovExtranosOpcion> {
+  @override
+  void initState() {
+    id_tics_mov_extranos = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_tics_mov_extranos,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_tics_mov_extranos = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 //------------------------------------------Problemas de equilibrio --------------------------------------------------
 
-class ProblemaEquilibrio extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierProblemasEquilibrio;
-
-  ProblemaEquilibrio({this.valueNotifierProblemasEquilibrio});
-
+class ProblemasEquilibrio extends StatefulWidget {
   @override
-  ProblemaEquiWidgetState createState() => ProblemaEquiWidgetState();
+  CheckProblemasEquilibrioWidgetState createState() =>
+      CheckProblemasEquilibrioWidgetState();
 }
 
-class ProblemaEquiWidgetState extends State<ProblemaEquilibrio> {
+class CheckProblemasEquilibrioWidgetState extends State<ProblemasEquilibrio> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas de equilibrio',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierProblemasEquilibrio.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierProblemasEquilibrio.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[12]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemasEquilibrioOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
-//-------------------------------------------- Con frecuencia se choca las cosas -------------------------------------------------
 
-class ConFrecCosas extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierChoqueCosas;
+// ProblemasEquilibrioOpcion *******************
 
-  ConFrecCosas({this.valueNotifierChoqueCosas});
+var id_problema_equilibrio;
 
+class ProblemasEquilibrioOpcion extends StatefulWidget {
   @override
-  ConFrecWidgetState createState() => ConFrecWidgetState();
+  ProblemasEquilibrioOpcionWidgetState createState() =>
+      ProblemasEquilibrioOpcionWidgetState();
 }
 
-class ConFrecWidgetState extends State<ConFrecCosas> {
+class ProblemasEquilibrioOpcionWidgetState
+    extends State<ProblemasEquilibrioOpcion> {
+  @override
+  void initState() {
+    id_problema_equilibrio = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Con frecuencia se choca las cosas',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierChoqueCosas.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierChoqueCosas.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problema_equilibrio,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problema_equilibrio = val;
+                    });
+                  },
+                ))
+            .toList(),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+//-------------------------------------------- Con frecuencia se choca las cosas -------------------------------------------------
+
+class ConFrecuenciaGolpea extends StatefulWidget {
+  @override
+  CheckConFrecuenciaGolpeaWidgetState createState() =>
+      CheckConFrecuenciaGolpeaWidgetState();
+}
+
+class CheckConFrecuenciaGolpeaWidgetState extends State<ConFrecuenciaGolpea> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[13]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ConFrecuenciaGolpeaOpcion()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ConFrecuenciaGolpeaOpcion *******************
+
+var id_frecuencia_choca_golpea;
+
+class ConFrecuenciaGolpeaOpcion extends StatefulWidget {
+  @override
+  ConFrecuenciaGolpeaOpcionWidgetState createState() =>
+      ConFrecuenciaGolpeaOpcionWidgetState();
+}
+
+class ConFrecuenciaGolpeaOpcionWidgetState
+    extends State<ConFrecuenciaGolpeaOpcion> {
+  @override
+  void initState() {
+    id_frecuencia_choca_golpea = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_frecuencia_choca_golpea,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_frecuencia_choca_golpea = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 // --------------------------------------------Desvanecimiento o desmayo ------------------------------------------------
 
-class DesvanDesmayo extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierDesmayo;
-
-  DesvanDesmayo({this.valueNotifierDesmayo});
-
+class DesvanecimientoDesmayo extends StatefulWidget {
   @override
-  DesvanDesWidgetState createState() => DesvanDesWidgetState();
+  CheckDesvanecimientoDesmayoWidgetState createState() =>
+      CheckDesvanecimientoDesmayoWidgetState();
 }
 
-class DesvanDesWidgetState extends State<DesvanDesmayo> {
+class CheckDesvanecimientoDesmayoWidgetState
+    extends State<DesvanecimientoDesmayo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Desvanecimiento o desmayo',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDesmayo.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierDesmayo.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[14]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            DesvanecimientoDesmayoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
+
+// DesvanecimientoDesmayoOpcion *******************
+
+var id_desvanecimiento_desmayo;
+
+class DesvanecimientoDesmayoOpcion extends StatefulWidget {
+  @override
+  DesvanecimientoDesmayoOpcionWidgetState createState() =>
+      DesvanecimientoDesmayoOpcionWidgetState();
+}
+
+class DesvanecimientoDesmayoOpcionWidgetState
+    extends State<DesvanecimientoDesmayoOpcion> {
+  @override
+  void initState() {
+    id_desvanecimiento_desmayo = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_desvanecimiento_desmayo,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_desvanecimiento_desmayo = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 // --------------------------------------------Caídas -------------------------------------------------
 
 class Caidas extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierCaidas;
-
-  Caidas({this.valueNotifierCaidas});
-
   @override
-  CaidasWidgetState createState() => CaidasWidgetState();
+  CheckCaidasWidgetState createState() => CheckCaidasWidgetState();
 }
 
-class CaidasWidgetState extends State<Caidas> {
+class CheckCaidasWidgetState extends State<Caidas> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Caídas',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierCaidas.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierCaidas.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Motor',
+              color: Colors.deepPurple,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[15]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            CaidasOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
+
+// CaidasOpcion *******************
+
+var id_caidas;
+
+class CaidasOpcion extends StatefulWidget {
+  @override
+  CaidasOpcionWidgetState createState() => CaidasOpcionWidgetState();
+}
+
+class CaidasOpcionWidgetState extends State<CaidasOpcion> {
+  @override
+  void initState() {
+    id_caidas = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_caidas,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_caidas = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 // --------------------------------------------Pérdida de sensibilidad -----------------------------------------
 
-class PerdidaSensibilidad extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierPerdidaSensibilidad;
-
-  PerdidaSensibilidad({this.valueNotifierPerdidaSensibilidad});
-
+class PerdidaSencibilidad extends StatefulWidget {
   @override
-  PerdidaSensibilidadWidgetState createState() =>
-      PerdidaSensibilidadWidgetState();
+  CheckPerdidaSencibilidadWidgetState createState() =>
+      CheckPerdidaSencibilidadWidgetState();
 }
 
-class PerdidaSensibilidadWidgetState extends State<PerdidaSensibilidad> {
+class CheckPerdidaSencibilidadWidgetState extends State<PerdidaSencibilidad> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Pérdida de sensibilidad',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierPerdidaSensibilidad.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierPerdidaSensibilidad.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[16]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            PerdidaSencibilidadOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
-// --------------------------------------------Cosquilleo o sensaciones extrañas en la piel ---------------------------------------------
 
-class CosqSensaPiel extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierCosquilleoPiel;
+// PerdidaSencibilidadOpcion *******************
 
-  CosqSensaPiel({this.valueNotifierCosquilleoPiel});
+var id_perdida_sencibilidad;
 
+class PerdidaSencibilidadOpcion extends StatefulWidget {
   @override
-  EsquizofreniaWidgetState createState() => EsquizofreniaWidgetState();
+  PerdidaSencibilidadOpcionWidgetState createState() =>
+      PerdidaSencibilidadOpcionWidgetState();
 }
 
-class EsquizofreniaWidgetState extends State<CosqSensaPiel> {
+class PerdidaSencibilidadOpcionWidgetState
+    extends State<PerdidaSencibilidadOpcion> {
+  @override
+  void initState() {
+    id_perdida_sencibilidad = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Cosquilleo o sensaciones extrañas en la piel',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierCosquilleoPiel.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierCosquilleoPiel.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_perdida_sencibilidad,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_perdida_sencibilidad = val;
+                    });
+                  },
+                ))
+            .toList(),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// --------------------------------------------Cosquilleo o sensaciones extrañas en la piel ---------------------------------------------
+
+class CosquilleoSensacionPiel extends StatefulWidget {
+  @override
+  CheckCosquilleoSensacionPielWidgetState createState() =>
+      CheckCosquilleoSensacionPielWidgetState();
+}
+
+class CheckCosquilleoSensacionPielWidgetState
+    extends State<CosquilleoSensacionPiel> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[17]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            CosquilleoSensacionPielOpcion()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// CosquilleoSensacionPielOpcion *******************
+
+var id_cosquilleo_sensacion_piel;
+
+class CosquilleoSensacionPielOpcion extends StatefulWidget {
+  @override
+  CosquilleoSensacionPielOpcionWidgetState createState() =>
+      CosquilleoSensacionPielOpcionWidgetState();
+}
+
+class CosquilleoSensacionPielOpcionWidgetState
+    extends State<CosquilleoSensacionPielOpcion> {
+  @override
+  void initState() {
+    id_cosquilleo_sensacion_piel = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_cosquilleo_sensacion_piel,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_cosquilleo_sensacion_piel = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1392,76 +2436,197 @@ class EsquizofreniaWidgetState extends State<CosqSensaPiel> {
 //---------------------------------------------Necesidad de entrecerrar los ojos o acercarse para ver con claridad ----------------------------
 
 class NecesidadOjosClaridad extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierOjosClaridad;
-
-  NecesidadOjosClaridad({this.valueNotifierOjosClaridad});
-
   @override
-  NecesidadOjosClaridadWidgetState createState() =>
-      NecesidadOjosClaridadWidgetState();
+  CheckNecesidadOjosClaridadWidgetState createState() =>
+      CheckNecesidadOjosClaridadWidgetState();
 }
 
-class NecesidadOjosClaridadWidgetState extends State<NecesidadOjosClaridad> {
+class CheckNecesidadOjosClaridadWidgetState
+    extends State<NecesidadOjosClaridad> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label:
-          'Necesidad de entrecerrar los ojos o acercarse para ver con claridad.',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierOjosClaridad.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierOjosClaridad.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[18]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            NecesidadOjosClaridadOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
-//---------------------------------------------Pérdida de audición ---------------------------------------------
 
-class PerdidaAudicion extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierPerdidaAudicion;
+// NecesidadOjosClaridadOpcion *******************
 
-  PerdidaAudicion({this.valueNotifierPerdidaAudicion});
+var id_necesidad_ojos_claridad;
 
+class NecesidadOjosClaridadOpcion extends StatefulWidget {
   @override
-  PerdidaAudicionWidgetState createState() => PerdidaAudicionWidgetState();
+  NecesidadOjosClaridadOpcionWidgetState createState() =>
+      NecesidadOjosClaridadOpcionWidgetState();
 }
 
-class PerdidaAudicionWidgetState extends State<PerdidaAudicion> {
+class NecesidadOjosClaridadOpcionWidgetState
+    extends State<NecesidadOjosClaridadOpcion> {
+  @override
+  void initState() {
+    id_necesidad_ojos_claridad = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Pérdida de audición',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierPerdidaAudicion.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierPerdidaAudicion.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_necesidad_ojos_claridad,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_necesidad_ojos_claridad = val;
+                    });
+                  },
+                ))
+            .toList(),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+//---------------------------------------------Pérdida de audición ---------------------------------------------
+
+class PerdidadAudicion extends StatefulWidget {
+  @override
+  CheckPerdidadAudicionWidgetState createState() =>
+      CheckPerdidadAudicionWidgetState();
+}
+
+class CheckPerdidadAudicionWidgetState extends State<PerdidadAudicion> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[19]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            PerdidadAudicionOpcion()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// PerdidadAudicionOpcion *******************
+
+var id_perdidad_audicion;
+
+class PerdidadAudicionOpcion extends StatefulWidget {
+  @override
+  PerdidadAudicionOpcionWidgetState createState() =>
+      PerdidadAudicionOpcionWidgetState();
+}
+
+class PerdidadAudicionOpcionWidgetState extends State<PerdidadAudicionOpcion> {
+  @override
+  void initState() {
+    id_perdidad_audicion = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_perdidad_audicion,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_perdidad_audicion = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1469,37 +2634,97 @@ class PerdidaAudicionWidgetState extends State<PerdidaAudicion> {
 //---------------------------------------------Utiliza audífonos ---------------------------------------------
 
 class UtilizaAudifonos extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierUtilizaAudifonos;
-
-  UtilizaAudifonos({this.valueNotifierUtilizaAudifonos});
-
   @override
-  UtilizaAudiWidgetState createState() => UtilizaAudiWidgetState();
+  CheckUtilizaAudifonosWidgetState createState() =>
+      CheckUtilizaAudifonosWidgetState();
 }
 
-class UtilizaAudiWidgetState extends State<UtilizaAudifonos> {
+class CheckUtilizaAudifonosWidgetState extends State<UtilizaAudifonos> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Utiliza audífonos',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierUtilizaAudifonos.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierUtilizaAudifonos.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[20]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            UtilizaAudifonosOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// UtilizaAudifonosOpcion *******************
+
+var id_utiliza_audifonos;
+
+class UtilizaAudifonosOpcion extends StatefulWidget {
+  @override
+  UtilizaAudifonosOpcionWidgetState createState() =>
+      UtilizaAudifonosOpcionWidgetState();
+}
+
+class UtilizaAudifonosOpcionWidgetState extends State<UtilizaAudifonosOpcion> {
+  @override
+  void initState() {
+    id_utiliza_audifonos = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_utiliza_audifonos,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_utiliza_audifonos = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1507,37 +2732,95 @@ class UtilizaAudiWidgetState extends State<UtilizaAudifonos> {
 //---------------------------------------------Zumbido ---------------------------------------------
 
 class Zumbido extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierZumbido;
-
-  Zumbido({this.valueNotifierZumbido});
-
   @override
-  ZumbidoWidgetState createState() => ZumbidoWidgetState();
+  CheckZumbidoWidgetState createState() => CheckZumbidoWidgetState();
 }
 
-class ZumbidoWidgetState extends State<Zumbido> {
+class CheckZumbidoWidgetState extends State<Zumbido> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Zumbido',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierZumbido.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierZumbido.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[21]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ZumbidoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// ZumbidoOpcion *******************
+
+var id_zumbido;
+
+class ZumbidoOpcion extends StatefulWidget {
+  @override
+  ZumbidoOpcionWidgetState createState() => ZumbidoOpcionWidgetState();
+}
+
+class ZumbidoOpcionWidgetState extends State<ZumbidoOpcion> {
+  @override
+  void initState() {
+    id_zumbido = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_zumbido,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_zumbido = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1545,116 +2828,296 @@ class ZumbidoWidgetState extends State<Zumbido> {
 //---------------------------------------------Utiliza anteojos para ver de cerca ---------------------------------------------
 
 class UtilizaAnteojosCerca extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierAnteojoCerca;
-
-  UtilizaAnteojosCerca({this.valueNotifierAnteojoCerca});
-
   @override
-  UtilizaAnteojosCercaWidgetState createState() =>
-      UtilizaAnteojosCercaWidgetState();
+  CheckUtilizaAnteojosCercaWidgetState createState() =>
+      CheckUtilizaAnteojosCercaWidgetState();
 }
 
-class UtilizaAnteojosCercaWidgetState extends State<UtilizaAnteojosCerca> {
+class CheckUtilizaAnteojosCercaWidgetState extends State<UtilizaAnteojosCerca> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Utiliza anteojos para ver de cerca',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierAnteojoCerca.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierAnteojoCerca.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[22]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            UtilizaAnteojosCercaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
     );
   }
 }
 
-//---------------------------------------------Utiliza anteojos para ver de cerca ---------------------------------------------
+// UtilizaAnteojosCercaOpcion *******************
 
-class UtilizaAnteojosLejos extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierAnteojoLejos;
+var id_utiliza_anteojos_cerca;
 
-  UtilizaAnteojosLejos({this.valueNotifierAnteojoLejos});
-
+class UtilizaAnteojosCercaOpcion extends StatefulWidget {
   @override
-  UtilizaAnteojosLejosWidgetState createState() =>
-      UtilizaAnteojosLejosWidgetState();
+  UtilizaAnteojosCercaOpcionWidgetState createState() =>
+      UtilizaAnteojosCercaOpcionWidgetState();
 }
 
-class UtilizaAnteojosLejosWidgetState extends State<UtilizaAnteojosLejos> {
+class UtilizaAnteojosCercaOpcionWidgetState
+    extends State<UtilizaAnteojosCercaOpcion> {
+  @override
+  void initState() {
+    id_utiliza_anteojos_cerca = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Utiliza anteojos para ver de lejos',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierAnteojoLejos.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierAnteojoLejos.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_utiliza_anteojos_cerca,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_utiliza_anteojos_cerca = val;
+                    });
+                  },
+                ))
+            .toList(),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+//---------------------------------------------Utiliza anteojos para ver de lejos ---------------------------------------------
+
+class UtilizaAnteojosLejos extends StatefulWidget {
+  @override
+  CheckUtilizaAnteojosLejosWidgetState createState() =>
+      CheckUtilizaAnteojosLejosWidgetState();
+}
+
+class CheckUtilizaAnteojosLejosWidgetState extends State<UtilizaAnteojosLejos> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[23]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            UtilizaAnteojosLejosOpcion()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// UtilizaAnteojosLejosOpcion *******************
+
+var id_utiliza_anteojos_lejos;
+
+class UtilizaAnteojosLejosOpcion extends StatefulWidget {
+  @override
+  UtilizaAnteojosLejosOpcionWidgetState createState() =>
+      UtilizaAnteojosLejosOpcionWidgetState();
+}
+
+class UtilizaAnteojosLejosOpcionWidgetState
+    extends State<UtilizaAnteojosLejosOpcion> {
+  @override
+  void initState() {
+    id_utiliza_anteojos_lejos = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_utiliza_anteojos_lejos,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_utiliza_anteojos_lejos = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //---------------------------------------------Problemas de visión de un lado ---------------------------------------------
 
-class ProblemaVisionLado extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierVisionLado;
-
-  ProblemaVisionLado({this.valueNotifierVisionLado});
-
+class ProblemasVisionLado extends StatefulWidget {
   @override
-  ProblemaVisionLadoWidgetState createState() =>
-      ProblemaVisionLadoWidgetState();
+  CheckProblemasVisionLadoWidgetState createState() =>
+      CheckProblemasVisionLadoWidgetState();
 }
 
-class ProblemaVisionLadoWidgetState extends State<ProblemaVisionLado> {
+class CheckProblemasVisionLadoWidgetState extends State<ProblemasVisionLado> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas de visión de un lado',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierVisionLado.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierVisionLado.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[24]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemasVisionLadoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// ProblemasVisionLadoOpcion *******************
+
+var id_problemas_vision_lado;
+
+class ProblemasVisionLadoOpcion extends StatefulWidget {
+  @override
+  ProblemasVisionLadoOpcionWidgetState createState() =>
+      ProblemasVisionLadoOpcionWidgetState();
+}
+
+class ProblemasVisionLadoOpcionWidgetState
+    extends State<ProblemasVisionLadoOpcion> {
+  @override
+  void initState() {
+    id_problemas_vision_lado = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problemas_vision_lado,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problemas_vision_lado = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1662,37 +3125,97 @@ class ProblemaVisionLadoWidgetState extends State<ProblemaVisionLado> {
 //---------------------------------------------Visión borrosa ---------------------------------------------
 
 class VisionBorrosa extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierVisionBorrosa;
-
-  VisionBorrosa({this.valueNotifierVisionBorrosa});
-
   @override
-  VisionBorrosaWidgetState createState() => VisionBorrosaWidgetState();
+  CheckVisionBorrosaWidgetState createState() =>
+      CheckVisionBorrosaWidgetState();
 }
 
-class VisionBorrosaWidgetState extends State<VisionBorrosa> {
+class CheckVisionBorrosaWidgetState extends State<VisionBorrosa> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Visión borrosa',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierVisionBorrosa.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierVisionBorrosa.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[25]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            VisionBorrosaOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// VisionBorrosaOpcion *******************
+
+var id_vision_borrosa;
+
+class VisionBorrosaOpcion extends StatefulWidget {
+  @override
+  VisionBorrosaOpcionWidgetState createState() =>
+      VisionBorrosaOpcionWidgetState();
+}
+
+class VisionBorrosaOpcionWidgetState extends State<VisionBorrosaOpcion> {
+  @override
+  void initState() {
+    id_vision_borrosa = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_vision_borrosa,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_vision_borrosa = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1700,37 +3223,95 @@ class VisionBorrosaWidgetState extends State<VisionBorrosa> {
 //---------------------------------------------Visión doble ---------------------------------------------
 
 class VisionDoble extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierVisionDoble;
-
-  VisionDoble({this.valueNotifierVisionDoble});
-
   @override
-  VisionDobleWidgetState createState() => VisionDobleWidgetState();
+  CheckVisionDobleWidgetState createState() => CheckVisionDobleWidgetState();
 }
 
-class VisionDobleWidgetState extends State<VisionDoble> {
+class CheckVisionDobleWidgetState extends State<VisionDoble> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Utiliza anteojos para ver de cerca',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierVisionDoble.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierVisionDoble.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[26]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            VisionDobleOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// VisionDobleOpcion *******************
+
+var id_vision_doble;
+
+class VisionDobleOpcion extends StatefulWidget {
+  @override
+  VisionDobleOpcionWidgetState createState() => VisionDobleOpcionWidgetState();
+}
+
+class VisionDobleOpcionWidgetState extends State<VisionDobleOpcion> {
+  @override
+  void initState() {
+    id_vision_doble = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_vision_doble,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_vision_doble = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1738,76 +3319,195 @@ class VisionDobleWidgetState extends State<VisionDoble> {
 //---------------------------------------------Ve cosas que no existen ---------------------------------------------
 
 class VeCosasNoExisten extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierCosasNoExisten;
-
-  VeCosasNoExisten({this.valueNotifierCosasNoExisten});
-
   @override
-  VeCosasNoExistenWidgetState createState() => VeCosasNoExistenWidgetState();
+  CheckVeCosasNoExistenWidgetState createState() =>
+      CheckVeCosasNoExistenWidgetState();
 }
 
-class VeCosasNoExistenWidgetState extends State<VeCosasNoExisten> {
+class CheckVeCosasNoExistenWidgetState extends State<VeCosasNoExisten> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Ve cosas que no existen',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierCosasNoExisten.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierCosasNoExisten.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[27]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            VeCosasNoExistenOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// VeCosasNoExistenOpcion *******************
+
+var id_cosas_no_existen;
+
+class VeCosasNoExistenOpcion extends StatefulWidget {
+  @override
+  VeCosasNoExistenOpcionWidgetState createState() =>
+      VeCosasNoExistenOpcionWidgetState();
+}
+
+class VeCosasNoExistenOpcionWidgetState extends State<VeCosasNoExistenOpcion> {
+  @override
+  void initState() {
+    id_cosas_no_existen = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_cosas_no_existen,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_cosas_no_existen = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //---------------------------------------------Sensibilidad a las luces brillantes ---------------------------------------------
 
-class SensiLucesBrillantes extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierSensibilidadCosasBrillantes;
-
-  SensiLucesBrillantes({this.valueNotifierSensibilidadCosasBrillantes});
-
+class SensibilidadLuz extends StatefulWidget {
   @override
-  SensiLucesBrillantesWidgetState createState() =>
-      SensiLucesBrillantesWidgetState();
+  CheckSensibilidadLuzWidgetState createState() =>
+      CheckSensibilidadLuzWidgetState();
 }
 
-class SensiLucesBrillantesWidgetState extends State<SensiLucesBrillantes> {
+class CheckSensibilidadLuzWidgetState extends State<SensibilidadLuz> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Sensibilidad a las luces brillantes',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierSensibilidadCosasBrillantes.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierSensibilidadCosasBrillantes.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[28]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            SensibilidadLuzOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// SensibilidadLuzOpcion *******************
+
+var id_sensibildad_luz;
+
+class SensibilidadLuzOpcion extends StatefulWidget {
+  @override
+  SensibilidadLuzOpcionWidgetState createState() =>
+      SensibilidadLuzOpcionWidgetState();
+}
+
+class SensibilidadLuzOpcionWidgetState extends State<SensibilidadLuzOpcion> {
+  @override
+  void initState() {
+    id_sensibildad_luz = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_sensibildad_luz,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_sensibildad_luz = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1815,38 +3515,99 @@ class SensiLucesBrillantesWidgetState extends State<SensiLucesBrillantes> {
 //---------------------------------------------Periodos cortos de ceguera ---------------------------------------------
 
 class PeriodosCortosCeguera extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierPeriodosCeguera;
-
-  PeriodosCortosCeguera({this.valueNotifierPeriodosCeguera});
-
   @override
-  PeriodosCortosCegueraWidgetState createState() =>
-      PeriodosCortosCegueraWidgetState();
+  CheckPeriodosCortosCegueraWidgetState createState() =>
+      CheckPeriodosCortosCegueraWidgetState();
 }
 
-class PeriodosCortosCegueraWidgetState extends State<PeriodosCortosCeguera> {
+class CheckPeriodosCortosCegueraWidgetState
+    extends State<PeriodosCortosCeguera> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Periodos cortos de ceguera',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierPeriodosCeguera.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierPeriodosCeguera.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[29]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            PeriodosCortosCegueraOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// PeriodosCortosCegueraOpcion *******************
+
+var id_periodo_ceguera;
+
+class PeriodosCortosCegueraOpcion extends StatefulWidget {
+  @override
+  PeriodosCortosCegueraOpcionWidgetState createState() =>
+      PeriodosCortosCegueraOpcionWidgetState();
+}
+
+class PeriodosCortosCegueraOpcionWidgetState
+    extends State<PeriodosCortosCegueraOpcion> {
+  @override
+  void initState() {
+    id_periodo_ceguera = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_periodo_ceguera,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_periodo_ceguera = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1854,37 +3615,97 @@ class PeriodosCortosCegueraWidgetState extends State<PeriodosCortosCeguera> {
 //---------------------------------------------No percibe cosas que pasan al lado de su cuerpo ---------------------------------------------
 
 class CosasPasanCuerpo extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierPersibeCosasCuerpo;
-
-  CosasPasanCuerpo({this.valueNotifierPersibeCosasCuerpo});
-
   @override
-  CosasPasanCuerpoWidgetState createState() => CosasPasanCuerpoWidgetState();
+  CheckCosasPasanCuerpoWidgetState createState() =>
+      CheckCosasPasanCuerpoWidgetState();
 }
 
-class CosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
+class CheckCosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'No percibe cosas que pasan al lado de su cuerpo',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierPersibeCosasCuerpo.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierPersibeCosasCuerpo.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[30]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            CosasPasanCuerpoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// CosasPasanCuerpoOpcion *******************
+
+var id_cosas_pasan_cuerpo;
+
+class CosasPasanCuerpoOpcion extends StatefulWidget {
+  @override
+  CosasPasanCuerpoOpcionWidgetState createState() =>
+      CosasPasanCuerpoOpcionWidgetState();
+}
+
+class CosasPasanCuerpoOpcionWidgetState extends State<CosasPasanCuerpoOpcion> {
+  @override
+  void initState() {
+    id_cosas_pasan_cuerpo = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_cosas_pasan_cuerpo,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_cosas_pasan_cuerpo = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1892,38 +3713,98 @@ class CosasPasanCuerpoWidgetState extends State<CosasPasanCuerpo> {
 //---------------------------------------------Dificultad para distinguir el calor del frío ---------------------------------------------
 
 class DistinguirCalorFrio extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierDificultadCalorFrio;
-
-  DistinguirCalorFrio({this.valueNotifierDificultadCalorFrio});
-
   @override
-  DistinguirCalorFrioWidgetState createState() =>
-      DistinguirCalorFrioWidgetState();
+  CheckDistinguirCalorFrioWidgetState createState() =>
+      CheckDistinguirCalorFrioWidgetState();
 }
 
-class DistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
+class CheckDistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Dificultad para distinguir el calor del frío',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDificultadCalorFrio.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierDificultadCalorFrio.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[31]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            DistinguirCalorFrioOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// DistinguirCalorFrioOpcion *******************
+
+var id_distinguir_calor_frio;
+
+class DistinguirCalorFrioOpcion extends StatefulWidget {
+  @override
+  DistinguirCalorFrioOpcionWidgetState createState() =>
+      DistinguirCalorFrioOpcionWidgetState();
+}
+
+class DistinguirCalorFrioOpcionWidgetState
+    extends State<DistinguirCalorFrioOpcion> {
+  @override
+  void initState() {
+    id_distinguir_calor_frio = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_distinguir_calor_frio,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_distinguir_calor_frio = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -1931,75 +3812,195 @@ class DistinguirCalorFrioWidgetState extends State<DistinguirCalorFrio> {
 //---------------------------------------------Problemas de gusto ---------------------------------------------
 
 class ProblemasGusto extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierProblemasGusto;
-
-  ProblemasGusto({this.valueNotifierProblemasGusto});
-
   @override
-  ProblemasGustoWidgetState createState() => ProblemasGustoWidgetState();
+  CheckProblemasGustoWidgetState createState() =>
+      CheckProblemasGustoWidgetState();
 }
 
-class ProblemasGustoWidgetState extends State<ProblemasGusto> {
+class CheckProblemasGustoWidgetState extends State<ProblemasGusto> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas de gusto',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierProblemasGusto.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierProblemasGusto.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[32]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemasGustoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// ProblemasGustoOpcion *******************
+
+var id_problema_gusto;
+
+class ProblemasGustoOpcion extends StatefulWidget {
+  @override
+  ProblemasGustoOpcionWidgetState createState() =>
+      ProblemasGustoOpcionWidgetState();
+}
+
+class ProblemasGustoOpcionWidgetState extends State<ProblemasGustoOpcion> {
+  @override
+  void initState() {
+    id_problema_gusto = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problema_gusto,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problema_gusto = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //---------------------------------------------Problemas de olfato ---------------------------------------------
 
-class ProblemasOlfato extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierProblemasOlfato;
-
-  ProblemasOlfato({this.valueNotifierProblemasOlfato});
-
+class ProblemaOlfato extends StatefulWidget {
   @override
-  ProblemasOlfatoWidgetState createState() => ProblemasOlfatoWidgetState();
+  CheckProblemaOlfatoWidgetState createState() =>
+      CheckProblemaOlfatoWidgetState();
 }
 
-class ProblemasOlfatoWidgetState extends State<ProblemasOlfato> {
+class CheckProblemaOlfatoWidgetState extends State<ProblemaOlfato> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Problemas de olfato',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierProblemasOlfato.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierProblemasOlfato.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[33]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            ProblemaOlfatoOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// ProblemaOlfatoOpcion *******************
+
+var id_problema_olfato;
+
+class ProblemaOlfatoOpcion extends StatefulWidget {
+  @override
+  ProblemaOlfatoOpcionWidgetState createState() =>
+      ProblemaOlfatoOpcionWidgetState();
+}
+
+class ProblemaOlfatoOpcionWidgetState extends State<ProblemaOlfatoOpcion> {
+  @override
+  void initState() {
+    id_problema_olfato = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_problema_olfato,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_problema_olfato = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -2007,37 +4008,95 @@ class ProblemasOlfatoWidgetState extends State<ProblemasOlfato> {
 //---------------------------------------------Dolor ---------------------------------------------
 
 class Dolor extends StatefulWidget {
-  final ValueNotifier<bool> valueNotifierDolor;
-
-  Dolor({this.valueNotifierDolor});
-
   @override
-  DolorWidgetState createState() => DolorWidgetState();
+  CheckDolorWidgetState createState() => CheckDolorWidgetState();
 }
 
-class DolorWidgetState extends State<Dolor> {
+class CheckDolorWidgetState extends State<Dolor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: 'Dolor',
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDolor.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          if (newValue == true) {
-            cant_check += 1;
-          } else {
-            cant_check -= 1;
-          }
-          widget.valueNotifierDolor.value = newValue;
-        });
-      },
-      textStyle: TextStyle(
-        fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            CustomDivider(
+              text: 'Sensorial',
+              color: Colors.pinkAccent,
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                "¿" + respuestaFisico[34]["nombre_evento"] + "?",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            DolorOpcion()
+          ],
+        ),
       ),
-      checkboxScale: 1.5,
+    );
+  }
+}
+
+// DolorOpcion *******************
+
+var id_dolor;
+
+class DolorOpcion extends StatefulWidget {
+  @override
+  DolorOpcionWidgetState createState() => DolorOpcionWidgetState();
+}
+
+class DolorOpcionWidgetState extends State<DolorOpcion> {
+  @override
+  void initState() {
+    id_dolor = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasFisico
+            .map((list) => RadioListTile(
+                  groupValue: id_dolor,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_dolor = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }

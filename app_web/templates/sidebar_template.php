@@ -69,6 +69,16 @@ $apellido=$_SESSION['apellido'];
           </a>
         </li>
 
+        <li class="nav-item">
+          <a href="pacientes_buscador.php" class="nav-link">
+            <i class="nav-icon fas fa-square-check"></i>
+            <p>
+              Buscar Pacientes
+              <!-- <span class="right badge badge-danger">New</span> -->
+            </p>
+          </a>
+        </li>
+
       </ul>
 
     </nav>

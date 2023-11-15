@@ -13,6 +13,9 @@ Flight::route('POST /login', 'login_doctor');
 // Read Pacientes  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 
+// Read Pacientes  ----------------------------------------------------------
+Flight::route('POST /list_pacientes', 'list_pacientes');
+
 // Solicutud a Pacientes  ----------------------------------------------------------
 Flight::route('POST /solicitud_medico_paciente', 'solicitud_medico_paciente');
 
@@ -114,6 +117,9 @@ Flight::route('POST /respuesta_screening_fisico','respuesta_screening_fisico');
 
 // Respuesta Screening Animo
 Flight::route('POST /respuesta_screening_animo','respuesta_screening_animo');
+
+// Tipo de Respuesta Animo
+Flight::route('POST /tipo_respuesta_animo','tipo_respuesta_animo');
 
 // Respuesta Screening CDR
 Flight::route('POST /respuesta_screening_cdr','respuesta_screening_cdr');
