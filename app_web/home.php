@@ -3,6 +3,8 @@
 session_start();
 include (__DIR__."/env.php");
 
+$id_medico = $_SESSION["id_medico"];
+
 $rutaRaiz = Env::$_URL_API;
 
 ?>
@@ -62,6 +64,9 @@ $rutaRaiz = Env::$_URL_API;
               </form>
               <div id="mensaje">
               </div>
+              
+              <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')"><i class="fa fa-plus" aria-hidden="true"></i></button>
+
 
             </div>
             <!-- /.card-header -->
@@ -264,4 +269,108 @@ $rutaRaiz = Env::$_URL_API;
 
 </body>
 
+<!-- Modal Nuevo Paciente-->
+<div class="modal fade" id="nuevoPacienteModal" tabindex="-1" role="dialog" aria-labelledby="nuevoPacienteModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Nueva Solicitud <abbr title="Envia una solicitud al paciente"><i class="fa-sharp fa-solid fa-circle-info"></i></abbr></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="modal_nuevo_anuncio" class="modal-body">
+        <div id="formulario">
+        <form action="" method="post">
+          <div class="form-group">
+          <label for="dni-text" class="col-form-label">Dni:</label>
+          <input class="form-control" id="dni_paciente" type="number" value="">
+          </div>
+          <div class="form-group">
+            <label for="descripcion-text" class="col-form-label">Mensaje(Opcional):</label>
+            <textarea class="form-control" id="mensaje_paciente"></textarea>
+          </div>
+        </form>
+        </div>
+        <div id="mensajeResultado"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="button_enviar" type="button" class="btn btn-primary" onclick="envio_solicitud()">Enviar</button>
+        <button id="button_ok" data-dismiss="modal" type="button" class="btn btn-primary" style="display: none;">Entendido</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('#nuevoPacienteModal').on('show.bs.modal', function () {
+    // Blanquea los campos del formulario
+    $('#dni_paciente').val('');
+    $('#mensaje_paciente').val('');
+    // Oculta el mensaje de resultado si estaba visible
+    $('#mensajeResultado').hide();
+  });
+  
+    function envio_solicitud() {
+
+      var mensaje = document.getElementById("mensaje_paciente").value;
+
+      if (mensaje.trim() === "") {
+        mensaje = " ";
+      } 
+
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+
+      var settings = {
+        "url": rootRaiz + "/solicitud_medico_paciente",
+        "method": "POST",
+        "data": JSON.stringify({
+          "dni_paciente": document.getElementById("dni_paciente").value,
+          "mensaje_paciente": mensaje,
+          "id_medico": "<?php echo $id_medico; ?>",
+        }),
+      };
+      console.log("<?php echo $id_medico; ?>");
+
+      $.ajax(settings).done(function (response) {
+
+        console.log(response);
+
+        var mensajeResultado = document.getElementById("mensajeResultado");
+
+        if (response['status'] == "Success") {
+         document.getElementById('button_ok').style.display = 'block';
+         document.getElementById('button_enviar').style.display = 'none';
+         
+
+          mensajeResultado.innerHTML = '<div class="alert alert-success">Solicitud enviada correctamente</div>';
+          document.getElementById('mensajeResultado').style.display = 'block';
+
+         document.getElementById('formulario').style.display = 'none';
+
+        } else {
+          if (response['status'] == "Vacio") {
+
+         document.getElementById('button_ok').style.display = 'block';
+         document.getElementById('button_enviar').style.display = 'none';
+
+          mensajeResultado.innerHTML = '<div class="alert alert-danger">No se pudo encontrar el paciente</div>';
+          document.getElementById('mensajeResultado').style.display = 'block';
+
+          }
+
+          if (response['status'] == "Error") {
+            document.getElementById('button_ok').style.display = 'block';
+         document.getElementById('button_enviar').style.display = 'none';
+
+          mensajeResultado.innerHTML = '<div class="alert alert-danger">Error!</div>';
+        
+          }
+        }
+      });
+
+    }
+    </script>
 </html>

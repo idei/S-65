@@ -42,7 +42,7 @@ if (isset($_POST['email'])) {
 
 try {
     
-    $sentencia = $db->prepare("SELECT nombre,apellido,especialidad,telefono,domicilio,dni,matricula, users.id, token, rela_rol 
+    $sentencia = $db->prepare("SELECT nombre,apellido,especialidad,telefono,domicilio,dni,matricula, users.id, token, rela_rol, medicos.id id_medico
     FROM users
     join medicos on users.id = medicos.rela_users
     WHERE email = '" . $email . "' AND password = '" . $password . "'");
@@ -53,8 +53,7 @@ try {
         $datos = $sentencia->fetch();
 
 
-        $id_paciente = $datos['id'];
-
+        $id_medico = $datos['id_medico'];
         $nombre = $datos['nombre'];
         $apellido = $datos['apellido'];
         $dni = $datos['dni'];
@@ -70,6 +69,7 @@ try {
             "email" => $email,
             //PacienteModel
             "medico" => [
+                "id_medico" => $id_medico,
                 "nombre" => $nombre,
                 "apellido" => $apellido,
                 "dni" => $dni,
@@ -84,7 +84,7 @@ try {
 
         $_SESSION['email'] = $email;
         $_SESSION['password'] = $password;
-        $_SESSION['id_medico'] = $datos['id'];
+        $_SESSION['id_medico'] = $datos['id_medico'];
         $_SESSION['dni'] = $datos['dni'];
         $_SESSION['nombre'] = $datos['nombre'];
         $_SESSION['apellido'] = $datos['apellido'];

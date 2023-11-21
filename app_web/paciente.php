@@ -121,8 +121,7 @@ $rutaRaiz = Env::$_URL_API;
               <br>
               <div class="col align-self-center">
                 <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
-                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos clinicos
-                  historicos</button>
+                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos</button>
               </div>
 
               <br>
@@ -662,13 +661,14 @@ $rutaRaiz = Env::$_URL_API;
 
     function guardar_chequeo() {
     var rootRaiz = "<?php echo $rutaRaiz; ?>";
-
+    var option = document.getElementById('select_chequeos').options[document.getElementById("select_chequeos").value - 1];
+    var title = option['title'];
     var parametros = {
       tipo_chequeo: document.getElementById("select_chequeos").value,
       fecha_chequeo: document.getElementById("fecha1").value,
       id_paciente: "<?php echo $id_paciente; ?>",
       id_medico: "<?php echo $id_medico; ?>",
-      descripcion: "Estimado paciente le envio para que complete el siguiente "+ document.getElementById("select_chequeos").title +":"
+      descripcion: "Estimado paciente le envio el siguiente chequeo de "+ title +""
     };
 
     $.ajax({
