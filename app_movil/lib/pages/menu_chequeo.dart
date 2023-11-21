@@ -265,7 +265,8 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                             CircleAvatar(
                                 radius:
                                     MediaQuery.of(context).size.width / radius,
-                                child: Icon(Icons.abc_sharp,
+                                //child: Icon(Icons.abc_sharp,
+                                child: Icon(Icons.access_alarms,
                                     color: Colors.white, size: 70.0)),
                             SizedBox(height: 8.0),
                             Text(
@@ -290,7 +291,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                             CircleAvatar(
                                 radius:
                                     MediaQuery.of(context).size.width / radius,
-                                child: Icon(Icons.arrow_circle_left_outlined,
+                                child: Icon(Icons.arrow_back_outlined,
                                     color: Colors.white, size: 70.0)),
                             SizedBox(height: 8.0),
                             Text(
