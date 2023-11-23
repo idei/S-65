@@ -123,7 +123,7 @@ $rutaRaiz = Env::$_URL_API;
                 <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
                   onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos
                 </button>
-                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos</button>
+                 
               </div>
 
               <br>

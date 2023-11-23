@@ -75,6 +75,7 @@ $rutaRaiz = Env::$_URL_API;
                 <thead>
 
                   <tr>
+                  <h1 class="d-flex justify-content-center">Mis Pacientes</h1>
                     <th scope="col"></th>
                     <th>Dni</th>
                     <th>Apellido</th>
