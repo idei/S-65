@@ -1974,7 +1974,7 @@ function get_chequeos()
         FROM recordatorios_medicos 
         JOIN tipo_screening on recordatorios_medicos.rela_screening = tipo_screening.id 
         JOIN estado_recordatorio ON recordatorios_medicos.rela_estado_recordatorio = estado_recordatorio.id
-        JOIN resultados_screenings ON recordatorios_medicos.rela_respuesta_screening = resultados_screenings.id
+        LEFT JOIN resultados_screenings ON recordatorios_medicos.rela_respuesta_screening = resultados_screenings.id
         JOIN pacientes AS P ON P.id = recordatorios_medicos.rela_paciente
         WHERE recordatorios_medicos.rela_medico = '" . $id_medico . "' ORDER BY fecha_creacion ASC");
 

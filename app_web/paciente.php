@@ -529,6 +529,8 @@ $rutaRaiz = Env::$_URL_API;
       //$.ajax(settings).done(function (response) {
       $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
+          tablaClinicos.innerHTML ='';
+          
           response['data'].forEach(element => {
             consume_alcohol = consumos(element['consume_alcohol']);
             consume_marihuana = consumos(element['consume_marihuana']);
