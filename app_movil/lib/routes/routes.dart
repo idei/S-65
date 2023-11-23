@@ -24,6 +24,7 @@ import 'package:app_salud/pages/screening.dart';
 import 'package:app_salud/pages/screening_adlq.dart';
 import 'package:app_salud/pages/screening_cerebral.dart';
 import 'package:app_salud/pages/splash_screen.dart';
+import 'package:app_salud/pages/ver_datos_clinicos.dart';
 import 'package:app_salud/pages/ver_screening.dart';
 import 'package:app_salud/pages/screening_animo.dart';
 import 'package:app_salud/pages/screening_cdr.dart';
@@ -50,6 +51,7 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/form_datos_generales': (context) => FormDatosGenerales(),
     '/form_datos_clinicos': (context) => FormDatosClinicos(),
     '/historial_clinico': (context) => HistorialClinico(),
+    '/ver_datos_clinicos': (context) => VerDatosClinicos(),
     '/form_antecedentes_personales': (context) => FormAntecedentesPersonales(),
     '/antecedentes_personales': (context) => AntecedentesPerPage(),
     '/antecedentes_familiares': (context) => AntecedentesFamiliarPage(),

@@ -1,11 +1,13 @@
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:app_salud/pages/env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import '../services/usuario_services.dart';
 
 class ScreeningConductualPage extends StatefulWidget {
   @override
@@ -26,65 +28,91 @@ var screening_recordatorio;
 List itemsConductual;
 List itemsConductualOtro;
 bool otroVisible = false;
+var usuarioModel;
+var _isPaciente = true;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        alert_screenings_generico(context, "Cuestionario Conductual",
-            " Tómese su tiempo para responder de la mejor manera "));
   }
 
   @override
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "CONDUC",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "CONDUC",
+              });
+            },
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "CONDUC",
-            });
-          },
+          title: Text('Chequeo de Conducta',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
         ),
-        title: Text('Chequeo de Conducta',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-      ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ColumnWidgetConductual();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+        body: Center(
+          child: SingleChildScrollView(
+            child: FutureBuilder(
+                future: getAllRespuesta(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ColumnWidgetConductual();
+                  } else {
+                    return Container(
+                      alignment: Alignment.center,
+                      child: _isLoadingIcon(),
+                    );
+                    // return Container(
+                    //     child: Column(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     ListTile(
+                    //         title: Text(
+                    //       'Error',
+                    //       textAlign: TextAlign.center,
+                    //       style: TextStyle(
+                    //           fontWeight: FontWeight.bold,
+                    //           fontFamily: Theme.of(context)
+                    //               .textTheme
+                    //               .headline1
+                    //               .fontFamily),
+                    //     )),
+                    //   ],
+                    // ));
+                  }
+                }),
+          ),
         ),
       ),
     );
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -143,6 +171,24 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   }
 }
 
+class _isLoadingIcon extends StatelessWidget {
+  const _isLoadingIcon({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+      child: const CircularProgressIndicator(color: Colors.blue),
+    );
+  }
+}
+
 class ColumnWidgetConductual extends StatefulWidget {
   const ColumnWidgetConductual({
     Key key,
@@ -154,38 +200,50 @@ class ColumnWidgetConductual extends StatefulWidget {
 
 class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        alert_screenings_generico(context, "Cuestionario Conductual",
+            " Tómese su tiempo para responder de la mejor manera "));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: <
         Widget>[
-      Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(20),
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: Text('¿Qué parentesco tiene con (nombre del usuario)?',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: Theme.of(context)
-                              .textTheme
-                              .headline1
-                              .fontFamily)),
+      if (!_isPaciente)
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(20),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                        '¿Qué parentesco tiene con (nombre del usuario)?',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily)),
+                  ),
                 ),
-              ),
 
-              Conductual1(),
+                Conductual1(),
 
-              // Usamos Container para el contenedor de la descripción
-            ],
+                // Usamos Container para el contenedor de la descripción
+              ],
+            ),
           ),
         ),
-      ),
       Divider(height: 5.0, color: Colors.black),
       Padding(
         padding: EdgeInsets.all(8.0),
@@ -725,85 +783,60 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   }
 
   guardarDatosConductual(BuildContext context) async {
-    if (id_conductual1 == null)
-      loginToast("Debe responder todas las preguntas");
+    if (id_conductual1 == null && _isLoading) {
+      id_conductual1 = "";
+    }
 
-    if (id_conductual2 == null)
-      loginToast("Debe responder todas las preguntas");
+    List<dynamic> conductuales = [
+      id_conductual1,
+      id_conductual2,
+      id_conductual3,
+      id_conductual4,
+      id_conductual5,
+      id_conductual6,
+      id_conductual7,
+      id_conductual8,
+      id_conductual9,
+      id_conductual10,
+      id_conductual11,
+      id_conductual12,
+      id_conductual13,
+    ];
 
-    if (id_conductual3 == null)
-      loginToast("Debe responder todas las preguntas");
+    for (var conductual in conductuales) {
+      if (conductual == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
 
-    if (id_conductual4 == null)
-      loginToast("Debe responder todas las preguntas");
+    showDialogMessage(context);
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_conductual";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "id_conductual1": id_conductual1,
+      "observaciones": otro.text,
+      "id_conductual2": id_conductual2,
+      "id_conductual3": id_conductual3,
+      "id_conductual4": id_conductual4,
+      "id_conductual5": id_conductual5,
+      "id_conductual6": id_conductual6,
+      "id_conductual7": id_conductual7,
+      "id_conductual8": id_conductual8,
+      "id_conductual9": id_conductual9,
+      "id_conductual10": id_conductual10,
+      "id_conductual11": id_conductual11,
+      "id_conductual12": id_conductual12,
+      "id_conductual13": id_conductual13,
+    });
 
-    if (id_conductual5 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual6 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual7 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual8 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual9 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual10 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual11 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual12 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual13 == null)
-      loginToast("Debe responder todas las preguntas");
-
-    if (id_conductual1 != null &&
-        id_conductual2 != null &&
-        id_conductual3 != null &&
-        id_conductual4 != null &&
-        id_conductual5 != null &&
-        id_conductual6 != null &&
-        id_conductual7 != null &&
-        id_conductual8 != null &&
-        id_conductual9 != null &&
-        id_conductual10 != null &&
-        id_conductual11 != null &&
-        id_conductual12 != null &&
-        id_conductual13 != null) {
-      showDialogMessage(context);
-      String URL_base = Env.URL_API;
-      var url = URL_base + "/respuesta_screening_conductual";
-      var response = await http.post(url, body: {
-        "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico.toString(),
-        "id_recordatorio": id_recordatorio.toString(),
-        "tipo_screening": tipo_screening['data'].toString(),
-        "id_conductual1": id_conductual1,
-        "observaciones": otro.text,
-        "id_conductual2": id_conductual2,
-        "id_conductual3": id_conductual3,
-        "id_conductual4": id_conductual4,
-        "id_conductual5": id_conductual5,
-        "id_conductual6": id_conductual6,
-        "id_conductual7": id_conductual7,
-        "id_conductual8": id_conductual8,
-        "id_conductual9": id_conductual9,
-        "id_conductual10": id_conductual10,
-        "id_conductual11": id_conductual11,
-        "id_conductual12": id_conductual12,
-        "id_conductual13": id_conductual13,
-      });
-
+    if (response.statusCode == 200) {
       var data = json.decode(response.body);
-
-      if (response.statusCode == 200) {
+      if (data['status'] == "Success") {
         if (data['data'] == "alert") {
           _alert_informe(
             context,
@@ -811,28 +844,24 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
             "Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.",
           );
         } else {
-          if (data['status'] == "Success") {
-            if (screening_recordatorio == true) {
-              Navigator.pushNamed(context, '/recordatorio');
-            } else {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "CONDUC",
-              });
-            }
-          }
+          _alert_informe(
+            context,
+            "Resultado:",
+            "No se presentaron resultados que indiquen algún problema.",
+          );
         }
       }
     }
   }
+}
 
-  loginToast(String toast) {
-    return Fluttertoast.showToast(
-        msg: toast,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white);
-  }
+loginToast(String toast) {
+  return Fluttertoast.showToast(
+      msg: toast,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white);
 }
 
 //------------***************
@@ -910,7 +939,7 @@ class Conductual1WidgetState extends State<Conductual1> {
         GenericRadioList(
           items: itemsConductualOtro,
           groupValue: id_conductual1,
-          heightContainer: 170.0,
+          heightContainer: 190.0,
           onChanged: (val) {
             setState(() {
               debugPrint('VAL = $val');

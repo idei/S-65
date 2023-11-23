@@ -27,26 +27,31 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => new GrupoConvivienteServices()),
         ChangeNotifierProvider(create: (_) => new AuthProvider()),
       ],
-      child: MaterialApp(
-        key: UniqueKey(),
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        supportedLocales: [
-          const Locale('es', 'ES'),
-        ],
-        theme: ThemeData(
-          primaryColor: Colors.blue,
-          textTheme: TextTheme(
-            headline1: TextStyle(
-              color: Colors.white,
-              fontFamily: 'NunitoR',
-              fontSize: 16.0,
+      child: WillPopScope(
+        onWillPop: () async {
+          return true; // Cambia esto según tu lógica.
+        },
+        child: MaterialApp(
+          key: UniqueKey(),
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          supportedLocales: [
+            const Locale('es', 'ES'),
+          ],
+          theme: ThemeData(
+            primaryColor: Colors.blue,
+            textTheme: TextTheme(
+              headline1: TextStyle(
+                color: Colors.white,
+                fontFamily: 'NunitoR',
+                fontSize: 16.0,
+              ),
             ),
           ),
+          debugShowCheckedModeBanner: false,
+          initialRoute: '/splash',
+          //initialRoute: '/screening_cerebral',
+          routes: getApplicationRoutes(),
         ),
-        debugShowCheckedModeBanner: false,
-        initialRoute: '/splash',
-        //initialRoute: '/screening_cerebral',
-        routes: getApplicationRoutes(),
       ),
     );
   }

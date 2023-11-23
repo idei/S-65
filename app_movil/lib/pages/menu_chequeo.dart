@@ -29,266 +29,287 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
 
     setParametrosMenu();
 
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(30, 20, 108, 1),
-      body: Center(
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: paddingHorizontal,
-                vertical: paddingVertical,
-              ),
-              height: constraints.maxHeight * heightContainer,
-              width: constraints.maxWidth * widthContainer,
-              child: GridView.count(
-                  crossAxisCount:
-                      3, // Define el número de columnas de la grilla
-                  childAspectRatio: childAspectRatioGrid,
-                  crossAxisSpacing: crossAxisSpacingGrid,
-                  mainAxisSpacing: mainAxisSpacingGrid,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "CONDUC";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/comportamiento.png'),
-                            radius: MediaQuery.of(context).size.width / radius,
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "CONDUCTUAL",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "SFMS";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
+    return WillPopScope(
+      onWillPop: () async {
+        // Personaliza aquí el comportamiento al presionar el botón de retroceso del dispositivo.
+        // Puedes realizar alguna acción, como mostrar un diálogo de confirmación antes de salir de la pantalla.
+        Navigator.pushNamed(context, '/menu');
+        return true; // Si el usuario cierra el diálogo sin seleccionar, no saldrá.
+      },
+      child: Scaffold(
+        backgroundColor: Color.fromRGBO(30, 20, 108, 1),
+        body: Center(
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: paddingHorizontal,
+                  vertical: paddingVertical,
+                ),
+                height: constraints.maxHeight * heightContainer,
+                width: constraints.maxWidth * widthContainer,
+                child: GridView.count(
+                    crossAxisCount:
+                        3, // Define el número de columnas de la grilla
+                    childAspectRatio: childAspectRatioGrid,
+                    crossAxisSpacing: crossAxisSpacingGrid,
+                    mainAxisSpacing: mainAxisSpacingGrid,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "CONDUC";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/comportamiento.png'),
                               radius:
                                   MediaQuery.of(context).size.width / radius,
-                              child: Icon(Icons.directions_run_rounded,
-                                  color: Colors.white, size: 70.0)),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "FÍSICO",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w500,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "QCQ";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: AssetImage('assets/cognicion.png'),
-                            radius: MediaQuery.of(context).size.width / radius,
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "COGNITIVO",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
+                            SizedBox(height: 8.0),
+                            Text(
+                              "CONDUCTUAL",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "ÁNIMO";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: AssetImage('assets/animo.png'),
-                            radius: MediaQuery.of(context).size.width / radius,
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "ÁNIMO",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "SFMS";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius:
+                                    MediaQuery.of(context).size.width / radius,
+                                child: Icon(Icons.directions_run_rounded,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "FÍSICO",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     select_screening = "CDR";
-                    //     Navigator.pushNamed(context, '/screening', arguments: {
-                    //       "select_screening": select_screening,
-                    //     });
-                    //   },
-                    //   child: Column(
-                    //     children: [
-                    //       CircleAvatar(
-                    //         backgroundImage: AssetImage('assets/cotidiana.png'),
-                    //         radius: MediaQuery.of(context).size.width / radius,
-                    //       ),
-                    //       SizedBox(height: 8.0),
-                    //       Text(
-                    //         "CDR",
-                    //         style: TextStyle(
-                    //           color: Colors.white,
-                    //           fontSize: 14.0,
-                    //           fontWeight: FontWeight.w500,
-                    //         ),
-                    //         textAlign: TextAlign.center,
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "RNUTRI";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: AssetImage('assets/nutricion.png'),
-                            radius: MediaQuery.of(context).size.width / radius,
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "NUTRICIÓN",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "SCER";
-                        Navigator.pushNamed(context, '/screening_cerebral',
-                            arguments: {
-                              "select_screening": select_screening,
-                            });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "QCQ";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/cognicion.png'),
                               radius:
                                   MediaQuery.of(context).size.width / radius,
-                              child: Icon(Icons.add_reaction_sharp,
-                                  color: Colors.white, size: 70.0)),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "SALUD CEREBRAL",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                            SizedBox(height: 8.0),
+                            Text(
+                              "COGNITIVO",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        select_screening = "ADLQ";
-                        Navigator.pushNamed(context, '/screening', arguments: {
-                          "select_screening": select_screening,
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "ÁNIMO";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: AssetImage('assets/animo.png'),
                               radius:
                                   MediaQuery.of(context).size.width / radius,
-                              child: Icon(Icons.abc_sharp,
-                                  color: Colors.white, size: 70.0)),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "ADLQ",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                            SizedBox(height: 8.0),
+                            Text(
+                              "ÁNIMO",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     select_screening = "CDR";
+                      //     Navigator.pushNamed(context, '/screening', arguments: {
+                      //       "select_screening": select_screening,
+                      //     });
+                      //   },
+                      //   child: Column(
+                      //     children: [
+                      //       CircleAvatar(
+                      //         backgroundImage: AssetImage('assets/cotidiana.png'),
+                      //         radius: MediaQuery.of(context).size.width / radius,
+                      //       ),
+                      //       SizedBox(height: 8.0),
+                      //       Text(
+                      //         "CDR",
+                      //         style: TextStyle(
+                      //           color: Colors.white,
+                      //           fontSize: 14.0,
+                      //           fontWeight: FontWeight.w500,
+                      //         ),
+                      //         textAlign: TextAlign.center,
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "RNUTRI";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/nutricion.png'),
+                              radius:
+                                  MediaQuery.of(context).size.width / radius,
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "NUTRICIÓN",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "SCER";
+                          Navigator.pushNamed(context, '/screening_cerebral',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius:
+                                    MediaQuery.of(context).size.width / radius,
+                                child: Icon(Icons.add_reaction_sharp,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "SALUD CEREBRAL",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          select_screening = "ADLQ";
+                          Navigator.pushNamed(context, '/screening',
+                              arguments: {
+                                "select_screening": select_screening,
+                              });
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius:
+                                    MediaQuery.of(context).size.width / radius,
+                                //child: Icon(Icons.abc_sharp,
+                                child: Icon(Icons.access_alarms,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "ADLQ",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
 
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/menu');
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                              radius:
-                                  MediaQuery.of(context).size.width / radius,
-                              child: Icon(Icons.arrow_circle_left_outlined,
-                                  color: Colors.white, size: 70.0)),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "VOLVER",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w500,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/menu');
+                        },
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius:
+                                    MediaQuery.of(context).size.width / radius,
+                                child: Icon(Icons.arrow_back_outlined,
+                                    color: Colors.white, size: 70.0)),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "VOLVER",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ]),
-            );
-          },
+                    ]),
+              );
+            },
+          ),
         ),
       ),
     );

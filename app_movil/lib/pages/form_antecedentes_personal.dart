@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-// Define a custom Form widget.
 class FormAntecedentesPersonales extends StatefulWidget {
   final pageName = 'form_antecedentes_personales';
 
@@ -13,6 +14,7 @@ class FormAntecedentesPersonales extends StatefulWidget {
 }
 
 var email;
+var usuarioModel;
 
 class _FormpruebaState extends State<FormAntecedentesPersonales> {
   final myController = TextEditingController();
@@ -30,46 +32,70 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
 
   @override
   Widget build(BuildContext context) {
-    //Map parametros = ModalRoute.of(context).settings.arguments;
-    //email = parametros["email"];
-    //email = "fabricio@gmail.com";
-
-    //read_datos_paciente(context);
-
-    return FutureBuilder(
-        future: read_datos_paciente(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
-
-          if (snapshot.hasData) {
-            return Antecedentes();
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: Center(
-                  child: Text(
-                    'Agregar \nAntecedentes Personales',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    email = usuarioModel.usuario.emailUser;
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            radius: MediaQuery.of(context).size.width / 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/antecedentes_personales');
+          },
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Center(
+          child: Text(
+            'Agregar \nAntecedentes Personales',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        height: MediaQuery.of(context)
+            .size
+            .height, // Ocupa todo el espacio vertical
+        child: FutureBuilder(
+          future: read_datos_paciente(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return Antecedentes();
+            } else {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Esto centra verticalmente
+                    children: [
+                      Text(snapshot.error),
+                    ],
                   ),
-                ),
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-              body: Center(
+                );
+                //_alert_informe(context, "No se pudieron leer los datos", 2);
+              }
+              return Center(
                 child: CircularProgressIndicator(
                   semanticsLabel: "Cargando",
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 
   read_datos_paciente() async {
-    await getStringValuesSF();
+    final completer = Completer<dynamic>();
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/user_read_antc_personales";
@@ -97,69 +123,75 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
       "cod_event_intoxicaciones": cod_event_intoxicaciones,
     });
 
-    var responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      var responseData = json.decode(response.body);
 
-    if (responseData["status"] == "Success") {
-      var data = responseData['data'];
+      if (responseData["status"] == "Success") {
+        var data = responseData['data'];
 
-      valueNotifierRetrasoMental.value = data["retraso"] == "1" ? true : false;
+        valueNotifierRetrasoMental.value =
+            data["retraso"] == "1" ? true : false;
 
-      valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
+        valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
 
-      valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
+        valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
 
-      valueNotifierLesiones_cabeza.value =
-          data["lesiones_cabeza"] == "1" ? true : false;
+        valueNotifierLesiones_cabeza.value =
+            data["lesiones_cabeza"] == "1" ? true : false;
 
-      valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
+        valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
 
-      valueNotifierAccidentes_caidas.value =
-          data["accidentes_caidas"] == "1" ? true : false;
+        valueNotifierAccidentes_caidas.value =
+            data["accidentes_caidas"] == "1" ? true : false;
 
-      valueNotifierLesiones_espalda.value =
-          data["lesiones_espalda"] == "1" ? true : false;
+        valueNotifierLesiones_espalda.value =
+            data["lesiones_espalda"] == "1" ? true : false;
 
-      valueNotifierInfecciones.value =
-          data["infecciones"] == "1" ? true : false;
+        valueNotifierInfecciones.value =
+            data["infecciones"] == "1" ? true : false;
 
-      valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
+        valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
 
-      valueNotifierAcv.value = data["acv"] == "1" ? true : false;
+        valueNotifierAcv.value = data["acv"] == "1" ? true : false;
 
-      valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
+        valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
 
-      valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
+        valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
 
-      valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
+        valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
 
-      valueNotifierEsclerosis.value = data["esclerosis"] == "1" ? true : false;
+        valueNotifierEsclerosis.value =
+            data["esclerosis"] == "1" ? true : false;
 
-      valueNotifierHuntington.value = data["huntington"] == "1" ? true : false;
+        valueNotifierHuntington.value =
+            data["huntington"] == "1" ? true : false;
 
-      valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
+        valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
 
-      valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
+        valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
 
-      valueNotifierEsquizofrenia.value =
-          data["esquizofrenia"] == "1" ? true : false;
+        valueNotifierEsquizofrenia.value =
+            data["esquizofrenia"] == "1" ? true : false;
 
-      valueNotifierEnfermedad_desorden.value =
-          data["enfermedad_desorden"] == "1" ? true : false;
+        valueNotifierEnfermedad_desorden.value =
+            data["enfermedad_desorden"] == "1" ? true : false;
 
-      valueNotifierIntoxicaciones.value =
-          data["intoxicaciones"] == "1" ? true : false;
+        valueNotifierIntoxicaciones.value =
+            data["intoxicaciones"] == "1" ? true : false;
+
+        completer.complete(true);
+      } else {
+        if (responseData["status"] == "Vacio") {
+          completer.complete(true);
+        } else {
+          completer.completeError("Error en la respuesta");
+        }
+      }
     } else {
-      _alert_informe(context, "No se pudieron leer los datos", 2);
+      completer.completeError("Error en la solicitud");
     }
-
-    return true;
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email");
-    email = email_prefer;
-    print(email);
+    //return true;
+    return completer.future;
   }
 }
 
@@ -189,75 +221,52 @@ class AntecedentesWidgetState extends State<Antecedentes> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: CircleAvatar(
-              radius: MediaQuery.of(context).size.width / 30,
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.blue,
-              ),
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/antecedentes_personales');
-            },
-          ),
-          backgroundColor: Theme.of(context).primaryColor,
-          title: Center(
-            child: Text(
-              'Agregar \nAntecedentes Personales',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              ),
-            ),
-          ),
-        ),
-        body: Form(
-          key: _formKey_antecedentes_familiares,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: <Widget>[
-                CheckRetrasoMental(),
-                CheckDesorHabla(),
-                DeficitAtencion(),
-                LesionCabeza(),
-                PerdidaConocimiento(),
-                AccidentesCaidasGolpes(),
-                Lesiones(),
-                Infecciones(),
-                Acv(),
-                Demencia(),
-                Parkinzon(),
-                Epilepsia(),
-                Esclerosis(),
-                Huntington(),
-                Depresion(),
-                TrastornoBipolar(),
-                Esquizofrenia(),
-                EnfermedadDesordenGrave(),
-                Intoxicaciones(),
-                SizedBox(height: 30),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: () {
-                    guardar_datos(context);
-                  },
-                  child: Text('Guardar Antecedentes',
-                      style: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily,
-                          fontWeight: FontWeight.bold)),
+    return Form(
+      key: _formKey_antecedentes_familiares,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListView(
+          children: <Widget>[
+            CheckRetrasoMental(),
+            CheckDesorHabla(),
+            DeficitAtencion(),
+            LesionCabeza(),
+            PerdidaConocimiento(),
+            AccidentesCaidasGolpes(),
+            Lesiones(),
+            Infecciones(),
+            Acv(),
+            Demencia(),
+            Parkinzon(),
+            Epilepsia(),
+            Esclerosis(),
+            Huntington(),
+            Depresion(),
+            TrastornoBipolar(),
+            Esquizofrenia(),
+            EnfermedadDesordenGrave(),
+            Intoxicaciones(),
+            SizedBox(height: 50),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
                 ),
-              ],
+                onPressed: () {
+                  guardar_datos(context);
+                },
+                child: Text('Guardar Antecedentes',
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                        fontWeight: FontWeight.bold)),
+              ),
             ),
-          ),
-        ));
+            SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
   }
 
   guardar_datos(BuildContext context) async {

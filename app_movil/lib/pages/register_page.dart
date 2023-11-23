@@ -34,13 +34,18 @@ class _FormRegisterState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    _formKey_registrar.currentState?.reset();
-    emailPaciente.clear();
-    passwordNuevo.clear();
-    nombrePaciente.clear();
-    apellidoPaciente.clear();
-    passwordRepetido.clear();
-    dni.clear();
+    // emailPaciente.clear();
+    // passwordNuevo.clear();
+    // nombrePaciente.clear();
+    // apellidoPaciente.clear();
+    // passwordRepetido.clear();
+    // dni.clear();
+    emailPaciente.text = '';
+    passwordNuevo.text = '';
+    nombrePaciente.text = '';
+    apellidoPaciente.text = '';
+    passwordRepetido.text = '';
+    dni.text = '';
   }
 
   @override
@@ -161,7 +166,13 @@ class _FormRegisterState extends State<RegisterPage> {
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.underline,
               fontSize: 15,
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily))
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+      // ElevatedButton(
+      //   onPressed: () {
+      //     _mostrarPDF(context);
+      //   },
+      //   child: Text('Abrir Términos y Condiciones'),
+      // )
     ]);
   }
 

@@ -1,13 +1,12 @@
-import 'package:app_salud/pages/screening_diabetes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-String email;
 
 class FormDatosClinicos extends StatefulWidget {
   final pageName = '/form_datos_clinicos';
@@ -28,32 +27,13 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   final _peso_corporal = TextEditingController();
   final _altura = TextEditingController();
 
-  getAllRespuesta() async {
-    // String URL_base = Env.URL_API;
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/respuesta_datos_clinicos";
-    var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
-    if (this.mounted) {
-      setState(() {
-        dataRespuestas = jsonDate;
-      });
-    }
-    print(jsonDate);
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    getStringValuesSF();
-  }
+  var usuarioModel;
+  var id_paciente;
 
   @override
   void initState() {
     super.initState();
     getAllRespuesta();
-    getStringValuesSF();
   }
 
   @override
@@ -69,20 +49,8 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
   @override
   Widget build(BuildContext context) {
-    void choiceAction(String choice) {
-      if (choice == Constants.Ajustes) {
-        Navigator.pushNamed(context, '/ajustes');
-      } else if (choice == Constants.Salir) {
-        Navigator.pushNamed(context, '/');
-      }
-    }
-
-    Map parametros = ModalRoute.of(context).settings.arguments;
-    if (parametros != null) {
-      email_prefer = parametros['email'];
-    } else {
-      getStringValuesSF();
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
         appBar: AppBar(
@@ -152,6 +120,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _presion_alta,
                     keyboardType: TextInputType.number,
                     maxLength: 3, // Establecer el número máximo de caracteres
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                          RegExp('[,]')), // Evitar comas
+                    ],
                     decoration: InputDecoration(
                       hintText: '95',
                     ),
@@ -198,6 +170,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _presion_baja,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                          RegExp('[,]')), // Evitar comas
+                    ],
                     maxLength: 2, // Establecer el número máximo de caracteres
                     decoration: InputDecoration(
                       hintText: '65',
@@ -249,6 +225,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _pulso,
                     maxLength: 3,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                          RegExp('[,]')), // Evitar comas
+                    ],
                     decoration: InputDecoration(
                       hintText: '80',
                     ),
@@ -304,6 +284,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   TextFormField(
                     controller: _peso_corporal,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                          RegExp('[,]')), // Evitar comas
+                    ],
                     decoration: InputDecoration(
                       hintText: '75.5',
                     ),
@@ -357,6 +341,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _altura,
                     keyboardType: TextInputType.number,
                     maxLength: 4,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                          RegExp('[,]')), // Evitar comas
+                    ],
                     decoration: InputDecoration(
                       hintText: '1.70',
                     ),
@@ -428,18 +416,25 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                   CardGenerico(ConsumeMarihuana(), "¿Fuma Marihuana?"),
                   SizedBox(height: 15),
                   CardGenerico(ConsumeOtrasDrogas(), "¿Consume otras drogas?"),
-                  SizedBox(height: 15),
-                  ElevatedButton(
+                  SizedBox(height: 25),
+                  ElevatedButton.icon(
+                    icon: _isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: const CircularProgressIndicator(),
+                          )
+                        : const Icon(Icons.save_alt),
                     style: ElevatedButton.styleFrom(elevation: 8),
                     onPressed: () {
-                      if (_formKey_datos_clinicos.currentState.validate()) {
-                        verification(context);
-                        if (estado_verification == true) {
-                          guardar_datos();
-                        }
+                      if (_formKey_datos_clinicos.currentState.validate() &&
+                          !_isLoading) {
+                        _startLoading();
+                      } else {
+                        null;
                       }
                     },
-                    child: Text(
+                    label: Text(
                       'Guardar Datos Clínicos',
                       style: TextStyle(
                         fontFamily:
@@ -452,6 +447,35 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
             ),
           ),
         ));
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await guardar_datos();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  getAllRespuesta() async {
+    // String URL_base = Env.URL_API;
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_datos_clinicos";
+    var response = await http.post(url, body: {});
+    print(response);
+    var jsonBody = response.body;
+    var jsonDate = json.decode(jsonBody);
+    if (this.mounted) {
+      setState(() {
+        dataRespuestas = jsonDate;
+      });
+    }
+    print(jsonDate);
   }
 
   Widget CardGenerico(StatefulWidget widget, String pregunta) {
@@ -501,8 +525,13 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
 
     if (response.statusCode == 200) {
       if (data["status"] == "Success") {
-        _alert_clinicos(
-            context, "Informacion para tener en cuenta", descri_informe, 2);
+        if (descri_informe != "") {
+          _alert_clinicos(
+              context, "Informacion para tener en cuenta", descri_informe, 2);
+        } else {
+          _alert_clinicos(context, "Sus datos clínicos fueron guardados",
+              descri_informe, 2);
+        }
       } else {
         loginToast("Error al guardar la información");
       }
@@ -713,6 +742,7 @@ _alert_informe(context, message, colorNumber) {
 
 _alert_clinicos(context, title, descripcion, number) async {
   Alert(
+    closeFunction: () {},
     context: context,
     title: title,
     desc: descripcion,
@@ -745,17 +775,6 @@ Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
       child: child,
     ),
   );
-}
-
-String email_prefer;
-var id_paciente;
-
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  email_prefer = prefs.getString("email_prefer");
-  id_paciente = prefs.getInt("id_paciente");
-  print("email_prefer");
-  print(email_prefer);
 }
 
 String descri_informe = "";
@@ -861,7 +880,7 @@ class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         key: list_view_alcohol,
         shrinkWrap: true,
@@ -973,7 +992,7 @@ class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -1046,7 +1065,7 @@ class _ConsumeMarihuanaState extends State<ConsumeMarihuana> {
           },
         ),
         if (_mostrarOpcion && _opcionSeleccionadaMarihuana != null)
-          Opcion_Consume_Tabaco()
+          Opcion_Consume_Marihuana()
       ],
     );
   }
@@ -1077,6 +1096,7 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
 
   @override
   void initState() {
+    super.initState();
     getAllRespuesta();
   }
 
@@ -1085,7 +1105,7 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -1196,7 +1216,7 @@ class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
     return Container(
       key: UniqueKey(),
       color: Colors.blue[100],
-      height: 230,
+      height: 200,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

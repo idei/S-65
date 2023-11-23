@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:app_salud/pages/env.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/medicamentos_model.dart';
 import '../services/usuario_services.dart';
 
 class MedicamentoAddPage extends StatefulWidget {
@@ -21,6 +21,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
 
   GlobalKey<AutoCompleteTextFieldState<Medicamentos_database>> key =
       GlobalKey();
+  GlobalKey<FormState> _formKey_add_medicamento = GlobalKey<FormState>();
 
   static List<Medicamentos_database> list_medicamentos_vademecum;
 
@@ -89,6 +90,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   bool _isChecked = false; // Valor seleccionado por defecto
   bool _isExpanded = false;
   bool _isExpandedBuscador = true;
+  TextEditingController dosis_frecuencia = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -113,101 +115,145 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
-            loading
-                ? Container(
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator())
-                : AnimatedContainer(
-                    duration: Duration(milliseconds: 400),
-                    height: _isExpandedBuscador ? 100.0 : 0.0,
-                    child: searchTextField =
-                        AutoCompleteTextField<Medicamentos_database>(
-                      key: key,
-                      clearOnSubmit: false,
-                      suggestions: list_medicamentos_vademecum,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16.0,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
-                        hintText: "Ingrese el nombre del medicamento",
-                        hintStyle: TextStyle(
-                            color: Colors.grey,
+      body: Form(
+        key: _formKey_add_medicamento,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              loading
+                  ? Container(
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator())
+                  : AnimatedContainer(
+                      duration: Duration(milliseconds: 400),
+                      height: _isExpandedBuscador ? 100.0 : 0.0,
+                      child: searchTextField =
+                          AutoCompleteTextField<Medicamentos_database>(
+                        key: key,
+                        clearOnSubmit: false,
+                        suggestions: list_medicamentos_vademecum,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.0,
                             fontFamily: Theme.of(context)
                                 .textTheme
                                 .headline1
                                 .fontFamily),
+                        decoration: InputDecoration(
+                          contentPadding:
+                              EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
+                          hintText: "Ingrese el nombre del medicamento",
+                          hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontFamily: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .fontFamily),
+                        ),
+                        itemFilter: (item, query) {
+                          return item.nombre_comercial
+                              .toLowerCase()
+                              .startsWith(query.toLowerCase());
+                        },
+                        itemSorter: (a, b) {
+                          return a.nombre_comercial
+                              .compareTo(b.nombre_comercial);
+                        },
+                        itemSubmitted: (item) {
+                          setState(() {
+                            searchTextField.textField.controller.text =
+                                item.nombre_comercial;
+                            data_id = item.id_medicamento;
+                            print(data_id);
+                          });
+                        },
+                        itemBuilder: (context, item) {
+                          return row(item);
+                        },
                       ),
-                      itemFilter: (item, query) {
-                        return item.nombre_comercial
-                            .toLowerCase()
-                            .startsWith(query.toLowerCase());
-                      },
-                      itemSorter: (a, b) {
-                        return a.nombre_comercial.compareTo(b.nombre_comercial);
-                      },
-                      itemSubmitted: (item) {
-                        setState(() {
-                          searchTextField.textField.controller.text =
-                              item.nombre_comercial;
-                          data_id = item.id_medicamento;
-                          print(data_id);
-                        });
-                      },
-                      itemBuilder: (context, item) {
-                        return row(item);
-                      },
                     ),
+              SizedBox(height: 40.0),
+              // Container(
+              //   alignment: Alignment.centerLeft,
+              //   child: CheckboxListTile(
+              //     contentPadding:
+              //         EdgeInsets.zero, // Ajusta el relleno alrededor del título
+              //     title: Text('¿No encuentra su medicamento?'),
+              //     value: _isChecked,
+              //     onChanged: (bool value) {
+              //       setState(() {
+              //         _isChecked = value;
+              //        // _isExpanded = value;
+              //         //_isExpandedBuscador = !value;
+              //       });
+              //     },
+              //   ),
+              // ),
+              // AnimatedContainer(
+              //   duration: Duration(milliseconds: 400),
+              //   height: _isExpanded ? 100.0 : 0.0,
+              //   child: TextFormField(
+              //     decoration: InputDecoration(
+              //       labelText: 'Ingrese el nombre del medicamento',
+              //     ),
+              //   ),
+              // ),
+
+              Center(
+                child: TextFormField(
+                  controller: dosis_frecuencia,
+                  decoration: InputDecoration(
+                    hintText: 'Ingrese dosis y frecuencia',
+                    hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
                   ),
-            SizedBox(height: 40.0),
-            // Container(
-            //   alignment: Alignment.centerLeft,
-            //   child: CheckboxListTile(
-            //     contentPadding:
-            //         EdgeInsets.zero, // Ajusta el relleno alrededor del título
-            //     title: Text('¿No encuentra su medicamento?'),
-            //     value: _isChecked,
-            //     onChanged: (bool value) {
-            //       setState(() {
-            //         _isChecked = value;
-            //        // _isExpanded = value;
-            //         //_isExpandedBuscador = !value;
-            //       });
-            //     },
-            //   ),
-            // ),
-            // AnimatedContainer(
-            //   duration: Duration(milliseconds: 400),
-            //   height: _isExpanded ? 100.0 : 0.0,
-            //   child: TextFormField(
-            //     decoration: InputDecoration(
-            //       labelText: 'Ingrese el nombre del medicamento',
-            //     ),
-            //   ),
-            // ),
-            SizedBox(height: 40.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(),
-              onPressed: () {
-                guardar_medicamento(int.parse(data_id));
-              },
-              child: Text('Aceptar',
+                  maxLength: 25,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Por favor ingrese los datos';
+                    }
+                    return null;
+                  },
+                  onChanged: (text) {
+                    print("Debe completar el campo");
+                  },
+                ),
+              ),
+              SizedBox(height: 40.0),
+              ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
+                style: ElevatedButton.styleFrom(elevation: 8),
+                onPressed: () {
+                  if (_formKey_add_medicamento.currentState.validate() &&
+                      data_id != null &&
+                      !_isLoading) {
+                    _startLoading(int.parse(data_id), dosis_frecuencia.text);
+                  } else {
+                    null;
+                  }
+                },
+                label: Text(
+                  'Aceptar',
                   style: TextStyle(
                       fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily)),
-            )
-          ],
+                          Theme.of(context).textTheme.headline1.fontFamily),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -219,12 +265,26 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   var email_argument;
   var id_paciente;
 
-  guardar_medicamento(int data_id) async {
+  bool _isLoading = false;
+  void _startLoading(int data_id, String dosis_frecuencia) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await guardar_medicamento(data_id, dosis_frecuencia);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  guardar_medicamento(int data_id, String dosis_frecuencia) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_medicamento";
     var response = await http.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medicamento": data_id.toString(),
+      "dosis_frecuencia": dosis_frecuencia,
     });
 
     if (response.statusCode == 200) {
@@ -238,14 +298,9 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
   }
 
   getStringValuesSF(UsuarioServices usuarioServices) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = await prefs.getString("email_prefer");
-    email_argument = email_prefer;
-    id_paciente = await prefs.getInt("id_paciente");
-    print(email_argument);
-    if (usuarioServices.existeUsuarioModel) {
-      email_argument = usuarioServices.usuario.emailUser;
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email_argument = usuarioModel.usuario.emailUser;
   }
 
   _alert_informe(context, message, colorNumber) {
@@ -259,48 +314,4 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
           style: const TextStyle(color: Colors.white)),
     ));
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
-}
-
-class Medicamentos_database {
-  String dosis_frecuencia;
-  String nombre_comercial;
-  String presentacion;
-  var rela_paciente;
-  var rela_medicamento;
-  var id_medicamento;
-
-  Medicamentos_database(
-      {this.dosis_frecuencia,
-      this.rela_paciente,
-      this.rela_medicamento,
-      this.id_medicamento,
-      this.nombre_comercial,
-      this.presentacion});
-
-  factory Medicamentos_database.fromJson(Map<String, dynamic> json) {
-    return Medicamentos_database(
-        id_medicamento: json['id_medicamento'],
-        dosis_frecuencia: json['dosis_frecuencia'],
-        rela_paciente: json['rela_paciente'],
-        rela_medicamento: json['rela_medicamento'],
-        nombre_comercial: json['nombre_comercial'],
-        presentacion: json['presentacion']);
-  }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

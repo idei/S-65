@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
+import '../widgets/CustomDivider.dart';
 import '../widgets/opciones_navbar.dart';
 
 class ScreeningBPage extends StatefulWidget {
@@ -22,6 +22,8 @@ var id_recordatorio;
 
 var email;
 var screening_recordatorio;
+
+var usuarioModel;
 
 List dataScreeningQC = [];
 
@@ -43,47 +45,57 @@ class _ScreeningBState extends State<ScreeningBPage> {
 
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Cuestionario de Quejas Cognitivas - QCQ',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "QCQ",
-            });
-          },
-        ),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "QCQ",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Cuestionario de Quejas Cognitivas - QCQ',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "QCQ",
+              });
             },
           ),
-        ],
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+            future: getAllRespuestaQC(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                return ScreeningQCQ();
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              }
+            }),
       ),
-      body: FutureBuilder(
-          future: getAllRespuestaQC(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ScreeningQCQ();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
     );
   }
 
@@ -105,11 +117,9 @@ class _ScreeningBState extends State<ScreeningBPage> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
-    print(email);
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -496,46 +506,46 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 ),
               )),
 
-          Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              margin: EdgeInsets.all(10),
-              elevation: 10,
-              child: ClipRRect(
-                // Los bordes del contenido del card se cortan usando BorderRadius
-                borderRadius: BorderRadius.circular(15),
+          // Card(
+          //     shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(15)),
+          //     margin: EdgeInsets.all(10),
+          //     elevation: 10,
+          //     child: ClipRRect(
+          //       // Los bordes del contenido del card se cortan usando BorderRadius
+          //       borderRadius: BorderRadius.circular(15),
 
-                // EL widget hijo que será recortado segun la propiedad anterior
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                    ),
-                    CustomDivider(
-                      text: 'Orientación',
-                      color: Colors.indigoAccent,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                    ),
-                    Container(
-                      width: 320,
-                      child: Text(
-                        '¿Tiene dificultades para decir con precisión su edad actual?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                    ),
-                    Orientacion4(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              )),
+          //       // EL widget hijo que será recortado segun la propiedad anterior
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: <Widget>[
+          //           Padding(
+          //             padding: EdgeInsets.all(8.0),
+          //           ),
+          //           CustomDivider(
+          //             text: 'Orientación',
+          //             color: Colors.indigoAccent,
+          //           ),
+          //           Padding(
+          //             padding: EdgeInsets.all(8.0),
+          //           ),
+          //           Container(
+          //             width: 320,
+          //             child: Text(
+          //               '¿Tiene dificultades para decir con precisión su edad actual?',
+          //               style: TextStyle(
+          //                 fontWeight: FontWeight.bold,
+          //                 fontSize: 18.0,
+          //               ),
+          //             ),
+          //           ),
+          //           Orientacion4(),
+          //           SizedBox(
+          //             height: 20,
+          //           ),
+          //         ],
+          //       ),
+          //     )),
 
           Card(
               shape: RoundedRectangleBorder(
@@ -1285,50 +1295,6 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
             padding: EdgeInsets.all(4.0),
           ),
         ]),
-      ),
-    );
-  }
-}
-
-class CustomDivider extends StatefulWidget {
-  var text;
-  var color;
-
-  CustomDivider({this.text, this.color});
-
-  @override
-  State<CustomDivider> createState() => _CustomDividerState();
-}
-
-class _CustomDividerState extends State<CustomDivider> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          Expanded(
-              child: Divider(
-            thickness: 5,
-            color: widget.color,
-          )),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              widget.text,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-              child: Divider(
-            thickness: 5,
-            color: widget.color,
-          )),
-        ],
       ),
     );
   }

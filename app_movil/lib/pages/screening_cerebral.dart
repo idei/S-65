@@ -1,31 +1,32 @@
 import 'dart:async';
-
 import 'package:app_salud/widgets/LabeledCheckboxGeneric.dart';
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ScreeningCerebral extends StatefulWidget {
   @override
   _ScreeningCerebralState createState() => _ScreeningCerebralState();
 }
 
-final _formKey_cerebral = GlobalKey<_ScreeningCerebralState>();
+//final _formKey_cerebral = GlobalKey<_ScreeningCerebralState>();
 
-TextEditingController otro_controller = TextEditingController();
 TextEditingController otro_habito_controller = TextEditingController();
+TextEditingController key_otro_controller = TextEditingController();
+
 List itemsRespuestasSaludCerebral;
 
 var id_paciente;
 var id_medico;
 var tipo_screening;
 var id_recordatorio;
-var email;
 var screening_recordatorio;
+var usuarioModel;
 
 class _ScreeningCerebralState extends State<ScreeningCerebral> {
   @override
@@ -34,44 +35,45 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    getStringValuesSF();
+  void dispose() {
+    super.dispose();
+  }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamed(context, '/menu_chequeo');
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/menu_chequeo');
+            },
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/menu_chequeo');
-          },
+          title: Center(
+            child: Text('Cuestionario de Hábitos \n     de Salud Cerebral',
+                style: TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                )),
+          ),
         ),
-        title: Center(
-          child: Text('Cuestionario de Hábitos \n     de Salud Cerebral',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-        ),
-      ),
-      body: FutureBuilder(
-          future: getAllRespuesta(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              // Estado de carga
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              // Estado de error
-              return Text("Error al cargar los datos");
-            } else {
-              // Estado de datos cargados
-              if (snapshot.data.isEmpty) {
-                // No hay datos
+        body: FutureBuilder(
+            future: getAllRespuesta(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.data.isEmpty) {
                 return Container(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -99,34 +101,53 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
               } else {
                 return ColumnWidgetCerebral();
               }
-            }
-          }),
+
+              // if (snapshot.connectionState == ConnectionState.waiting) {
+              //   // Estado de carga
+              //   return Center(child: CircularProgressIndicator());
+              // } else if (snapshot.hasError) {
+              //   // Estado de error
+              //   return Text("Error al cargar los datos");
+              // } else {
+              //   // Estado de datos cargados
+
+              //     return ColumnWidgetCerebral();
+              //   }
+              // }
+            }),
+      ),
     );
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
     get_tiposcreening("SCER");
 
-    if (parametros["bandera"] == "recordatorio") {
-      screening_recordatorio = true;
-      id_recordatorio = parametros["id_recordatorio"];
-      id_paciente = id_paciente;
-      id_medico = parametros["id_medico"];
-      tipo_screening = parametros["tipo_screening"];
-    } else {
-      if (parametros["bandera"] == "screening_nuevo") {
-        screening_recordatorio = false;
-        id_paciente = id_paciente;
-        id_recordatorio = null;
-        id_medico = null;
-        //tipo_screening = parametros["tipo_screening"];
-      }
-    }
+    tipo_screening = parametros["select_screening"];
+
+    screening_recordatorio = false;
+    id_recordatorio = null;
+    id_medico = null;
+
+    // if (parametros["bandera"] == "recordatorio") {
+    //   screening_recordatorio = true;
+    //   id_recordatorio = parametros["id_recordatorio"];
+    //   id_paciente = id_paciente;
+    //   id_medico = parametros["id_medico"];
+    //   tipo_screening = parametros["tipo_screening"];
+    // } else {
+    //   if (parametros["bandera"] == "screening_nuevo") {
+    //     screening_recordatorio = false;
+    //     id_paciente = id_paciente;
+    //     id_recordatorio = null;
+    //     id_medico = null;
+    //     //tipo_screening = parametros["tipo_screening"];
+    //   }
+    // }
   }
 
   get_tiposcreening(var codigo_screening) async {
@@ -140,6 +161,8 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
   }
 
   Future<List> getAllRespuesta() async {
+    getStringValuesSF();
+
     var response;
     final completer = Completer<List>();
 
@@ -174,15 +197,22 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
 }
 
 class ColumnWidgetCerebral extends StatefulWidget {
-  const ColumnWidgetCerebral({
-    Key key,
-  }) : super(key: key);
-
   @override
-  State<ColumnWidgetCerebral> createState() => _ColumnWidgetCerebralState();
+  _ColumnWidgetCerebralState createState() => _ColumnWidgetCerebralState();
 }
 
 class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
+  ValueNotifier<bool> valueNotifierActividadFisica = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierAlimentacionSaludable =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierContactoSocial = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierSueno = ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierActividadEsfuerzoMental =
+      ValueNotifier<bool>(false);
+  ValueNotifier<bool> valueNotifierOtro = ValueNotifier<bool>(false);
+  ValueNotifier<bool> _showAdditionalFieldsNotifier =
+      ValueNotifier<bool>(false);
+
   @override
   void initState() {
     super.initState();
@@ -192,62 +222,64 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
         "Consigna: seleccione la opción que mejor describa sus hábitos. Si este cuestionario no puede ser completado por Ud. mismo pida ayuda a alguien cercano que conozca sobre sus hábtitos actuales y pasados. Recuerde que este cuestionario se realiza una sola vez"));
   }
 
-  ValueNotifier<bool> valueNotifierActividadFisica = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierAlimentacionSaludable =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierContactoSocial = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierSueno = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierActividadEsfuerzoMental =
-      ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierOtro = ValueNotifier<bool>(false);
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(children: [
-        Card(
-          shadowColor: Colors.yellow,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
-          elevation: 10,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(25),
-                  child: Text(
-                    '¿Qué hábitos considera que le hacen bien a la salud de su cerebro? (Varias respuestas)',
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Card(
+                shadowColor: Colors.yellow,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                margin: EdgeInsets.all(15),
+                elevation: 10,
+                child: Column(children: [
+                  Container(
+                    padding: EdgeInsets.all(25),
+                    child: Text(
+                      '¿Qué hábitos considera que le hacen bien a la salud de su cerebro? (Varias respuestas)',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily),
+                    ),
                   ),
-                ),
-                Divider(
-                  height: 5.0,
-                  color: Colors.black,
-                ),
-                ActividadFisica(
-                    valueNotifierActividadFisica: valueNotifierActividadFisica),
-                AlimentacionSaludable(
-                    valueNotifierAlimentacionSaludable:
-                        valueNotifierAlimentacionSaludable),
-                ContactoSocial(
-                    valueNotifierContactoSocial: valueNotifierContactoSocial),
-                Sueno(valueNotifierSueno: valueNotifierSueno),
-                ActividadEsfuerzoMental(
-                    valueNotifierActividadEsfuerzoMental:
-                        valueNotifierActividadEsfuerzoMental),
-                Otro(valueNotifierOtro: valueNotifierOtro),
-                Padding(
-                  padding: EdgeInsets.all(10.0),
-                ),
-              ],
-            ),
+                  Divider(
+                    height: 5.0,
+                    color: Colors.black,
+                  ),
+                  ActividadFisica(
+                      valueNotifierActividadFisica:
+                          valueNotifierActividadFisica),
+                  AlimentacionSaludable(
+                      valueNotifierAlimentacionSaludable:
+                          valueNotifierAlimentacionSaludable),
+                  ContactoSocial(
+                      valueNotifierContactoSocial: valueNotifierContactoSocial),
+                  Sueno(valueNotifierSueno: valueNotifierSueno),
+                  ActividadEsfuerzoMental(
+                      valueNotifierActividadEsfuerzoMental:
+                          valueNotifierActividadEsfuerzoMental),
+                  Otro(
+                    valueNotifierOtro: valueNotifierOtro,
+                    showAdditionalFieldsNotifier: _showAdditionalFieldsNotifier,
+                  ),
+                ]),
+              ),
+              Padding(
+                padding: EdgeInsets.all(10.0),
+              ),
+            ],
           ),
         ),
         Padding(
@@ -471,7 +503,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "Contacto social. ¿Cuántos días en la semana tiene contacto con amigos?",
+                    "Contacto social. ¿Cuántos días en la semana tiene contacto con amigos o vínculos sociales?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -484,6 +516,40 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                   color: Colors.black,
                 ),
                 ContactoSocialAmigos()
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.yellow,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(25),
+                  child: Text(
+                    "Contacto social. ¿Cuántos días en la semana tiene contacto con familiares?",
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Divider(
+                  height: 5.0,
+                  color: Colors.black,
+                ),
+                ContactoSocialFamilia()
               ],
             ),
           ),
@@ -607,7 +673,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "Sueño. ¿Realiza siestas durante el día?",
+                    "Sueño. En general, ¿Realiza siestas durante el día?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -641,7 +707,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Text(
-                    "Sueño. ¿A que hora se duerme habitualmente?",
+                    "Sueño ¿En general, se acuesta y se levanta en el mismo horario?",
                     style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -654,40 +720,6 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                   color: Colors.black,
                 ),
                 SuenoDuerme()
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(8.0),
-        ),
-        Card(
-          shadowColor: Colors.yellow,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          margin: EdgeInsets.all(15),
-          elevation: 10,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(25),
-                  child: Text(
-                    "Sueño. ¿Duerme menos de 8 hs por noche?",
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily),
-                  ),
-                ),
-                Divider(
-                  height: 5.0,
-                  color: Colors.black,
-                ),
-                SuenoDuermeNoche()
               ],
             ),
           ),
@@ -722,6 +754,40 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
                   color: Colors.black,
                 ),
                 SuenoHoraNoche()
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+        ),
+        Card(
+          shadowColor: Colors.yellow,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(15),
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(25),
+                  child: Text(
+                    "Sueño ¿Ha estado con problemas de sueño (para conciliar, mantener o despertar) durante los últimos 2 años?",
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily),
+                  ),
+                ),
+                Divider(
+                  height: 5.0,
+                  color: Colors.black,
+                ),
+                SuenoDuermeNoche()
               ],
             ),
           ),
@@ -901,133 +967,112 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
   }
 
   guardarDatosSaludCerebral(BuildContext context) async {
-    if (id_actividad_fisica_moderada == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividad_fisica_minutos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_persona_mantenida_10anos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_persona_activa_vida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_dias_alimenta_saludable == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_alimenta_saludable_vida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_contacto_social_amigos == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_contacto_social_actividad == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_calidad_sueno == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_despierto_dia == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_siesta_dia == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_duerme == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_duerme_noche == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_sueno_hora_noche == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividades_esfuerzo_mental == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_actividad_indole_cultural == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_esperanza_habito_saludable == null)
-      loginToast("Debe responder todas las preguntas");
+    List<dynamic> ids_cerebrales = [
+      id_actividad_fisica_moderada,
+      id_actividad_fisica_minutos,
+      id_persona_mantenida_10anos,
+      id_persona_activa_vida,
+      id_dias_alimenta_saludable,
+      id_alimenta_saludable_vida,
+      id_contacto_social_amigos,
+      id_contacto_social_actividad,
+      id_sueno_calidad_sueno,
+      id_sueno_despierto_dia,
+      id_sueno_siesta_dia,
+      id_sueno_duerme,
+      id_sueno_duerme_noche,
+      id_sueno_hora_noche,
+      id_actividades_esfuerzo_mental,
+      id_actividad_indole_cultural,
+      id_esperanza_habito_saludable,
+    ];
 
-    if (id_actividad_fisica_moderada != null &&
-        id_actividad_fisica_minutos != null &&
-        id_persona_mantenida_10anos != null &&
-        id_persona_activa_vida != null &&
-        id_dias_alimenta_saludable != null &&
-        id_alimenta_saludable_vida != null &&
-        id_contacto_social_amigos != null &&
-        id_contacto_social_actividad != null &&
-        id_sueno_calidad_sueno != null &&
-        id_sueno_despierto_dia != null &&
-        id_sueno_siesta_dia != null &&
-        id_sueno_duerme != null &&
-        id_sueno_hora_noche != null &&
-        id_sueno_duerme_noche != null &&
-        id_actividades_esfuerzo_mental != null &&
-        id_actividad_indole_cultural != null &&
-        id_esperanza_habito_saludable != null) {
-      showDialogMessage(context);
-      String URL_base = Env.URL_API;
-      var url = URL_base + "/respuesta_screening_cerebral";
-      var response = await http.post(url, body: {
-        "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico.toString(),
-        "id_recordatorio": id_recordatorio.toString(),
-        "tipo_screening": tipo_screening['data'].toString(),
-        "actividad_fisica": valueNotifierActividadFisica.value.toString(),
-        "alimentacion_saludable":
-            valueNotifierAlimentacionSaludable.value.toString(),
-        "contacto_social": valueNotifierContactoSocial.value.toString(),
-        "sueno": valueNotifierSueno.value.toString(),
-        "actividades_esfuerzo_mental":
-            valueNotifierActividadEsfuerzoMental.value.toString(),
-        "otro": valueNotifierOtro.value.toString(),
-        "otro_texto": otro_controller.text.toString(),
-        "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
-        "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
-        "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
-        "id_persona_activa_vida": id_persona_activa_vida.toString(),
-        "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
-        "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
-        "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
-        "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
-        "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
-        "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
-        "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
-        "id_sueno_duerme": id_sueno_duerme.toString(),
-        "id_sueno_duerme_noche": id_sueno_duerme_noche.toString(),
-        "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
-        "id_actividades_esfuerzo_mental":
-            id_actividades_esfuerzo_mental.toString(),
-        "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
-        "id_esperanza_habito_saludable":
-            id_esperanza_habito_saludable.toString()
-      });
+    for (var variable in ids_cerebrales) {
+      if (variable == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
 
-      var data = json.decode(response.body);
+    showDialogMessage(context);
 
-      if (response.statusCode == 200) {
-        if (data['data'] == "alert") {
-          showCustomAlert(
-            context,
-            "Screening Terminado",
-            "",
-            true,
-            () {
-              _scaffold_messenger(context, "Screening Registrado", 1);
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_cerebral";
+    var response = await http.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening['data'].toString(),
+      "actividad_fisica": valueNotifierActividadFisica.value.toString(),
+      "alimentacion_saludable":
+          valueNotifierAlimentacionSaludable.value.toString(),
+      "contacto_social": valueNotifierContactoSocial.value.toString(),
+      "sueno": valueNotifierSueno.value.toString(),
+      "actividades_esfuerzo_mental":
+          valueNotifierActividadEsfuerzoMental.value.toString(),
+      "otro": valueNotifierOtro.value.toString(),
+      "otro_texto": key_otro_controller.text.toString(),
+      "otro_habito_texto": otro_habito_controller.text.toString(),
+      "id_actividad_fisica_moderada": id_actividad_fisica_moderada.toString(),
+      "id_actividad_fisica_minutos": id_actividad_fisica_minutos.toString(),
+      "id_persona_mantenida_10anos": id_persona_mantenida_10anos.toString(),
+      "id_persona_activa_vida": id_persona_activa_vida.toString(),
+      "id_dias_alimenta_saludable": id_dias_alimenta_saludable.toString(),
+      "id_alimenta_saludable_vida": id_alimenta_saludable_vida.toString(),
+      "id_contacto_social_amigos": id_contacto_social_amigos.toString(),
+      "id_contacto_social_actividad": id_contacto_social_actividad.toString(),
+      "id_sueno_calidad_sueno": id_sueno_calidad_sueno.toString(),
+      "id_sueno_despierto_dia": id_sueno_despierto_dia.toString(),
+      "id_sueno_siesta_dia": id_sueno_siesta_dia.toString(),
+      "id_sueno_duerme": id_sueno_duerme.toString(),
+      "id_sueno_duerme_noche": id_sueno_duerme_noche.toString(),
+      "id_sueno_hora_noche": id_sueno_hora_noche.toString(),
+      "id_actividades_esfuerzo_mental":
+          id_actividades_esfuerzo_mental.toString(),
+      "id_actividad_indole_cultural": id_actividad_indole_cultural.toString(),
+      "id_esperanza_habito_saludable": id_esperanza_habito_saludable.toString()
+    });
 
-              if (screening_recordatorio == true) {
-                Navigator.pushNamed(context, '/recordatorio');
-              } else {
-                Navigator.pushNamed(context, '/screening', arguments: {
-                  "select_screening": "SCER",
-                });
-              }
-            },
-          );
-        } else {
-          _scaffold_messenger(context, "Screening Registrado", 1);
+    var data;
 
-          if (data['status'] == "Success") {
+    if (response.statusCode == 200) {
+      data = json.decode(response.body);
+
+      if (data['data'] == "alert") {
+        showCustomAlert(
+          context,
+          "Screening Terminado",
+          "",
+          true,
+          () {
+            _scaffold_messenger(context, "Screening Registrado", 1);
+
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
             } else {
-              Navigator.pushNamed(context, '/screening', arguments: {
-                "select_screening": "SCER",
-              });
+              // Navigator.pushNamed(context, '/screening', arguments: {
+              //   "select_screening": "SCER",
+              // });
+              Navigator.pushNamed(context, '/menu_chequeo');
             }
+          },
+        );
+      } else {
+        _scaffold_messenger(context, "Screening Registrado", 1);
+
+        if (data['status'] == "Success") {
+          if (screening_recordatorio == true) {
+            Navigator.pushNamed(context, '/recordatorio');
+          } else {
+            // Navigator.pushNamed(context, '/screening', arguments: {
+            //   "select_screening": "SCER",
+            // });
+            Navigator.pushNamed(context, '/menu_chequeo');
           }
         }
-      } else {
-        _scaffold_messenger(context, "No se pudo guardar el chequeo", 2);
       }
+    } else {
+      _scaffold_messenger(context, "No se pudo guardar el chequeo", 2);
     }
   }
 
@@ -1158,7 +1203,7 @@ class CheckAlimentacionSaludableWidgetState
 }
 
 //-----------------------------------------------------------------------------------------------------------
-//-------------------------------------- Alimentacion Saludable -----------------------------------------------------
+//-------------------------------------- ContactoSocial -----------------------------------------------------
 
 class ContactoSocial extends StatefulWidget {
   final ValueNotifier<bool> valueNotifierContactoSocial;
@@ -1251,8 +1296,9 @@ class CheckActividadEsfuerzoMentalWidgetState
 
 class Otro extends StatefulWidget {
   final ValueNotifier<bool> valueNotifierOtro;
+  final ValueNotifier<bool> showAdditionalFieldsNotifier;
 
-  Otro({this.valueNotifierOtro});
+  Otro({this.valueNotifierOtro, this.showAdditionalFieldsNotifier});
 
   @override
   CheckOtroWidgetState createState() => CheckOtroWidgetState();
@@ -1270,37 +1316,60 @@ class CheckOtroWidgetState extends State<Otro> {
           onChanged: (bool newValue) {
             setState(() {
               widget.valueNotifierOtro.value = newValue;
-              if (!widget.valueNotifierOtro.value) {
-                otro_controller
-                    .clear(); // Reiniciar el TextField cuando el checkbox se desactiva
+              if (newValue) {
+                widget.showAdditionalFieldsNotifier.value = true;
+              } else {
+                widget.showAdditionalFieldsNotifier.value = false;
               }
-              print(widget.valueNotifierOtro.value);
             });
           },
         ),
-        if (widget.valueNotifierOtro.value)
-          Container(
-            padding: EdgeInsets.all(10),
-            child: TextFormField(
-              controller: otro_controller,
-              maxLength: _characterLimit,
-              decoration: InputDecoration(
-                  labelText: '¿Qué otro hábito?',
-                  labelStyle: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                  )),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Debe completar este campo';
-                }
-                return null;
-              },
-              onChanged: (text) {
-                print("Debe completar el campo");
-              },
-            ),
-          ),
+        //---------
+        ValueListenableBuilder<bool>(
+          valueListenable: widget.showAdditionalFieldsNotifier,
+          builder: (context, value, child) {
+            return Visibility(
+              visible: widget.showAdditionalFieldsNotifier.value,
+              maintainSize:
+                  false, // Esto evita que mantenga el espacio incluso cuando está oculto
+              child: AnimatedOpacity(
+                opacity: widget.showAdditionalFieldsNotifier.value ? 1.0 : 0.0,
+                duration: Duration(
+                    milliseconds:
+                        500), // Duración de la animación en milisegundos
+                curve: Curves.easeInOut, // Curva de la animación
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(children: [
+                      TextFormField(
+                        controller: key_otro_controller,
+                        decoration: InputDecoration(
+                            labelText: '¿Qué otro hábito? ',
+                            labelStyle: TextStyle(
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Por favor ingrese el nombre del contacto';
+                          }
+                          return null;
+                        },
+                        onChanged: (text) {
+                          print("Debe completar el campo");
+                        },
+                      ),
+                      SizedBox(height: 10.0),
+                    ]),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
@@ -1309,7 +1378,7 @@ class CheckOtroWidgetState extends State<Otro> {
 //-----------------------------------------------------------------------------------------------------------
 // Realiza Actividad Fisica *******************
 
-var id_actividad_fisica_moderada = null;
+var id_actividad_fisica_moderada;
 
 class ActividadFisicaModerada extends StatefulWidget {
   @override
@@ -1320,9 +1389,15 @@ class ActividadFisicaModerada extends StatefulWidget {
 class ActividadFisicaModeradaWidgetState
     extends State<ActividadFisicaModerada> {
   @override
+  void initState() {
+    id_actividad_fisica_moderada = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 350,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1362,7 +1437,7 @@ class ActividadFisicaModeradaWidgetState
 
 // Realiza Actividad Fisica *******************
 
-var id_actividad_fisica_minutos = null;
+var id_actividad_fisica_minutos;
 
 class ActividadFisicaModeradaMinutos extends StatefulWidget {
   @override
@@ -1373,9 +1448,15 @@ class ActividadFisicaModeradaMinutos extends StatefulWidget {
 class ActividadFisicaModeradaMinutosWidgetState
     extends State<ActividadFisicaModeradaMinutos> {
   @override
+  void initState() {
+    id_actividad_fisica_minutos = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 350,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1415,7 +1496,7 @@ class ActividadFisicaModeradaMinutosWidgetState
 
 // Persona Activa 10 Años *******************
 
-var id_persona_mantenida_10anos = null;
+var id_persona_mantenida_10anos;
 
 class PersonaActiva10Anos extends StatefulWidget {
   @override
@@ -1425,9 +1506,15 @@ class PersonaActiva10Anos extends StatefulWidget {
 
 class PersonaActiva10AnosWidgetState extends State<PersonaActiva10Anos> {
   @override
+  void initState() {
+    id_persona_mantenida_10anos = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 290,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1483,7 +1570,7 @@ class PersonaActivaVidaWidgetState extends State<PersonaActivaVida> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 270,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1522,7 +1609,7 @@ class PersonaActivaVidaWidgetState extends State<PersonaActivaVida> {
 
 // Dias Alimenta Saludable *******************
 
-var id_dias_alimenta_saludable = null;
+var id_dias_alimenta_saludable;
 
 class DiasAlimentaSaludable extends StatefulWidget {
   @override
@@ -1532,9 +1619,15 @@ class DiasAlimentaSaludable extends StatefulWidget {
 
 class DiasAlimentaSaludableWidgetState extends State<DiasAlimentaSaludable> {
   @override
+  void initState() {
+    id_dias_alimenta_saludable = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 350,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1574,7 +1667,7 @@ class DiasAlimentaSaludableWidgetState extends State<DiasAlimentaSaludable> {
 
 // Alimenta Saludable Vida *******************
 
-var id_alimenta_saludable_vida = null;
+var id_alimenta_saludable_vida;
 
 class AlimentarSaludableVida extends StatefulWidget {
   @override
@@ -1584,9 +1677,15 @@ class AlimentarSaludableVida extends StatefulWidget {
 
 class AlimentarSaludableVidaWidgetState extends State<AlimentarSaludableVida> {
   @override
+  void initState() {
+    id_alimenta_saludable_vida = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 290,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1625,7 +1724,7 @@ class AlimentarSaludableVidaWidgetState extends State<AlimentarSaludableVida> {
 
 // Contacto Social Amigos *******************
 
-var id_contacto_social_amigos = null;
+var id_contacto_social_amigos;
 
 class ContactoSocialAmigos extends StatefulWidget {
   @override
@@ -1635,9 +1734,15 @@ class ContactoSocialAmigos extends StatefulWidget {
 
 class ContactoSocialAmigosWidgetState extends State<ContactoSocialAmigos> {
   @override
+  void initState() {
+    id_contacto_social_amigos = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 260,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1674,9 +1779,9 @@ class ContactoSocialAmigosWidgetState extends State<ContactoSocialAmigos> {
   }
 }
 
-// Contacto Social Amigos *******************
+// Contacto Social Familiares *******************
 
-var id_contacto_social_familia = null;
+var id_contacto_social_familia;
 
 class ContactoSocialFamilia extends StatefulWidget {
   @override
@@ -1686,9 +1791,15 @@ class ContactoSocialFamilia extends StatefulWidget {
 
 class ContactoSocialFamiliaWidgetState extends State<ContactoSocialFamilia> {
   @override
+  void initState() {
+    id_contacto_social_familia = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 280,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1726,9 +1837,9 @@ class ContactoSocialFamiliaWidgetState extends State<ContactoSocialFamilia> {
   }
 }
 
-// Contacto Social Amigos *******************
+// Contacto Social Actividad *******************
 
-var id_contacto_social_actividad = null;
+var id_contacto_social_actividad;
 
 class ContactoSocialActividad extends StatefulWidget {
   @override
@@ -1738,6 +1849,12 @@ class ContactoSocialActividad extends StatefulWidget {
 
 class ContactoSocialActividadWidgetState
     extends State<ContactoSocialActividad> {
+  @override
+  void initState() {
+    id_contacto_social_actividad = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1780,7 +1897,7 @@ class ContactoSocialActividadWidgetState
 
 // Sueño Calidad de Sueño *******************
 
-var id_sueno_calidad_sueno = null;
+var id_sueno_calidad_sueno;
 
 class SuenoCalidadSueno extends StatefulWidget {
   @override
@@ -1788,6 +1905,12 @@ class SuenoCalidadSueno extends StatefulWidget {
 }
 
 class SuenoCalidadSuenoWidgetState extends State<SuenoCalidadSueno> {
+  @override
+  void initState() {
+    id_sueno_calidad_sueno = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1827,7 +1950,7 @@ class SuenoCalidadSuenoWidgetState extends State<SuenoCalidadSueno> {
 
 // Sueño Despierto Dia *******************
 
-var id_sueno_despierto_dia = null;
+var id_sueno_despierto_dia;
 
 class SuenoDespiernoDia extends StatefulWidget {
   @override
@@ -1835,6 +1958,12 @@ class SuenoDespiernoDia extends StatefulWidget {
 }
 
 class SuenoDespiernoDiaWidgetState extends State<SuenoDespiernoDia> {
+  @override
+  void initState() {
+    id_sueno_despierto_dia = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1874,7 +2003,7 @@ class SuenoDespiernoDiaWidgetState extends State<SuenoDespiernoDia> {
 
 // Sueño Siesta Dia *******************
 
-var id_sueno_siesta_dia = null;
+var id_sueno_siesta_dia;
 
 class SuenoSiestaDia extends StatefulWidget {
   @override
@@ -1882,6 +2011,12 @@ class SuenoSiestaDia extends StatefulWidget {
 }
 
 class SuenoSiestaDiaWidgetState extends State<SuenoSiestaDia> {
+  @override
+  void initState() {
+    id_sueno_siesta_dia = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1921,7 +2056,7 @@ class SuenoSiestaDiaWidgetState extends State<SuenoSiestaDia> {
 
 // Sueño Duerme *******************
 
-var id_sueno_duerme = null;
+var id_sueno_duerme;
 
 class SuenoDuerme extends StatefulWidget {
   @override
@@ -1929,6 +2064,12 @@ class SuenoDuerme extends StatefulWidget {
 }
 
 class SuenoDuermeWidgetState extends State<SuenoDuerme> {
+  @override
+  void initState() {
+    id_sueno_duerme = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1968,7 +2109,7 @@ class SuenoDuermeWidgetState extends State<SuenoDuerme> {
 
 // Sueño Duerme Noche *******************
 
-var id_sueno_duerme_noche = null;
+var id_sueno_duerme_noche;
 
 class SuenoDuermeNoche extends StatefulWidget {
   @override
@@ -1976,6 +2117,12 @@ class SuenoDuermeNoche extends StatefulWidget {
 }
 
 class SuenoDuermeNocheWidgetState extends State<SuenoDuermeNoche> {
+  @override
+  void initState() {
+    id_sueno_duerme_noche = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -2015,7 +2162,7 @@ class SuenoDuermeNocheWidgetState extends State<SuenoDuermeNoche> {
 
 // Sueño Duerme Hora de Noche *******************
 
-var id_sueno_hora_noche = null;
+var id_sueno_hora_noche;
 
 class SuenoHoraNoche extends StatefulWidget {
   @override
@@ -2024,9 +2171,15 @@ class SuenoHoraNoche extends StatefulWidget {
 
 class SuenoHoraNocheWidgetState extends State<SuenoHoraNoche> {
   @override
+  void initState() {
+    id_sueno_hora_noche = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 250,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2034,7 +2187,10 @@ class SuenoHoraNocheWidgetState extends State<SuenoHoraNoche> {
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasSaludCerebral
             .map(
-              (list) => list['code'] == "SCER60" || list['code'] == "SCER61"
+              (list) => list['code'] == "SCER46" ||
+                      list['code'] == "SCER47" ||
+                      list['code'] == "SCER48" ||
+                      list['code'] == "SCER49"
                   ? RadioListTile(
                       groupValue: id_sueno_hora_noche,
                       title: Text(
@@ -2062,7 +2218,7 @@ class SuenoHoraNocheWidgetState extends State<SuenoHoraNoche> {
 
 // Actividades Esfuerzo Mental *******************
 
-var id_actividades_esfuerzo_mental = null;
+var id_actividades_esfuerzo_mental;
 
 class ActividadesEsfuerzoMental extends StatefulWidget {
   @override
@@ -2073,9 +2229,15 @@ class ActividadesEsfuerzoMental extends StatefulWidget {
 class ActividadesEsfuerzoMentalWidgetState
     extends State<ActividadesEsfuerzoMental> {
   @override
+  void initState() {
+    id_actividades_esfuerzo_mental = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2113,9 +2275,9 @@ class ActividadesEsfuerzoMentalWidgetState
   }
 }
 
-// Actividades Esfuerzo Mental *******************
+// Actividades Indole Cultural *******************
 
-var id_actividad_indole_cultural = null;
+var id_actividad_indole_cultural;
 
 class ActividadesIndoleCultural extends StatefulWidget {
   @override
@@ -2126,9 +2288,15 @@ class ActividadesIndoleCultural extends StatefulWidget {
 class ActividadesIndoleCulturalWidgetState
     extends State<ActividadesIndoleCultural> {
   @override
+  void initState() {
+    id_actividad_indole_cultural = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2166,9 +2334,9 @@ class ActividadesIndoleCulturalWidgetState
   }
 }
 
-// Actividades Esfuerzo Mental *******************
+// Esperanza Habito Saludable *******************
 
-var id_esperanza_habito_saludable = null;
+var id_esperanza_habito_saludable;
 
 class EsperanzaHabitoSaludable extends StatefulWidget {
   @override
@@ -2179,9 +2347,15 @@ class EsperanzaHabitoSaludable extends StatefulWidget {
 class EsperanzaHabitoSaludableWidgetState
     extends State<EsperanzaHabitoSaludable> {
   @override
+  void initState() {
+    id_esperanza_habito_saludable = null;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 130,
       // width: 350,
       child: ListView(
         shrinkWrap: true,

@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../widgets/LabeledCheckboxGeneric.dart';
+import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import '../services/usuario_services.dart';
 import 'package:app_salud/widgets/alert_informe.dart';
+import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'env.dart';
 import 'ajustes.dart';
 
@@ -14,7 +17,9 @@ var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
 var email;
-List respuestaAnimo;
+List eventoAnimo;
+var usuarioModel;
+List itemsRespuestasAnimo = [];
 
 class FormScreeningAnimo extends StatefulWidget {
   @override
@@ -43,10 +48,9 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -85,62 +89,55 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   Widget build(BuildContext context) {
     getStringValuesSF();
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        // Navegar a la ruta deseada, por ejemplo, la ruta '/inicio':
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ÁNIMO",
+        });
+        // Devuelve 'true' para permitir la navegación hacia atrás.
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/screening', arguments: {
+                "select_screening": "ÁNIMO",
+              });
+            },
           ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/screening', arguments: {
-              "select_screening": "ÁNIMO",
-            });
-          },
+          title: Text('Chequeo de Ánimo',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              )),
         ),
-        title: Text('Chequeo de Ánimo',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            )),
+        body: FutureBuilder(
+            future: getAllRespuesta(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              print(snapshot.connectionState);
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
+              } else {
+                return ScreeningAnimo();
+              }
+            }),
       ),
-      body: FutureBuilder(
-          future: getAllRespuestaNutricional(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            print(snapshot.connectionState);
-            if (snapshot.hasData) {
-              return ScreeningAnimo();
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            }
-          }),
     );
-  }
-
-  Future<List> getAllRespuestaNutricional() async {
-    var response;
-
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_eventos_animo";
-
-    response = await http.post(url, body: {});
-
-    var jsonData = json.decode(response.body);
-
-    if (response.statusCode == 200) {
-      return respuestaAnimo = jsonData['data'];
-    } else {
-      return null;
-    }
   }
 }
 
@@ -155,137 +152,108 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   final _formKey_screening_animo = GlobalKey<FormState>();
 
   //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
-  ValueNotifier<bool> valueNotifierSatisfecho = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierAbandonado = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierVidaVacia = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierAburrida = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierHumor = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierTemor = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierFeliz = ValueNotifier<bool>(false);
-
-  ValueNotifier<bool> valueNotifierDesamparado = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierPrefiere = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierMemoria = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierEstar_vivo = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierInutil = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierEnergia = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierSituacion = ValueNotifier<bool>(false);
-  ValueNotifier<bool> valueNotifierSituacionMejor = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey_screening_animo,
-      child: ListView(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10.0),
-          ),
-          SatisfechoVida(valueNotifierSatisfecho: valueNotifierSatisfecho),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Abandonado(valueNotifierAbandonado: valueNotifierAbandonado),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          VidaVacia(valueNotifierVidaVacia: valueNotifierVidaVacia),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Aburrida(valueNotifierAburrida: valueNotifierAburrida),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Humor(valueNotifierHumor: valueNotifierHumor),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Temor(valueNotifierTemor: valueNotifierTemor),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Feliz(valueNotifierFeliz: valueNotifierFeliz),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Desamparados(valueNotifierDesamparado: valueNotifierDesamparado),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Prefiere(valueNotifierPrefiere: valueNotifierPrefiere),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Memoria(valueNotifierMemoria: valueNotifierMemoria),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          EstarVivo(valueNotifierEstar_vivo: valueNotifierEstar_vivo),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Inutil(valueNotifierInutil: valueNotifierInutil),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Energia(valueNotifierEnergia: valueNotifierEnergia),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Situacion(valueNotifierSituacion: valueNotifierSituacion),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          MejorUsted(valueNotifierSituacion_mejor: valueNotifierSituacionMejor),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-          ),
-          Divider(height: 10.0, color: Colors.black),
-          Padding(
-            padding: EdgeInsets.all(15.0),
-          ),
-          Center(
-            child: ElevatedButton.icon(
-              icon: _isLoading
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: const CircularProgressIndicator(),
-                    )
-                  : const Icon(Icons.save_alt),
-              style: ElevatedButton.styleFrom(
-                textStyle: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily),
-              ),
-              onPressed: () => !_isLoading ? _startLoading() : null,
-              label: Text('GUARDAR',
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                    fontWeight: FontWeight.bold,
-                  )),
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(10.0),
             ),
-          ),
-        ],
+            SatisfechoVida(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Abandonado(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            VidaVacia(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Aburrida(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Humor(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Temor(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Feliz(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Desamparado(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Prefiere(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Memoria(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            EstarVivo(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Inutil(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Energia(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Situacion(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            MejorUsted(),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+            ),
+            Padding(
+              padding: EdgeInsets.all(15.0),
+            ),
+            Center(
+              child: ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
+                style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
+                ),
+                onPressed: () => !_isLoading ? _startLoading() : null,
+                label: Text('GUARDAR',
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -293,6 +261,33 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   var responseDecoder;
 
   guardar_datos(context) async {
+    List<dynamic> ids_animo = [
+      id_satisfecho,
+      id_abandonado,
+      id_aburrida,
+      id_desamparado,
+      id_energia,
+      id_estar_vivo,
+      id_feliz,
+      id_humor,
+      id_inutil,
+      id_mejor_usted,
+      id_memoria,
+      id_prefiere,
+      id_situacion,
+      id_temor,
+      id_vida_vacia,
+    ];
+
+    for (var variable in ids_animo) {
+      if (variable == null) {
+        alert_informe_scaffold(
+            context, "Debe responder todas las preguntas", 2);
+        _isLoading = false;
+        return; // Salir de la función
+      }
+    }
+
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_animo";
     var response = await http.post(url, body: {
@@ -300,21 +295,21 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
       "tipo_screening": tipo_screening["data"].toString(),
-      "satisfecho": valueNotifierSatisfecho.value.toString(),
-      "abandonado": valueNotifierAbandonado.value.toString(),
-      "vacia": valueNotifierVidaVacia.value.toString(),
-      "aburrida": valueNotifierAburrida.value.toString(),
-      "humor": valueNotifierHumor.value.toString(),
-      "temor": valueNotifierTemor.value.toString(),
-      "feliz": valueNotifierFeliz.value.toString(),
-      "desamparado": valueNotifierDesamparado.value.toString(),
-      "prefiere": valueNotifierPrefiere.value.toString(),
-      "memoria": valueNotifierMemoria.value.toString(),
-      "estar_vivo": valueNotifierEstar_vivo.value.toString(),
-      "inutil": valueNotifierInutil.value.toString(),
-      "energia": valueNotifierEnergia.value.toString(),
-      "situacion": valueNotifierSituacion.value.toString(),
-      "situacion_mejor": valueNotifierSituacionMejor.value.toString(),
+      "satisfecho": id_satisfecho.toString(),
+      "abandonado": id_abandonado.toString(),
+      "vacia": id_vida_vacia.toString(),
+      "aburrida": id_aburrida.toString(),
+      "humor": id_humor.toString(),
+      "temor": id_temor.toString(),
+      "feliz": id_feliz.toString(),
+      "desamparado": id_desamparado.toString(),
+      "prefiere": id_prefiere.toString(),
+      "memoria": id_memoria.toString(),
+      "estar_vivo": id_estar_vivo.toString(),
+      "inutil": id_inutil.toString(),
+      "energia": id_energia.toString(),
+      "situacion": id_situacion.toString(),
+      "situacion_mejor": id_mejor_usted.toString(),
       "cod_event_satisfecho": cod_event_satisfecho,
       "cod_event_abandonado": cod_event_abandonado,
       "cod_event_vacia": cod_event_vacia,
@@ -337,23 +332,50 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
 
       if (responseDecoder['status'] == "Success") {
         if (int.parse(responseDecoder['data']) >= 9) {
-          showCustomAlert(
+          _alert_informe(
             context,
             "Para tener en cuenta",
             "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
-            screening_recordatorio,
-            () {},
           );
         } else {
           if (int.parse(responseDecoder['data']) < 9) {
-            showCustomAlert(
+            _alert_informe(
               context,
               "Para tener en cuenta",
               "En este momento no presenta sintomatología del estado del ánimo que requiera una consulta con especialista. Sin embargo, le sugerimos seguir controlando su estado de ánimo periódicamente.",
-              screening_recordatorio,
-              () {},
             );
-          } else {
+          }
+        }
+        // if (screening_recordatorio == true) {
+        //   Navigator.pushNamed(context, '/recordatorio');
+        // } else {
+        //   Navigator.pushNamed(context, '/screening', arguments: {
+        //     "select_screening": "ÁNIMO",
+        //   });
+        // }
+      }
+    } else {
+      _alert_informe(
+        context,
+        "Error al guardar",
+        response.body,
+      );
+    }
+  }
+
+  _alert_informe(context, title, descripcion) async {
+    Alert(
+      context: context,
+      title: title,
+      desc: descripcion,
+      alertAnimation: FadeAlertAnimation,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Entendido",
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+          onPressed: () {
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
             } else {
@@ -361,18 +383,11 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
                 "select_screening": "ÁNIMO",
               });
             }
-          }
-        }
-      }
-    } else {
-      showCustomAlert(
-        context,
-        "Error al guardar",
-        response.body,
-        screening_recordatorio,
-        () {},
-      );
-    }
+          },
+          width: 120,
+        )
+      ],
+    ).show();
   }
 
   bool _isLoading = false;
@@ -391,41 +406,70 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   }
 
   showDialogMessage() async {
-    await Future.delayed(Duration(microseconds: 1));
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            child: Container(
-              height: 80,
-              width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Guardando Información",
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
+    if (!_isLoading) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Container(
+                height: 80,
+                width: 80,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 10,
                     ),
-                  )
-                ],
+                    Text(
+                      "Guardando Información",
+                      style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        });
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
+            );
+          });
     }
+  }
+}
+
+Future getAllRespuesta() async {
+  await getAllEventosAnimo();
+
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_respuesta_animo";
+  var response = await http.post(url, body: {});
+
+  var jsonDate = json.decode(response.body);
+
+  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+    //setState(() {
+    itemsRespuestasAnimo = jsonDate['data'];
+    //});
+    return true;
+  } else {
+    return false;
+  }
+}
+
+Future<List> getAllEventosAnimo() async {
+  var response;
+
+  String URL_base = Env.URL_API;
+  var url = URL_base + "/tipo_eventos_animo";
+
+  response = await http.post(url, body: {});
+
+  var jsonData = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    return eventoAnimo = jsonData['data'];
+  } else {
+    return null;
   }
 }
 
@@ -448,10 +492,6 @@ String cod_event_situacion_mejor = 'ANI15';
 //-------------------------------------- ÄNIMO 1 -----------------------------------------------------
 
 class SatisfechoVida extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierSatisfecho;
-
-  SatisfechoVida({this.valueNotifierSatisfecho});
-
   @override
   CheckSatisfechoVidaWidgetState createState() =>
       CheckSatisfechoVidaWidgetState();
@@ -460,15 +500,78 @@ class SatisfechoVida extends StatefulWidget {
 class CheckSatisfechoVidaWidgetState extends State<SatisfechoVida> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[0]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierSatisfecho.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierSatisfecho.value = newValue ?? false;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[0]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            Satisfecho()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Satisfecho *******************
+
+var id_satisfecho;
+
+class Satisfecho extends StatefulWidget {
+  @override
+  SatisfechoWidgetState createState() => SatisfechoWidgetState();
+}
+
+class SatisfechoWidgetState extends State<Satisfecho> {
+  @override
+  void initState() {
+    id_satisfecho = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_satisfecho,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_satisfecho = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -477,110 +580,338 @@ class CheckSatisfechoVidaWidgetState extends State<SatisfechoVida> {
 
 // --------------------------------- ANIMO 2 ----------------------------------------------------
 
-// ignore: must_be_immutable
 class Abandonado extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierAbandonado;
-
-  Abandonado({this.valueNotifierAbandonado});
-
   @override
-  CheckAbandonadoWidgetState createState() => CheckAbandonadoWidgetState();
+  CardAbandonadoWidgetState createState() => CardAbandonadoWidgetState();
 }
 
-class CheckAbandonadoWidgetState extends State<Abandonado> {
+class CardAbandonadoWidgetState extends State<Abandonado> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[1]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierAbandonado.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierAbandonado.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                //"¿Está satisfecho con su vida?",
+                eventoAnimo[1]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonAbandonado()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_abandonado;
+
+class RadioButtonAbandonado extends StatefulWidget {
+  @override
+  RadioButtonAbandonadoWidgetState createState() =>
+      RadioButtonAbandonadoWidgetState();
+}
+
+class RadioButtonAbandonadoWidgetState extends State<RadioButtonAbandonado> {
+  @override
+  void initState() {
+    id_abandonado = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_abandonado,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_abandonado = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //-------------------------------------------ANIMO 3--------------------------------------------
-
 class VidaVacia extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierVidaVacia;
-
-  VidaVacia({this.valueNotifierVidaVacia});
-
   @override
-  VidaVaciaWidgetState createState() => VidaVaciaWidgetState();
+  CardVidaVaciaWidgetState createState() => CardVidaVaciaWidgetState();
 }
 
-class VidaVaciaWidgetState extends State<VidaVacia> {
+class CardVidaVaciaWidgetState extends State<VidaVacia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[2]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierVidaVacia.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierVidaVacia.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[2]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonVidaVacia()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_vida_vacia;
+
+class RadioButtonVidaVacia extends StatefulWidget {
+  @override
+  RadioButtonVidaVaciaWidgetState createState() =>
+      RadioButtonVidaVaciaWidgetState();
+}
+
+class RadioButtonVidaVaciaWidgetState extends State<RadioButtonVidaVacia> {
+  @override
+  void initState() {
+    id_vida_vacia = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_vida_vacia,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_vida_vacia = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //------------------------------------------ ANIMO 4 -------------------------------------------
 
-// ignore: must_be_immutable
 class Aburrida extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierAburrida;
-
-  Aburrida({this.valueNotifierAburrida});
-
   @override
-  AburridaWidgetState createState() => AburridaWidgetState();
+  CardAburridaWidgetState createState() => CardAburridaWidgetState();
 }
 
-class AburridaWidgetState extends State<Aburrida> {
+class CardAburridaWidgetState extends State<Aburrida> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[3]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierAburrida.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierAburrida.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[3]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonAburrida()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_aburrida;
+
+class RadioButtonAburrida extends StatefulWidget {
+  @override
+  RadioButtonAburridaWidgetState createState() =>
+      RadioButtonAburridaWidgetState();
+}
+
+class RadioButtonAburridaWidgetState extends State<RadioButtonAburrida> {
+  @override
+  void initState() {
+    id_aburrida = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_aburrida,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_aburrida = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 //------------------------------------------ANIMO 5 ---------------------------------------
-
 class Humor extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierHumor;
-
-  Humor({this.valueNotifierHumor});
-
   @override
-  HumorWidgetState createState() => HumorWidgetState();
+  CardHumorWidgetState createState() => CardHumorWidgetState();
 }
 
-class HumorWidgetState extends State<Humor> {
+class CardHumorWidgetState extends State<Humor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[4]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierHumor.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierHumor.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[4]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonHumor()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_humor;
+
+class RadioButtonHumor extends StatefulWidget {
+  @override
+  RadioButtonHumorWidgetState createState() => RadioButtonHumorWidgetState();
+}
+
+class RadioButtonHumorWidgetState extends State<RadioButtonHumor> {
+  @override
+  void initState() {
+    id_humor = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_humor,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_humor = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -588,26 +919,83 @@ class HumorWidgetState extends State<Humor> {
 // ----------------------------------------ANIMO 6---------------------------------------
 
 class Temor extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierTemor;
-
-  Temor({this.valueNotifierTemor});
-
   @override
-  TemorWidgetState createState() => TemorWidgetState();
+  CardTemorWidgetState createState() => CardTemorWidgetState();
 }
 
-class TemorWidgetState extends State<Temor> {
+class CardTemorWidgetState extends State<Temor> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[5]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierTemor.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierTemor.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[5]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonTemor()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_temor;
+
+class RadioButtonTemor extends StatefulWidget {
+  @override
+  RadioButtonTemorWidgetState createState() => RadioButtonTemorWidgetState();
+}
+
+class RadioButtonTemorWidgetState extends State<RadioButtonTemor> {
+  @override
+  void initState() {
+    id_temor = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_temor,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_temor = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -615,52 +1003,168 @@ class TemorWidgetState extends State<Temor> {
 // ---------------------------------------- ANIMO 7 -----------------------------------
 
 class Feliz extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierFeliz;
-
-  Feliz({this.valueNotifierFeliz});
-
   @override
-  FelizWidgetState createState() => FelizWidgetState();
+  CardFelizWidgetState createState() => CardFelizWidgetState();
 }
 
-class FelizWidgetState extends State<Feliz> {
+class CardFelizWidgetState extends State<Feliz> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[6]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierFeliz.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierFeliz.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[6]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonFeliz()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_feliz;
+
+class RadioButtonFeliz extends StatefulWidget {
+  @override
+  RadioButtonFelizWidgetState createState() => RadioButtonFelizWidgetState();
+}
+
+class RadioButtonFelizWidgetState extends State<RadioButtonFeliz> {
+  @override
+  void initState() {
+    id_feliz = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_feliz,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_feliz = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
 
 // -----------------------------------------ANIMO 8 -----------------------------------------------------
 
-class Desamparados extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierDesamparado;
-
-  Desamparados({this.valueNotifierDesamparado});
+class Desamparado extends StatefulWidget {
   @override
-  DesamparadosWidgetState createState() => DesamparadosWidgetState();
+  CardDesamparadoWidgetState createState() => CardDesamparadoWidgetState();
 }
 
-class DesamparadosWidgetState extends State<Desamparados> {
+class CardDesamparadoWidgetState extends State<Desamparado> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[7]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierDesamparado.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierDesamparado.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[7]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonDesamparado()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_desamparado;
+
+class RadioButtonDesamparado extends StatefulWidget {
+  @override
+  RadioButtonDesamparadoWidgetState createState() =>
+      RadioButtonDesamparadoWidgetState();
+}
+
+class RadioButtonDesamparadoWidgetState extends State<RadioButtonDesamparado> {
+  @override
+  void initState() {
+    id_desamparado = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_desamparado,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_desamparado = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -668,25 +1172,84 @@ class DesamparadosWidgetState extends State<Desamparados> {
 //-------------------------------------------- ANIMO 9 -----------------------------------------------------------
 
 class Prefiere extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierPrefiere;
-
-  Prefiere({this.valueNotifierPrefiere});
   @override
-  PrefiereWidgetState createState() => PrefiereWidgetState();
+  CardPrefiereWidgetState createState() => CardPrefiereWidgetState();
 }
 
-class PrefiereWidgetState extends State<Prefiere> {
+class CardPrefiereWidgetState extends State<Prefiere> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[8]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierPrefiere.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierPrefiere.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[8]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonPrefiere()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_prefiere;
+
+class RadioButtonPrefiere extends StatefulWidget {
+  @override
+  RadioButtonPrefiereWidgetState createState() =>
+      RadioButtonPrefiereWidgetState();
+}
+
+class RadioButtonPrefiereWidgetState extends State<RadioButtonPrefiere> {
+  @override
+  void initState() {
+    id_prefiere = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_prefiere,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_prefiere = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -694,25 +1257,84 @@ class PrefiereWidgetState extends State<Prefiere> {
 // -------------------------------------------ANIMO 10 --------------------------------------------
 
 class Memoria extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierMemoria;
-
-  Memoria({this.valueNotifierMemoria});
   @override
-  MemoriaWidgetState createState() => MemoriaWidgetState();
+  CardMemoriaWidgetState createState() => CardMemoriaWidgetState();
 }
 
-class MemoriaWidgetState extends State<Memoria> {
+class CardMemoriaWidgetState extends State<Memoria> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[9]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierMemoria.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierMemoria.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[9]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonMemoria()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_memoria;
+
+class RadioButtonMemoria extends StatefulWidget {
+  @override
+  RadioButtonMemoriaWidgetState createState() =>
+      RadioButtonMemoriaWidgetState();
+}
+
+class RadioButtonMemoriaWidgetState extends State<RadioButtonMemoria> {
+  @override
+  void initState() {
+    id_memoria = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_memoria,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_memoria = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -720,103 +1342,338 @@ class MemoriaWidgetState extends State<Memoria> {
 // ------------------------------------------ANIMO 11 ---------------------------------------------------
 
 class EstarVivo extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierEstar_vivo;
-
-  EstarVivo({this.valueNotifierEstar_vivo});
   @override
-  EstarVivoWidgetState createState() => EstarVivoWidgetState();
+  CardEstarVivoWidgetState createState() => CardEstarVivoWidgetState();
 }
 
-class EstarVivoWidgetState extends State<EstarVivo> {
+class CardEstarVivoWidgetState extends State<EstarVivo> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[10]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierEstar_vivo.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierEstar_vivo.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[10]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonEstarVivo()
+          ],
+        ),
+      ),
     );
   }
 }
+
+var id_estar_vivo;
+
+class RadioButtonEstarVivo extends StatefulWidget {
+  @override
+  RadioButtonEstarVivoWidgetState createState() =>
+      RadioButtonEstarVivoWidgetState();
+}
+
+class RadioButtonEstarVivoWidgetState extends State<RadioButtonEstarVivo> {
+  @override
+  void initState() {
+    id_estar_vivo = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_estar_vivo,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_estar_vivo = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 //-------------------------------------------- ANIMO 12---------------------------------------------------
 
 class Inutil extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierInutil;
-
-  Inutil({this.valueNotifierInutil});
-
   @override
-  InutilWidgetState createState() => InutilWidgetState();
+  CardInutilWidgetState createState() => CardInutilWidgetState();
 }
 
-class InutilWidgetState extends State<Inutil> {
+class CardInutilWidgetState extends State<Inutil> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[11]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierInutil.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierInutil.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[11]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonInutil()
+          ],
+        ),
+      ),
     );
   }
 }
+
+var id_inutil;
+
+class RadioButtonInutil extends StatefulWidget {
+  @override
+  RadioButtonInutilWidgetState createState() => RadioButtonInutilWidgetState();
+}
+
+class RadioButtonInutilWidgetState extends State<RadioButtonInutil> {
+  @override
+  void initState() {
+    id_inutil = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_inutil,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_inutil = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 //------------------------------------------ANIMO 13 --------------------------------------------------
 
 class Energia extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierEnergia;
-
-  Energia({this.valueNotifierEnergia});
-
   @override
-  EnergiaWidgetState createState() => EnergiaWidgetState();
+  CardEnergiaWidgetState createState() => CardEnergiaWidgetState();
 }
 
-class EnergiaWidgetState extends State<Energia> {
+class CardEnergiaWidgetState extends State<Energia> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[12]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierEnergia.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierEnergia.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[12]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonEnergia()
+          ],
+        ),
+      ),
     );
   }
 }
+
+var id_energia;
+
+class RadioButtonEnergia extends StatefulWidget {
+  @override
+  RadioButtonEnergiaWidgetState createState() =>
+      RadioButtonEnergiaWidgetState();
+}
+
+class RadioButtonEnergiaWidgetState extends State<RadioButtonEnergia> {
+  @override
+  void initState() {
+    id_energia = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_energia,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_energia = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 //-------------------------------------------- ANIMO 14 -------------------------------------------------
 
 class Situacion extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierSituacion;
-
-  Situacion({this.valueNotifierSituacion});
-
   @override
-  ConFrecWidgetState createState() => ConFrecWidgetState();
+  CardSituacionWidgetState createState() => CardSituacionWidgetState();
 }
 
-class ConFrecWidgetState extends State<Situacion> {
+class CardSituacionWidgetState extends State<Situacion> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[13]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierSituacion.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierSituacion.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[13]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonSituacion()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_situacion;
+
+class RadioButtonSituacion extends StatefulWidget {
+  @override
+  RadioButtonSituacionWidgetState createState() =>
+      RadioButtonSituacionWidgetState();
+}
+
+class RadioButtonSituacionWidgetState extends State<RadioButtonSituacion> {
+  @override
+  void initState() {
+    id_situacion = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_situacion,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_situacion = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -824,26 +1681,84 @@ class ConFrecWidgetState extends State<Situacion> {
 // --------------------------------------------ANIMO 15 ------------------------------------------------
 
 class MejorUsted extends StatefulWidget {
-  ValueNotifier<bool> valueNotifierSituacion_mejor;
-
-  MejorUsted({this.valueNotifierSituacion_mejor});
-
   @override
-  MejorUstedWidgetState createState() => MejorUstedWidgetState();
+  CardMejorUstedWidgetState createState() => CardMejorUstedWidgetState();
 }
 
-class MejorUstedWidgetState extends State<MejorUsted> {
+class CardMejorUstedWidgetState extends State<MejorUsted> {
   @override
   Widget build(BuildContext context) {
-    return LabeledCheckboxGeneric(
-      label: respuestaAnimo[14]["nombre_evento"],
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      value: widget.valueNotifierSituacion_mejor.value,
-      onChanged: (bool newValue) {
-        setState(() {
-          widget.valueNotifierSituacion_mejor.value = newValue;
-        });
-      },
+    return Card(
+      shadowColor: Colors.yellow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(25),
+              child: Text(
+                eventoAnimo[14]["nombre_evento"],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily),
+              ),
+            ),
+            Divider(
+              height: 5.0,
+              color: Colors.black,
+            ),
+            RadioButtonMejorUsted()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+var id_mejor_usted;
+
+class RadioButtonMejorUsted extends StatefulWidget {
+  @override
+  RadioButtonMejorUstedWidgetState createState() =>
+      RadioButtonMejorUstedWidgetState();
+}
+
+class RadioButtonMejorUstedWidgetState extends State<RadioButtonMejorUsted> {
+  @override
+  void initState() {
+    id_mejor_usted = null;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      // width: 350,
+      child: ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(8.0),
+        children: itemsRespuestasAnimo
+            .map((list) => RadioListTile(
+                  groupValue: id_mejor_usted,
+                  title: Text(list['respuesta']),
+                  value: list['id'].toString(),
+                  onChanged: (val) {
+                    setState(() {
+                      debugPrint('VAL = $val');
+                      id_mejor_usted = val;
+                    });
+                  },
+                ))
+            .toList(),
+      ),
     );
   }
 }

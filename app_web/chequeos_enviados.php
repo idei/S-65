@@ -261,9 +261,9 @@ session_start();
 
             var estado;
             var rootRaiz = "<?php echo $rutaRaiz; ?>";
-
+ 
             var settings = {
-                "url": rootRaiz + "/chequeos_medico",
+                "url": rootRaiz + "/get_chequeos",
                 "method": "POST",
                 "data": JSON.stringify({
                     "id_medico": "<?php echo $_SESSION['id_medico']; ?>"

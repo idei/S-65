@@ -121,6 +121,8 @@ $rutaRaiz = Env::$_URL_API;
               <br>
               <div class="col align-self-center">
                 <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
+                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos
+                </button>
                   onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos</button>
               </div>
 
@@ -528,6 +530,8 @@ $rutaRaiz = Env::$_URL_API;
       //$.ajax(settings).done(function (response) {
       $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
+          tablaClinicos.innerHTML ='';
+          
           response['data'].forEach(element => {
             consume_alcohol = consumos(element['consume_alcohol']);
             consume_marihuana = consumos(element['consume_marihuana']);

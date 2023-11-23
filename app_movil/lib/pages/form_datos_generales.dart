@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
+import '../widgets/alert_informe.dart';
 import 'env.dart';
 
 var email_argument;
@@ -53,6 +54,10 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   var apellidoContactoFieldKey = GlobalKey<FormFieldState<String>>();
   var celularContactoFieldKey = GlobalKey<FormFieldState<String>>();
   var isGrupoConviviente;
+  var bandera;
+
+  DateTime currentFechaProvider;
+  DateTime fechaSelect;
 
   TextEditingController _dateController = TextEditingController();
 
@@ -110,9 +115,22 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
           usuarioModel.usuario.paciente.rela_nivel_instruccion;
     }
 
+    if (rela_grupo_conviviente == "" &&
+        rela_departamento == "" &&
+        rela_genero == "" &&
+        rela_departamento == "" &&
+        bandera == true) {
+      bandera = false;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => alert_screenings_generico(context, "Usted ya esta registrado",
+            "A continuación se le piden algunos datos personales para terminar de completar su ficha personal"),
+      );
+    }
+
     rela_users = usuarioModel.usuario.paciente.rela_users;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
     email_argument = usuarioModel.usuario.emailUser;
+    currentFechaProvider = usuarioModel.usuario.paciente.fecha_nacimiento;
 
     isGrupoConviviente;
     int changedCount = 0;
@@ -280,17 +298,29 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                           format: DateFormat('yyyy-MM-dd'),
                           onShowPicker: (context, currentValue) {
                             return showDatePicker(
-                                locale: const Locale("es", "ES"),
-                                context: context,
-                                firstDate: DateTime(1900),
-                                initialDate: currentValue ?? DateTime.now(),
-                                lastDate: DateTime(2100));
+                                    // ... otras propiedades ...
+                                    initialDate:
+                                        currentFechaProvider ?? DateTime.now(),
+                                    context: context,
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime(2100))
+                                .then((selectedDate) {
+                              if (selectedDate != null) {
+                                setState(() {
+                                  currentFechaProvider = selectedDate;
+                                  fechaSelect = selectedDate;
+                                });
+                                return selectedDate;
+                              }
+                              return currentValue;
+                            });
                           },
                           validator: (date) =>
                               date == null ? 'Invalid date' : null,
                           onChanged: (value) => setState(() {
-                            currentfecha = value;
-                            //_dateController.text = value.toString();
+                            currentFechaProvider = value;
+                            fechaSelect = value;
+
                             value = value;
                             changedCount++;
                           }),
@@ -362,7 +392,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                           color: Color.fromARGB(134, 190, 218, 241),
                           child: Center(
                             child: Text(
-                              'GRUPO CONVIVIENTE',
+                              'CONTACTO DE ASISTENCIA',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
@@ -373,22 +403,23 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                         ),
                         SizedBox(height: 10.0),
                         DropdownButtonFormField<String>(
-                            key: relaGrupoFieldKey,
-                            hint: Text("Relación con Paciente"),
-                            value: rela_grupo_conviviente.isNotEmpty
-                                ? rela_grupo_conviviente
-                                : null,
-                            items: myDropdownMenuItemsGrupoConvivencia,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                rela_grupo_conviviente = newValue;
-                                if (newValue == "1") {
-                                  _showAdditionalFieldsNotifier.value = false;
-                                } else {
-                                  _showAdditionalFieldsNotifier.value = true;
-                                }
-                              });
-                            }),
+                          key: relaGrupoFieldKey,
+                          hint: Text("Relación con Paciente"),
+                          value: rela_grupo_conviviente.isNotEmpty
+                              ? rela_grupo_conviviente
+                              : null,
+                          items: myDropdownMenuItemsGrupoConvivencia,
+                          onChanged: (String newValue) {
+                            setState(() {
+                              rela_grupo_conviviente = newValue;
+                              if (newValue == "1") {
+                                _showAdditionalFieldsNotifier.value = false;
+                              } else {
+                                _showAdditionalFieldsNotifier.value = true;
+                              }
+                            });
+                          },
+                        ),
                         SizedBox(height: 10.0),
                         ValueListenableBuilder<bool>(
                           valueListenable: _showAdditionalFieldsNotifier,
@@ -502,12 +533,42 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
                                       .fontFamily),
                             ),
                             onPressed: () {
+                              if (relaDeptoFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(
+                                    context, "Seleccione el Departamento", 2);
+                                return;
+                              }
+
+                              if (relaGeneroFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(
+                                    context, "Seleccione el Género", 2);
+                                return;
+                              }
+
+                              if (relaNivelFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(context,
+                                    "Seleccione el Nivel Educativo", 2);
+                                return;
+                              }
+
+                              if (relaDeptoFieldKey.currentState.value !=
+                                  null) {
+                              } else {
+                                _alert_informe(context,
+                                    "Seleccione el Contacto de Asistencia", 2);
+                                return;
+                              }
+
                               if (formKey_datos_personales.currentState
                                       .validate() &&
                                   !_isLoading) {
                                 _startLoading(usuarioModel);
-                              } else {
-                                null;
                               }
                             },
                             label: Text('Guardar Datos',
@@ -587,10 +648,16 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     DateTime fecha_paciente;
 
     if (usuarioModel.usuario.paciente.fecha_nacimiento.toString() == "null") {
-      fecha_paciente = currentfecha;
+      fecha_paciente = fechaSelect;
     } else {
-      fecha_paciente = currentfecha;
+      if (fechaSelect == null) {
+        fecha_paciente = currentFechaProvider;
+      } else {
+        fecha_paciente = fechaSelect;
+      }
     }
+
+    print(fechaSelect);
 
     String pepe = fecha_paciente.toString();
 
@@ -648,16 +715,16 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       _isLoading = false;
     });
   }
-}
 
-_alert_informe(context, message, colorNumber) {
-  var color;
-  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
 
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    backgroundColor: color,
-    content: Text(message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white)),
-  ));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
+  }
 }

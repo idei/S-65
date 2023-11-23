@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 import '../services/session_service.dart';
 import 'recuperar_contras.dart';
 import 'env.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -38,45 +37,51 @@ class _LoginPage extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: UniqueKey(),
-        body: Form(
-          key: _formKey_ingresar,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                child: Column(children: <Widget>[
-                  Container(
-                    child: Image.asset('assets/logo1.png'),
-                    height: 110.0,
-                  ),
-                  InputEmailWidget(),
-                  SizedBox(height: 30),
-                  InputPasswordWidget(),
-                  SizedBox(height: 30),
-                  ButtonIniciarSesion(context),
-                  SizedBox(height: 10),
-                  GestureDetector(
-                      child: Text("¿Olvido la contraseña?",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              fontSize: 15,
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily)),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    RecuperarPage()));
-                      }),
-                  SizedBox(height: 20),
-                  ButtonRegresar(context),
-                ]),
-              )
-            ],
+        body: WillPopScope(
+          onWillPop: () async {
+            Navigator.pushNamed(context, '/');
+            return true;
+          },
+          child: Form(
+            key: _formKey_ingresar,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: Column(children: <Widget>[
+                    Container(
+                      child: Image.asset('assets/logo1.png'),
+                      height: 110.0,
+                    ),
+                    InputEmailWidget(),
+                    SizedBox(height: 30),
+                    InputPasswordWidget(),
+                    SizedBox(height: 30),
+                    ButtonIniciarSesion(context),
+                    SizedBox(height: 10),
+                    GestureDetector(
+                        child: Text("¿Olvido la contraseña?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                                fontSize: 15,
+                                fontFamily: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    .fontFamily)),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      RecuperarPage()));
+                        }),
+                    SizedBox(height: 20),
+                    ButtonRegresar(context),
+                  ]),
+                )
+              ],
+            ),
           ),
         ));
   }
@@ -108,8 +113,15 @@ class _LoginPage extends State<LoginPage> {
 
         authProvider.login();
 
+        await Provider.of<DepartamentoServices>(context, listen: false)
+            .loadDepartamentos();
+        await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
+        await Provider.of<NivelEducativoService>(context, listen: false)
+            .loadNivelEducativo();
+        await Provider.of<GrupoConvivienteServices>(context, listen: false)
+            .loadGrupoConviviente();
+
         if (estado_users == "2" && responseBody['status'] == "Success") {
-          set_preference();
           Navigator.pushNamed(
             context,
             '/menu',
@@ -130,14 +142,6 @@ class _LoginPage extends State<LoginPage> {
     } else {
       _alert_informe(context, "Error: " + responseBody['request'], 2);
     }
-  }
-
-  set_preference() async {
-    await consult_preference();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setInt("id_paciente", int.parse(id_paciente));
-    prefs.setString("email", email.text);
   }
 
   consult_preference() async {
@@ -239,14 +243,6 @@ class _LoginPage extends State<LoginPage> {
     });
 
     await fetchLogin();
-
-    await Provider.of<DepartamentoServices>(context, listen: false)
-        .loadDepartamentos();
-    await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
-    await Provider.of<NivelEducativoService>(context, listen: false)
-        .loadNivelEducativo();
-    await Provider.of<GrupoConvivienteServices>(context, listen: false)
-        .loadGrupoConviviente();
 
     setState(() {
       _isLoading = false;

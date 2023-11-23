@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:app_salud/pages/form_datos_generales.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
+import 'package:intl/intl.dart';
 
 TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
-String email_set_shared;
 
 class VerRecordatorioPersonal extends StatefulWidget {
   @override
@@ -22,6 +21,8 @@ var fecha_limite;
 var rela_estado_recordatorio;
 var descripcion;
 var id_recordatorio;
+var estado_text;
+var estado_recordatorio;
 
 class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
   @override
@@ -32,6 +33,7 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
     rela_estado_recordatorio = parametros["estado_recordatorio"];
     descripcion = parametros["descripcion"];
     fecha_limite = parametros["fecha_limite"];
+    estado_recordatorio = parametros["estado"];
 
     return FutureBuilder(
         future: timer(),
@@ -41,6 +43,7 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
           } else {
             return Scaffold(
               appBar: AppBar(
+                backgroundColor: Color.fromRGBO(45, 175, 168, 1),
                 title: Text('Recordatorio Personal',
                     style: TextStyle(
                       fontFamily:
@@ -62,7 +65,47 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
     return true;
   }
 
+  String fechaFormateada;
+
   Widget Recordatorios(BuildContext context) {
+    final now = DateTime.now();
+    var dia;
+    var mes;
+
+    if (now.day < 10) {
+      dia = '0' + now.day.toString();
+    } else {
+      dia = now.day.toString();
+    }
+
+    if (now.month < 10) {
+      mes = '0' + now.month.toString();
+    } else {
+      mes = now.month.toString();
+    }
+
+    String formatter = now.year.toString() + "-" + mes + "-" + dia;
+    print(formatter);
+    DateTime fecha_limite1 = DateTime.parse(formatter);
+    DateTime fecha_limite2 = DateTime.parse(fecha_limite);
+
+    final difference = fecha_limite2.difference(fecha_limite1).inDays;
+    print(difference);
+
+    DateFormat dateFormatEntrada = DateFormat("yyyy-MM-dd");
+    DateTime fechaEntrada = dateFormatEntrada.parse(fecha_limite);
+
+    DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
+    fechaFormateada = dateFormatSalida.format(fechaEntrada);
+
+    if (difference < 0) {
+      estado_text = "Vencido";
+    } else if (difference == 1) {
+      estado_text = "Próximo a vencer";
+    } else if (difference > 1) {
+      estado_text = "Vigente";
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(45, 175, 168, 1),
@@ -71,42 +114,56 @@ class _VerRecordatorioState extends State<VerRecordatorioPersonal> {
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
             )),
       ),
-      body: Card(
-        shadowColor: Color.fromRGBO(45, 175, 168, 1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: EdgeInsets.all(15),
-        elevation: 10,
-        child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(children: <Widget>[
-              Text("$descripcion"),
-              SizedBox(
-                height: 20,
-              ),
-              Text("Fecha: $fecha_limite "),
-              SizedBox(
-                height: 40,
-              ),
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(45, 175, 168, 1),
-                    padding: EdgeInsets.all(20),
-                  ),
-                  onPressed: () {
-                    update_estado_recordartorio();
-                    Navigator.of(context).pushReplacementNamed('/recordatorio');
-                  },
-                  child: Text(
-                    'Hecho',
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.headline1.fontFamily,
-                    ),
-                  ),
-                ),
-              ),
-            ])),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity, // Ancho igual al ancho de la pantalla
+            child: Card(
+              shadowColor: Color.fromRGBO(45, 175, 168, 1),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              margin: EdgeInsets.all(15),
+              elevation: 10,
+              child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text("Título: $descripcion"),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text("Fecha Límite: $fechaFormateada "),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text("Estado : $estado_text "),
+                      ])),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          // Center(
+          //   child: ElevatedButton(
+          //     style: ElevatedButton.styleFrom(
+          //       primary: Color.fromRGBO(45, 175, 168, 1),
+          //       padding: EdgeInsets.all(10),
+          //     ),
+          //     onPressed: () {
+          //       update_estado_recordartorio();
+          //       Navigator.of(context).pushReplacementNamed('/recordatorio');
+          //     },
+          //     child: Text(
+          //       'Hecho',
+          //       style: TextStyle(
+          //         fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+        ],
       ),
     );
   }

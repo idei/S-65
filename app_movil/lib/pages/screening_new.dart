@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:app_salud/pages/form_datos_generales.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../services/usuario_services.dart';
 import 'env.dart';
 
 var id_paciente;
@@ -16,18 +17,12 @@ class NewScreening extends StatefulWidget {
 
 final _formKey_screening_new = GlobalKey<FormState>();
 
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String email_prefer = prefs.getString("email_prefer");
-  email_argument = email_prefer;
-  id_paciente = prefs.getInt("id_paciente");
-  print(email_argument);
-}
-
 class _NewScreeningState extends State<NewScreening> {
   @override
   Widget build(BuildContext context) {
-    getStringValuesSF();
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email_argument = usuarioModel.usuario.emailUser;
 
     return Scaffold(
         appBar: AppBar(

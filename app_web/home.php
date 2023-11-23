@@ -64,7 +64,7 @@ $rutaRaiz = Env::$_URL_API;
               </form>
               <div id="mensaje">
               </div>
-              
+                            
               <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')"><i class="fa fa-plus" aria-hidden="true"></i></button>
 
 

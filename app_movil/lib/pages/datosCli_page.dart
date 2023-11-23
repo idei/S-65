@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 
 var email_argument;
 var id_paciente;
@@ -11,24 +12,17 @@ class DatosClinicos extends StatefulWidget {
 }
 
 String email_prefer;
-getStringValuesSF() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  email_prefer = prefs.getString("email_prefer");
-  email_argument = email_prefer;
-  id_paciente = prefs.getInt("id_paciente");
-}
+var usuarioModel;
 
 class _DatosClinicosState extends State<DatosClinicos> {
   @override
   Widget build(BuildContext context) {
-    Map parametros = ModalRoute.of(context).settings.arguments;
     final isTablet = Device.get().isTablet;
 
-    if (parametros != null) {
-      email_argument = parametros['email'];
-    } else {
-      getStringValuesSF();
-    }
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    email_argument = usuarioModel.usuario.emailUser;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(

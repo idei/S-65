@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../services/usuario_services.dart';
 import '../widgets/opciones_navbar.dart';
 import '../widgets/alert_informe.dart';
 import 'env.dart';
@@ -13,6 +14,7 @@ var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
 var email;
+var usuarioModel;
 
 class ScreeningADLQPage extends StatefulWidget {
   @override
@@ -28,66 +30,62 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: CircleAvatar(
-            radius: MediaQuery.of(context).size.width / 30,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.blue,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamed(context, '/screening', arguments: {
+          "select_screening": "ADLQ",
+        });
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 30,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.blue,
+              ),
             ),
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/screening', arguments: {
-              "select_screening": "ADLQ",
-            });
-          },
-        ),
-        title: Text('Chequeo de Actividades de la Vida Diaria',
-            style: TextStyle(
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-            )),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+            onPressed: () {
+              Navigator.pushNamed(context, '/screening', arguments: {
+                "select_screening": "ADLQ",
+              });
             },
           ),
-        ],
-      ),
-      body: FutureBuilder(
-        future: getAllRespuestasADLQ(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                semanticsLabel: "Cargando",
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Container(
-              child: Center(
-                child: Text("Error: ${snapshot.error}"),
-              ),
-            );
-          } else if (snapshot.hasData) {
-            return ColumnWidgetAlimentacion();
-          } else {
-            return Container(
-              child: Center(
-                child: Text("No hay datos disponibles."),
-              ),
-            );
-          }
-        },
+          title: Text('Chequeo de Actividades de la Vida Diaria',
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+              )),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: getAllRespuestasADLQ(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return ColumnWidgetAlimentacion();
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: "Cargando",
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -110,10 +108,9 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
   }
 
   getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String email_prefer = prefs.getString("email_prefer");
-    email = email_prefer;
-    id_paciente = prefs.getInt("id_paciente");
+    usuarioModel = Provider.of<UsuarioServices>(context);
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
+    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 
@@ -215,11 +212,17 @@ class ColumnWidgetAlimentacion extends StatefulWidget {
 class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
         context,
         "Chequeo Actividades de la Vida Diaria",
         "El ADLQ es un cuestionario de ACTIVIDADES DE LA VIDA DIARIA que idealmente debe ser respondida por un familiar cercano, cuidador o persona de referencia para poder informar adecuadamente sobre el desenvolvimiento de la persona en diferentes aspectos de la vida diaria al momento actual. Consigna: seleccione la opción que mejor describa a la persona al día de la fecha"));
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -277,7 +280,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(10),
-                  child: Text('Vestido',
+                  child: Text('Vestirse',
                       style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -543,7 +546,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
                             Theme.of(context).textTheme.headline1.fontFamily),
                   ),
                 ),
-                AspectoPersonal(),
+                MantenimientoHogar(),
               ],
             ),
           ),
@@ -1156,7 +1159,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
               )),
         ),
         Padding(
-          padding: EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(8.0),
         ),
       ]),
     );
@@ -1176,51 +1179,89 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
   }
 
   guardarDatosADLQ() async {
-    if (id_alimentacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
-    if (id_arreglos_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_aspecto_personal == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_bano == null) loginToast("Debe responder todas las preguntas");
-    if (id_comprar_comida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_comprension == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_conducir == null) loginToast("Debe responder todas las preguntas");
-    if (id_conversacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_cuidado_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_empleo == null) loginToast("Debe responder todas las preguntas");
-    if (id_escritura == null) loginToast("Debe responder todas las preguntas");
-    if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
-    if (id_lavado_ropa == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_lectura == null) loginToast("Debe responder todas las preguntas");
-    if (id_manejo_efectivo == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_manejo_finanzas == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_mantenimiento_hogar == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_movilidad_barrio == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
-    if (id_prepara_comida == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
-    if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
-    if (id_tomar_medicacion == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_transporte_publico == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_uso_telefono == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_viaje_fuera_ambiente == null)
-      loginToast("Debe responder todas las preguntas");
-    if (id_viajes == null) loginToast("Debe responder todas las preguntas");
+    List<dynamic> variables = [
+      id_alimentacion,
+      id_vestimenta,
+      id_arreglos_hogar,
+      id_aspecto_personal,
+      id_bano,
+      id_comprar_comida,
+      id_comprension,
+      id_conducir,
+      id_conversacion,
+      id_cuidado_hogar,
+      id_empleo,
+      id_escritura,
+      id_evacuacion,
+      id_lavado_ropa,
+      id_lectura,
+      id_manejo_efectivo,
+      id_manejo_finanzas,
+      id_mantenimiento_hogar,
+      id_movilidad_barrio,
+      id_poner_mesa,
+      id_prepara_comida,
+      id_recreacion,
+      id_reuniones,
+      id_tomar_medicacion,
+      id_transporte_publico,
+      id_uso_telefono,
+      id_viaje_fuera_ambiente,
+      id_viajes,
+    ];
+
+    for (var variable in variables) {
+      if (variable == null) {
+        loginToast("Debe responder todas las preguntas");
+        return; // Salir de la función
+      }
+    }
+
+    // if (id_alimentacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
+    // if (id_arreglos_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_aspecto_personal == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_bano == null) loginToast("Debe responder todas las preguntas");
+    // if (id_comprar_comida == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_comprension == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_conducir == null) loginToast("Debe responder todas las preguntas");
+    // if (id_conversacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_cuidado_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_empleo == null) loginToast("Debe responder todas las preguntas");
+    // if (id_escritura == null) loginToast("Debe responder todas las preguntas");
+    // if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
+    // if (id_lavado_ropa == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_lectura == null) loginToast("Debe responder todas las preguntas");
+    // if (id_manejo_efectivo == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_manejo_finanzas == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_mantenimiento_hogar == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_movilidad_barrio == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
+    // if (id_prepara_comida == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
+    // if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
+    // if (id_tomar_medicacion == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_transporte_publico == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_uso_telefono == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_viaje_fuera_ambiente == null)
+    //   loginToast("Debe responder todas las preguntas");
+    // if (id_viajes == null) loginToast("Debe responder todas las preguntas");
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_adlq";
@@ -1346,7 +1387,7 @@ class AlimentacionWidgetState extends State<Alimentarse> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1851,7 +1892,7 @@ class MantenimientoHogarWidgetState extends State<MantenimientoHogar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 310,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -1970,7 +2011,8 @@ class LavadoRopaWidgetState extends State<LavadoRopa> {
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8.0),
         children: itemsRespuestasADLQ
-            .map((list) => list['code'] == "ADLQ48" ||
+            .map((list) => list['code'] == "ADLQ47" ||
+                    list['code'] == "ADLQ48" ||
                     list['code'] == "ADLQ49" ||
                     list['code'] == "ADLQ50" ||
                     list['code'] == "ADLQ600"
@@ -2017,7 +2059,7 @@ class EmpleoWidgetState extends State<Empleo> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 430,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2074,7 +2116,7 @@ class RecreacionWidgetState extends State<Recreacion> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 450,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2130,7 +2172,7 @@ class ReunionesWidgetState extends State<Reuniones> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2186,7 +2228,7 @@ class ViajesWidgetState extends State<Viajes> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2242,7 +2284,7 @@ class ComprarComidaWidgetState extends State<ComprarComida> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 370,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2298,7 +2340,7 @@ class ManejoEfectivoWidgetState extends State<ManejoEfectivo> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2354,7 +2396,7 @@ class ManejoFinanzasWidgetState extends State<ManejoFinanzas> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 480,
+      height: 450,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2411,7 +2453,7 @@ class TransportePublicoWidgetState extends State<TransportePublico> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2467,7 +2509,7 @@ class ConducirWidgetState extends State<Conducir> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2523,7 +2565,7 @@ class MovilidadBarrioWidgetState extends State<MovilidadBarrio> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 360,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2580,7 +2622,7 @@ class ViajarFueraAmbienteWidgetState extends State<ViajarFueraAmbiente> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2636,7 +2678,7 @@ class UsoTelefonoWidgetState extends State<UsoTelefono> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2747,7 +2789,7 @@ class ComprensionWidgetState extends State<Comprension> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 320,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2802,7 +2844,7 @@ class LecturaWidgetState extends State<Lectura> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       // width: 350,
       child: ListView(
         shrinkWrap: true,
@@ -2857,7 +2899,7 @@ class EscrituraWidgetState extends State<Escritura> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 350,
       child: ListView(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

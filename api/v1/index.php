@@ -13,6 +13,16 @@ Flight::route('POST /login', 'login_doctor');
 // Read Pacientes  ----------------------------------------------------------
 Flight::route('POST /pacientes', 'read_pacientes');
 
+// Read TODOS Pacientes  ----------------------------------------------------------
+Flight::route('POST /list_pacientes', 'list_pacientes');
+
+// Read Pacientes  ----------------------------------------------------------
+Flight::route('POST /estado_solicitud_medico_paciente', 'estado_solicitud_medico_paciente');
+
+// Solicutud a Pacientes  ----------------------------------------------------------
+Flight::route('POST /solicitud_medico_paciente', 'solicitud_medico_paciente');
+
+
 // Read Antecedentes Familiares
 Flight::route('POST /antecedentes_familiares', 'read_antecedentes_familiares');
 
@@ -21,6 +31,9 @@ Flight::route('POST /antecedentes_personales', 'read_antecedentes_personales');
 
 // Read Datos Clinicos
 Flight::route('POST /datos_clinicos', 'read_datos_clinicos');
+
+// Read Datos Clinicos
+Flight::route('POST /read_datos_clinicos_paciente', 'read_datos_clinicos_paciente');
 
 // Read Datos Personales
 Flight::route('POST /datos_personales', 'read_datos_personales');
@@ -34,7 +47,7 @@ Flight::route('POST /crear_recordatorio_chequeo', 'crear_recordatorio_chequeo');
 Flight::route('POST /chequeos_medico_paciente', 'chequeos_medico_paciente');
 
 // Read Todos los Chequeos del medico
-Flight::route('POST /chequeos_medico', 'get_chequeos');
+Flight::route('POST /get_chequeos', 'get_chequeos');
 
 // Read Departamentos o Generos
 Flight::route('POST /deptos_generos_patologias', 'read_deptos_generos_patologias');
@@ -107,6 +120,9 @@ Flight::route('POST /respuesta_screening_fisico','respuesta_screening_fisico');
 
 // Respuesta Screening Animo
 Flight::route('POST /respuesta_screening_animo','respuesta_screening_animo');
+
+// Tipo de Respuesta Animo
+Flight::route('POST /tipo_respuesta_animo','tipo_respuesta_animo');
 
 // Respuesta Screening CDR
 Flight::route('POST /respuesta_screening_cdr','respuesta_screening_cdr');
@@ -186,6 +202,10 @@ Flight::route('POST /respuesta','respuesta');
 
 // Read Respuestas
 Flight::route('POST /read_list_medicos','read_list_medicos');
+
+// Read Respuestas
+Flight::route('POST /update_estado_habilitacion_medico','update_estado_habilitacion_medico');
+
 
 // Consult Preference
 Flight::route('POST /consult_preference','consult_preference');
