@@ -47,7 +47,7 @@ Flight::route('POST /crear_recordatorio_chequeo', 'crear_recordatorio_chequeo');
 Flight::route('POST /chequeos_medico_paciente', 'chequeos_medico_paciente');
 
 // Read Todos los Chequeos del medico
-Flight::route('POST /chequeos_medico', 'get_chequeos');
+Flight::route('POST /get_chequeos', 'get_chequeos');
 
 // Read Departamentos o Generos
 Flight::route('POST /deptos_generos_patologias', 'read_deptos_generos_patologias');
