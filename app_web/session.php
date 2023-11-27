@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 header('Content-Type: application/json; charset=utf8');
 
@@ -95,7 +95,8 @@ try {
 
     } else {
 
-        echo "Error al iniciar sesión";
+        echo json_encode(["status" => "Error", "message" => "Error al iniciar sesión"]);
+
     }
 } catch (PDOException $error) {
 
