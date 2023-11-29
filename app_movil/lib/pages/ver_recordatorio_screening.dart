@@ -117,7 +117,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                 ),
                 //Text("Screening $tipo_screening: "),
                 Text(
-                  "Estimado paciente le envio para que complete el siguiente Screening de $nombre_screening ",
+                  "Estimado paciente le envio para que complete el siguiente Chequeo de $nombre_screening ",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

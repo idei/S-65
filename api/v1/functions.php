@@ -219,7 +219,7 @@ function read_pacientes()
         $smt = Flight::db()->prepare("select pacientes.id, dni, nombre, apellido, fecha_nacimiento FROM `pacientes` 
         INNER JOIN medicos_pacientes 
         ON medicos_pacientes.rela_paciente = pacientes.id
-        WHERE rela_medico = '" . $id_medicos . "'");
+        WHERE rela_medico = '" . $id_medicos . "' and estado_habilitacion = 2");
         $smt->execute();
 
         if ($smt->rowCount() > 0) {
@@ -425,13 +425,7 @@ function read_antecedentes_familiares()
 
 
     try {
-        // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
-        $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE id = '" . $id_paciente . "'");
-        $select_id_paciente->execute();
-        $id_paciente = $select_id_paciente->fetch();
-        $id_paciente = $id_paciente["id"];
-
-
+      
         // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
 
         $select_antecedentes = Flight::db()->prepare("SELECT * FROM antecedentes_medicos_familiares WHERE rela_paciente = '" . $id_paciente . "'");
@@ -576,7 +570,7 @@ function read_antecedentes_familiares()
 
                         if ($eventos["codigo_evento"] == $cod_event_depresion) {
                             if ($antecedentes["rela_tipo"] == "1") {
-                                $depresion = "Depresion";
+                                $depresion = "Depresión";
                                 $stack = array("depresion" => $depresion);
                                 $data = array_merge($data, $stack);
                             }
@@ -648,7 +642,7 @@ function read_antecedentes_familiares()
 
                         if ($eventos["codigo_evento"] == $cod_event_cardiologico) {
                             if ($antecedentes["rela_tipo"] == "1") {
-                                $cardiologico = "Cardiologico";
+                                $cardiologico = "Cardiológico";
                                 $stack = array("cardiologico" => $intoxicaciones);
                                 $data = array_merge($data, $stack);
                             }
@@ -664,8 +658,16 @@ function read_antecedentes_familiares()
 
                         if ($eventos["codigo_evento"] == $cod_event_hipertension) {
                             if ($antecedentes["rela_tipo"] == "1") {
-                                $hipertension = "Hipertension";
+                                $hipertension = "Hipertensión";
                                 $stack = array("hipertension" => $hipertension);
+                                $data = array_merge($data, $stack);
+                            }
+                        }
+
+                        if ($eventos["codigo_evento"] == $cod_event_colesterol) {
+                            if ($antecedentes["rela_tipo"] == "1") {
+                                $colesterol = "Colesterol";
+                                $stack = array("colesterol" => $colesterol);
                                 $data = array_merge($data, $stack);
                             }
                         }
@@ -741,14 +743,7 @@ function read_antecedentes_personales()
 
 
     try {
-        // SELECCION DE ID DEL PACIENTE A PARTIR DEL ID DEL LOGIN
-        $select_id_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE id = '" . $id_paciente . "'");
-        $select_id_paciente->execute();
-
-        $id_paciente = $select_id_paciente->fetch();
-        $id_paciente = $id_paciente["id"];
-
-
+    
         // BUSCO SI EXISTEN FILAS DE ESE USUARIO/ID EN LA TABLA antecedentes_medicos_personales
         $select_antecedentes = Flight::db()->prepare("SELECT * FROM antecedentes_medicos_personales WHERE rela_paciente = '" . $id_paciente . "'");
         $select_antecedentes->execute();
@@ -892,7 +887,7 @@ function read_antecedentes_personales()
 
                         if ($eventos["codigo_evento"] == $cod_event_depresion) {
                             if ($antecedentes["rela_tipo"] == "1") {
-                                $depresion = "Depresion";
+                                $depresion = "Depresión";
                                 $stack = array("depresion" => $depresion);
                                 $data = array_merge($data, $stack);
                             }
@@ -983,17 +978,7 @@ function read_datos_clinicos()
 
 
     try {
-        // SELECCION DE ID USER A PARTIR DE LA CLAVE PRINCIPAL EMAIL
-
-        $select_id_users = Flight::db()->prepare("SELECT pacientes.id id
-     FROM pacientes 
-     WHERE id = '" . $id_paciente . "'");
-
-        $select_id_users->execute();
-        $id_users = $select_id_users->fetch();
-        $id_users = $id_users["id"];
-
-
+        
         $select_data_clinica = Flight::db()->prepare("SELECT *
         FROM datos_clinicos 
         WHERE rela_paciente = '" . $id_paciente . "' ORDER BY fecha_alta DESC");

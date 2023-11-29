@@ -37,7 +37,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
     WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
           context,
           "Cuestionario Físico",
-          "¿Usted presentó alguno de los siguientes sintomas en los últimos 6 meses?",
+          "¿Usted presentó alguno de los siguientes síntomas en los últimos 6 meses?",
           true,
           () => Navigator.pop(context),
         ));

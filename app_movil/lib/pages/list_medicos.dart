@@ -154,15 +154,20 @@ class _ListMedicosState extends State<ListMedicos>
                                     height: 60,
                                     width: double.infinity,
                                     child: Center(
-                                        child: ListView(
-                                      children: ListTile.divideTiles(
-                                        color: Colors.black,
-                                        tiles: snapshot.data
+                                      child: ListView.builder(
+                                        itemCount: snapshot.data
                                             .where((element) =>
                                                 element.estado_habilitacion ==
                                                 "1")
-                                            .map((element) {
+                                            .length,
+                                        itemBuilder: (context, index) {
+                                          final element = snapshot.data
+                                              .where((element) =>
+                                                  element.estado_habilitacion ==
+                                                  "1")
+                                              .elementAt(index);
                                           id_medico = element.rela_medico;
+
                                           return Center(
                                             child: Padding(
                                               padding:
@@ -197,9 +202,9 @@ class _ListMedicosState extends State<ListMedicos>
                                               ),
                                             ),
                                           );
-                                        }),
+                                        },
                                       ),
-                                    )),
+                                    ),
                                   ),
                                   SizedBox(height: 5),
                                   Row(

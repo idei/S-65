@@ -101,7 +101,7 @@ $rutaRaiz = Env::$_URL_API;
 
               <div class="col align-self-center">
                 <button type="button" onclick="antecedentesP()" class="btn btn-block btn-info btn-flat text-uppercase"
-                  data-toggle="modal" data-target="#modalMedico">Antecedentes Médicos</button>
+                  data-toggle="modal" data-target="#modalMedico">Antecedentes Personales</button>
               </div>
               <br>
               <div class="col align-self-center">
@@ -160,7 +160,7 @@ $rutaRaiz = Env::$_URL_API;
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Antecedentes Médicos</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Antecedentes Personales</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -203,32 +203,34 @@ $rutaRaiz = Env::$_URL_API;
                   </div>
                   <div class="modal-body">
                     <div id="resultado_familiares"></div>
-                    <div id="retraso"></div>
-                    <div id="desorden"></div>
-                    <div id="deficit"></div>
-                    <div id="lesiones_cabeza"></div>
-                    <div id="lesiones_espalda"></div>
-                    <div id="infecciones"></div>
-                    <div id="toxinas"></div>
-                    <div id="acv"></div>
-                    <div id="demencia"></div>
-                    <div id="parkinson"></div>
-                    <div id="epilepsia"></div>
-                    <div id="esclerosis"></div>
-                    <div id="huntington"></div>
-                    <div id="depresion"></div>
-                    <div id="trastorno"></div>
-                    <div id="esquizofrenia"></div>
-                    <div id="enfermedad_desorden"></div>
-                    <div id="intoxicaciones"></div>
-                    <div id="cancer"></div>
-                    <div id="cirujia"></div>
-                    <div id="trasplante"></div>
-                    <div id="hipotiroidismo"></div>
-                    <div id="cardiologico"></div>
-                    <div id="diabetes"></div>
-                    <div id="hipertension"></div>
-                    <div id="colesterol"></div>
+                    <div id="accidentes_caidas_fam"></div>
+                    <div id="retraso_fam"></div>
+                    <div id="desorden_fam"></div>
+                    <div id="deficit_fam"></div>
+                    <div id="lesiones_cabeza_fam"></div>
+                    <div id="lesiones_espalda_fam"></div>
+                    <div id="infecciones_fam"></div>
+                    <div id="toxinas_fam"></div>
+                    <div id="acv_fam"></div>
+                    <div id="demencia_fam"></div>
+                    <div id="parkinson_fam"></div>
+                    <div id="epilepsia_fam"></div>
+                    <div id="esclerosis_fam"></div>
+                    <div id="huntington_fam"></div>
+                    <div id="depresion_fam"></div>
+                    <div id="trastorno_fam"></div>
+                    <div id="esquizofrenia_fam"></div>
+                    <div id="enfermedad_desorden_fam"></div>
+                    <div id="intoxicaciones_fam"></div>
+                    <div id="cancer_fam"></div>
+                    <div id="cirujia_fam"></div>
+                    <div id="trasplante_fam"></div>
+                    <div id="hipotiroidismo_fam"></div>
+                    <div id="cardiologico_fam"></div>
+                    <div id="diabetes_fam"></div>
+                    <div id="hipertension_fam"></div>
+                    <div id="colesterol_fam"></div>
+
                   </div>
                   <div class="modal-footer">
                   </div>
@@ -438,36 +440,37 @@ $rutaRaiz = Env::$_URL_API;
         }),
       };
       $.ajax(settings).done(function (response) {
-        console.log(response['status']);
+        console.log(response['data']);
         if (response['status'] == "Success") {
           var response = response['data'];
 
-          $("#retraso").html(response['retraso']);
-          $('#deficit').html(response['deficit']);
-          $('#desorden').html(response['desorden']);
-          $('#lesiones_cabeza').html(response['lesiones_cabeza']);
-          $('#lesiones_espalda').html(response['lesiones_espalda']);
-          $('#infecciones').html(response['infecciones']);
-          $('#toxinas').html(response['toxinas']);
-          $('#acv').html(response['acv']);
-          $('#demencia').html(response['demencia']);
-          $('#parkinson').html(response['parkinson']);
-          $('#epilepsia').html(response['epilepsia']);
-          $('#esclerosis').html(response['esclerosis']);
-          $('#huntington').html(response['huntington']);
-          $('#depresion').html(response['depresion']);
-          $('#trastorno').html(response['trastorno']);
-          $('#esquizofrenia').html(response['esquizofrenia']);
-          $('#enfermedad_desorden').html(response['enfermedad_desorden']);
-          $('#intoxicaciones').html(response['intoxicaciones']);
-          $('#cancer').html(response['cancer']);
-          $('#cirujia').html(response['cirujia']);
-          $('#trasplante').html(response['trasplante']);
-          $('#hipotiroidismo').html(response['hipotiroidismo']);
-          $('#cardiologico').html(response['cardiologico']);
-          $('#diabetes').html(response['diabetes']);
-          $('#hipertension').html(response['hipertension']);
-          $('#colesterol').html(response['colesterol']);
+          $("#accidentes_caidas_fam").html(response['accidentes_caidas']);
+          $("#retraso_fam").html(response['retraso']);
+          $('#deficit_fam').html(response['deficit']);
+          $('#desorden_fam').html(response['desorden']);
+          $('#lesiones_cabeza_fam').html(response['lesiones_cabeza']);
+          $('#lesiones_espalda_fam').html(response['lesiones_espalda']);
+          $('#infecciones_fam').html(response['infecciones']);
+          $('#toxinas_fam').html(response['toxinas']);
+          $('#acv_fam').html(response['acv']);
+          $('#demencia_fam').html(response['demencia']);
+          $('#parkinson_fam').html(response['parkinson']);
+          $('#epilepsia_fam').html(response['epilepsia']);
+          $('#esclerosis_fam').html(response['esclerosis']);
+          $('#huntington_fam').html(response['huntington']);
+          $('#depresion_fam').html(response['depresion']);
+          $('#trastorno_fam').html(response['trastorno']);
+          $('#esquizofrenia_fam').html(response['esquizofrenia']);
+          $('#enfermedad_desorden_fam').html(response['enfermedad_desorden']);
+          $('#intoxicaciones_fam').html(response['intoxicaciones']);
+          $('#cancer_fam').html(response['cancer']);
+          $('#cirujia_fam').html(response['cirujia']);
+          $('#trasplante_fam').html(response['trasplante']);
+          $('#hipotiroidismo_fam').html(response['hipotiroidismo']);
+          $('#cardiologico_fam').html(response['cardiologico']);
+          $('#diabetes_fam').html(response['diabetes']);
+          $('#hipertension_fam').html(response['hipertension']);
+          $('#colesterol_fam').html(response['colesterol']);
 
         } else {
           if (response['status'] == "Vacio") {
@@ -530,6 +533,7 @@ $rutaRaiz = Env::$_URL_API;
       //$.ajax(settings).done(function (response) {
       $.ajax(settings).done(function (response) {
         if (response['status'] == "Success") {
+          console.log(response['data']);
           tablaClinicos.innerHTML ='';
           
           response['data'].forEach(element => {
@@ -620,16 +624,19 @@ $rutaRaiz = Env::$_URL_API;
       });
     }
 
+    function consumos(frecuencia) {
+    const frecuenciaConsumos = {
+        902: "A veces (una vez al mes)",
+        903: "Con frecuencia (una vez por semana)",
+        904: "Siempre (casi todos los días)",
+        1:"Si",
+        2:"No"
+        // Agrega más mapeos según sea necesario
+    };
 
-    function consumos(frecuencia){
-      if (frecuencia == 902) {
-                return consume = "A veces (una vez al mes)";
-            } else if(frecuencia == 903){
-              return consume = "Con frecuencia (una vez por semana)";
-            } else {
-              return consume = "Siempre (casi todos los días)";
-            }
-    }
+    // Verifica si la frecuencia está mapeada, de lo contrario, usa un valor predeterminado
+    return frecuenciaConsumos[frecuencia] || "Frecuencia no especificada";
+}
 
     function read_nombre_chequeos() {
     var parametros = {};
@@ -807,7 +814,7 @@ $rutaRaiz = Env::$_URL_API;
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Datos Históricos Clínicos</h5>
+              <h5 class="modal-title" id="exampleModalLongTitle">Datos Clínicos Históricos</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
