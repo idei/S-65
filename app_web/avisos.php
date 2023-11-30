@@ -53,7 +53,7 @@ $id_medico = $_SESSION["id_medico"];
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-3">
-                                    <br></br>
+                                    <br>
                                     <button class="btn btn-primary float-left" onclick="$('#nuevoAvisoGrupalModal').modal('show')"><i class="fa fa-users" aria-hidden="true"></i> Crear Aviso Grupal</button>
                                 </div>
                                 <div class="col-9">

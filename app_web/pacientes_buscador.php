@@ -44,7 +44,7 @@ $id_medico = $_SESSION["id_medico"];
 
             <!-- Main content -->
             <section class="content">
-
+<br>
                 <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')">Enviar Solicitud</button>
                 <div id="mensaje">
               </div>
