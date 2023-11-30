@@ -29,7 +29,7 @@ $id_medico = $_SESSION["id_medico"];
     <link rel="stylesheet" href="dist/css/fixes.css">
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed" onload="chequeos_pacientes()">
+<body class="hold-transition sidebar-mini layout-fixed" onload="list_pacientes()">
     <div class="wrapper">
         <?php include('./templates/navbar_template.php'); ?>
 
@@ -45,33 +45,53 @@ $id_medico = $_SESSION["id_medico"];
             <!-- Main content -->
             <section class="content">
 
-                <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                <button id="nuevo_paciente" type="submit" class="btn-primary btn-sm" onclick="$('#nuevoPacienteModal').modal('show')">Enviar Solicitud</button>
                 <div id="mensaje">
               </div>
 
                 <!-- Stack the columns on mobile by making one full-width and the other half-width -->
-                <div class="row" style="margin: 100; color: rgb(92, 90, 90);">
-                    <div class="container-fluid">
+                 <!-- /.card-header -->
+                 <h3 style="text-align: center">Todos los pacientes</h3>
+            <div class="card-body table-responsive p-0">
+              <table class="table table-head-fixed text-nowrap">
+                <thead>
 
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col">Tipo de Chequeo</th>
-                                    <th scope="col">Fecha de Envío</th>
-                                    <th scope="col">Fecha Límite</th>
-                                    <th scope="col">Paciente</th>
-                                    <th scope="col">Estado</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla">
+                  <tr>
+                    <th scope="col"></th>
+                    <th id="dni_paciente_l">Dni</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody id="tabla">
 
-                            </tbody>
-                        </table>
+                </tbody>
+              </table>
+            </div>
+             <!-- /.card-header -->
+             <br>
+             <h3 style="text-align: center;background-color: white;">Solicitudes enviadas </h3>
 
-                    </div>
-                </div>
+             <div class="card-body table-responsive p-0" style="height: 600px;">
+              <table class="table table-head-fixed text-nowrap">
+                <thead>
+
+                  <tr>
+                    <th scope="col"></th>
+                    <th>Dni</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Estado Habilitación</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody id="tabla2">
+
+                </tbody>
+              </table>
+            </div>
             </section>
             <!-- /.content -->
 
@@ -147,7 +167,125 @@ $id_medico = $_SESSION["id_medico"];
     <script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <script>
+    function list_pacientes() {
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+      const tabla = document.querySelector('#tabla');
 
+      var url_imagen = "";
+
+      var edadPaciente = 0;
+
+      var fechaActual = new Date();
+
+      var parametros = {
+        dni: "<?php echo $_SESSION['dni']; ?>"
+      };
+
+      console.log("<?php echo $_SESSION['id_medico']; ?>");
+
+      $.ajax({
+        data: JSON.stringify(parametros),
+        url: rootRaiz + "/list_pacientes",
+        type: 'POST',
+        dataType: "JSON",
+
+        success: function (response) {
+          console.log(response);
+          if (response['status'] == 'Success') {
+            console.log(response['status']);
+
+            response['data'].forEach(element => {
+              var fechaPaciente = element['fecha_nacimiento'];
+
+              edadPaciente = parseInt(fechaActual.getFullYear()) - parseInt(fechaPaciente);
+
+              tabla.innerHTML += `
+              <tr>
+              <th scope="row"></th>
+              <td>${element['dni']}</td>
+              <td>${element['apellido']}</td>
+              <td>${element['nombre']}</td>
+              <td>${edadPaciente}</td>
+              <td>
+              </form>
+              </td>
+              </tr>
+              `;
+            });
+          } else {
+            console.log(response['status']);
+            if (response['status'] == 'Vacio') {
+              tabla.innerHTML += ``;
+            }
+          }
+
+        }
+      });
+    }
+    </script>
+     <script>
+     $(document).ready(function() {
+        // Realizar una solicitud AJAX al servidor para obtener los datos
+
+        var rootRaiz = "<?php echo $rutaRaiz; ?>";
+      const tabla = document.querySelector('#tabla2');
+
+      var parametros = {
+        id_medico: "<?php echo $id_medico; ?>"
+      };
+      $.ajax({
+        data: JSON.stringify(parametros),
+        url: rootRaiz + "/estado_solicitud_medico_paciente",
+        type: 'POST',
+        dataType: "JSON",
+
+        success: function (response) {
+          console.log(response);
+          if (response['status'] == 'Success') {
+            console.log(response['status']);
+
+            response['data'].forEach(element => {
+            let estado = '';
+            switch (element['estado_habilitacion']) {
+                case "0":
+                    estado = 'Rechazado';
+                    break;
+                case "1":
+                    estado = 'Pendiente';
+                    break;
+                case "2":
+                    estado = 'Aprobado';
+                    break;
+                default:
+                    estado = 'Desconocido';
+                    break;
+            }
+
+              tabla.innerHTML += `
+              <tr>
+              <th scope="row"></th>
+              <td>${element['dni']}</td>
+              <td>${element['apellido']}</td>
+              <td>${element['nombre']}</td>
+              <td>${estado}</td>
+              <td>
+              </form>
+              </td>
+              </tr>
+              `;
+            });
+          } else {
+            console.log(response['status']);
+            if (response['status'] == 'Vacio') {
+              tabla.innerHTML += ``;
+            }
+          }
+
+        }
+      });
+    })
+    </script>
     <script>
         
         $('#nuevoPacienteModal').on('show.bs.modal', function() {
