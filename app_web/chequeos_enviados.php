@@ -288,7 +288,7 @@ session_start();
           <td>${element['fecha_limite']}</td>
           <td>${element['apellido_paciente']} ${element['nombre_paciente']}</td>
           <td>${element['nombre_estado']}</td>
-          <td><button class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre']}','${element['resultado']}')"><i class="fa-solid fa-file-lines"></i></button>
+          <td><button class="btn btn-sm btn-primary ${estado} " onclick="ver_mas_chequeo('${element['id']}','${element['nombre_estado']}','${element['resultado']}')"><i class="fa-solid fa-file-lines"></i></button>
           </td>
           </tr>
           `;
@@ -304,11 +304,12 @@ session_start();
         }
 
         function ver_mas_chequeo(id_chequeo, nombre_estado, resultado) {
+            console.log(nombre_estado);
       if (nombre_estado == "Enviado") {
         console.log(nombre_estado);
 
       } else {
-        if (nombre_estado = "Respondido") {
+        if (nombre_estado == "Respondido") {
           console.log(nombre_estado);
           $('#modal_resultado_chequeo').modal('show'); // abrir
           modal_resultado.innerHTML = `

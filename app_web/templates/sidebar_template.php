@@ -87,8 +87,8 @@ $apellido=$_SESSION['apellido'];
   <!-- /.sidebar -->
 
   <div class="sidebar-custom">
-    <a href="#" class="btn btn-link" id="buttonfix2"><i class="fas fa-cog"></i></a>
-    <a href="#" class="btn btn-secondary hide-on-collapse pos-right"  id="buttonfix1" >Ayuda</a>
+    <!-- <a href="#" class="btn btn-link" id="buttonfix2"><i class="fas fa-cog"></i></a>
+    <a href="#" class="btn btn-secondary hide-on-collapse pos-right"  id="buttonfix1" >Ayuda</a> -->
   </div>
   <!-- /.sidebar-custom -->
 </aside>
