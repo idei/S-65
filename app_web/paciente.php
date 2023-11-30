@@ -167,6 +167,7 @@ $rutaRaiz = Env::$_URL_API;
                   </div>
                   <div class="modal-body">
                     <div id="resultado_personales"></div>
+                    <div id="accidentes_caidas"></div>
                     <div id="retraso"></div>
                     <div id="desorden"></div>
                     <div id="deficit"></div>
@@ -402,6 +403,7 @@ $rutaRaiz = Env::$_URL_API;
         if (response['status'] == "Success") {
           var response = response['data'];
 
+          $("#accidentes_caidas").html(response['accidentes_caidas']);
           $("#retraso").html(response['retraso']);
           $('#deficit').html(response['deficit']);
           $('#desorden').html(response['desorden']);
