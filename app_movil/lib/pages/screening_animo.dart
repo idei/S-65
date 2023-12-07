@@ -34,8 +34,8 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
           context,
-          "Cuestionario de Ánimo",
-          "Este cuestionario valora cómo está su ánimo actualmente . Por favor responda sinceramente a cada una de las preguntas.  ",
+          "Chequeo de Ánimo",
+          "Este chequeo valora cómo está su ánimo actualmente . Por favor responda sinceramente a cada una de las preguntas.  ",
           true,
           () => Navigator.pop(context),
         ));

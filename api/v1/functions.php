@@ -324,7 +324,34 @@ function solicitud_medico_paciente()
     $estado_habilitacion = '1';
 
     try {
-      
+
+        $smt = Flight::db()->prepare("SELECT pacientes.id,nombre,apellido,dni,estado_habilitacion
+        FROM `pacientes` LEFT JOIN medicos_pacientes ON medicos_pacientes.rela_paciente = pacientes.id
+        where pacientes.dni = '" . $dni . "' and rela_medico = '" . $id_medico . "'");
+        $smt->execute();
+
+        if ($smt->rowCount() > 0) {
+            $respuesta = $smt->fetch();
+
+            $estado_habilitacion = '2';
+
+            $id_paciente = $respuesta['id'];
+
+            
+            $data = [
+                'id_paciente' => $id_paciente,
+                'id_medico' => $id_medico,
+                'estado_habilitacion' => $estado_habilitacion
+            ];
+
+            $update_solicitud = Flight::db()->prepare("UPDATE medicos_pacientes
+                    SET estado_habilitacion=:estado_habilitacion
+                    WHERE rela_paciente=:id_paciente and rela_medico=:id_medico");
+
+            $update_solicitud->execute($data);
+            $returnData = msg("Success", []);
+
+        }else{
             $select_dni_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE dni = '" . $dni . "'");
             $select_dni_paciente->execute();
 
@@ -346,6 +373,8 @@ function solicitud_medico_paciente()
 
             $returnData = msg("Vacio", []);
         }
+        }
+         
     } catch (PDOException $error) {
 
         $returnData = msg_error("Error", $error->getMessage(), $error->getCode());

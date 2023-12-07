@@ -36,7 +36,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
     cant_check = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
           context,
-          "Cuestionario Físico",
+          "Chequeo Físico",
           "¿Usted presentó alguno de los siguientes síntomas en los últimos 6 meses?",
           true,
           () => Navigator.pop(context),
@@ -549,7 +549,7 @@ class FisicoWidgetState extends State<ScreeningFisico> {
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
               _scaffold_messenger(
-                  context, "Screening del Médico Respondido", 1);
+                  context, "Chequeo del Médico Respondido", 1);
             } else {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "SFMS",
@@ -568,12 +568,12 @@ class FisicoWidgetState extends State<ScreeningFisico> {
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
               _scaffold_messenger(
-                  context, "Screening del Médico Respondido", 1);
+                  context, "Chequeo del Médico Respondido", 1);
             } else {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "SFMS",
               });
-              _scaffold_messenger(context, "Screening Registrado", 1);
+              _scaffold_messenger(context, "Chequeo Registrado", 1);
             }
           },
         );

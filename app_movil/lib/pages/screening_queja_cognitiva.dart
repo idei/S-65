@@ -34,8 +34,8 @@ class _ScreeningBState extends State<ScreeningBPage> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => alert_screenings_generico(
           context,
-          "Cuestionario de Quejas Cognitivas",
-          "Este cuestionario explora sobre posibles y actuales quejas cognitivas, por ejemplo que ultimamente hay a notado que se olvida más que antes o que está más disperso. Deberà elegir la opción que describa la frecuencia en que dicha queja aparece en su rutina."),
+          "Chequeo de Quejas Cognitivas",
+          "Este chequeo explora sobre posibles y actuales quejas cognitivas, por ejemplo que ultimamente hay a notado que se olvida más que antes o que está más disperso. Deberà elegir la opción que describa la frecuencia en que dicha queja aparece en su rutina."),
     );
   }
 

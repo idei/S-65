@@ -204,7 +204,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) =>
-        alert_screenings_generico(context, "Cuestionario Conductual",
+        alert_screenings_generico(context, "Chequeo Conductual",
             " Tómese su tiempo para responder de la mejor manera "));
   }
 

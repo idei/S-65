@@ -229,6 +229,11 @@ class _FormRegisterState extends State<RegisterPage> {
           if (value.isEmpty) {
             return 'Por favor ingrese un DNI';
           }
+          // Utilizar una expresión regular para validar que tenga más de 6 dígitos
+          if (!RegExp(r'^[0-9]{7,}$').hasMatch(value)) {
+            return 'El DNI debe tener al menos 7 dígitos';
+          }
+
           return null;
         },
         keyboardType: TextInputType.number,

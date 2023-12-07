@@ -217,7 +217,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
     WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
         context,
         "Chequeo Actividades de la Vida Diaria",
-        "El ADLQ es un cuestionario de ACTIVIDADES DE LA VIDA DIARIA que idealmente debe ser respondida por un familiar cercano, cuidador o persona de referencia para poder informar adecuadamente sobre el desenvolvimiento de la persona en diferentes aspectos de la vida diaria al momento actual. Consigna: seleccione la opción que mejor describa a la persona al día de la fecha"));
+        "El ADLQ es un chequeo de ACTIVIDADES DE LA VIDA DIARIA que idealmente debe ser respondida por un familiar cercano, cuidador o persona de referencia para poder informar adecuadamente sobre el desenvolvimiento de la persona en diferentes aspectos de la vida diaria al momento actual. Consigna: seleccione la opción que mejor describa a la persona al día de la fecha"));
   }
 
   @override
@@ -1307,7 +1307,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
         Navigator.pushNamed(context, '/screening', arguments: {
           "select_screening": "ADLQ",
         });
-        _scaffold_messenger(context, "Screening Registrado", 1);
+        _scaffold_messenger(context, "Chequeo Registrado", 1);
       } else {
         _scaffold_messenger(context, "No se pudo guardar el Chequeo", 2);
       }

@@ -122,7 +122,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     maxLength: 3, // Establecer el número máximo de caracteres
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
-                          RegExp('[,]')), // Evitar comas
+                          RegExp('[,*+-/=%]')), // Evitar comas
                     ],
                     decoration: InputDecoration(
                       hintText: '95',
@@ -172,7 +172,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
-                          RegExp('[,]')), // Evitar comas
+                          RegExp('[,*+-/=%]')), // Evitar comas
                     ],
                     maxLength: 2, // Establecer el número máximo de caracteres
                     decoration: InputDecoration(
@@ -227,7 +227,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
-                          RegExp('[,]')), // Evitar comas
+                          RegExp('[,*+-/=%]')), // Evitar comas
                     ],
                     decoration: InputDecoration(
                       hintText: '80',
@@ -270,10 +270,10 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                                 _alert_clinicos(
                                     context,
                                     "Peso Corporal",
-                                    "El indice de masa corporal (IMC) es un indicador de grasa que hay en el cuerpo." +
+                                    "El índice de masa corporal (IMC) es un indicador de grasa que hay en el cuerpo." +
                                         "Se calcula a partir de la estatura y el peso, y puede indicar si se tiene peso bajo, normal," +
                                         "sobrepeso u obesidad. Tambien puede ayudar a evaluar el riesgo que hay de tener enfermedades que" +
-                                        "ocurren al tener mas grasa corporal." +
+                                        "ocurren al tener más grasa corporal." +
                                         "\n\nRecuerde ingresar su peso en KG por ejemplo: 80 KG.",
                                     1);
                               })
@@ -286,7 +286,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
-                          RegExp('[,]')), // Evitar comas
+                          RegExp('[,*+-/=%]')), // Evitar comas
                     ],
                     decoration: InputDecoration(
                       hintText: '75.5',
@@ -343,7 +343,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     maxLength: 4,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
-                          RegExp('[,]')), // Evitar comas
+                          RegExp('[,*+-/=%]')), // Evitar comas
                     ],
                     decoration: InputDecoration(
                       hintText: '1.70',

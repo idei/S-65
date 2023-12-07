@@ -1041,11 +1041,11 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
       if (data['data'] == "alert") {
         showCustomAlert(
           context,
-          "Screening Terminado",
+          "Chequeo Terminado",
           "",
           true,
           () {
-            _scaffold_messenger(context, "Screening Registrado", 1);
+            _scaffold_messenger(context, "Chequeo Registrado", 1);
 
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
@@ -1058,7 +1058,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
           },
         );
       } else {
-        _scaffold_messenger(context, "Screening Registrado", 1);
+        _scaffold_messenger(context, "Chequeo Registrado", 1);
 
         if (data['status'] == "Success") {
           if (screening_recordatorio == true) {
