@@ -170,6 +170,9 @@ Flight::route('POST /respuesta_screening_cerebral','respuesta_screening_cerebral
 // Register User
 Flight::route('POST /user_register','user_register');
 
+// Register Medico
+Flight::route('POST /medico_register','medico_register');
+
 // Read All Screenings
 Flight::route('POST /screenings','screenings');
 

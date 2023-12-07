@@ -37,7 +37,7 @@
         <!-- Agregado un div para mostrar mensajes de error -->
         <div id="mensaje"></div>
 
-        <form action="../index3.html" method="post">
+        <form action="" method="post">
           <div class="input-group mb-3">
             <input id="email" type="email" class="form-control" placeholder="Correo Electrónico" autocomplete="username">
             <div class="input-group-append">

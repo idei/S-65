@@ -2722,7 +2722,6 @@ function read_tipo_screening()
 
 function verificar($data_input, $tipo)
 {
-
     if (isset($data_input[$tipo])) {
         if ($data_input[$tipo] != "") {
             $tipo = $data_input[$tipo];
@@ -7293,6 +7292,156 @@ function user_register()
                             "estado_users" => $estado_users
                         ]
                     );
+                    $returnData = msg("Success", $lista);
+                } else {
+                    $returnData = msg("Success", "No se pudo realizar el registro");
+                }
+            }
+        }
+    } catch (PDOException $error) {
+
+        $returnData = msg_error("Error", $error->getMessage(), $error->getCode());
+    }
+
+    Flight::json($returnData);
+}
+
+function medico_register()
+{
+
+    $data_input = json_decode(file_get_contents("php://input"), true);
+
+    $returnData = [];
+
+    $apellido = verificar($data_input, "apellido");
+
+    // if (isset($_POST['apellido'])) {
+    //     $apellido = $_POST["apellido"];
+    // } else {
+    //     $apellido = verificar($data_input, "apellido");
+    // }
+
+    if (isset($_POST['nombre'])) {
+        $nombre = $_POST["nombre"];
+    } else {
+        $nombre = verificar($data_input, "nombre");
+    }
+
+
+    if (isset($_POST['email'])) {
+        $email = $_POST["email"];
+    } else {
+        $email = verificar($data_input, "email");
+    }
+
+    if (isset($_POST['password'])) {
+        $password = $_POST["password"];
+    } else {
+        $password = verificar($data_input, "password");
+    }
+
+    if (isset($_POST['dni'])) {
+        $dni = $_POST["dni"];
+    } else {
+        $dni = verificar($data_input, "dni");
+    }
+
+    if (isset($_POST['matricula'])) {
+        $matricula = $_POST["matricula"];
+    } else {
+        $matricula = verificar($data_input, "matricula");
+    }
+
+    if (isset($_POST['especialidad'])) {
+        $especialidad = $_POST["especialidad"];
+    } else {
+        $especialidad = verificar($data_input, "especialidad");
+    }
+
+    $rela_rol = 1;
+
+    try {
+
+        $token = uniqid(random_int(100, 999), true);
+
+        // Limpiar los espacios en blanco
+         $email = trim($email);
+
+        $lista = array();
+
+        $query = "SELECT email FROM users WHERE email = :email";
+        $stmt = Flight::db()->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+        $result = $stmt->rowCount();
+
+
+        $query = "SELECT * FROM medicos WHERE dni = :dni";
+        $stmt_dni = Flight::db()->prepare($query);
+        $stmt_dni->bindParam(":dni", $dni);
+        $stmt_dni->execute();
+        $result_dni = $stmt_dni->rowCount();
+
+        if ($result_dni > 0) {
+        
+        $returnData = msg("Vacio", "Ya existe un médico con ese DNI");
+        Flight::json($returnData);
+        exit;
+        }
+        
+        if ($result == 1) {
+            $lista = "Ya existe un médico con ese EMAIL";
+            
+            $returnData = msg("Vacio", $lista);
+
+        } else {
+
+            $stmt = Flight::db()->prepare('INSERT INTO users(email,password,token,rela_rol) VALUES(?,?,?,?)');
+            $stmt->bindParam(1, $email);
+            $stmt->bindParam(2, $password);
+            $stmt->bindParam(3, $token);
+            $stmt->bindParam(4, $rela_rol);
+
+            $stmt->execute();
+
+            $result = $stmt->rowCount();
+            if ($result) {
+                $select_email = Flight::db()->prepare("SELECT id FROM users WHERE email = '" . $email . "'");
+                $select_email->execute();
+                $rela_users = $select_email->fetch();
+
+                $insert_medico = Flight::db()->prepare('INSERT INTO medicos(rela_users,nombre,apellido,matricula,especialidad,dni)VALUES(?,?,?,?,?,?)');
+
+                $insert_medico->bindParam(1, $rela_users['id']);
+                $insert_medico->bindParam(2, $nombre);
+                $insert_medico->bindParam(3, $apellido);
+                $insert_medico->bindParam(4, $matricula);
+                $insert_medico->bindParam(5, $especialidad);
+                $insert_medico->bindParam(6, $dni);
+
+                $insert_medico->execute();
+
+                $id_medico = Flight::db()->lastInsertId();
+                
+                $insert_medico = $stmt->rowCount();
+                if ($insert_medico) {
+
+                    $lista = array(
+                        "request" => "Success",
+                        "token" => $token,
+                        "email" => $email,
+                        "password" => $password,
+                        "paciente" => [
+                            "id_medico"=>$id_medico,
+                            "rela_users" => $rela_users,
+                            "nombre" => $nombre,
+                            "apellido" => $apellido,
+                            "dni" => $dni,
+                            "especialidad" => $especialidad,
+                            "matricula" => $matricula
+                        ]
+                    );
+    
                     $returnData = msg("Success", $lista);
                 } else {
                     $returnData = msg("Success", "No se pudo realizar el registro");
