@@ -329,7 +329,12 @@ $id_medico = $_SESSION["id_medico"];
                     document.getElementById('button_enviar').style.display = 'none';
                     document.getElementById('mensajeResultado').style.display = 'block';
 
-                    mensajeResultado.innerHTML = '<div class="alert alert-success">Solicitud enviada correctamente</div>';
+                    if (response['data'] == 'Reenviada') {
+                      mensajeResultado.innerHTML = '<div class="alert alert-success">Solicitud renviada correctamente</div>';
+
+                    }else{
+                      mensajeResultado.innerHTML = '<div class="alert alert-success">Solicitud enviada correctamente</div>';
+                    }
 
                     document.getElementById('formulario').style.display = 'none';
 

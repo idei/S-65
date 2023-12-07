@@ -349,7 +349,8 @@ function solicitud_medico_paciente()
                     WHERE rela_paciente=:id_paciente and rela_medico=:id_medico");
 
             $update_solicitud->execute($data);
-            $returnData = msg("Success", []);
+
+            $returnData = msg("Success", ["Reenviada"]);
 
         }else{
             $select_dni_paciente = Flight::db()->prepare("SELECT id FROM `pacientes` WHERE dni = '" . $dni . "'");
