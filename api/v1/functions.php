@@ -216,7 +216,7 @@ function read_pacientes()
         $id_medicos = $select_medicos->fetch();
         $id_medicos = $id_medicos["id"];
 
-        $smt = Flight::db()->prepare("select pacientes.id, dni, nombre, apellido, fecha_nacimiento FROM `pacientes` 
+        $smt = Flight::db()->prepare("select DISTINCT pacientes.id, dni, nombre, apellido, fecha_nacimiento FROM `pacientes` 
         INNER JOIN medicos_pacientes 
         ON medicos_pacientes.rela_paciente = pacientes.id
         WHERE rela_medico = '" . $id_medicos . "' and estado_habilitacion = 2");
