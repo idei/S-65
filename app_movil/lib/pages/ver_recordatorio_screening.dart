@@ -310,7 +310,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_recordatorio_medicos";
     var response = await http.post(url, body: {
-      "id_recordatorio": id_recordatorio,
+      "id_recordatorio": id_recordatorio.toString(),
     });
 
     var jsonDate = json.decode(response.body);

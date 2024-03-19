@@ -5332,7 +5332,7 @@ function tipo_respuesta_quejas()
 }
 
 function tipo_respuesta_animo()
-{
+{ 
     try {
         $stmt = Flight::db()->prepare("SELECT * FROM tipos_respuestas WHERE code IN ('SCER60','SCER61')");
         $stmt->execute();
@@ -6592,9 +6592,9 @@ function respuesta_screening_quejas()
 
     // SELECCION DE EVENTOS
     $select_evento = Flight::db()->prepare("SELECT id,nombre_evento,codigo_evento FROM `eventos` WHERE codigo_evento
-IN ('ATE1','ATE2','ATE3','ATE4','ARI1','ARI2','ARI3','ARI4','FUNE1','FUNE2','FUNE3','FUNE4',
-'MEM1','MEM2','MEM3','MEM4','PYG1','PYG2','PYG3','PYG4','LEN1','LEN2','LEN3','LEN4'
-)");
+ IN ('ATE1','ATE2','ATE3','ATE4','ARI1','ARI2','ARI3','ARI4','FUNE1','FUNE2','FUNE3','FUNE4',
+    'MEM1','MEM2','MEM3','MEM4','PYG1','PYG2','PYG3','PYG4','LEN1','LEN2','LEN3','LEN4'
+    )");
 
     $select_evento->execute();
     $evento = $select_evento->fetchAll();
@@ -9230,6 +9230,13 @@ function update_estado_habilitacion_medico(){
         $id_medico = verificar($data_input, "id_medico");
     }
 
+    // if ($_POST['ids_medicos']) {
+    //     $idMedicos = $_POST['ids_medicos'];
+    //     Flight::json($idMedicos);
+    // } else {
+    //     Flight::json("No");
+    // }
+
     if (isset($_POST['estado_paciente_medico'])) {
         $estado_paciente_medico = $_POST["estado_paciente_medico"];
     } else {
@@ -9237,17 +9244,23 @@ function update_estado_habilitacion_medico(){
     }
 
     try {
-        $data = [
+
+    //  foreach ($idMedicos as $idMedico) {
+    //     Flight::json($idMedico);
+     
+    $data = [
             'id_paciente' => $id_paciente,
             'id_medico' => $id_medico,
             'estado_paciente_medico' => $estado_paciente_medico,
         ];
-        $update_estado_habilitacion = Flight::db()->prepare("UPDATE medicos_pacientes
+    
+    $update_estado_habilitacion = Flight::db()->prepare("UPDATE medicos_pacientes
                     SET estado_habilitacion=:estado_paciente_medico
                     WHERE rela_paciente=:id_paciente and rela_medico=:id_medico");
     
-        $update_estado_habilitacion->execute($data);
+    $update_estado_habilitacion->execute($data);
 
+    //}
         $returnData = msg("Success", []);
 
     } catch (PDOException $error) {
@@ -9501,7 +9514,6 @@ function create_avisos()
         $stmt->execute();
 
         $id_aviso = Flight::db()->lastInsertId();
-
 
         switch ($criterio) {
 

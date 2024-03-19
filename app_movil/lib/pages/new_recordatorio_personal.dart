@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-var email;
+var id_paciente;
 var usuarioModel;
 
 class RecordatorioPersonal extends StatefulWidget {
@@ -37,7 +37,8 @@ class _RecuperarState extends State<RecordatorioPersonal> {
     int changedCount = 0;
 
     usuarioModel = Provider.of<UsuarioServices>(context);
-    email = usuarioModel.usuario.emailUser;
+
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
         appBar: AppBar(
@@ -141,7 +142,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/new_recordatorio_personal";
     var response = await http.post(url, body: {
-      "email": email,
+      "id_paciente": id_paciente.toString(),
       "titulo": tituloController.text,
       "fecha_limite": fechaLimiteController.text,
     });

@@ -50,8 +50,8 @@ class _ListMedicosState extends State<ListMedicos>
     ));
   }
 
-  void _handleAccept(String id_medico) async {
-    bool resultado = await update_estado_habilitacion("2", id_medico);
+  void _handleAccept(var id_medico) async {
+    bool resultado = await update_estado_habilitacion(2, id_medico);
 
     if (resultado) {
       _alert_informe(context, "Médico vinculado correctamente", 1);
@@ -66,8 +66,8 @@ class _ListMedicosState extends State<ListMedicos>
     }
   }
 
-  void _handleCancel(String id_medico) async {
-    bool resultado = await update_estado_habilitacion("0", id_medico);
+  void _handleCancel(var id_medico) async {
+    bool resultado = await update_estado_habilitacion(0, id_medico);
 
     if (resultado) {
       _alert_informe(context, "Médico rechazado correctamente", 1);
@@ -158,13 +158,13 @@ class _ListMedicosState extends State<ListMedicos>
                                         itemCount: snapshot.data
                                             .where((element) =>
                                                 element.estado_habilitacion ==
-                                                "1")
+                                                1)
                                             .length,
                                         itemBuilder: (context, index) {
                                           final element = snapshot.data
                                               .where((element) =>
                                                   element.estado_habilitacion ==
-                                                  "1")
+                                                  1)
                                               .elementAt(index);
                                           id_medico = element.rela_medico;
 
@@ -239,7 +239,7 @@ class _ListMedicosState extends State<ListMedicos>
                     children: ListTile.divideTiles(
                       color: Colors.black,
                       tiles: snapshot.data
-                          .where((data) => data.estado_habilitacion == "2")
+                          .where((data) => data.estado_habilitacion == 2)
                           .map((data) => ListTile(
                                 title: GestureDetector(
                                   onTap: () {},
@@ -320,15 +320,15 @@ class _ListMedicosState extends State<ListMedicos>
     ));
   }
 
-  update_estado_habilitacion(String estado, String id_medico) async {
+  update_estado_habilitacion(var estado, var id_medico) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/update_estado_habilitacion_medico";
     var response = await http.post(
       url,
       body: {
         "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico,
-        "estado_paciente_medico": estado,
+        "id_medico": id_medico.toString(),
+        "estado_paciente_medico": estado.toString(),
       },
     );
 
@@ -362,7 +362,7 @@ Future<List<MedicoModel>> fetchMedicos() async {
     }
 
     bool buscarPorNombreMedico(List<MedicoModel> listaMedicos) {
-      return listaMedicos.any((medico) => medico.estado_habilitacion == "1");
+      return listaMedicos.any((medico) => medico.estado_habilitacion == 1);
     }
 
     if (buscarPorNombreMedico(medicos_items)) {

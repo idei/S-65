@@ -240,7 +240,7 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                   if (_formKey_add_medicamento.currentState.validate() &&
                       data_id != null &&
                       !_isLoading) {
-                    _startLoading(int.parse(data_id), dosis_frecuencia.text);
+                    _startLoading(data_id, dosis_frecuencia.text);
                   } else {
                     null;
                   }

@@ -121,8 +121,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     keyboardType: TextInputType.number,
                     maxLength: 3, // Establecer el número máximo de caracteres
                     inputFormatters: [
-                      FilteringTextInputFormatter.deny(
-                          RegExp('[,*+-/=%]')), // Evitar comas
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                     ],
                     decoration: InputDecoration(
                       hintText: '95',
@@ -171,8 +170,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _presion_baja,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter.deny(
-                          RegExp('[,*+-/=%]')), // Evitar comas
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                     ],
                     maxLength: 2, // Establecer el número máximo de caracteres
                     decoration: InputDecoration(
@@ -226,8 +224,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     maxLength: 3,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter.deny(
-                          RegExp('[,*+-/=%]')), // Evitar comas
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                     ],
                     decoration: InputDecoration(
                       hintText: '80',
@@ -285,8 +282,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     controller: _peso_corporal,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter.deny(
-                          RegExp('[,*+-/=%]')), // Evitar comas
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                     ],
                     decoration: InputDecoration(
                       hintText: '75.5',
@@ -342,8 +338,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     keyboardType: TextInputType.number,
                     maxLength: 4,
                     inputFormatters: [
-                      FilteringTextInputFormatter.deny(
-                          RegExp('[,*+-/=%]')), // Evitar comas
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                     ],
                     decoration: InputDecoration(
                       hintText: '1.70',
@@ -404,6 +399,9 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
                     decoration: InputDecoration(
                       hintText: '90',
                     ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    ],
                     onChanged: (text) {
                       print("Debe completar el campo");
                     },
@@ -467,15 +465,13 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     if (this.mounted) {
       setState(() {
         dataRespuestas = jsonDate;
       });
     }
-    print(jsonDate);
   }
 
   Widget CardGenerico(StatefulWidget widget, String pregunta) {
@@ -1088,7 +1084,7 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
     var jsonDate = json.decode(jsonBody);
     if (this.mounted) {
       setState(() {
-        data = jsonDate;
+        data = jsonDate['data'];
       });
     }
     print(jsonDate);

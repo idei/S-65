@@ -13,14 +13,14 @@ class DepartamentoModel extends InheritedWidget {
   Map<String, dynamic> get map {
     return {
       "id": idDepartamento,
-      "nombre": nombreDepartamento,
+      "nombre_departamento": nombreDepartamento,
     };
   }
 
   factory DepartamentoModel.fromJson(Map<String, dynamic> json) {
     return DepartamentoModel(
       idDepartamento: json['id'].toString(),
-      nombreDepartamento: json['nombre'].toString(),
+      nombreDepartamento: json['nombre_departamento'].toString(),
     );
   }
 

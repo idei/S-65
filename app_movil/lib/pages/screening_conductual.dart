@@ -128,7 +128,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
       if (parametros["bandera"] == "screening_nuevo") {
         screening_recordatorio = false;
         id_paciente = id_paciente;
-        id_recordatorio = null;
+        id_recordatorio = "null";
         id_medico = null;
       }
     }
@@ -140,9 +140,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     var response = await http.post(url, body: {
       "codigo_screening": codigo_screening,
     });
-    print(response);
+
     var jsonDate = json.decode(response.body);
-    print(jsonDate);
+
     tipo_screening = jsonDate;
   }
 

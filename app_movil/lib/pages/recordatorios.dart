@@ -67,7 +67,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
                         .map((data) => ListTile(
                               title: GestureDetector(
                                   onTap: () {
-                                    if (data.estado_recordatorio == "0") {
+                                    if (data.estado_recordatorio == "4") {
                                       Navigator.of(context).pushNamed(
                                           '/ver_recordatorio_personal',
                                           arguments: {
@@ -227,7 +227,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/recordatorios";
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente,
+      "id_paciente": id_paciente.toString(),
     });
     responseDecode = json.decode(response.body);
 
@@ -244,21 +244,4 @@ class _RecordatorioState extends State<RecordatorioPage> {
       return null;
     }
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

@@ -34,7 +34,7 @@ Flight::route('POST /datos_clinicos', 'read_datos_clinicos');
 
 // Read Datos Clinicos
 Flight::route('POST /read_datos_clinicos_paciente', 'read_datos_clinicos_paciente');
-
+ 
 // Read Datos Personales
 Flight::route('POST /datos_personales', 'read_datos_personales');
 

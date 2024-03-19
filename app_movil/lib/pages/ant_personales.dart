@@ -1,3 +1,4 @@
+import 'package:app_salud/pages/datosCli_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'dart:convert';
@@ -12,8 +13,8 @@ class AntecedentesPerPage extends StatefulWidget {
   _AntecedentesPerState createState() => _AntecedentesPerState();
 }
 
-String email;
 var usuarioModel;
+String id_paciente;
 
 class _AntecedentesPerState extends State<AntecedentesPerPage> {
   bool isLoading = false;
@@ -29,7 +30,7 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
     usuarioModel = Provider.of<UsuarioServices>(context);
     final isTablet = Device.get().isTablet;
 
-    email = usuarioModel.usuario.emailUser;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente.toString();
 
     final size = MediaQuery.of(context).size;
 
@@ -189,9 +190,7 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/form_antecedentes_personales',
-                    arguments: {
-                      "email": email,
-                    });
+                    arguments: {});
               },
               child: CircleAvatar(
                 radius: sizeCircle,
@@ -218,8 +217,11 @@ class _AntecedentesPerState extends State<AntecedentesPerPage> {
   Future<List<AntecedentesPersonalesModel>>
       fetchAntecedentesPersonales() async {
     String URL_base = Env.URL_API;
-    var url = URL_base + "/antecedentes_personales_paciente";
-    var response = await http.post(url, body: {"email": email});
+    var url = URL_base + "/antecedentes_paciente";
+    var response = await http.post(
+      url,
+      body: {"id_paciente": id_paciente, "tipo_antecedente": "1"},
+    );
     var responseDecode = jsonDecode(response.body);
 
     if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {

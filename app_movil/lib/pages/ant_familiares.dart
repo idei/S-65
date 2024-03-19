@@ -12,7 +12,7 @@ class AntecedentesFamiliarPage extends StatefulWidget {
   _AntecedentesFamiliarState createState() => _AntecedentesFamiliarState();
 }
 
-String email;
+String id_paciente;
 var usuarioModel;
 
 class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
@@ -29,7 +29,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
 
-    email = usuarioModel.usuario.emailUser;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente.toString();
 
     final size = MediaQuery.of(context).size;
     var sizeCircle;
@@ -188,9 +188,7 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/form_antecedentes_familiares',
-                    arguments: {
-                      "email": email,
-                    });
+                    arguments: {});
               },
               child: CircleAvatar(
                 radius: sizeCircle,
@@ -226,8 +224,11 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
 
   Future<List<AntecedenteFamiliaresModel>> fetchAntecedentesFamiliares() async {
     String URL_base = Env.URL_API;
-    var url = URL_base + "/antecedentes_familiares_paciente";
-    var response = await http.post(url, body: {"email": email});
+    var url = URL_base + "/antecedentes_paciente";
+    var response = await http.post(
+      url,
+      body: {"id_paciente": id_paciente, "tipo_antecedente": "2"},
+    );
     var responseDecode = jsonDecode(response.body);
 
     if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {

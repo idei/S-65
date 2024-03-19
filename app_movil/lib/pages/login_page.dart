@@ -1,7 +1,9 @@
 import 'package:app_salud/models/usuario_model.dart';
 import 'package:app_salud/services/departamento_service.dart';
+import 'package:app_salud/services/device_utils.dart';
 import 'package:app_salud/services/genero_service.dart';
 import 'package:app_salud/services/grupo_conviviente_service.dart';
+import 'package:app_salud/services/login_service.dart';
 import 'package:app_salud/services/nivel_educativo_service.dart';
 import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,7 @@ class _LoginPage extends State<LoginPage> {
   String estado_read_date;
   String estado_login;
   var _obscureText = true;
+  String _errorMessage;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,19 +91,20 @@ class _LoginPage extends State<LoginPage> {
 
   fetchLogin() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final deviceName = await DeviceUtils.getDeviceName();
+    var responseBody;
 
     String URL_base = Env.URL_API;
 
-    var url = URL_base + "/login_paciente";
+    var url = URL_base + "/login";
 
     var response = await http.post(url, body: {
       "email": email.text,
       "password": password.text,
     });
 
-    var responseBody = json.decode(response.body);
-
     if (response.statusCode == 200) {
+      responseBody = json.decode(response.body);
       if (responseBody['status'] == "Success") {
         Map userMap = responseBody;
         var usuarioModel = UsuarioModel.fromJsonLogin(userMap);
@@ -136,6 +140,7 @@ class _LoginPage extends State<LoginPage> {
         }
         loginToast('Cargando información');
       }
+
       if (responseBody['status'] == 'Fail Session') {
         _alert_informe(context, 'Usuario o contraseña incorrectos', 2);
       }

@@ -331,14 +331,14 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
       responseDecoder = json.decode(response.body);
 
       if (responseDecoder['status'] == "Success") {
-        if (int.parse(responseDecoder['data']) >= 9) {
+        if (responseDecoder['data'] >= 9) {
           _alert_informe(
             context,
             "Para tener en cuenta",
             "Usted tiene algunos síntomas del estado del ánimo de los cuales ocuparse, le sugerimos que realice una consulta psiquiátrica o que converse sobre estos síntomas con su médico de cabecera. ",
           );
         } else {
-          if (int.parse(responseDecoder['data']) < 9) {
+          if (responseDecoder['data'] < 9) {
             _alert_informe(
               context,
               "Para tener en cuenta",

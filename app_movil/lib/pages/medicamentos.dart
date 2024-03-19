@@ -137,7 +137,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     ),
                                     onPressed: () {
                                       _showAlertDialog(
-                                        int.parse(data.id_medicamento),
+                                        data.id_medicamento,
                                         data.dosis_frecuencia,
                                         1,
                                       );
@@ -338,13 +338,14 @@ class _MedicamentoState extends State<MedicamentoPage> {
     //String URL_base = Env.URL_PREFIX;
     String URL_base = Env.URL_API;
     var url = URL_base + "/medicamentos";
+    var responseDecode;
+
     var response = await http.post(url, body: {
-      "email": email_argument,
+      "id_paciente": id_paciente.toString(),
     });
 
-    var responseDecode = jsonDecode(response.body);
-
     if (response.statusCode == 200) {
+      responseDecode = jsonDecode(response.body);
       if (responseDecode['status'] != "Vacio") {
         final List<MedicamentoModel> listMedicamentos = [];
 

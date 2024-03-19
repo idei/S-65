@@ -13,7 +13,6 @@ var id_medico;
 var tipo_screening;
 var id_recordatorio;
 var screening_recordatorio;
-var email;
 var usuarioModel;
 
 class ScreeningADLQPage extends StatefulWidget {
@@ -110,7 +109,6 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
   getStringValuesSF() async {
     usuarioModel = Provider.of<UsuarioServices>(context);
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
-    email = usuarioModel.usuario.emailUser;
 
     Map parametros = ModalRoute.of(context).settings.arguments;
 

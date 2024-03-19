@@ -13,7 +13,7 @@ class FormAntecedentesPersonales extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
-var email;
+var id_paciente;
 var usuarioModel;
 
 class _FormpruebaState extends State<FormAntecedentesPersonales> {
@@ -33,7 +33,8 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
-    email = usuarioModel.usuario.emailUser;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente.toString();
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -98,9 +99,10 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
     final completer = Completer<dynamic>();
 
     String URL_base = Env.URL_API;
-    var url = URL_base + "/user_read_antc_personales";
+    var url = URL_base + "/antecedentes_medicos";
     var response = await http.post(url, body: {
-      "email": email,
+      "id_paciente": id_paciente,
+      "tipo_antecedente": "1",
       "cod_event_retraso": cod_event_retraso,
       "cod_event_desorden": cod_event_desorden,
       "cod_event_deficit": cod_event_deficit,
@@ -129,55 +131,52 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
       if (responseData["status"] == "Success") {
         var data = responseData['data'];
 
-        valueNotifierRetrasoMental.value =
-            data["retraso"] == "1" ? true : false;
+        valueNotifierRetrasoMental.value = data["retraso"] == 1 ? true : false;
 
-        valueNotifierDesorden.value = data["desorden"] == "1" ? true : false;
+        valueNotifierDesorden.value = data["desorden"] == 1 ? true : false;
 
-        valueNotifierDeficit.value = data["deficit"] == "1" ? true : false;
+        valueNotifierDeficit.value = data["deficit"] == 1 ? true : false;
 
         valueNotifierLesiones_cabeza.value =
-            data["lesiones_cabeza"] == "1" ? true : false;
+            data["lesiones_cabeza"] == 1 ? true : false;
 
-        valueNotifierPerdidas.value = data["perdidas"] == "1" ? true : false;
+        valueNotifierPerdidas.value = data["perdidas"] == 1 ? true : false;
 
         valueNotifierAccidentes_caidas.value =
-            data["accidentes_caidas"] == "1" ? true : false;
+            data["accidentes_caidas"] == 1 ? true : false;
 
         valueNotifierLesiones_espalda.value =
-            data["lesiones_espalda"] == "1" ? true : false;
+            data["lesiones_espalda"] == 1 ? true : false;
 
         valueNotifierInfecciones.value =
-            data["infecciones"] == "1" ? true : false;
+            data["infecciones"] == 1 ? true : false;
 
-        valueNotifierToxinas.value = data["toxinas"] == "1" ? true : false;
+        valueNotifierToxinas.value = data["toxinas"] == 1 ? true : false;
 
-        valueNotifierAcv.value = data["acv"] == "1" ? true : false;
+        valueNotifierAcv.value = data["acv"] == 1 ? true : false;
 
-        valueNotifierDemencia.value = data["demencia"] == "1" ? true : false;
+        valueNotifierDemencia.value = data["demencia"] == 1 ? true : false;
 
-        valueNotifierParkinson.value = data["parkinson"] == "1" ? true : false;
+        valueNotifierParkinson.value = data["parkinson"] == 1 ? true : false;
 
-        valueNotifierEpilepsia.value = data["epilepsia"] == "1" ? true : false;
+        valueNotifierEpilepsia.value = data["epilepsia"] == 1 ? true : false;
 
-        valueNotifierEsclerosis.value =
-            data["esclerosis"] == "1" ? true : false;
+        valueNotifierEsclerosis.value = data["esclerosis"] == 1 ? true : false;
 
-        valueNotifierHuntington.value =
-            data["huntington"] == "1" ? true : false;
+        valueNotifierHuntington.value = data["huntington"] == 1 ? true : false;
 
-        valueNotifierDepresion.value = data["depresion"] == "1" ? true : false;
+        valueNotifierDepresion.value = data["depresion"] == 1 ? true : false;
 
-        valueNotifierTrastorno.value = data["trastorno"] == "1" ? true : false;
+        valueNotifierTrastorno.value = data["trastorno"] == 1 ? true : false;
 
         valueNotifierEsquizofrenia.value =
-            data["esquizofrenia"] == "1" ? true : false;
+            data["esquizofrenia"] == 1 ? true : false;
 
         valueNotifierEnfermedad_desorden.value =
-            data["enfermedad_desorden"] == "1" ? true : false;
+            data["enfermedad_desorden"] == 1 ? true : false;
 
         valueNotifierIntoxicaciones.value =
-            data["intoxicaciones"] == "1" ? true : false;
+            data["intoxicaciones"] == 1 ? true : false;
 
         completer.complete(true);
       } else {
@@ -271,9 +270,10 @@ class AntecedentesWidgetState extends State<Antecedentes> {
 
   guardar_datos(BuildContext context) async {
     String URL_base = Env.URL_API;
-    var url = URL_base + "/save_antec_personales";
+    var url = URL_base + "/save_antecedentes";
     var response = await http.post(url, body: {
-      "email": email,
+      "id_paciente": id_paciente,
+      "tipo_antecedente": "1",
       "retraso": valueNotifierRetrasoMental.value.toString(),
       "desorden": valueNotifierDesorden.value.toString(),
       "deficit": valueNotifierDeficit.value.toString(),

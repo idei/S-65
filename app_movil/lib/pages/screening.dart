@@ -274,7 +274,7 @@ class _ScreeningState extends State<ScreeningPage> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_screenings";
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente,
+      "id_paciente": id_paciente.toString(),
       "select_screening": select_screening,
     });
     data = json.decode(response.body);
