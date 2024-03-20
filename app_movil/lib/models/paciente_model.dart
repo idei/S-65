@@ -58,7 +58,7 @@ class PacienteModel {
   factory PacienteModel.fromJsonFromRegisterInitial(Map<String, dynamic> json) {
     return PacienteModel(
       id_paciente: json['id_paciente'],
-      rela_users: json['rela_users']['id'].toString(),
+      rela_users: json['rela_users'].toString(),
       nombre: json['nombre'],
       apellido: json['apellido'],
       dni: json['dni'],
@@ -82,7 +82,7 @@ class PacienteModel {
       celular_contacto: json['celular_contacto'],
       estado_users: json['estado_users'],
       //-----------
-      id_paciente: json['id_paciente'],
+      id_paciente: json['id_paciente']['id'],
       rela_users: json['rela_users'].toString(),
       nombre: json['nombre'],
       apellido: json['apellido'],

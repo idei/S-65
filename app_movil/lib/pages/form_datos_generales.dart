@@ -657,19 +657,15 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
       }
     }
 
-    print(fechaSelect);
-
-    String pepe = fecha_paciente.toString();
-
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_personales";
 
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente,
+      "id_paciente": id_paciente.toString(),
       "nombre": nombre_paciente,
       "apellido": apellido_paciente,
       "dni": dni_paciente,
-      "fecha_nacimiento": pepe,
+      "fecha_nacimiento": fecha_paciente.toString(),
       "email": email_argument.toString(),
       "rela_genero": rela_genero,
       "rela_departamento": rela_depto,

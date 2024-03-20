@@ -33,13 +33,6 @@ class _FormRegisterState extends State<RegisterPage> {
 
   @override
   void initState() {
-    super.initState();
-    // emailPaciente.clear();
-    // passwordNuevo.clear();
-    // nombrePaciente.clear();
-    // apellidoPaciente.clear();
-    // passwordRepetido.clear();
-    // dni.clear();
     emailPaciente.text = '';
     passwordNuevo.text = '';
     nombrePaciente.text = '';
@@ -79,7 +72,7 @@ class _FormRegisterState extends State<RegisterPage> {
                   SizedBox(height: 10),
                   _crearDNI(),
                   SizedBox(height: 10),
-                  _crearCheck(),
+                  CheckBoxCondiciones(),
                   SizedBox(height: 10),
                   _crearBotonRegistrar(context),
                   SizedBox(height: 10),
@@ -90,65 +83,6 @@ class _FormRegisterState extends State<RegisterPage> {
             ),
           ),
         ));
-  }
-
-  registerPaciente() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/user_register";
-    var response = await http.post(url, body: {
-      "email": emailPaciente.text,
-      "password": passwordNuevo.text,
-      "nombre": nombrePaciente.text,
-      "apellido": apellidoPaciente.text,
-      "dni": dni.text,
-    });
-
-    var responseDecoder = json.decode(response.body);
-
-    if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
-      Map userMap = json.decode(response.body);
-      var newUsuarioModel = UsuarioModel.fromJson(userMap);
-
-      final usuarioService =
-          Provider.of<UsuarioServices>(context, listen: false);
-      usuarioService.usuario = newUsuarioModel;
-      //---------------------------
-
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.login();
-
-      await Provider.of<DepartamentoServices>(context, listen: false)
-          .loadDepartamentos();
-      await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
-      await Provider.of<NivelEducativoService>(context, listen: false)
-          .loadNivelEducativo();
-      await Provider.of<GrupoConvivienteServices>(context, listen: false)
-          .loadGrupoConviviente();
-
-      Navigator.pushNamed(context, '/form_datos_generales', arguments: {
-        'nombre': newUsuarioModel.paciente.nombre,
-        "apellido": apellidoPaciente.text,
-        "dni": dni.text,
-        "email": emailPaciente.text,
-        "bandera": 1,
-      });
-    } else {
-      if (responseDecoder['status'] == "Vacio") {
-        _alert_informe(context, responseDecoder['data'], 2);
-      } else {
-        var error = response.statusCode + responseDecoder['data'];
-        loginToast(error.toString());
-      }
-    }
-  }
-
-  loginToast(String toast) {
-    return Fluttertoast.showToast(
-        msg: toast,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white);
   }
 
   Widget _crearCheck() {
@@ -167,12 +101,6 @@ class _FormRegisterState extends State<RegisterPage> {
               decoration: TextDecoration.underline,
               fontSize: 15,
               fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-      // ElevatedButton(
-      //   onPressed: () {
-      //     _mostrarPDF(context);
-      //   },
-      //   child: Text('Abrir Términos y Condiciones'),
-      // )
     ]);
   }
 
@@ -396,20 +324,6 @@ class _FormRegisterState extends State<RegisterPage> {
     );
   }
 
-  void _startLoading() async {
-    setState(() {
-      _isLoading = true;
-      _isEnabled = false;
-    });
-
-    await registerPaciente();
-
-    setState(() {
-      _isLoading = false;
-      _isEnabled = true;
-    });
-  }
-
   Widget _crearBotonRegresar(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
@@ -429,5 +343,115 @@ class _FormRegisterState extends State<RegisterPage> {
         Navigator.popAndPushNamed(context, '/');
       },
     );
+  }
+
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+      _isEnabled = false;
+    });
+
+    await registerPaciente();
+
+    setState(() {
+      _isLoading = false;
+      _isEnabled = true;
+    });
+  }
+
+  registerPaciente() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/register_paciente";
+    var response = await http.post(url, body: {
+      "email": emailPaciente.text,
+      "password": passwordNuevo.text,
+      "nombre": nombrePaciente.text,
+      "apellido": apellidoPaciente.text,
+      "dni": dni.text,
+    });
+
+    var responseDecoder = json.decode(response.body);
+
+    if (responseDecoder['status'] == "Success" && response.statusCode == 200) {
+      Map userMap = json.decode(response.body);
+      var newUsuarioModel = UsuarioModel.fromJson(userMap);
+
+      final usuarioService =
+          Provider.of<UsuarioServices>(context, listen: false);
+      usuarioService.usuario = newUsuarioModel;
+      //---------------------------
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.login();
+
+      await Provider.of<DepartamentoServices>(context, listen: false)
+          .loadDepartamentos();
+      await Provider.of<GeneroServices>(context, listen: false).loadGeneros();
+      await Provider.of<NivelEducativoService>(context, listen: false)
+          .loadNivelEducativo();
+      await Provider.of<GrupoConvivienteServices>(context, listen: false)
+          .loadGrupoConviviente();
+
+      Navigator.pushNamed(context, '/form_datos_generales', arguments: {
+        'nombre': nombrePaciente.text,
+        "apellido": apellidoPaciente.text,
+        "dni": dni.text,
+        "email": emailPaciente.text,
+        "bandera": 1,
+      });
+    } else {
+      if (responseDecoder['status'] == "Vacio") {
+        _alert_informe(context, responseDecoder['data'], 2);
+      } else {
+        var error = response.statusCode + responseDecoder['data'];
+        loginToast(error.toString());
+      }
+    }
+  }
+
+  loginToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white);
+  }
+}
+
+class CheckBoxCondiciones extends StatefulWidget {
+  CheckBoxCondiciones({Key key}) : super(key: key);
+
+  @override
+  State<CheckBoxCondiciones> createState() => _CheckBoxCondicionesState();
+}
+
+class _CheckBoxCondicionesState extends State<CheckBoxCondiciones> {
+  bool acepto;
+
+  @override
+  void initState() {
+    acepto = false;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: <Widget>[
+      Checkbox(
+        value: acepto,
+        onChanged: (value) {
+          setState(() {
+            acepto = value;
+          });
+        },
+      ),
+      Text('Acepto términos y condiciones',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+              fontSize: 15,
+              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+    ]);
   }
 }

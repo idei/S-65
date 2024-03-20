@@ -16,7 +16,7 @@ class FormDatosClinicos extends StatefulWidget {
 }
 
 class _FormDatosClinicosState extends State<FormDatosClinicos> {
-  List dataRespuestas;
+  List<dynamic> dataRespuestas;
 
   GlobalKey<FormState> _formKey_datos_clinicos = GlobalKey<FormState>();
 
@@ -33,7 +33,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   @override
   void initState() {
     super.initState();
-    getAllRespuesta();
+    // getAllRespuesta();
   }
 
   @override
@@ -460,19 +460,19 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
     });
   }
 
-  getAllRespuesta() async {
-    // String URL_base = Env.URL_API;
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/respuesta_datos_clinicos";
-    var response = await http.post(url, body: {});
+  // getAllRespuesta() async {
+  //   // String URL_base = Env.URL_API;
+  //   String URL_base = Env.URL_API;
+  //   var url = URL_base + "/respuesta_datos_clinicos";
+  //   var response = await http.post(url, body: {});
 
-    var jsonDate = json.decode(response.body);
-    if (this.mounted) {
-      setState(() {
-        dataRespuestas = jsonDate;
-      });
-    }
-  }
+  //   var jsonDate = json.decode(response.body);
+  //   if (this.mounted) {
+  //     setState(() {
+  //       dataRespuestas = jsonDate;
+  //     });
+  //   }
+  // }
 
   Widget CardGenerico(StatefulWidget widget, String pregunta) {
     return Card(
@@ -854,15 +854,13 @@ class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     if (this.mounted) {
       setState(() {
-        data = jsonDate;
+        data = jsonDate['data'];
       });
     }
-    print(jsonDate);
   }
 
   @override
@@ -968,11 +966,11 @@ class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     if (this.mounted) {
       setState(() {
-        data = jsonDate;
+        data = jsonDate['data'];
       });
     }
   }
@@ -1079,15 +1077,13 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     if (this.mounted) {
       setState(() {
         data = jsonDate['data'];
       });
     }
-    print(jsonDate);
   }
 
   @override
@@ -1192,12 +1188,11 @@ class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
-    print(response);
-    var jsonBody = response.body;
-    var jsonDate = json.decode(jsonBody);
+
+    var jsonDate = json.decode(response.body);
     if (this.mounted) {
       setState(() {
-        data = jsonDate;
+        data = jsonDate['data'];
       });
     }
   }
@@ -1233,13 +1228,4 @@ class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
       ),
     );
   }
-}
-
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
 }

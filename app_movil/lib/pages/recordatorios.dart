@@ -14,7 +14,6 @@ class RecordatorioPage extends StatefulWidget {
 
 List<RecordatoriosModel> recordatorios_items;
 bool _isLoading = false;
-var email_argument;
 var usuarioModel;
 var id_paciente;
 
@@ -23,7 +22,6 @@ class _RecordatorioState extends State<RecordatorioPage> {
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
-    email_argument = usuarioModel.usuario.emailUser;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(

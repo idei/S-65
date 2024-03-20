@@ -16,14 +16,14 @@ class Avisos extends StatefulWidget {
 List<AvisosModel> avisos_items;
 bool _isLoading = false;
 var usuarioModel;
-var id_paciente_argument;
+var id_paciente;
 
 class _AvisosState extends State<Avisos> {
   var responseDecode;
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
-    id_paciente_argument = usuarioModel.usuario.paciente.id_paciente;
+    id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
       appBar: AppBar(
@@ -230,7 +230,7 @@ class _AvisosState extends State<Avisos> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/avisos_paciente";
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente_argument.toString(),
+      "id_paciente": id_paciente.toString(),
     });
     responseDecode = json.decode(response.body);
 
