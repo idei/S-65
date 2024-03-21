@@ -12,12 +12,12 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-TextEditingController dosis_frecuencia = TextEditingController();
+TextEditingController dosis = TextEditingController();
+TextEditingController frecuencia = TextEditingController();
 
 class _MedicamentoState extends State<MedicamentoPage> {
   var data;
   bool isLoading = false;
-  var email_argument;
   var usuarioModel;
   var id_paciente;
   double sizeIconEditar;
@@ -30,7 +30,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
 
-    email_argument = usuarioModel.usuario.emailUser;
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     if (isTablet) {
@@ -93,12 +92,27 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                         .textTheme
                                         .headline1
                                         .fontFamily)),
-                            subtitle: Text(data.dosis_frecuencia,
-                                style: TextStyle(
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
+                            subtitle: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text("Dosis: " + data.dosis,
+                                    textAlign: TextAlign
+                                        .right, // Alinea el texto a la derecha
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                                Text("Frecuencia: " + data.frecuencia,
+                                    textAlign: TextAlign
+                                        .right, // Alinea el texto a la derecha
+                                    style: TextStyle(
+                                        fontFamily: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .fontFamily)),
+                              ],
+                            ),
                             trailing: Wrap(children: [
                               // CircleAvatar(
                               //   radius: MediaQuery.of(context).size.width /
@@ -138,7 +152,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     onPressed: () {
                                       _showAlertDialog(
                                         data.id_medicamento,
-                                        data.dosis_frecuencia,
+                                        data.dosis,
+                                        data.frecuencia,
                                         1,
                                       );
                                     },
@@ -166,8 +181,9 @@ class _MedicamentoState extends State<MedicamentoPage> {
                                     ),
                                     onPressed: () {
                                       _showAlertDialog(
-                                        int.parse(data.id_medicamento),
-                                        data.dosis_frecuencia,
+                                        data.id_medicamento,
+                                        data.dosis,
+                                        data.frecuencia,
                                         2,
                                       );
                                     },
@@ -216,108 +232,6 @@ class _MedicamentoState extends State<MedicamentoPage> {
                   ],
                 ));
               }
-
-              // if (snapshot.hasData) {
-              //   return ListView(
-              //     children: ListTile.divideTiles(
-              //       color: Colors.black26,
-              //       tiles: snapshot.data
-              //           .map((data) => ListTile(
-              //                 title: ListTile(
-              //                   leading: Icon(
-              //                     Icons.arrow_right_rounded,
-              //                     color: Colors.blue,
-              //                     size: 38.0,
-              //                   ),
-              //                   title: Text(data.nombre_comercial,
-              //                       style: TextStyle(
-              //                           overflow: TextOverflow.clip,
-              //                           fontFamily: Theme.of(context)
-              //                               .textTheme
-              //                               .headline1
-              //                               .fontFamily)),
-              //                   subtitle: Text(data.dosis_frecuencia,
-              //                       style: TextStyle(
-              //                           fontFamily: Theme.of(context)
-              //                               .textTheme
-              //                               .headline1
-              //                               .fontFamily)),
-              //                   trailing: Wrap(children: [
-              //                     CircleAvatar(
-              //                       radius: MediaQuery.of(context).size.width /
-              //                           radiusIconEditar,
-              //                       backgroundColor: Colors.blue,
-              //                       child: IconButton(
-              //                         icon: Icon(
-              //                           Icons.edit,
-              //                           color: Colors.white,
-              //                           size: sizeIconEditar,
-              //                         ),
-              //                         onPressed: () {
-              //                           _showAlertDialog(
-              //                             int.parse(data.id_medicamento),
-              //                             data.dosis_frecuencia,
-              //                             1,
-              //                           );
-              //                         },
-              //                       ),
-              //                     ),
-              //                     SizedBox(
-              //                       width: 25,
-              //                     ),
-              //                     CircleAvatar(
-              //                       radius: MediaQuery.of(context).size.width /
-              //                           radiusIconDelete,
-              //                       backgroundColor: Colors.red,
-              //                       child: IconButton(
-              //                         icon: Icon(
-              //                           Icons.delete,
-              //                           size: sizeIconDelete,
-              //                         ),
-              //                         color: Colors.white,
-              //                         onPressed: () {
-              //                           _showAlertDialog(
-              //                             int.parse(data.id_medicamento),
-              //                             data.dosis_frecuencia,
-              //                             2,
-              //                           );
-              //                         },
-              //                       ),
-              //                     ),
-              //                   ]),
-              //                 ),
-              //               ))
-              //           .toList(),
-              //     ).toList(),
-              //   );
-              // } else {
-              //   if (!isLoading) {
-              //     return Container(
-              //       alignment: Alignment.center,
-              //       child: Positioned(
-              //         child: _isLoadingIcon(),
-              //       ),
-              //     );
-              //   } else {
-              //     return Container(
-              //         child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         ListTile(
-              //             title: Text(
-              //           'No tiene medicamentos registrados',
-              //           textAlign: TextAlign.center,
-              //           style: TextStyle(
-              //               fontWeight: FontWeight.bold,
-              //               fontFamily: Theme.of(context)
-              //                   .textTheme
-              //                   .headline1
-              //                   .fontFamily),
-              //         )),
-              //       ],
-              //     ));
-              //   }
-              // }
             },
           ),
         ),
@@ -363,11 +277,12 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 
   guardarFrecuenciaMedicamento(
-      int id_medicamento, String dosis_frecuencia) async {
+      int id_medicamento, String dosis, String frecuencia) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_dosis_frecuencia";
     var response = await http.post(url, body: {
-      "dosis_frecuencia": dosis_frecuencia,
+      "dosis": dosis,
+      "frecuencia": frecuencia,
       "id_medicamento": id_medicamento.toString(),
       "id_paciente": id_paciente.toString(),
     });
@@ -375,29 +290,46 @@ class _MedicamentoState extends State<MedicamentoPage> {
     print(response.body);
   }
 
-  void _showAlertDialog(
-      int id_medicamento, String data_frecuencia, int button_pressed) {
-    dosis_frecuencia.text = data_frecuencia.toString();
+  void _showAlertDialog(int id_medicamento, String data_dosis,
+      String data_frecuencia, int button_pressed) {
+    dosis.text = data_dosis.toString();
+    frecuencia.text = data_frecuencia.toString();
     showDialog(
         context: context,
         builder: (buildcontext) {
           if (button_pressed == 1) {
             return AlertDialog(
-              title: Text("Ingrese dosis y frecuencia",
+              title: Text("Editar dosis y/o frecuencia",
                   style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily)),
-              content: TextFormField(
-                controller: dosis_frecuencia,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Por favor ingrese los datos';
-                  }
-                  return null;
-                },
-                onChanged: (text) {
-                  print("Debe completar el campo");
-                },
+              content: Column(
+                children: [
+                  TextFormField(
+                    controller: dosis,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Por favor ingrese la dosis';
+                      }
+                      return null;
+                    },
+                    onChanged: (text) {
+                      print("Debe completar el campo");
+                    },
+                  ),
+                  TextFormField(
+                    controller: frecuencia,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Por favor ingrese la frecuencia';
+                      }
+                      return null;
+                    },
+                    onChanged: (text) {
+                      print("Debe completar el campo");
+                    },
+                  ),
+                ],
               ),
               actions: <Widget>[
                 Center(
@@ -412,7 +344,10 @@ class _MedicamentoState extends State<MedicamentoPage> {
                     ),
                     onPressed: () {
                       guardarFrecuenciaMedicamento(
-                          id_medicamento, dosis_frecuencia.text);
+                        id_medicamento,
+                        dosis.text,
+                        frecuencia.text,
+                      );
                       Navigator.popAndPushNamed(context, "/medicamentos");
                     },
                   ),

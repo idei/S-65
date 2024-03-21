@@ -209,7 +209,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
             ),
           ),
         ),
-        title: Text(data.descripcion.toUpperCase(),
+        title: Text((data.descripcion ?? "Sin Descripción").toUpperCase(),
             maxLines: 4,
             style: TextStyle(
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),

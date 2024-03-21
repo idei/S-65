@@ -73,7 +73,7 @@ class _MenuChequeoState extends State<MenuChequeoPage> {
                             ),
                             SizedBox(height: 8.0),
                             Text(
-                              "CONDUCTUAL",
+                              "COMPORTAMIENTOS",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14.0,

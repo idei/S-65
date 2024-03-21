@@ -142,7 +142,7 @@ class _DatosClinicosState extends State<DatosClinicos> {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  "REGISTRAR \n DATOS CLÍNICO",
+                                  "REGISTRAR NUEVOS \n DATOS CLÍNICOS",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                   ),

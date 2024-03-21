@@ -1,21 +1,11 @@
 import 'package:app_salud/models/medico_model.dart';
 import 'package:app_salud/pages/screening_adlq.dart';
-import 'package:app_salud/services/medico_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
-import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-var id_paciente;
-String nombre_medico;
-String apellido_medico;
-var especialidad;
-var matricula;
-var rela_medico;
-var usuarioModel;
 
 class ListMedicos extends StatefulWidget {
   @override
@@ -27,15 +17,22 @@ List<MedicoModel> medicos_items;
 bool _isLoading = false;
 
 bool _isCardVisible = false;
+var id_paciente;
 
 class _ListMedicosState extends State<ListMedicos>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<Offset> _slideAnimation;
 
+  String nombre_medico;
+  String apellido_medico;
+  var especialidad;
+  var matricula;
+  var rela_medico;
+  var usuarioModel;
+
   @override
   void initState() {
-    super.initState();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000), // Duración de la animación
@@ -48,38 +45,7 @@ class _ListMedicosState extends State<ListMedicos>
       parent: _animationController,
       curve: Curves.easeOut, // Curva de animación
     ));
-  }
-
-  void _handleAccept(var id_medico) async {
-    bool resultado = await update_estado_habilitacion(2, id_medico);
-
-    if (resultado) {
-      _alert_informe(context, "Médico vinculado correctamente", 1);
-
-      _animationController.forward().then((value) {
-        setState(() {
-          _isCardVisible = false;
-        });
-      });
-    } else {
-      _alert_informe(context, "No se puede vincular el Médico", 2);
-    }
-  }
-
-  void _handleCancel(var id_medico) async {
-    bool resultado = await update_estado_habilitacion(0, id_medico);
-
-    if (resultado) {
-      _alert_informe(context, "Médico rechazado correctamente", 1);
-
-      _animationController.forward().then((value) {
-        setState(() {
-          _isCardVisible = false;
-        });
-      });
-    } else {
-      _alert_informe(context, "No se rechazó la vinculación", 2);
-    }
+    super.initState();
   }
 
   @override
@@ -90,7 +56,7 @@ class _ListMedicosState extends State<ListMedicos>
 
     return Scaffold(
       appBar: AppBar(
-        leading: new IconButton(
+        leading: IconButton(
           icon: CircleAvatar(
             radius: MediaQuery.of(context).size.width / 30,
             backgroundColor: Colors.white,
@@ -111,34 +77,15 @@ class _ListMedicosState extends State<ListMedicos>
         ),
       ),
       body: FutureBuilder<List<MedicoModel>>(
-        future: fetchMedicos(),
+        future: fetchMedicos(id_paciente),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            if (!_isLoading) {
-              return Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: "Cargando",
-                ),
-              );
-            } else {
-              return Container(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ListTile(
-                      title: Text(
-                    'No tiene médicos vinculados',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily),
-                  )),
-                ],
-              ));
-            }
-          } else {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: "Cargando",
+              ),
+            );
+          } else if (snapshot.hasData) {
             return Column(
               children: [
                 AnimatedBuilder(
@@ -219,7 +166,7 @@ class _ListMedicosState extends State<ListMedicos>
                                       SizedBox(width: 10),
                                       ElevatedButton(
                                         onPressed: () {
-                                          _handleCancel(id_medico);
+                                          _modalCancel(id_medico);
                                         },
                                         child: Text('Denegar'),
                                       ),
@@ -301,10 +248,121 @@ class _ListMedicosState extends State<ListMedicos>
                 ),
               ],
             );
+          } else {
+            return Container(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ListTile(
+                    title: Text(
+                  'No tiene médicos vinculados',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
+                )),
+              ],
+            ));
           }
         },
       ),
     );
+  }
+
+  Future<List<MedicoModel>> fetchMedicos(var id_paciente) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/read_list_medicos";
+    var response = await http.post(
+      url,
+      body: {
+        "id_paciente": id_paciente.toString(),
+      },
+    );
+
+    var responseDecode = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
+      final List<MedicoModel> medicos_items = [];
+
+      for (var medicos in responseDecode['data']) {
+        medicos_items.add(MedicoModel.fromJson(medicos));
+      }
+
+      bool buscarPorNombreMedico(List<MedicoModel> listaMedicos) {
+        return listaMedicos.any((medico) => medico.estado_habilitacion == 1);
+      }
+
+      if (buscarPorNombreMedico(medicos_items)) {
+        _isCardVisible = true;
+      } else {
+        _isCardVisible = false;
+      }
+
+      return medicos_items;
+    } else {
+      _isLoading = true;
+      return null;
+    }
+  }
+
+  void _handleAccept(var id_medico) async {
+    bool resultado = await update_estado_habilitacion(2, id_medico);
+
+    if (resultado) {
+      _alert_informe(context, "Médico vinculado correctamente", 1);
+
+      _animationController.forward().then((value) {
+        setState(() {
+          _isCardVisible = false;
+        });
+      });
+    } else {
+      _alert_informe(context, "No se puede vincular el Médico", 2);
+    }
+  }
+
+  void _modalCancel(var id_medico) {
+    showDialog(
+        context: context,
+        builder: (buildcontext) {
+          return AlertDialog(
+            title: Text("¿Está seguro de querer denegar este médico?",
+                style: TextStyle(
+                    fontFamily:
+                        Theme.of(context).textTheme.headline1.fontFamily)),
+            actions: <Widget>[
+              ElevatedButton(
+                  onPressed: () {
+                    _handleCancel(id_medico);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Si")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("No")),
+            ],
+          );
+        });
+  }
+
+  void _handleCancel(var id_medico) async {
+    bool resultado = await update_estado_habilitacion(0, id_medico);
+
+    if (resultado) {
+      _alert_informe(context, "Médico rechazado correctamente", 1);
+
+      _animationController.forward().then((value) {
+        setState(() {
+          _isCardVisible = false;
+        });
+      });
+    } else {
+      _alert_informe(context, "No se rechazó la vinculación", 2);
+    }
   }
 
   _alert_informe(context, message, colorNumber) {
@@ -339,41 +397,5 @@ class _ListMedicosState extends State<ListMedicos>
     } else {
       return false;
     }
-  }
-}
-
-Future<List<MedicoModel>> fetchMedicos() async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/read_list_medicos";
-  var response = await http.post(
-    url,
-    body: {
-      "id_paciente": id_paciente.toString(),
-    },
-  );
-
-  var responseDecode = jsonDecode(response.body);
-
-  if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
-    final List<MedicoModel> medicos_items = [];
-
-    for (var medicos in responseDecode['data']) {
-      medicos_items.add(MedicoModel.fromJson(medicos));
-    }
-
-    bool buscarPorNombreMedico(List<MedicoModel> listaMedicos) {
-      return listaMedicos.any((medico) => medico.estado_habilitacion == 1);
-    }
-
-    if (buscarPorNombreMedico(medicos_items)) {
-      _isCardVisible = true;
-    } else {
-      _isCardVisible = false;
-    }
-
-    return medicos_items;
-  } else {
-    _isLoading = true;
-    return null;
   }
 }

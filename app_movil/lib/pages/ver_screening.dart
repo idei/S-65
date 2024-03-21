@@ -74,7 +74,7 @@ class _VerScreeningState extends State<VerScreening> {
     }
 
     if (codigo == "CONDUC") {
-      titulo = "Conductual";
+      titulo = "Comportamiento";
       if (double.parse(result_screening) > 4) {
         mensaje =
             "A tener en cuenta: Sería bueno que consulte con su médico clínico o neurólogo sobre lo informado con respecto a su funcionamiento en la vida cotidiana. Es posible que el especialista le solicite una evaluación cognitiva para explorar màs en detalle su funcionamiento cognitivo y posible impacto sobre su rutina.";

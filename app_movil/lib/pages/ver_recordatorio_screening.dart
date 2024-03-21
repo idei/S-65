@@ -1,4 +1,3 @@
-import 'package:app_salud/pages/list_medicos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:intl/intl.dart';
@@ -16,21 +15,23 @@ class VerRecordatorio extends StatefulWidget {
   _VerRecordatorioState createState() => _VerRecordatorioState();
 }
 
-var id_paciente;
-var id_medico;
-var rela_estado_recordatorio;
-var tipo_screening;
-var nombre_screening;
-var id_recordatorio;
-var recordatorioModel;
-var descripcion;
-var widget_boton;
-final isTablet = Device.get().isTablet;
-var radiusAvatar;
-var fecha_limite;
-var fechaFormateada;
-
 class _VerRecordatorioState extends State<VerRecordatorio> {
+  var id_paciente;
+  var id_medico;
+  var nombre_medico;
+  var apellido_medico;
+  var rela_estado_recordatorio;
+  var tipo_screening;
+  var nombre_screening;
+  var id_recordatorio;
+  var recordatorioModel;
+  var descripcion;
+  var widget_boton;
+  final isTablet = Device.get().isTablet;
+  var radiusAvatar;
+  var fecha_limite;
+  var fechaFormateada;
+
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
