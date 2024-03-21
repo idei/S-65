@@ -19,6 +19,7 @@ final nombrePaciente = TextEditingController();
 final apellidoPaciente = TextEditingController();
 final passwordRepetido = TextEditingController();
 final dni = TextEditingController();
+bool acepto;
 
 // Define a custom Form widget.
 class RegisterPage extends StatefulWidget {
@@ -29,8 +30,6 @@ class RegisterPage extends StatefulWidget {
 final _formKey_registrar = GlobalKey<FormState>();
 
 class _FormRegisterState extends State<RegisterPage> {
-  bool acepto = false;
-
   @override
   void initState() {
     emailPaciente.text = '';
@@ -85,24 +84,24 @@ class _FormRegisterState extends State<RegisterPage> {
         ));
   }
 
-  Widget _crearCheck() {
-    return Row(children: <Widget>[
-      Checkbox(
-        value: acepto,
-        onChanged: (value) {
-          setState(() {
-            acepto = value;
-          });
-        },
-      ),
-      Text('Acepto términos y condiciones',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              decoration: TextDecoration.underline,
-              fontSize: 15,
-              fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
-    ]);
-  }
+  // Widget _crearCheck() {
+  //   return Row(children: <Widget>[
+  //     Checkbox(
+  //       value: acepto,
+  //       onChanged: (value) {
+  //         setState(() {
+  //           acepto = value;
+  //         });
+  //       },
+  //     ),
+  //     Text('Acepto términos y condiciones',
+  //         style: TextStyle(
+  //             fontWeight: FontWeight.bold,
+  //             decoration: TextDecoration.underline,
+  //             fontSize: 15,
+  //             fontFamily: Theme.of(context).textTheme.headline1.fontFamily)),
+  //   ]);
+  // }
 
   Widget _crearEmail() {
     return Container(
@@ -427,8 +426,6 @@ class CheckBoxCondiciones extends StatefulWidget {
 }
 
 class _CheckBoxCondicionesState extends State<CheckBoxCondiciones> {
-  bool acepto;
-
   @override
   void initState() {
     acepto = false;
