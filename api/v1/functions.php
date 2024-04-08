@@ -1326,7 +1326,7 @@ function read_datos_personales()
 
 
     Flight::json($returnData);
-}
+} 
 /*
 function read_datos_clinicos_historicos()
 {
@@ -8938,7 +8938,7 @@ function save_datos_clinicos()
             $insert_dato_clinico->bindParam(11, $id_tabaco);
             $insert_dato_clinico->bindParam(12, $estado_clinico);
             $insert_dato_clinico->execute();
-
+            
             $insert_dato_clinico = $insert_dato_clinico->rowCount();
             if ($insert_dato_clinico) {
                 $returnData = msg("Success", []);

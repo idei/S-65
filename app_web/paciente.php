@@ -1,10 +1,10 @@
 <?php
-include (__DIR__."/env.php");
+include(__DIR__ . "/env.php");
 
 session_start();
 
 if (isset($_POST['id_paciente'])) {
-$id_paciente = $_POST["id_paciente"];
+  $id_paciente = $_POST["id_paciente"];
 }
 
 $id_medico = $_SESSION["id_medico"];
@@ -21,8 +21,7 @@ $rutaRaiz = Env::$_URL_API;
   <title>S-65 | Médico</title>
 
   <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <!-- <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
@@ -40,13 +39,14 @@ $rutaRaiz = Env::$_URL_API;
   }
 
   #loading-indicator {
-  display: block;
-  text-align: center;
-  padding: 20px;
-}
-#content_paciente {
-  display: none;
-}
+    display: block;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #content_paciente {
+    display: none;
+  }
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed" onload="leerInformacionPaciente()">
@@ -57,79 +57,73 @@ $rutaRaiz = Env::$_URL_API;
     <?php include('./templates/sidebar_template.php'); ?>
 
     <div class="content-wrapper">
-</br>
+      </br>
       <!-- Content Header (Page header) -->
       <?php
       $titulo = "";
-     // include('./templates/content_header.php');
+      // include('./templates/content_header.php');
       ?>
 
       <!-- Main content -->
-      <section class="content" >
+      <section class="content">
         <!-- <div class="d-flex" id="wrapper"> -->
         <!-- Page content-->
         <div class="callout callout-info">
           <div class="row">
             <div class="col-6">
-            <div id="loading-indicator">Cargando...</div>
+              <div id="loading-indicator">Cargando...</div>
               <div id="content_paciente">
-              <h4>Datos de Paciente</h4>
-              <div id="nombre"></div>
-              <div id="dni"></div>
-              <div>
-                <br>
-                <b>Información del Grupo Conviviente</b>
-                <br>
+                <h4>Datos de Paciente</h4>
+                <div id="nombre"></div>
+                <div id="dni"></div>
+                <div>
+                  <br>
+                  <b>Información del Grupo Conviviente</b>
+                  <br>
+                </div>
+                <div id="contacto"></div>
+                <div id="depto"></div>
+                </br>
+                <h4>Últimos Datos Clínicos</h4>
+                <div id="peso"></div>
+                <div id="presionA"></div>
+                <div id="presionB"></div>
+                <div id="pulso"></div>
+                <div id="circun"></div>
+                <div id="alcohol"></div>
+                <div id="fuma"></div>
+                <div id="mari"></div>
+                <div id="otras"></div>
               </div>
-              <div id="contacto"></div>
-              <div id="depto"></div>
-              </br>
-              <h4>Últimos Datos Clínicos</h4>
-              <div id="peso"></div>
-              <div id="presionA"></div>
-              <div id="presionB"></div>
-              <div id="pulso"></div>
-              <div id="circun"></div>
-              <div id="alcohol"></div>
-              <div id="fuma"></div>
-              <div id="mari"></div>
-              <div id="otras"></div>
-              </div>
-              
+
             </div>
             <div class="col-6 text-center">
 
               <div class="col align-self-center">
-                <button type="button" onclick="antecedentesP()" class="btn btn-block btn-info btn-flat text-uppercase"
-                  data-toggle="modal" data-target="#modalMedico">Antecedentes Personales</button>
+                <button type="button" onclick="antecedentesP()" class="btn btn-block btn-info btn-flat text-uppercase" data-toggle="modal" data-target="#modalMedico">Antecedentes Personales</button>
               </div>
               <br>
               <div class="col align-self-center">
-                <button type="button" onclick="antecedentesF()" class="btn btn-block btn-info btn-flat text-uppercase"
-                  data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
+                <button type="button" onclick="antecedentesF()" class="btn btn-block btn-info btn-flat text-uppercase" data-toggle="modal" data-target="#modalFamiliar">Antecedentes Familiares</button>
               </div>
               <br>
               <div class="col align-self-center">
-                  <button onclick="read_nombre_chequeos();" class="btn btn-block btn-info btn-flat text-uppercase"
-                  data-toggle="modal" data-target="#nuevochequeoModal">Enviar Chequeo</button>
+                <button onclick="read_nombre_chequeos();" class="btn btn-block btn-info btn-flat text-uppercase" data-toggle="modal" data-target="#nuevochequeoModal">Enviar Chequeo</button>
               </div>
               <br>
               <div class="col align-self-center">
-                <button class="btn btn-block btn-info btn-flat text-uppercase"
-                  onclick="$('#nuevoAvisoModal').modal('show')">Enviar Aviso</button>
+                <button class="btn btn-block btn-info btn-flat text-uppercase" onclick="$('#nuevoAvisoModal').modal('show')">Enviar Aviso</button>
               </div>
               <br>
               <div class="col align-self-center">
-                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
-                  onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos
+                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal" onclick="datos_historicos_clinicos()" data-target="#clinicoHistorico">Datos Clínicos Históricos
                 </button>
-                 
+
               </div>
 
               <br>
               <div class="col align-self-center">
-                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal"
-                  onclick="read_medicamentos_paciente()" data-target="#planfarmacologico">Plan Farmacológico</button>
+                <button class="btn btn-block btn-info btn-flat text-uppercase" type="button" data-toggle="modal" onclick="read_medicamentos_paciente()" data-target="#planfarmacologico">Plan Farmacológico</button>
               </div>
 
             </div>
@@ -155,8 +149,7 @@ $rutaRaiz = Env::$_URL_API;
           <hr>
           <div class="container" style="margin: 30px;">
 
-            <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog"
-              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="modalMedico" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -192,8 +185,7 @@ $rutaRaiz = Env::$_URL_API;
                 </div>
               </div>
             </div>
-            <div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog"
-              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -274,7 +266,7 @@ $rutaRaiz = Env::$_URL_API;
       };
 
 
-      $.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function(response) {
 
         if (response['status'] == "Success") {
           document.getElementById('loading-indicator').style.display = 'none';
@@ -332,7 +324,7 @@ $rutaRaiz = Env::$_URL_API;
         }),
       };
 
-      $.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function(response) {
 
         if (response['status'] == "Success") {
           response['data'].forEach(element => {
@@ -376,17 +368,17 @@ $rutaRaiz = Env::$_URL_API;
 
     }
 
-    
+
     function ver_mas_chequeo(id_chequeo, nombre, resultado, nombre_estado) {
-       
-        if (nombre_estado == "Respondido") {
-          console.log(nombre_estado);
-          $('#modal_resultado_chequeo').modal('show'); // abrir
-          modal_resultado.innerHTML = `
+
+      if (nombre_estado == "Respondido") {
+        console.log(nombre_estado);
+        $('#modal_resultado_chequeo').modal('show'); // abrir
+        modal_resultado.innerHTML = `
           <p style="color:black;">Puntaje obtenido: <b> ${resultado} </b></p>`;
 
-        }
-      
+      }
+
     }
 
     function antecedentesP() {
@@ -399,7 +391,7 @@ $rutaRaiz = Env::$_URL_API;
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function(response) {
         if (response['status'] == "Success") {
           var response = response['data'];
 
@@ -441,7 +433,7 @@ $rutaRaiz = Env::$_URL_API;
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      $.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function(response) {
         console.log(response['data']);
         if (response['status'] == "Success") {
           var response = response['data'];
@@ -487,7 +479,7 @@ $rutaRaiz = Env::$_URL_API;
       var id_paciente = "<?php echo $id_paciente; ?>";
       var id_medico = "<?php echo $_SESSION["id_medico"]; ?>";
 
-      console.log(id_paciente + " " +id_medico);
+      console.log(id_paciente + " " + id_medico);
 
       var parametros = {
         descripcion: document.getElementById("descripcion_anuncio_individual").value,
@@ -503,14 +495,14 @@ $rutaRaiz = Env::$_URL_API;
         type: 'POST',
         dataType: "JSON",
 
-        success: function (response) {
+        success: function(response) {
 
           if (response['status'] == 'Success') {
             tabla.innerHTML = ``;
-            showalert("Aviso creado","alert-primary");
-            
+            showalert("Aviso creado", "alert-primary");
+
           } else {
-            showalert("Error","alert-danger");
+            showalert("Error", "alert-danger");
             console.log(response['status']);
           }
 
@@ -533,11 +525,11 @@ $rutaRaiz = Env::$_URL_API;
       };
 
       //$.ajax(settings).done(function (response) {
-      $.ajax(settings).done(function (response) {
+      $.ajax(settings).done(function(response) {
         if (response['status'] == "Success") {
           console.log(response['data']);
-          tablaClinicos.innerHTML ='';
-          
+          tablaClinicos.innerHTML = '';
+
           response['data'].forEach(element => {
             consume_alcohol = consumos(element['consume_alcohol']);
             consume_marihuana = consumos(element['consume_marihuana']);
@@ -557,7 +549,7 @@ $rutaRaiz = Env::$_URL_API;
                 <td>${fuma_tabaco}</td>
                 </tr>
                 `;
-                //console.log(tablaClinicos);
+            //console.log(tablaClinicos);
           });
         } else {
           if (response['status'] == "Vacio") {
@@ -594,8 +586,8 @@ $rutaRaiz = Env::$_URL_API;
           "id_paciente": "<?php echo $id_paciente; ?>",
         }),
       };
-      
-      $.ajax(settings).done(function (response) {
+
+      $.ajax(settings).done(function(response) {
         if (response['status'] == "Success") {
           tablaMedicamentos.innerHTML = ``;
           // console.log(response['data']);
@@ -627,89 +619,86 @@ $rutaRaiz = Env::$_URL_API;
     }
 
     function consumos(frecuencia) {
-    const frecuenciaConsumos = {
+      const frecuenciaConsumos = {
         902: "A veces (una vez al mes)",
         903: "Con frecuencia (una vez por semana)",
         904: "Siempre (casi todos los días)",
-        1:"Si",
-        2:"No"
+        1: "Si",
+        2: "No"
         // Agrega más mapeos según sea necesario
-    };
+      };
 
-    // Verifica si la frecuencia está mapeada, de lo contrario, usa un valor predeterminado
-    return frecuenciaConsumos[frecuencia] || "Frecuencia no especificada";
-}
+      // Verifica si la frecuencia está mapeada, de lo contrario, usa un valor predeterminado
+      return frecuenciaConsumos[frecuencia] || "Frecuencia no especificada";
+    }
 
     function read_nombre_chequeos() {
-    var parametros = {};
-    var rootRaiz = "<?php echo $rutaRaiz; ?>";
+      var parametros = {};
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
 
-    $.ajax({
-      data: JSON.stringify(parametros),
-      url: rootRaiz + '/chequeos',
-      type: 'POST',
-      dataType: "JSON",
+      $.ajax({
+        data: JSON.stringify(parametros),
+        url: rootRaiz + '/chequeos',
+        type: 'POST',
+        dataType: "JSON",
 
-      success: function(response) {
+        success: function(response) {
 
-        if (response['status'] == 'Success') {
-          var response = response['data'];
-          select_chequeos.innerHTML = ``;
-          response['chequeos'][0].forEach(element => {
-            
-            select_chequeos.innerHTML += `
+          if (response['status'] == 'Success') {
+            var response = response['data'];
+            select_chequeos.innerHTML = ``;
+            response['chequeos'][0].forEach(element => {
+
+              select_chequeos.innerHTML += `
               <option value="${element["id"]}" title="${element["nombre"]}">${element["nombre"]}</option>
               `;
-          });
+            });
 
-        } else {
-          modal_body.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
+          } else {
+            modal_body.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
+          }
+
         }
+      });
 
-      }
-    });
-
-  }
+    }
 
 
     function guardar_chequeo() {
-    var rootRaiz = "<?php echo $rutaRaiz; ?>";
-    var option = document.getElementById('select_chequeos').options[document.getElementById("select_chequeos").value - 1];
-    var title = option['title'];
-    var parametros = {
-      tipo_chequeo: document.getElementById("select_chequeos").value,
-      fecha_chequeo: document.getElementById("fecha1").value,
-      id_paciente: "<?php echo $id_paciente; ?>",
-      id_medico: "<?php echo $id_medico; ?>",
-      descripcion: "Estimado paciente le envio el siguiente chequeo de "+ title +""
-    };
+      var rootRaiz = "<?php echo $rutaRaiz; ?>";
+      var option = document.getElementById('select_chequeos').options[document.getElementById("select_chequeos").value - 1];
+      var title = option['title'];
+      var parametros = {
+        tipo_chequeo: document.getElementById("select_chequeos").value,
+        fecha_chequeo: document.getElementById("fecha1").value,
+        id_paciente: "<?php echo $id_paciente; ?>",
+        id_medico: "<?php echo $id_medico; ?>",
+        descripcion: "Estimado paciente le envio el siguiente chequeo de " + title + ""
+      };
 
-    $.ajax({
-      data: JSON.stringify(parametros),
-      url: rootRaiz + '/crear_recordatorio_chequeo',
-      type: 'POST',
-      dataType: "JSON",
+      $.ajax({
+        data: JSON.stringify(parametros),
+        url: rootRaiz + '/crear_recordatorio_chequeo',
+        type: 'POST',
+        dataType: "JSON",
 
-      success: function(response) {
+        success: function(response) {
 
-        if (response['request'] == 'Success') {
+          if (response['request'] == 'Success') {
 
-          $('#modal_chequeo').modal('show'); // abrir
+            $('#modal_chequeo').modal('show'); // abrir
 
-          titulo_modal.innerHTML = `Chequeo creado correctamente`;
+            titulo_modal.innerHTML = `Chequeo creado correctamente`;
 
-        } else {
-          titulo_modal.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
-          //$("#mensaje").html("");
+          } else {
+            titulo_modal.innerHTML = `<p style="color:red;">No se encuentra el paciente</p>`;
+            //$("#mensaje").html("");
+          }
+
+
         }
-
-
-      }
-    });
-  }
-
-    
-
+      });
+    }
   </script>
   <!-- jQuery -->
   <script src="plugins/jquery/jquery.min.js"></script>
@@ -764,24 +753,24 @@ $rutaRaiz = Env::$_URL_API;
         </button>
       </div>
       <div id="modal_nuevo_anuncio" class="modal-body">
-      <form>
-            <div class="card-body">
+        <form>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Chequeos </label>
+              <select id="select_chequeos" class="form-control" aria-label="Default select example">
+
+              </select>
+            </div>
+            <div class="form-group mb-4">
               <div class="form-group">
-                <label>Chequeos </label>
-                <select id="select_chequeos" class="form-control" aria-label="Default select example">
+                <label for="">Elegir Fecha</label>
+                <input type="date" placeholder="Elegir Fecha" class="form-control" id="fecha1">
 
-                </select>
-              </div>
-              <div class="form-group mb-4">
-                <div class="form-group">
-                  <label for="">Elegir Fecha</label>
-                  <input type="date" placeholder="Elegir Fecha" class="form-control" id="fecha1">
-
-                </div>
               </div>
             </div>
-            
-          </form>
+          </div>
+
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="guardar_chequeo()">Enviar Chequeo</button>
@@ -791,8 +780,7 @@ $rutaRaiz = Env::$_URL_API;
 </div>
 
 <!-- Modal Ver Resultado Chequeo-->
-<div class="modal fade" id="modal_resultado_chequeo" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modal_resultado_chequeo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -811,8 +799,7 @@ $rutaRaiz = Env::$_URL_API;
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-12">
-      <div class="modal fade bd-example-modal-lg" id="clinicoHistorico" tabindex="-1" role="dialog"
-        aria-labelledby="clinicoHistoricoTitle" aria-hidden="true">
+      <div class="modal fade bd-example-modal-lg" id="clinicoHistorico" tabindex="-1" role="dialog" aria-labelledby="clinicoHistoricoTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -826,17 +813,17 @@ $rutaRaiz = Env::$_URL_API;
                 <table class="table table-striped mb-0">
                   <thead>
                     <tr>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fecha</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presión alta</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presión baja</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Pulso</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Peso</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Circunferencia de cintura</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Talla</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Consume alcohol</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Consume marihuana</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Otras drogas</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fuma tabaco</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Fecha</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Presión alta</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Presión baja</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Pulso</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Peso</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Circunferencia de cintura</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Talla</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Consume alcohol</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Consume marihuana</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Otras drogas</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Fuma tabaco</th>
                     </tr>
                   </thead>
                   <tbody id="tablaClinicos"></tbody>
@@ -856,8 +843,7 @@ $rutaRaiz = Env::$_URL_API;
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-12">
-      <div class="modal fade bd-example-modal-lg" id="planfarmacologico" tabindex="-1" role="dialog"
-        aria-labelledby="planfarmacologicoTitle" aria-hidden="true">
+      <div class="modal fade bd-example-modal-lg" id="planfarmacologico" tabindex="-1" role="dialog" aria-labelledby="planfarmacologicoTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -871,11 +857,11 @@ $rutaRaiz = Env::$_URL_API;
                 <table class="table table-striped mb-0">
                   <thead>
                     <tr>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Nombre Comercial</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Forma Farmaceutica</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Presentación</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Dosis o Frecuencia</th>
-                      <th style="vertical-align: inherit;text-align: center;"scope="col">Fecha</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Nombre Comercial</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Forma Farmaceutica</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Presentación</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Dosis o Frecuencia</th>
+                      <th style="vertical-align: inherit;text-align: center;" scope="col">Fecha</th>
                     </tr>
                   </thead>
                   <tbody id="tablaMedicamentos"></tbody>

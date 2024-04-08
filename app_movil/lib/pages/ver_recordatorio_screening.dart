@@ -9,6 +9,21 @@ TextEditingController email = TextEditingController();
 TextEditingController email_nuevo = TextEditingController();
 TextEditingController password = TextEditingController();
 TextEditingController password_nuevo = TextEditingController();
+var id_paciente;
+var id_medico;
+var nombre_medico;
+var apellido_medico;
+var rela_estado_recordatorio;
+var tipo_screening;
+var nombre_screening;
+var id_recordatorio;
+var recordatorioModel;
+var descripcion;
+var widget_boton;
+final isTablet = Device.get().isTablet;
+var radiusAvatar;
+var fecha_limite;
+var fechaFormateada;
 
 class VerRecordatorio extends StatefulWidget {
   @override
@@ -16,22 +31,6 @@ class VerRecordatorio extends StatefulWidget {
 }
 
 class _VerRecordatorioState extends State<VerRecordatorio> {
-  var id_paciente;
-  var id_medico;
-  var nombre_medico;
-  var apellido_medico;
-  var rela_estado_recordatorio;
-  var tipo_screening;
-  var nombre_screening;
-  var id_recordatorio;
-  var recordatorioModel;
-  var descripcion;
-  var widget_boton;
-  final isTablet = Device.get().isTablet;
-  var radiusAvatar;
-  var fecha_limite;
-  var fechaFormateada;
-
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
@@ -48,8 +47,6 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     DateFormat dateFormatSalida = DateFormat("dd-MM-yyyy");
     fechaFormateada = dateFormatSalida.format(fechaEntrada);
 
-    getRecordatorioMedico(id_recordatorio);
-
     if (isTablet) {
       radiusAvatar = 15.3;
     } else {
@@ -57,7 +54,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
     }
 
     return FutureBuilder(
-        future: timer(),
+        future: getRecordatorioMedico(id_recordatorio),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             return Recordatorios(context);
@@ -322,9 +319,12 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
         apellido_medico = jsonDate['data']['apellido'];
         nombre_screening = jsonDate['data']['nombre_screening'];
         tipo_screening = jsonDate['data']['codigo_screening'];
+        return true;
       } else {
         print(jsonDate['status']);
         id_medico = "";
+
+        return id_medico;
       }
     }
   }

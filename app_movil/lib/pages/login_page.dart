@@ -130,7 +130,7 @@ class _LoginPage extends State<LoginPage> {
             '/menu',
           );
         } else {
-          if (estado_users == 1) {
+          if (estado_users == "1") {
             Navigator.pushNamed(
               context,
               '/form_datos_generales',

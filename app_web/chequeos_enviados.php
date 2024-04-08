@@ -258,7 +258,6 @@ session_start();
         }
 
         function chequeos_pacientes() {
-console.log("<?php echo $_SESSION['id_medico']; ?>");
             var estado;
             var rootRaiz = "<?php echo $rutaRaiz; ?>";
  

@@ -33,19 +33,19 @@ class DatosClinicos {
 
   factory DatosClinicos.fromJson(Map<String, dynamic> json) {
     return DatosClinicos(
-      id: json['id'],
-      rela_paciente: json['rela_paciente'],
+      id: json['id'].toString(),
+      rela_paciente: json['rela_paciente'].toString(),
       presion_alta: json['presion_alta'],
       presion_baja: json['presion_baja'],
       pulso: json['pulso'],
       peso: json['peso'],
       circunferencia_cintura: json['circunferencia_cintura'],
       talla: json['talla'],
-      consume_alcohol: json['consume_alcohol'],
-      consume_marihuana: json['consume_marihuana'],
-      otras_drogas: json['otras_drogas'],
-      fuma_tabaco: json['fuma_tabaco'],
-      estado_clinico: json['estado_clinico'],
+      consume_alcohol: json['consume_alcohol'].toString(),
+      consume_marihuana: json['consume_marihuana'].toString(),
+      otras_drogas: json['otras_drogas'].toString(),
+      fuma_tabaco: json['fuma_tabaco'].toString(),
+      estado_clinico: json['estado_clinico'].toString(),
       fecha_alta: json['fecha_alta'],
     );
   }

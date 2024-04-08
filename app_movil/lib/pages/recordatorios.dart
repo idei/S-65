@@ -65,7 +65,7 @@ class _RecordatorioState extends State<RecordatorioPage> {
                         .map((data) => ListTile(
                               title: GestureDetector(
                                   onTap: () {
-                                    if (data.estado_recordatorio == "4") {
+                                    if (data.estado_recordatorio == 4) {
                                       Navigator.of(context).pushNamed(
                                           '/ver_recordatorio_personal',
                                           arguments: {

@@ -303,7 +303,7 @@ class _VerDatosClinicosState extends State<VerDatosClinicos> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_datos_clinicos_paciente";
     var response = await http.post(url, body: {
-      "id_paciente": id_paciente,
+      "id_paciente": id_paciente.toString(),
       "id_dato_clinico": id_dato_clinico,
     });
 
