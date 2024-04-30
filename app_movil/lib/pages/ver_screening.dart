@@ -117,7 +117,8 @@ class _VerScreeningState extends State<VerScreening> {
     }
 
     return FutureBuilder(
-        future: timer(),
+        future: Future.value(
+            true), // Simulamos una operación asíncrona que se resuelve inmediatamente con el valor true
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             return Screenings(context);
@@ -137,11 +138,6 @@ class _VerScreeningState extends State<VerScreening> {
             );
           }
         });
-  }
-
-  timer() async {
-    await new Future.delayed(new Duration(milliseconds: 500));
-    return true;
   }
 
   Widget Screenings(BuildContext context) {

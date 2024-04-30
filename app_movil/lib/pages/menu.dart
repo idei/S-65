@@ -413,7 +413,7 @@ class _FormMenuState extends State<MenuPage> {
   void setParametrosMenu() {
     if (isTablet) {
       heightContainer = 0.8;
-      widthContainer = 0.9;
+      widthContainer = 0.95;
       childAspectRatioGrid = 0.8;
       crossAxisSpacingGrid = 10.0;
       mainAxisSpacingGrid = 60.0;

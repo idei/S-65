@@ -3,7 +3,6 @@ import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
 
-var email_argument;
 var id_paciente;
 
 class DatosClinicos extends StatefulWidget {
@@ -20,7 +19,7 @@ class _DatosClinicosState extends State<DatosClinicos> {
     final isTablet = Device.get().isTablet;
 
     usuarioModel = Provider.of<UsuarioServices>(context);
-    email_argument = usuarioModel.usuario.emailUser;
+
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
     return Scaffold(
@@ -62,9 +61,7 @@ class _DatosClinicosState extends State<DatosClinicos> {
                             onTap: () {
                               Navigator.pushNamed(
                                   context, '/form_datos_clinicos',
-                                  arguments: {
-                                    "email": email_argument,
-                                  });
+                                  arguments: {});
                             },
                             child: Column(
                               children: [
@@ -129,9 +126,7 @@ class _DatosClinicosState extends State<DatosClinicos> {
                             onTap: () {
                               Navigator.pushNamed(
                                   context, '/form_datos_clinicos',
-                                  arguments: {
-                                    "email": email_argument,
-                                  });
+                                  arguments: {});
                             },
                             child: Column(
                               children: [

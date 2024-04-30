@@ -19,6 +19,14 @@ var id_paciente;
 
 class _RecordatorioState extends State<RecordatorioPage> {
   var data_error;
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
@@ -50,12 +58,12 @@ class _RecordatorioState extends State<RecordatorioPage> {
           // Aquí puedes realizar la lógica de actualización de datos, como volver a cargar los recordatorios desde la base de datos o la API.
           // Luego, llama a setState() para reconstruir la UI con los nuevos datos.
           setState(() {
-            read_recordatorios();
+            readRecordatorios();
             // Tu lógica de actualización de datos aquí
           });
         },
         child: FutureBuilder<List<RecordatoriosModel>>(
-            future: read_recordatorios(),
+            future: readRecordatorios(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView(
@@ -141,6 +149,12 @@ class _RecordatorioState extends State<RecordatorioPage> {
     );
   }
 
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   var color;
   var font_bold;
   var estado;
@@ -220,26 +234,34 @@ class _RecordatorioState extends State<RecordatorioPage> {
     );
   }
 
-  Future<List<RecordatoriosModel>> read_recordatorios() async {
-    var responseDecode;
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/recordatorios";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-    });
-    responseDecode = json.decode(response.body);
+  Future<List<RecordatoriosModel>> readRecordatorios() async {
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/recordatorios";
+      var response = await _client.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+      });
+      var responseDecode = json.decode(response.body);
 
-    if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
-      final List<RecordatoriosModel> recordatorios_item = [];
+      if (response.statusCode == 200) {
+        if (responseDecode['status'] != "Vacio") {
+          final List<RecordatoriosModel> recordatoriosItems = [];
 
-      for (var recordatorio in responseDecode['data']) {
-        recordatorios_item.add(RecordatoriosModel.fromJson(recordatorio));
+          for (var recordatorio in responseDecode['data']) {
+            recordatoriosItems.add(RecordatoriosModel.fromJson(recordatorio));
+          }
+
+          return recordatoriosItems;
+        } else {
+          _isLoading = true;
+          return null;
+        }
+      } else {
+        throw Exception('Error en la solicitud HTTP: ${response.statusCode}');
       }
-
-      return recordatorios_item;
-    } else {
-      _isLoading = true;
-      return null;
+    } catch (e) {
+      print('Error al obtener los recordatorios: $e');
+      throw Exception('Error al obtener los recordatorios');
     }
   }
 }

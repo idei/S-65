@@ -1,7 +1,6 @@
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -27,11 +26,14 @@ class FormScreeningSintomas extends StatefulWidget {
   _FormpruebaState createState() => _FormpruebaState();
 }
 
+http.Client _client; // Cliente HTTP para realizar las solicitudes
+
 class _FormpruebaState extends State<FormScreeningSintomas> {
   final myController = TextEditingController();
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
     cant_check = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
@@ -45,6 +47,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -135,7 +138,7 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
   getTipoScreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
     print(response);
@@ -151,24 +154,24 @@ class _FormpruebaState extends State<FormScreeningSintomas> {
       Navigator.pushNamed(context, '/');
     }
   }
-}
 
-Future getAllRespuestaFisico() async {
-  await getAllEventosFisico();
+  Future getAllRespuestaFisico() async {
+    await getAllEventosFisico();
 
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_respuesta_animo";
-  var response = await http.post(url, body: {});
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_animo";
+    var response = await _client.post(url, body: {});
 
-  var jsonDate = json.decode(response.body);
+    var jsonDate = json.decode(response.body);
 
-  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
-    //setState(() {
-    itemsRespuestasFisico = jsonDate['data'];
-    //});
-    return true;
-  } else {
-    return false;
+    if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+      //setState(() {
+      itemsRespuestasFisico = jsonDate['data'];
+      //});
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -180,7 +183,7 @@ Future<List> getAllEventosFisico() async {
   String URL_base = Env.URL_API;
   var url = URL_base + "/tipo_eventos_fisico";
 
-  response = await http.post(url, body: {});
+  response = await _client.post(url, body: {});
 
   var jsonData = json.decode(response.body);
 
@@ -202,6 +205,20 @@ class ScreeningFisico extends StatefulWidget {
 
 class FisicoWidgetState extends State<ScreeningFisico> {
   final _formKey_screening_fisico = GlobalKey<FormState>();
+
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -457,7 +474,7 @@ class FisicoWidgetState extends State<ScreeningFisico> {
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_fisico";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
@@ -548,8 +565,7 @@ class FisicoWidgetState extends State<ScreeningFisico> {
           () {
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
-              _scaffold_messenger(
-                  context, "Chequeo del Médico Respondido", 1);
+              _scaffold_messenger(context, "Chequeo del Médico Respondido", 1);
             } else {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "SFMS",
@@ -567,8 +583,7 @@ class FisicoWidgetState extends State<ScreeningFisico> {
           () {
             if (screening_recordatorio == true) {
               Navigator.pushNamed(context, '/recordatorio');
-              _scaffold_messenger(
-                  context, "Chequeo del Médico Respondido", 1);
+              _scaffold_messenger(context, "Chequeo del Médico Respondido", 1);
             } else {
               Navigator.pushNamed(context, '/screening', arguments: {
                 "select_screening": "SFMS",

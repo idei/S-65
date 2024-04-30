@@ -30,10 +30,12 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   var usuarioModel;
   var id_paciente;
 
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
-    // getAllRespuesta();
   }
 
   @override
@@ -44,6 +46,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
     _pulso.dispose();
     _peso_corporal.dispose();
     _altura.dispose();
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -52,399 +55,402 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
     usuarioModel = Provider.of<UsuarioServices>(context);
     id_paciente = usuarioModel.usuario.paciente.id_paciente;
 
-    return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: CircleAvatar(
-              radius: MediaQuery.of(context).size.width / 30,
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.blue,
+    return Builder(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: CircleAvatar(
+                radius: MediaQuery.of(context).size.width / 30,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.blue,
+                ),
               ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/datoscli');
+              },
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/datoscli');
-            },
+            title: Text('Datos Clínicos',
+                style: TextStyle(
+                  fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
+                )),
           ),
-          title: Text('Datos Clínicos',
-              style: TextStyle(
-                fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
-              )),
-        ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey_datos_clinicos,
-            child: Container(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Presión Alta ",
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontFamily: Theme.of(context)
-                                  .textTheme
-                                  .headline1
-                                  .fontFamily,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {
-                                _alert_clinicos(
-                                    context,
-                                    "Presión Arterial",
-                                    "La presión arterial es la fuerza de su sangre al empujar contra las paredes de sus arterias." +
-                                        "Cada vez que su corazón late, bombea sangre hacia las arterias. \n\n Recuerde colocar los valores de" +
-                                        "presion asi por ejemplo -> 120/80 y no 12/8.",
-                                    1);
-                              })
-                        ],
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _presion_alta,
-                    keyboardType: TextInputType.number,
-                    maxLength: 3, // Establecer el número máximo de caracteres
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    decoration: InputDecoration(
-                      hintText: '95',
-                    ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Por favor complete el campo';
-                      }
-
-                      return null;
-                    },
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Presión Baja ",
-                            style: TextStyle(
+          body: SingleChildScrollView(
+            child: Form(
+              key: _formKey_datos_clinicos,
+              child: Container(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Presión Alta ",
+                              style: TextStyle(
                                 fontSize: 17,
                                 fontFamily: Theme.of(context)
                                     .textTheme
                                     .headline1
-                                    .fontFamily),
-                          ),
-                        ],
-                      ),
-                      /*Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {})
-                        ],
-                      ),*/
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _presion_baja,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    maxLength: 2, // Establecer el número máximo de caracteres
-                    decoration: InputDecoration(
-                      hintText: '65',
+                                    .fontFamily,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.info_outline),
+                                tooltip: 'Más información',
+                                color: Colors.blue,
+                                onPressed: () {
+                                  _alert_clinicos(
+                                      context,
+                                      "Presión Arterial",
+                                      "La presión arterial es la fuerza de su sangre al empujar contra las paredes de sus arterias." +
+                                          "Cada vez que su corazón late, bombea sangre hacia las arterias. \n\n Recuerde colocar los valores de" +
+                                          "presion asi por ejemplo -> 120/80 y no 12/8.",
+                                      1);
+                                })
+                          ],
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Por favor complete el campo';
-                      }
-                      return null;
-                    },
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text("Pulso (por minuto)",
+                    TextFormField(
+                      controller: _presion_alta,
+                      keyboardType: TextInputType.number,
+                      maxLength: 3, // Establecer el número máximo de caracteres
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      decoration: InputDecoration(
+                        hintText: '95',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Por favor complete el campo';
+                        }
+
+                        return null;
+                      },
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Presión Baja ",
                               style: TextStyle(
                                   fontSize: 17,
                                   fontFamily: Theme.of(context)
                                       .textTheme
                                       .headline1
-                                      .fontFamily)),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {
-                                _alert_clinicos(
-                                    context,
-                                    "Pulso",
-                                    "La frecuencia cardiaca se refiere a cuantas veces tu corazón late por minuto se podria usar como una medida de tu salud cardiovascular.",
-                                    1);
-                              })
-                        ],
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _pulso,
-                    maxLength: 3,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    decoration: InputDecoration(
-                      hintText: '80',
+                                      .fontFamily),
+                            ),
+                          ],
+                        ),
+                        /*Column(
+                            children: [
+                              IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  icon: Icon(Icons.info_outline),
+                                  tooltip: 'Más información',
+                                  color: Colors.blue,
+                                  onPressed: () {})
+                            ],
+                          ),*/
+                      ],
                     ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Por favor ingrese el pulso';
-                      }
-                      return null;
-                    },
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Peso(kg) ",
-                            style: TextStyle(
-                                fontSize: 17,
-                                fontFamily: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .fontFamily),
-                          ),
-                        ],
+                    TextFormField(
+                      controller: _presion_baja,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      maxLength: 2, // Establecer el número máximo de caracteres
+                      decoration: InputDecoration(
+                        hintText: '65',
                       ),
-                      Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {
-                                _alert_clinicos(
-                                    context,
-                                    "Peso Corporal",
-                                    "El índice de masa corporal (IMC) es un indicador de grasa que hay en el cuerpo." +
-                                        "Se calcula a partir de la estatura y el peso, y puede indicar si se tiene peso bajo, normal," +
-                                        "sobrepeso u obesidad. Tambien puede ayudar a evaluar el riesgo que hay de tener enfermedades que" +
-                                        "ocurren al tener más grasa corporal." +
-                                        "\n\nRecuerde ingresar su peso en KG por ejemplo: 80 KG.",
-                                    1);
-                              })
-                        ],
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _peso_corporal,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    decoration: InputDecoration(
-                      hintText: '75.5',
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Por favor complete el campo';
+                        }
+                        return null;
+                      },
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
                     ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Por favor ingrese el peso corporal';
-                      }
-                      return null;
-                    },
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                    onTap: () {},
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Talla / Altura (mts)",
-                            style: TextStyle(
-                                fontSize: 17,
-                                fontFamily: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .fontFamily),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {
-                                _alert_clinicos(
-                                    context,
-                                    "Altura",
-                                    "Recuerde ingresar su altura en metro por ejemplo: 1,70 m y no en cm 170 cm.",
-                                    1);
-                              })
-                        ],
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _altura,
-                    keyboardType: TextInputType.number,
-                    maxLength: 4,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    decoration: InputDecoration(
-                      hintText: '1.70',
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text("Pulso (por minuto)",
+                                style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .fontFamily)),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.info_outline),
+                                tooltip: 'Más información',
+                                color: Colors.blue,
+                                onPressed: () {
+                                  _alert_clinicos(
+                                      context,
+                                      "Pulso",
+                                      "La frecuencia cardiaca se refiere a cuantas veces tu corazón late por minuto se podria usar como una medida de tu salud cardiovascular.",
+                                      1);
+                                })
+                          ],
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Por favor ingrese la altura';
-                      }
-                      return null;
-                    },
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Circunferencia de Cintura (cm)",
-                            style: TextStyle(
-                                fontSize: 17,
-                                fontFamily: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    .fontFamily),
-                          ),
-                        ],
+                    TextFormField(
+                      controller: _pulso,
+                      maxLength: 3,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      decoration: InputDecoration(
+                        hintText: '80',
                       ),
-                      Column(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(Icons.info_outline),
-                              tooltip: 'Más información',
-                              color: Colors.blue,
-                              onPressed: () {
-                                _alert_clinicos(
-                                    context,
-                                    "Circunferencia de Cintura",
-                                    "La circunferencia de la cintura es una medida para evaluar el riesgo de padecimientos relacionados " +
-                                        "con la obesidad como la diabetes tipo 2, el colesterol alto, la hipertension y las cardiopatias. " +
-                                        "Una manera de controlarlo es mediante alimentacion y  el ejercicio. Para registrarla, coloca una cinta" +
-                                        "metrica alrededor de tu cintura a la altura del ombligo. No aguantes la respiracion ni metas el vientre." +
-                                        "\n\nRecuerde que la medida ingresada tiene que ser en cm.",
-                                    1);
-                              })
-                        ],
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    controller: _circunfer_cintura,
-                    maxLength: 4, // Establecer el número máximo de caracteres
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: '90',
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Por favor ingrese el pulso';
+                        }
+                        return null;
+                      },
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    ],
-                    onChanged: (text) {
-                      print("Debe completar el campo");
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  CardGenerico(ConsumeAlcohol(), "¿Consume Alcohol?"),
-                  SizedBox(height: 15),
-                  CardGenerico(ConsumeTabaco(), "¿Fuma Tabaco?"),
-                  SizedBox(height: 15),
-                  CardGenerico(ConsumeMarihuana(), "¿Fuma Marihuana?"),
-                  SizedBox(height: 15),
-                  CardGenerico(ConsumeOtrasDrogas(), "¿Consume otras drogas?"),
-                  SizedBox(height: 25),
-                  ElevatedButton.icon(
-                    icon: _isLoading
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            child: const CircularProgressIndicator(),
-                          )
-                        : const Icon(Icons.save_alt),
-                    style: ElevatedButton.styleFrom(elevation: 8),
-                    onPressed: () {
-                      if (_formKey_datos_clinicos.currentState.validate() &&
-                          !_isLoading) {
-                        _startLoading();
-                      } else {
-                        null;
-                      }
-                    },
-                    label: Text(
-                      'Guardar Datos Clínicos',
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Peso(kg) ",
+                              style: TextStyle(
+                                  fontSize: 17,
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.info_outline),
+                                tooltip: 'Más información',
+                                color: Colors.blue,
+                                onPressed: () {
+                                  _alert_clinicos(
+                                      context,
+                                      "Peso Corporal",
+                                      "El índice de masa corporal (IMC) es un indicador de grasa que hay en el cuerpo." +
+                                          "Se calcula a partir de la estatura y el peso, y puede indicar si se tiene peso bajo, normal," +
+                                          "sobrepeso u obesidad. Tambien puede ayudar a evaluar el riesgo que hay de tener enfermedades que" +
+                                          "ocurren al tener más grasa corporal." +
+                                          "\n\nRecuerde ingresar su peso en KG por ejemplo: 80 KG.",
+                                      1);
+                                })
+                          ],
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _peso_corporal,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      decoration: InputDecoration(
+                        hintText: '75.5',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Por favor ingrese el peso corporal';
+                        }
+                        return null;
+                      },
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
+                      onTap: () {},
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Talla / Altura (mts)",
+                              style: TextStyle(
+                                  fontSize: 17,
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.info_outline),
+                                tooltip: 'Más información',
+                                color: Colors.blue,
+                                onPressed: () {
+                                  _alert_clinicos(
+                                      context,
+                                      "Altura",
+                                      "Recuerde ingresar su altura en metro por ejemplo: 1,70 m y no en cm 170 cm.",
+                                      1);
+                                })
+                          ],
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _altura,
+                      keyboardType: TextInputType.number,
+                      maxLength: 4,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      decoration: InputDecoration(
+                        hintText: '1.70',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Por favor ingrese la altura';
+                        }
+                        return null;
+                      },
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Circunferencia de Cintura (cm)",
+                              style: TextStyle(
+                                  fontSize: 17,
+                                  fontFamily: Theme.of(context)
+                                      .textTheme
+                                      .headline1
+                                      .fontFamily),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.info_outline),
+                                tooltip: 'Más información',
+                                color: Colors.blue,
+                                onPressed: () {
+                                  _alert_clinicos(
+                                      context,
+                                      "Circunferencia de Cintura",
+                                      "La circunferencia de la cintura es una medida para evaluar el riesgo de padecimientos relacionados " +
+                                          "con la obesidad como la diabetes tipo 2, el colesterol alto, la hipertension y las cardiopatias. " +
+                                          "Una manera de controlarlo es mediante alimentacion y  el ejercicio. Para registrarla, coloca una cinta" +
+                                          "metrica alrededor de tu cintura a la altura del ombligo. No aguantes la respiracion ni metas el vientre." +
+                                          "\n\nRecuerde que la medida ingresada tiene que ser en cm.",
+                                      1);
+                                })
+                          ],
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _circunfer_cintura,
+                      maxLength: 4, // Establecer el número máximo de caracteres
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: '90',
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      ],
+                      onChanged: (text) {
+                        print("Debe completar el campo");
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    CardGenerico(ConsumeAlcohol(), "¿Consume Alcohol?"),
+                    SizedBox(height: 15),
+                    CardGenerico(ConsumeTabaco(), "¿Fuma Tabaco?"),
+                    SizedBox(height: 15),
+                    CardGenerico(ConsumeMarihuana(), "¿Fuma Marihuana?"),
+                    SizedBox(height: 15),
+                    CardGenerico(
+                        ConsumeOtrasDrogas(), "¿Consume otras drogas?"),
+                    SizedBox(height: 25),
+                    ElevatedButton.icon(
+                      icon: _isLoading
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: const CircularProgressIndicator(),
+                            )
+                          : const Icon(Icons.save_alt),
+                      style: ElevatedButton.styleFrom(elevation: 8),
+                      onPressed: () {
+                        if (_formKey_datos_clinicos.currentState.validate() &&
+                            !_isLoading) {
+                          _startLoading();
+                        } else {
+                          null;
+                        }
+                      },
+                      label: Text(
+                        'Guardar Datos Clínicos',
+                        style: TextStyle(
+                          fontFamily:
+                              Theme.of(context).textTheme.headline1.fontFamily,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          ));
+    });
   }
 
   bool _isLoading = false;
@@ -459,20 +465,6 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
       _isLoading = false;
     });
   }
-
-  // getAllRespuesta() async {
-  //   // String URL_base = Env.URL_API;
-  //   String URL_base = Env.URL_API;
-  //   var url = URL_base + "/respuesta_datos_clinicos";
-  //   var response = await http.post(url, body: {});
-
-  //   var jsonDate = json.decode(response.body);
-  //   if (this.mounted) {
-  //     setState(() {
-  //       dataRespuestas = jsonDate;
-  //     });
-  //   }
-  // }
 
   Widget CardGenerico(StatefulWidget widget, String pregunta) {
     return Card(
@@ -503,7 +495,7 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
   guardar_datos() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_clinicos";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "presion_alta": _presion_alta.text,
       "presion_baja": _presion_baja.text,
       "pulso": _pulso.text,
@@ -517,16 +509,23 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
       "id_paciente": id_paciente.toString(),
     });
 
-    var data = json.decode(response.body);
-
     if (response.statusCode == 200) {
+      var data = json.decode(response.body);
       if (data["status"] == "Success") {
         if (descri_informe != "") {
-          _alert_clinicos(
-              context, "Informacion para tener en cuenta", descri_informe, 2);
+          Navigator.pushNamed(context, '/datoscli');
+          _alert_informe_pepe(
+              context, "Datos Clínicos Guardados", descri_informe);
+
+          // _alert_clinicos(
+          //     context, "Informacion para tener en cuenta", descri_informe, 2);
         } else {
-          _alert_clinicos(context, "Sus datos clínicos fueron guardados",
-              descri_informe, 2);
+          Navigator.pushNamed(context, '/datoscli');
+          _alert_informe_pepe(
+              context, "Sus datos clínicos fueron guardados", "");
+
+          // _alert_clinicos(context, "Sus datos clínicos fueron guardados",
+          //     descri_informe, 2);
         }
       } else {
         loginToast("Error al guardar la información");
@@ -736,6 +735,28 @@ _alert_informe(context, message, colorNumber) {
   ));
 }
 
+_alert_informe_pepe(context, title, descripcion) async {
+  Alert(
+    context: context,
+    title: title,
+    desc: descripcion,
+    alertAnimation: FadeAlertAnimation,
+    buttons: [
+      DialogButton(
+        child: Text(
+          "Entendido",
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          //Navigator.pushNamed(context, '/datoscli');
+        },
+        width: 120,
+      )
+    ],
+  ).show();
+}
+
 _alert_clinicos(context, title, descripcion, number) async {
   Alert(
     closeFunction: () {},
@@ -753,8 +774,8 @@ _alert_clinicos(context, title, descripcion, number) async {
           if (number == 1) {
             Navigator.pop(context);
           } else {
-            Navigator.pushNamed(context, '/datoscli');
             _alert_informe(context, "Datos Clínicos Guardados", 1);
+            Navigator.pushNamed(context, '/datoscli');
           }
         },
         width: 120,
@@ -849,8 +870,22 @@ class OpcionConsumeAlcohol extends StatefulWidget {
 class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
   List data = List();
   var list_view_alcohol;
+  http.Client _client_add; // Cliente HTTP para realizar las solicitudes
 
-  getAllRespuesta() async {
+  @override
+  void initState() {
+    _client_add = http.Client(); // Inicializar el cliente HTTP
+    getAllRespuestaAlcohol();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client_add.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
+  getAllRespuestaAlcohol() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
@@ -861,12 +896,6 @@ class Consume_AlcoholWidgetState extends State<OpcionConsumeAlcohol> {
         data = jsonDate['data'];
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getAllRespuesta();
   }
 
   @override
@@ -961,8 +990,22 @@ class Opcion_Consume_Tabaco extends StatefulWidget {
 
 class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
   List data = List();
+  http.Client _client_add; // Cliente HTTP para realizar las solicitudes
 
-  getAllRespuesta() async {
+  @override
+  void initState() {
+    _client_add = http.Client(); // Inicializar el cliente HTTP
+    getAllRespuestaTabaco();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client_add.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
+  getAllRespuestaTabaco() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
@@ -973,12 +1016,6 @@ class Consume_TabacoWidgetState extends State<Opcion_Consume_Tabaco> {
         data = jsonDate['data'];
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getAllRespuesta();
   }
 
   @override
@@ -1072,8 +1109,22 @@ class Opcion_Consume_Marihuana extends StatefulWidget {
 
 class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
   List data = List();
+  http.Client _client_add; // Cliente HTTP para realizar las solicitudes
 
-  Future getAllRespuesta() async {
+  @override
+  void initState() {
+    _client_add = http.Client(); // Inicializar el cliente HTTP
+    getAllRespuestaMarihuana();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client_add.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
+  Future getAllRespuestaMarihuana() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
@@ -1084,12 +1135,6 @@ class Consume_MarihuanaWidgetState extends State<Opcion_Consume_Marihuana> {
         data = jsonDate['data'];
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getAllRespuesta();
   }
 
   @override
@@ -1183,8 +1228,22 @@ class OpcionOtrasDrogas extends StatefulWidget {
 
 class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
   List data = List();
+  http.Client _client_add; // Cliente HTTP para realizar las solicitudes
 
-  Future getAllRespuesta() async {
+  @override
+  void initState() {
+    _client_add = http.Client(); // Inicializar el cliente HTTP
+    getAllRespuestaOtras();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client_add.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
+  Future getAllRespuestaOtras() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_datos_clinicos";
     var response = await http.post(url, body: {});
@@ -1195,11 +1254,6 @@ class OpcionOtrasDrogasWidgetState extends State<OpcionOtrasDrogas> {
         data = jsonDate['data'];
       });
     }
-  }
-
-  @override
-  void initState() {
-    getAllRespuesta();
   }
 
   @override

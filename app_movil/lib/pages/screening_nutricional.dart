@@ -1,6 +1,5 @@
 import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app_salud/pages/env.dart';
@@ -16,6 +15,7 @@ var email;
 var screening_recordatorio;
 var usuarioModel;
 List itemsRespuestasNutricion = [];
+List respuestaNutricional;
 
 class ScreeningNutricional extends StatefulWidget {
   final pageName = 'screening_nutricional';
@@ -26,14 +26,17 @@ class ScreeningNutricional extends StatefulWidget {
 
 class _ScreeningNutricionalState extends State<ScreeningNutricional> {
   final myController = TextEditingController();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
   }
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     myController.dispose();
     super.dispose();
   }
@@ -150,43 +153,52 @@ class _ScreeningNutricionalState extends State<ScreeningNutricional> {
           );
         });
   }
-}
 
-Future getAllRespuestaNutricional() async {
-  await getAllEventosNutricional();
+  Future<bool> getAllRespuestaNutricional() async {
+    try {
+      await getAllEventosNutricional();
 
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_respuesta_animo";
-  var response = await http.post(url, body: {});
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/tipo_respuesta_animo";
+      var response = await _client.post(url, body: {});
 
-  var jsonDate = json.decode(response.body);
-
-  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
-    //setState(() {
-    itemsRespuestasNutricion = jsonDate['data'];
-    //});
-    return true;
-  } else {
-    return false;
+      if (response.statusCode == 200) {
+        var jsonDate = json.decode(response.body);
+        if (jsonDate['status'] != "Vacio") {
+          itemsRespuestasNutricion = jsonDate['data'];
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        print(
+            'Error en la solicitud getAllRespuestaNutricional: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error en la solicitud getAllRespuestaNutricional: $e');
+      return false;
+    }
   }
-}
 
-List respuestaNutricional;
+  Future<List> getAllEventosNutricional() async {
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/tipo_eventos_nutricional";
+      var response = await _client.post(url, body: {});
 
-Future<List> getAllEventosNutricional() async {
-  var response;
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_eventos_nutricional";
-
-  response = await http.post(url, body: {});
-
-  var jsonData = json.decode(response.body);
-
-  if (response.statusCode == 200) {
-    return respuestaNutricional = jsonData['data'];
-  } else {
-    return null;
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        return respuestaNutricional = jsonData['data'];
+      } else {
+        print(
+            'Error en la solicitud getAllEventosNutricional: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error en la solicitud getAllEventosNutricional: $e');
+      return null;
+    }
   }
 }
 
@@ -200,6 +212,20 @@ class FormNutricional extends StatefulWidget {
 }
 
 class _FormNutricionalState extends State<FormNutricional> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -310,14 +336,14 @@ class _FormNutricionalState extends State<FormNutricional> {
 
     showDialogMessage();
 
-    await guardarDatos(context);
+    await guardarDatos();
 
     setState(() {
       _isLoading = false;
     });
   }
 
-  guardarDatos(BuildContext context) async {
+  guardarDatos() async {
     List<dynamic> ids_nutricional = [
       id_nutri1,
       id_nutri2,
@@ -343,7 +369,7 @@ class _FormNutricionalState extends State<FormNutricional> {
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_nutricional";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
@@ -387,11 +413,6 @@ class _FormNutricionalState extends State<FormNutricional> {
           });
         }
       });
-      // _alert_informe(
-      //   context,
-      //   "Para tener en cuenta",
-      //   responseDecode['data'],
-      // );
     } else {
       if (screening_recordatorio == true) {
         Navigator.pushNamed(context, '/recordatorio');

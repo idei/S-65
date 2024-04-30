@@ -32,6 +32,20 @@ var matricula;
 var id_paciente;
 
 class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Map parametros = ModalRoute.of(context).settings.arguments;
@@ -98,7 +112,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   read_medico() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_medico";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "rela_paciente": id_paciente.toString(),
     });
 
@@ -267,7 +281,7 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
   update_aviso_paciente() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/update_estado_aviso";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "rela_aviso": id_aviso.toString(),
       "rela_paciente": id_paciente.toString(),
       "estado_leido": estado_aviso.toString(),
@@ -275,11 +289,85 @@ class _VerAvisoGeneralState extends State<VerAvisoGeneral> {
 
     var data = json.decode(response.body);
   }
+
+  update_estado_aviso(var id_aviso, BuildContext context) async {
+    await generate_vinculation(context);
+
+    String URL_base = Env.URL_PREFIX;
+    var url = URL_base + "/update_estado_aviso";
+    var response = await _client.post(url, body: {
+      "rela_aviso": id_aviso.toString(),
+      "rela_paciente": id_paciente.toString(),
+      "estado_leido": "1",
+    });
+
+    print(response.body);
+    var data = json.decode(response.body);
+    print(data);
+  }
+
+  var data_vinculation;
+
+  generate_vinculation(BuildContext context) async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/generate_vinculation";
+    var response = await _client.post(url, body: {
+      "rela_medico": rela_medico.toString(),
+      "id_paciente": id_paciente.toString(),
+    });
+
+    print(response.body);
+    data_vinculation = json.decode(response.body);
+    print(data_vinculation);
+
+    if (data_vinculation['estado'] == "Success") {
+      _alert_clinicos(
+        context,
+        "Gracias",
+        "Pronto se estara comunicando con usted el médico",
+        1,
+      );
+    }
+  }
+
+  _alert_clinicos(context, title, descripcion, number) async {
+    Alert(
+      context: context,
+      title: title,
+      desc: descripcion,
+      alertAnimation: FadeAlertAnimation,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Entendido",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            if (number == 1) {
+              //update_estado_aviso();
+              Navigator.of(context).pushReplacementNamed('/avisos');
+            } else {
+              Navigator.of(context).pushReplacementNamed('/avisos');
+            }
+          },
+          width: 120,
+        )
+      ],
+    ).show();
+  }
+
+  Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    return Align(
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
+  }
 }
 
 class MyStatelessWidget extends StatelessWidget {
-  //const MyStatelessWidget({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -300,80 +388,4 @@ class MyStatelessWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-_alert_clinicos(context, title, descripcion, number) async {
-  Alert(
-    context: context,
-    title: title,
-    desc: descripcion,
-    alertAnimation: FadeAlertAnimation,
-    buttons: [
-      DialogButton(
-        child: Text(
-          "Entendido",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        onPressed: () {
-          if (number == 1) {
-            //update_estado_aviso();
-            Navigator.of(context).pushReplacementNamed('/avisos');
-          } else {
-            Navigator.of(context).pushReplacementNamed('/avisos');
-          }
-        },
-        width: 120,
-      )
-    ],
-  ).show();
-}
-
-update_estado_aviso(var id_aviso, BuildContext context) async {
-  await generate_vinculation(context);
-
-  String URL_base = Env.URL_PREFIX;
-  var url = URL_base + "/update_estado_aviso";
-  var response = await http.post(url, body: {
-    "rela_aviso": id_aviso.toString(),
-    "rela_paciente": id_paciente.toString(),
-    "estado_leido": "1",
-  });
-
-  print(response.body);
-  var data = json.decode(response.body);
-  print(data);
-}
-
-var data_vinculation;
-
-generate_vinculation(BuildContext context) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/generate_vinculation";
-  var response = await http.post(url, body: {
-    "rela_medico": rela_medico.toString(),
-    "id_paciente": id_paciente.toString(),
-  });
-
-  print(response.body);
-  data_vinculation = json.decode(response.body);
-  print(data_vinculation);
-
-  if (data_vinculation['estado'] == "Success") {
-    _alert_clinicos(
-      context,
-      "Gracias",
-      "Pronto se estara comunicando con usted el médico",
-      1,
-    );
-  }
-}
-
-Widget FadeAlertAnimation(BuildContext context, Animation<double> animation,
-    Animation<double> secondaryAnimation, Widget child) {
-  return Align(
-    child: FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
 }

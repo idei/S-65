@@ -28,15 +28,22 @@ var usuarioModel;
 List dataScreeningQC = [];
 
 class _ScreeningBState extends State<ScreeningBPage> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => alert_screenings_generico(
-          context,
-          "Chequeo de Quejas Cognitivas",
+      (_) => alert_screenings_generico(context, "Chequeo de Quejas Cognitivas",
           "Este chequeo explora sobre posibles y actuales quejas cognitivas, por ejemplo que ultimamente hay a notado que se olvida más que antes o que está más disperso. Deberà elegir la opción que describa la frecuencia en que dicha queja aparece en su rutina."),
     );
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 
   @override
@@ -102,7 +109,7 @@ class _ScreeningBState extends State<ScreeningBPage> {
   getAllRespuestaQC() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/tipo_respuesta_quejas";
-    var response = await http.post(url, body: {});
+    var response = await _client.post(url, body: {});
 
     var jsonDate = json.decode(response.body);
 
@@ -145,7 +152,7 @@ class _ScreeningBState extends State<ScreeningBPage> {
   get_tiposcreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
 
@@ -174,6 +181,19 @@ class ScreeningQCQ extends StatefulWidget {
 
 class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
   final _formKey_quejas_cognitivas = GlobalKey<FormState>();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1298,127 +1318,127 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
       ),
     );
   }
-}
 
-loginToast(String toast) {
-  return Fluttertoast.showToast(
-      msg: toast,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white);
-}
-
-guardarDatos(BuildContext context) async {
-  if (id_ate1 == null ||
-      id_ate2 == null ||
-      id_ate3 == null ||
-      id_ate4 == null) {
-    loginToast("Debe responder si los item de Atención");
-    return;
+  loginToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white);
   }
 
-  if (id_funejec1 == null ||
-      id_funejec2 == null ||
-      id_funejec3 == null ||
-      id_funejec4 == null) {
-    loginToast("Debe responder si los item de Funciones Ejecutivas");
-    return;
+  guardarDatos(BuildContext context) async {
+    if (id_ate1 == null ||
+        id_ate2 == null ||
+        id_ate3 == null ||
+        id_ate4 == null) {
+      loginToast("Debe responder si los item de Atención");
+      return;
+    }
+
+    if (id_funejec1 == null ||
+        id_funejec2 == null ||
+        id_funejec3 == null ||
+        id_funejec4 == null) {
+      loginToast("Debe responder si los item de Funciones Ejecutivas");
+      return;
+    }
+
+    if (id_ori1 == null ||
+        id_ori2 == null ||
+        id_ori3 == null ||
+        id_ori4 == null) {
+      loginToast("Debe responder si los item de Orientación");
+      return;
+    }
+
+    if (id_memoria1 == null ||
+        id_memoria2 == null ||
+        id_memoria3 == null ||
+        id_memoria4 == null) {
+      loginToast("Debe responder si los item de Memoria");
+      return;
+    }
+
+    if (id_prexgnosia1 == null ||
+        id_prexgnosia2 == null ||
+        id_prexgnosia3 == null ||
+        id_prexgnosia4 == null) {
+      loginToast("Debe responder si los item de Praxias y Gnosias");
+      return;
+    }
+
+    if (id_leng1 == null ||
+        id_leng2 == null ||
+        id_leng3 == null ||
+        id_leng4 == null) {
+      loginToast("Debe responder si los item de Lenguajes");
+      return;
+    }
+
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/respuesta_screening_quejas";
+    var response = await _client.post(url, body: {
+      "id_paciente": id_paciente.toString(),
+      "id_medico": id_medico.toString(),
+      "id_recordatorio": id_recordatorio.toString(),
+      "tipo_screening": tipo_screening.toString(),
+      "id_ate1": id_ate1,
+      "id_ate2": id_ate2,
+      "id_ate3": id_ate3,
+      "id_ate4": id_ate4,
+      "id_ori1": id_ori1,
+      "id_ori2": id_ori2,
+      "id_ori3": id_ori3,
+      "id_ori4": id_ori4,
+      "id_funejec1": id_funejec1,
+      "id_funejec2": id_funejec2,
+      "id_funejec3": id_funejec3,
+      "id_funejec4": id_funejec4,
+      "id_memoria1": id_memoria1,
+      "id_memoria2": id_memoria2,
+      "id_memoria3": id_memoria3,
+      "id_memoria4": id_memoria4,
+      "id_prexgnosia1": id_prexgnosia1,
+      "id_prexgnosia2": id_prexgnosia2,
+      "id_prexgnosia3": id_prexgnosia3,
+      "id_prexgnosia4": id_prexgnosia4,
+      "id_leng1": id_leng1,
+      "id_leng2": id_leng2,
+      "id_leng3": id_leng3,
+      "id_leng4": id_leng4,
+    });
+
+    var data = json.decode(response.body);
+    String mensajeCQC;
+
+    if (data['data'] == "mas_20") {
+      mensajeCQC =
+          "Sería bueno que consulte con su médico clínico o neurólogo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.";
+    }
+
+    if (data['data'] == "menos_20") {
+      mensajeCQC =
+          "En este momento no presenta quejas cognitivas significativas. Continue estimulando sus funciones cognitivas, como la memoria, con actividades desafiantes para su cerebro.";
+    }
+
+    showCustomAlert(
+      context,
+      "Para tener en cuenta",
+      mensajeCQC,
+      true,
+      () {
+        if (screening_recordatorio == true) {
+          Navigator.pushNamed(context, '/recordatorio');
+        } else {
+          Navigator.pushNamed(context, '/screening', arguments: {
+            "select_screening": "QCQ",
+          });
+        }
+      },
+    );
   }
-
-  if (id_ori1 == null ||
-      id_ori2 == null ||
-      id_ori3 == null ||
-      id_ori4 == null) {
-    loginToast("Debe responder si los item de Orientación");
-    return;
-  }
-
-  if (id_memoria1 == null ||
-      id_memoria2 == null ||
-      id_memoria3 == null ||
-      id_memoria4 == null) {
-    loginToast("Debe responder si los item de Memoria");
-    return;
-  }
-
-  if (id_prexgnosia1 == null ||
-      id_prexgnosia2 == null ||
-      id_prexgnosia3 == null ||
-      id_prexgnosia4 == null) {
-    loginToast("Debe responder si los item de Praxias y Gnosias");
-    return;
-  }
-
-  if (id_leng1 == null ||
-      id_leng2 == null ||
-      id_leng3 == null ||
-      id_leng4 == null) {
-    loginToast("Debe responder si los item de Lenguajes");
-    return;
-  }
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/respuesta_screening_quejas";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente.toString(),
-    "id_medico": id_medico.toString(),
-    "id_recordatorio": id_recordatorio.toString(),
-    "tipo_screening": tipo_screening.toString(),
-    "id_ate1": id_ate1,
-    "id_ate2": id_ate2,
-    "id_ate3": id_ate3,
-    "id_ate4": id_ate4,
-    "id_ori1": id_ori1,
-    "id_ori2": id_ori2,
-    "id_ori3": id_ori3,
-    "id_ori4": id_ori4,
-    "id_funejec1": id_funejec1,
-    "id_funejec2": id_funejec2,
-    "id_funejec3": id_funejec3,
-    "id_funejec4": id_funejec4,
-    "id_memoria1": id_memoria1,
-    "id_memoria2": id_memoria2,
-    "id_memoria3": id_memoria3,
-    "id_memoria4": id_memoria4,
-    "id_prexgnosia1": id_prexgnosia1,
-    "id_prexgnosia2": id_prexgnosia2,
-    "id_prexgnosia3": id_prexgnosia3,
-    "id_prexgnosia4": id_prexgnosia4,
-    "id_leng1": id_leng1,
-    "id_leng2": id_leng2,
-    "id_leng3": id_leng3,
-    "id_leng4": id_leng4,
-  });
-
-  var data = json.decode(response.body);
-  String mensajeCQC;
-
-  if (data['data'] == "mas_20") {
-    mensajeCQC =
-        "Sería bueno que consulte con su médico clínico o neurólogo sobre los síntomas cognitivos, probablemente le solicite una evaluación cognitiva para explorar su funcionamiento cognitivo.";
-  }
-
-  if (data['data'] == "menos_20") {
-    mensajeCQC =
-        "En este momento no presenta quejas cognitivas significativas. Continue estimulando sus funciones cognitivas, como la memoria, con actividades desafiantes para su cerebro.";
-  }
-
-  showCustomAlert(
-    context,
-    "Para tener en cuenta",
-    mensajeCQC,
-    true,
-    () {
-      if (screening_recordatorio == true) {
-        Navigator.pushNamed(context, '/recordatorio');
-      } else {
-        Navigator.pushNamed(context, '/screening', arguments: {
-          "select_screening": "QCQ",
-        });
-      }
-    },
-  );
 }
 
 //----------------------------------------ATENCION 1------------------------------------------------------------------------------------------

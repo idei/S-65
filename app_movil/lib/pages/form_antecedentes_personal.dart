@@ -18,16 +18,12 @@ var usuarioModel;
 
 class _FormpruebaState extends State<FormAntecedentesPersonales> {
   final myController = TextEditingController();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    myController.dispose();
-    super.dispose();
   }
 
   @override
@@ -95,12 +91,19 @@ class _FormpruebaState extends State<FormAntecedentesPersonales> {
     );
   }
 
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    myController.dispose();
+    super.dispose();
+  }
+
   read_datos_paciente() async {
     final completer = Completer<dynamic>();
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/antecedentes_medicos";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente,
       "tipo_antecedente": "1",
       "cod_event_retraso": cod_event_retraso,
@@ -217,6 +220,13 @@ class Antecedentes extends StatefulWidget {
 
 class AntecedentesWidgetState extends State<Antecedentes> {
   final _formKey_antecedentes_familiares = GlobalKey<FormState>();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,14 +257,23 @@ class AntecedentesWidgetState extends State<Antecedentes> {
             Intoxicaciones(),
             SizedBox(height: 50),
             Center(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
                 ),
                 onPressed: () {
-                  guardar_datos(context);
+                  _startLoading();
                 },
-                child: Text('Guardar Antecedentes',
+                label: Text('Guardar Antecedentes',
                     style: TextStyle(
                         fontFamily:
                             Theme.of(context).textTheme.headline1.fontFamily,
@@ -268,10 +287,62 @@ class AntecedentesWidgetState extends State<Antecedentes> {
     );
   }
 
-  guardar_datos(BuildContext context) async {
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+
+    super.dispose();
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardar_datos();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Datos",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  guardar_datos() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_antecedentes";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente,
       "tipo_antecedente": "1",
       "retraso": valueNotifierRetrasoMental.value.toString(),
@@ -316,8 +387,9 @@ class AntecedentesWidgetState extends State<Antecedentes> {
       "cod_event_intoxicaciones": cod_event_intoxicaciones,
     });
 
-    var responseDecoder = json.decode(response.body);
+    var responseDecoder;
     if (response.statusCode == 200) {
+      responseDecoder = json.decode(response.body);
       if (responseDecoder["status"] == "Success") {
         _alert_informe(context, "Antecedentes Guardados", 1);
         Navigator.of(context).pushReplacementNamed('/antecedentes_personales');

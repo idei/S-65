@@ -32,9 +32,18 @@ var usuarioModel;
 var _isPaciente = true;
 
 class _ScreeningConductualState extends State<ScreeningConductualPage> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 
   @override
@@ -75,7 +84,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
         body: Center(
           child: SingleChildScrollView(
             child: FutureBuilder(
-                future: getAllRespuesta(),
+                future: getAllRespuestaSC(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ColumnWidgetConductual();
@@ -137,7 +146,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
   get_tiposcreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
 
@@ -146,7 +155,7 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     tipo_screening = jsonDate;
   }
 
-  Future<List> getAllRespuesta({
+  Future<List> getAllRespuestaSC({
     bool otro = false,
   }) async {
     var response;
@@ -155,9 +164,9 @@ class _ScreeningConductualState extends State<ScreeningConductualPage> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/tipo_respuesta_conductual";
 
-    responseOtro = await http.post(url, body: {"otro": "otro"});
+    responseOtro = await _client.post(url, body: {"otro": "otro"});
 
-    response = await http.post(url, body: {});
+    response = await _client.post(url, body: {});
 
     var jsonData = json.decode(response.body);
     var jsonDataOtro = json.decode(responseOtro.body);
@@ -201,11 +210,20 @@ class ColumnWidgetConductual extends StatefulWidget {
 class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) =>
         alert_screenings_generico(context, "Chequeo Conductual",
             " Tómese su tiempo para responder de la mejor manera "));
+  }
+
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 
   @override
@@ -813,7 +831,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
     showDialogMessage(context);
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_conductual";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),

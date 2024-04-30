@@ -16,12 +16,14 @@ String id_paciente;
 var usuarioModel;
 
 class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
-  bool isLoading = false;
+  bool _isLoading = false;
   List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
   final isTablet = Device.get().isTablet;
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
   }
 
@@ -120,62 +122,6 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
                   ],
                 ));
               }
-
-              // if (snapshot.hasData) {
-              //   return ListView(
-              //     children: ListTile.divideTiles(
-              //       color: Colors.black26,
-              //       tiles: snapshot.data
-              //           .map((data) => ListTile(
-              //                 title: GestureDetector(
-              //                   onTap: () {},
-              //                   child: ListTile(
-              //                     leading: Icon(
-              //                       Icons.arrow_right_rounded,
-              //                       color: Colors.blue,
-              //                       size: 30,
-              //                     ),
-              //                     title: Text(data.antecedenteDescripcion,
-              //                         style: TextStyle(
-              //                             fontFamily: Theme.of(context)
-              //                                 .textTheme
-              //                                 .headline1
-              //                                 .fontFamily)),
-              //                   ),
-              //                 ),
-              //               ))
-              //           .toList(),
-              //     ).toList(),
-              //   );
-              // } else {
-              //   if (!isLoading) {
-              //     return Container(
-              //       alignment: Alignment.center,
-              //       child: Positioned(
-              //         child: _isLoadingIcon(),
-              //       ),
-              //     );
-              //   } else {
-              //     return Container(
-              //         child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         ListTile(
-              //             title: Text(
-              //           'No tiene antecedentes familiares',
-              //           textAlign: TextAlign.center,
-              //           style: TextStyle(
-              //               fontWeight: FontWeight.bold,
-              //               color: Colors.black87,
-              //               fontFamily: Theme.of(context)
-              //                   .textTheme
-              //                   .headline1
-              //                   .fontFamily),
-              //         )),
-              //       ],
-              //     ));
-              //   }
-              // }
             },
           ),
         ),
@@ -214,62 +160,66 @@ class _AntecedentesFamiliarState extends State<AntecedentesFamiliarPage> {
     );
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
-    }
-  }
-
   Future<List<AntecedenteFamiliaresModel>> fetchAntecedentesFamiliares() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/antecedentes_paciente";
-    var response = await http.post(
-      url,
-      body: {"id_paciente": id_paciente, "tipo_antecedente": "2"},
-    );
-    var responseDecode = jsonDecode(response.body);
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/antecedentes_paciente";
+      var responseDecode;
 
-    if (response.statusCode == 200 && responseDecode['status'] != "Vacio") {
-      final List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
+      var response = await _client.post(
+        url,
+        body: {"id_paciente": id_paciente, "tipo_antecedente": "2"},
+      );
 
-      for (var antecedentes in responseDecode['data']) {
-        listAntecFamiliares
-            .add(AntecedenteFamiliaresModel.fromJson(antecedentes));
+      if (response.statusCode == 200) {
+        responseDecode = jsonDecode(response.body);
+
+        if (responseDecode['status'] != "Vacio") {
+          final List<AntecedenteFamiliaresModel> listAntecFamiliares = [];
+
+          for (var antecedentes in responseDecode['data']) {
+            listAntecFamiliares
+                .add(AntecedenteFamiliaresModel.fromJson(antecedentes));
+          }
+
+          return listAntecFamiliares;
+        } else {
+          _isLoading = true;
+          return null;
+        }
+      } else {
+        // Manejar casos donde el servidor devuelve un código de estado diferente de 200
+        print('Error: ${response.statusCode}');
+        return [];
       }
-
-      return listAntecFamiliares;
-    } else {
-      isLoading = true;
-      return null;
+    } catch (e) {
+      // Manejar cualquier excepción que pueda ocurrir durante la llamada a la API
+      print('Error: $e');
+      return [];
     }
   }
-}
-
-class _isLoadingIcon extends StatelessWidget {
-  const _isLoadingIcon({
-    Key key,
-  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-      child: const CircularProgressIndicator(color: Colors.blue),
-    );
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 }
 
-class Constants {
-  static const String Ajustes = 'Ajustes';
-  static const String Salir = 'Salir';
-  static const List<String> choices = <String>[
-    Ajustes,
-    Salir,
-  ];
-}
+// class _isLoadingIcon extends StatelessWidget {
+//   const _isLoadingIcon({
+//     Key key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.all(10),
+//       height: 60,
+//       width: 60,
+//       decoration: BoxDecoration(
+//           color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+//       child: const CircularProgressIndicator(color: Colors.blue),
+//     );
+//   }
+// }

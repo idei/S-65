@@ -20,9 +20,11 @@ final _formKey_recuperar = GlobalKey<FormState>();
 class _RecuperarState extends State<RecordatorioPersonal> {
   TextEditingController fechaLimiteController = TextEditingController();
   TextEditingController tituloController = TextEditingController();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
     fechaLimiteController.text = '';
     tituloController.text = '';
@@ -129,7 +131,7 @@ class _RecuperarState extends State<RecordatorioPersonal> {
                         ),
                         onPressed: () {
                           if (_formKey_recuperar.currentState.validate()) {
-                            guardar_datos(context);
+                            guardarDatos(context);
                           }
                         },
                       ),
@@ -138,23 +140,38 @@ class _RecuperarState extends State<RecordatorioPersonal> {
         ));
   }
 
-  guardar_datos(context) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/new_recordatorio_personal";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-      "titulo": tituloController.text,
-      "fecha_limite": fechaLimiteController.text,
-    });
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
-    var responseDecode = jsonDecode(response.body);
+  guardarDatos(BuildContext context) async {
+    try {
+      // Validar campos de entrada
+      if (tituloController.text.isEmpty || fechaLimiteController.text.isEmpty) {
+        throw Exception('Por favor completa todos los campos.');
+      }
 
-    if (response.statusCode == 200 && responseDecode['status'] == "Success") {
-      _alert_informe(context, "Recordatorio creado correctamente", 1);
-      Navigator.of(context).pushReplacementNamed('/recordatorio');
-    } else {
-      _alert_informe(
-          context, "Error al guardar: ${responseDecode['status']}", 2);
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/new_recordatorio_personal";
+      var response = await _client.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+        "titulo": tituloController.text,
+        "fecha_limite": fechaLimiteController.text,
+      });
+
+      var responseDecode = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && responseDecode['status'] == "Success") {
+        _alert_informe(context, "Recordatorio creado correctamente", 1);
+        Navigator.of(context).pushReplacementNamed('/recordatorio');
+      } else {
+        throw Exception('Error al guardar: ${responseDecode['status']}');
+      }
+    } catch (e) {
+      print('Error al guardar los datos: $e');
+      _alert_informe(context, "Error al guardar: $e", 2);
       Navigator.of(context).pushReplacementNamed('/recordatorio');
     }
   }

@@ -64,20 +64,17 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
   ValueNotifier<bool> _showAdditionalFieldsNotifier =
       ValueNotifier<bool>(false);
 
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
     Provider.of<UsuarioServices>(context, listen: false).loadData(context);
     rela_departamento = '';
     rela_genero = '';
     rela_nivel_instruccion = '';
     rela_grupo_conviviente = '';
-  }
-
-  @override
-  void dispose() {
-    _showAdditionalFieldsNotifier.dispose();
-    super.dispose();
   }
 
   @override
@@ -591,6 +588,13 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
         ));
   }
 
+  @override
+  void dispose() {
+    _showAdditionalFieldsNotifier.dispose();
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   showDialogMessage() async {
     await Future.delayed(Duration(microseconds: 1));
     showDialog(
@@ -660,7 +664,7 @@ class _FormDatosGeneralesState extends State<FormDatosGenerales> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/save_datos_personales";
 
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "nombre": nombre_paciente,
       "apellido": apellido_paciente,

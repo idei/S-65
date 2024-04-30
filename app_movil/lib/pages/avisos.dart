@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/avisos_model.dart';
 import '../services/usuario_services.dart';
-import '../widgets/opciones_navbar.dart';
 import 'env.dart';
 
 class Avisos extends StatefulWidget {
@@ -19,7 +18,20 @@ var usuarioModel;
 var id_paciente;
 
 class _AvisosState extends State<Avisos> {
-  var responseDecode;
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     usuarioModel = Provider.of<UsuarioServices>(context);
@@ -48,11 +60,8 @@ class _AvisosState extends State<Avisos> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          // Aquí puedes realizar la lógica de actualización de datos, como volver a cargar los recordatorios desde la base de datos o la API.
-          // Luego, llama a setState() para reconstruir la UI con los nuevos datos.
           setState(() {
             read_avisos();
-            // Tu lógica de actualización de datos aquí
           });
         },
         child: FutureBuilder<List<AvisosModel>>(
@@ -85,13 +94,7 @@ class _AvisosState extends State<Avisos> {
                   ).toList(),
                 );
               } else {
-                if (!_isLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      semanticsLabel: "Cargando",
-                    ),
-                  );
-                } else {
+                if (snapshot.connectionState == ConnectionState.done) {
                   return Container(
                       child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -111,6 +114,11 @@ class _AvisosState extends State<Avisos> {
                     ],
                   ));
                 }
+                return Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: "Cargando",
+                  ),
+                );
               }
             }),
       ),
@@ -227,32 +235,37 @@ class _AvisosState extends State<Avisos> {
   }
 
   Future<List<AvisosModel>> read_avisos() async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/avisos_paciente";
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-    });
-    responseDecode = json.decode(response.body);
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/avisos_paciente";
+      var response = await _client.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+      });
+      var responseDecode;
 
-    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
-      final List<AvisosModel> avisos_items = [];
+      if (response.statusCode == 200) {
+        responseDecode = json.decode(response.body);
 
-      for (var avisos in responseDecode['data']) {
-        avisos_items.add(AvisosModel.fromJson(avisos));
+        if (responseDecode['status'] != 'Vacio') {
+          final List<AvisosModel> avisos_items = [];
+
+          for (var avisos in responseDecode['data']) {
+            avisos_items.add(AvisosModel.fromJson(avisos));
+          }
+
+          return avisos_items;
+        } else {
+          _isLoading = true;
+          return null;
+        }
+      } else {
+        // Maneja casos donde el servidor devuelve un código de estado diferente de 200
+        print('Error: ${response.statusCode}');
+        return [];
       }
-
-      return avisos_items;
-    } else {
-      _isLoading = true;
-      return null;
-    }
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
+    } catch (e) {
+      print('Error: $e');
+      return [];
     }
   }
 }

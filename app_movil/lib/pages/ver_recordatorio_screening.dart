@@ -74,11 +74,6 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
         });
   }
 
-  timer() async {
-    await new Future.delayed(new Duration(milliseconds: 500));
-    return true;
-  }
-
   Widget Recordatorios(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -132,7 +127,7 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                 SizedBox(
                   height: 40,
                 ),
-                if (rela_estado_recordatorio != "3")
+                if (rela_estado_recordatorio != 3)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -269,50 +264,23 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                       ),
                     ],
                   ),
-                // : Container(
-                //     width: 50, // Ancho del contenedor
-                //     height: 40, // Alto del contenedor
-                //     decoration: BoxDecoration(
-                //       color:
-                //           Colors.green, // Color de fondo del contenedor
-                //       borderRadius: BorderRadius.circular(
-                //           10), // Borde redondeado del contenedor
-                //     ),
-                //     child: Center(
-                //       child: Text(
-                //         'Este Screening ya fue respondido',
-                //         style: TextStyle(
-                //           color: Colors.white, // Color del texto
-                //           fontSize: 20, // Tamaño del texto
-                //         ),
-                //       ),
-                //     ),
-                //   )
               ])),
         ));
   }
 
-  _alert_informe(context, message, colorNumber) {
-    var color;
-    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: color,
-      content: Text(message,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white)),
-    ));
-  }
-
   getRecordatorioMedico(var codigo_screening) async {
     String URL_base = Env.URL_API;
+    var jsonDate;
+
     var url = URL_base + "/read_recordatorio_medicos";
+
     var response = await http.post(url, body: {
       "id_recordatorio": id_recordatorio.toString(),
     });
 
-    var jsonDate = json.decode(response.body);
     if (response.statusCode == 200) {
+      jsonDate = json.decode(response.body);
+
       if (jsonDate['status'] == 'Success') {
         id_medico = jsonDate['data']['id_medico'];
         nombre_medico = jsonDate['data']['nombre'];

@@ -12,12 +12,9 @@ class MedicamentoPage extends StatefulWidget {
   _MedicamentoState createState() => _MedicamentoState();
 }
 
-TextEditingController dosis = TextEditingController();
-TextEditingController frecuencia = TextEditingController();
-
 class _MedicamentoState extends State<MedicamentoPage> {
   var data;
-  bool isLoading = false;
+  bool _isLoading = false;
   var usuarioModel;
   var id_paciente;
   double sizeIconEditar;
@@ -25,6 +22,26 @@ class _MedicamentoState extends State<MedicamentoPage> {
   double radiusIconEditar;
   double radiusIconDelete;
   double radiusCircle;
+
+  http.Client _client_save_dosis; // Cliente HTTP para realizar las solicitudes
+  http.Client
+      _client_read_medicamento; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client_save_dosis = http.Client(); // Inicializar el cliente HTTP
+    _client_read_medicamento = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client_save_dosis
+        .close(); // Cerrar el cliente HTTP cuando la página se destruye
+    _client_read_medicamento
+        .close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,174 +84,180 @@ class _MedicamentoState extends State<MedicamentoPage> {
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               ),
             )),
-        body: Container(
-          child: FutureBuilder<List<MedicamentoModel>>(
-            future: read_medicamentos(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: "Cargando",
-                  ),
-                );
-              } else if (snapshot.hasData) {
-                return ListView(
-                  children: ListTile.divideTiles(
-                      color: Colors.black26,
-                      tiles: snapshot.data.map(
-                        (data) => Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: ListTile(
-                            title: Text(data.nombre_comercial,
-                                style: TextStyle(
-                                    overflow: TextOverflow.clip,
-                                    fontFamily: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .fontFamily)),
-                            subtitle: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text("Dosis: " + data.dosis,
-                                    textAlign: TextAlign
-                                        .right, // Alinea el texto a la derecha
-                                    style: TextStyle(
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily)),
-                                Text("Frecuencia: " + data.frecuencia,
-                                    textAlign: TextAlign
-                                        .right, // Alinea el texto a la derecha
-                                    style: TextStyle(
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily)),
-                              ],
+        body: Builder(builder: (BuildContext context) {
+          return Container(
+            child: FutureBuilder<List<MedicamentoModel>>(
+              future: read_medicamentos(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      semanticsLabel: "Cargando",
+                    ),
+                  );
+                } else if (snapshot.hasData) {
+                  return ListView(
+                    children: ListTile.divideTiles(
+                        color: Colors.black26,
+                        tiles: snapshot.data.map(
+                          (data) => Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: ListTile(
+                              title: Text(data.nombre_comercial,
+                                  style: TextStyle(
+                                      overflow: TextOverflow.clip,
+                                      fontFamily: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .fontFamily)),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text("Dosis: " + data.dosis,
+                                      textAlign: TextAlign
+                                          .right, // Alinea el texto a la derecha
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
+                                  Text("Frecuencia: " + data.frecuencia,
+                                      textAlign: TextAlign
+                                          .right, // Alinea el texto a la derecha
+                                      style: TextStyle(
+                                          fontFamily: Theme.of(context)
+                                              .textTheme
+                                              .headline1
+                                              .fontFamily)),
+                                ],
+                              ),
+                              trailing: Wrap(children: [
+                                // CircleAvatar(
+                                //   radius: MediaQuery.of(context).size.width /
+                                //       radiusIconEditar,
+                                //   backgroundColor: Colors.blue,
+                                //   child: IconButton(
+                                //     icon: Icon(
+                                //       Icons.edit,
+                                //       color: Colors.white,
+                                //       size: sizeIconEditar,
+                                //     ),
+                                //     onPressed: () {
+                                //       _showAlertDialog(
+                                //         int.parse(data.id_medicamento),
+                                //         data.dosis_frecuencia,
+                                //         1,
+                                //       );
+                                //     },
+                                //   ),
+                                // ),
+                                CircleAvatar(
+                                  radius: MediaQuery.of(context).size.width *
+                                      radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
+                                  backgroundColor: Colors.blue,
+                                  child: FractionallySizedBox(
+                                    widthFactor:
+                                        0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                    heightFactor:
+                                        0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                        size:
+                                            sizeIconEditar, // Ajusta el tamaño del icono según tus necesidades
+                                      ),
+                                      onPressed: () {
+                                        _showAlertDialog(
+                                          context,
+                                          data.id_medicamento,
+                                          data.dosis,
+                                          data.frecuencia,
+                                          1,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 25,
+                                ),
+                                CircleAvatar(
+                                  radius: MediaQuery.of(context).size.width *
+                                      radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
+                                  backgroundColor: Colors.red,
+                                  child: FractionallySizedBox(
+                                    widthFactor:
+                                        0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                    heightFactor:
+                                        0.9, // Controla el tamaño del icono dentro del CircleAvatar
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                        size:
+                                            sizeIconDelete, // Ajusta el tamaño del icono según tus necesidades
+                                      ),
+                                      onPressed: () {
+                                        _showAlertDialog(
+                                          context,
+                                          data.id_medicamento,
+                                          data.dosis,
+                                          data.frecuencia,
+                                          2,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                //-------------------
+                                // CircleAvatar(
+                                //   radius: MediaQuery.of(context).size.width /
+                                //       radiusIconDelete,
+                                //   backgroundColor: Colors.red,
+                                //   child: IconButton(
+                                //     icon: Icon(
+                                //       Icons.delete,
+                                //       size: sizeIconDelete,
+                                //     ),
+                                //     color: Colors.white,
+                                //     onPressed: () {
+                                //       _showAlertDialog(
+                                //         int.parse(data.id_medicamento),
+                                //         data.dosis_frecuencia,
+                                //         2,
+                                //       );
+                                //     },
+                                //   ),
+                                // ),
+                              ]),
                             ),
-                            trailing: Wrap(children: [
-                              // CircleAvatar(
-                              //   radius: MediaQuery.of(context).size.width /
-                              //       radiusIconEditar,
-                              //   backgroundColor: Colors.blue,
-                              //   child: IconButton(
-                              //     icon: Icon(
-                              //       Icons.edit,
-                              //       color: Colors.white,
-                              //       size: sizeIconEditar,
-                              //     ),
-                              //     onPressed: () {
-                              //       _showAlertDialog(
-                              //         int.parse(data.id_medicamento),
-                              //         data.dosis_frecuencia,
-                              //         1,
-                              //       );
-                              //     },
-                              //   ),
-                              // ),
-                              CircleAvatar(
-                                radius: MediaQuery.of(context).size.width *
-                                    radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
-                                backgroundColor: Colors.blue,
-                                child: FractionallySizedBox(
-                                  widthFactor:
-                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
-                                  heightFactor:
-                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                      size:
-                                          sizeIconEditar, // Ajusta el tamaño del icono según tus necesidades
-                                    ),
-                                    onPressed: () {
-                                      _showAlertDialog(
-                                        data.id_medicamento,
-                                        data.dosis,
-                                        data.frecuencia,
-                                        1,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 25,
-                              ),
-                              CircleAvatar(
-                                radius: MediaQuery.of(context).size.width *
-                                    radiusCircle, // Ajusta el tamaño según el ancho de la pantalla
-                                backgroundColor: Colors.red,
-                                child: FractionallySizedBox(
-                                  widthFactor:
-                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
-                                  heightFactor:
-                                      0.9, // Controla el tamaño del icono dentro del CircleAvatar
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.white,
-                                      size:
-                                          sizeIconDelete, // Ajusta el tamaño del icono según tus necesidades
-                                    ),
-                                    onPressed: () {
-                                      _showAlertDialog(
-                                        data.id_medicamento,
-                                        data.dosis,
-                                        data.frecuencia,
-                                        2,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              //-------------------
-                              // CircleAvatar(
-                              //   radius: MediaQuery.of(context).size.width /
-                              //       radiusIconDelete,
-                              //   backgroundColor: Colors.red,
-                              //   child: IconButton(
-                              //     icon: Icon(
-                              //       Icons.delete,
-                              //       size: sizeIconDelete,
-                              //     ),
-                              //     color: Colors.white,
-                              //     onPressed: () {
-                              //       _showAlertDialog(
-                              //         int.parse(data.id_medicamento),
-                              //         data.dosis_frecuencia,
-                              //         2,
-                              //       );
-                              //     },
-                              //   ),
-                              // ),
-                            ]),
                           ),
-                        ),
-                      )).toList(),
-                );
-              } else {
-                return Container(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ListTile(
-                        title: Text(
-                      'No tiene medicamentos registrados',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              Theme.of(context).textTheme.headline1.fontFamily),
-                    )),
-                  ],
-                ));
-              }
-            },
-          ),
-        ),
+                        )).toList(),
+                  );
+                } else {
+                  return Container(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                          title: Text(
+                        'No tiene medicamentos registrados',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: Theme.of(context)
+                                .textTheme
+                                .headline1
+                                .fontFamily),
+                      )),
+                    ],
+                  ));
+                }
+              },
+            ),
+          );
+        }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Add your onPressed code here!
@@ -249,54 +272,48 @@ class _MedicamentoState extends State<MedicamentoPage> {
   }
 
   Future<List<MedicamentoModel>> read_medicamentos() async {
-    //String URL_base = Env.URL_PREFIX;
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/medicamentos";
-    var responseDecode;
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/medicamentos";
 
-    var response = await http.post(url, body: {
-      "id_paciente": id_paciente.toString(),
-    });
+      var response = await _client_read_medicamento.post(url, body: {
+        "id_paciente": id_paciente.toString(),
+      });
 
-    if (response.statusCode == 200) {
-      responseDecode = jsonDecode(response.body);
-      if (responseDecode['status'] != "Vacio") {
-        final List<MedicamentoModel> listMedicamentos = [];
-
-        for (var medicamentos in responseDecode['data']) {
-          listMedicamentos.add(MedicamentoModel.fromJson(medicamentos));
+      if (response.statusCode == 200) {
+        var responseDecode = json.decode(response.body);
+        if (responseDecode['status'] != "Vacio") {
+          final List<MedicamentoModel> listMedicamentos = [];
+          for (var medicamentos in responseDecode['data']) {
+            listMedicamentos.add(MedicamentoModel.fromJson(medicamentos));
+          }
+          return listMedicamentos;
+        } else {
+          _isLoading = true;
+          return null;
         }
-        return listMedicamentos;
       } else {
-        isLoading = true;
-        return null;
+        // Error en la solicitud HTTP
+        throw Exception(
+            'Error al obtener los medicamentos: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Error al obtener JSON');
+    } catch (e) {
+      // Error en la ejecución de la función
+      print('Error en la función read_medicamentos: $e');
+      throw Exception('Error al obtener los medicamentos');
     }
   }
 
-  guardarFrecuenciaMedicamento(
-      int id_medicamento, String dosis, String frecuencia) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/save_dosis_frecuencia";
-    var response = await http.post(url, body: {
-      "dosis": dosis,
-      "frecuencia": frecuencia,
-      "id_medicamento": id_medicamento.toString(),
-      "id_paciente": id_paciente.toString(),
-    });
-    data = json.decode(response.body);
-    print(response.body);
-  }
+  void _showAlertDialog(BuildContext context, int id_medicamento,
+      String data_dosis, String data_frecuencia, int button_pressed) {
+    TextEditingController dosis = TextEditingController();
+    TextEditingController frecuencia = TextEditingController();
 
-  void _showAlertDialog(int id_medicamento, String data_dosis,
-      String data_frecuencia, int button_pressed) {
     dosis.text = data_dosis.toString();
     frecuencia.text = data_frecuencia.toString();
     showDialog(
         context: context,
-        builder: (buildcontext) {
+        builder: (BuildContext context) {
           if (button_pressed == 1) {
             return AlertDialog(
               title: Text("Editar dosis y/o frecuencia",
@@ -344,11 +361,11 @@ class _MedicamentoState extends State<MedicamentoPage> {
                     ),
                     onPressed: () {
                       guardarFrecuenciaMedicamento(
+                        context,
                         id_medicamento,
                         dosis.text,
                         frecuencia.text,
                       );
-                      Navigator.popAndPushNamed(context, "/medicamentos");
                     },
                   ),
                 )
@@ -377,16 +394,47 @@ class _MedicamentoState extends State<MedicamentoPage> {
         });
   }
 
-  delete_medicamento(BuildContext context, var id_medicamento) async {
+  Future<void> guardarFrecuenciaMedicamento(BuildContext context,
+      int id_medicamento, String dosis, String frecuencia) async {
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/save_dosis_frecuencia";
+      var response = await _client_save_dosis.post(url, body: {
+        "dosis": dosis,
+        "frecuencia": frecuencia,
+        "id_medicamento": id_medicamento.toString(),
+        "id_paciente": id_paciente.toString(),
+      });
+
+      if (response.statusCode == 200) {
+        var responseDecode = json.decode(response.body);
+        if (responseDecode['status'] == "Success") {
+          _alert_informe(context, "Guardado correctamente", 1);
+          Navigator.popAndPushNamed(context, "/medicamentos");
+        } else {
+          _alert_informe(
+              context, "Error al guardar: ${responseDecode['status']}", 2);
+          Navigator.popAndPushNamed(context, "/medicamentos");
+        }
+      } else {
+        _alert_informe(context, "Error al guardar", 2);
+      }
+    } catch (e) {
+      print('Error al procesar la solicitud: $e');
+      _alert_informe(context, "Error al procesar la solicitud", 2);
+    }
+  }
+
+  void delete_medicamento(BuildContext context, var id_medicamento) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/delete_medicamento";
-    var response = await http.post(url, body: {
+    var response = await _client_save_dosis.post(url, body: {
       "id_medicamento": id_medicamento.toString(),
       "id_paciente": id_paciente.toString(),
     });
 
     if (response.statusCode == 200) {
-      _alert_informe(context, "Medicamento Eliminado", 1);
+      _alert_informe(context, "Medicamento Eliminado", 2);
       Navigator.popAndPushNamed(context, "/medicamentos");
     } else {
       var mensajeError = 'Error al obtener JSON: ' + response.body;
@@ -395,7 +443,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
     }
   }
 
-  _alert_informe(context, message, colorNumber) {
+  void _alert_informe(context, message, colorNumber) {
     var color;
     colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
 

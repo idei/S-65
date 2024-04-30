@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/usuario_services.dart';
-import '../widgets/opciones_navbar.dart';
 import '../widgets/alert_informe.dart';
 import 'env.dart';
 
@@ -21,10 +20,25 @@ class ScreeningADLQPage extends StatefulWidget {
 }
 
 class _ScreeningADLQState extends State<ScreeningADLQPage> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
+    //getStringValuesSF();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     getStringValuesSF();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 
   @override
@@ -58,17 +72,17 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
                 fontFamily: Theme.of(context).textTheme.headline1.fontFamily,
               )),
           actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
+            // PopupMenuButton<String>(
+            //   onSelected: choiceAction,
+            //   itemBuilder: (BuildContext context) {
+            //     return Constants.choices.map((String choice) {
+            //       return PopupMenuItem<String>(
+            //         value: choice,
+            //         child: Text(choice),
+            //       );
+            //     }).toList();
+            //   },
+            // ),
           ],
         ),
         body: FutureBuilder(
@@ -94,7 +108,7 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
   get_tiposcreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
     if (response.statusCode == 200) {
@@ -132,27 +146,20 @@ class _ScreeningADLQState extends State<ScreeningADLQPage> {
   }
 
   Future<List> getAllRespuestasADLQ() async {
-    var response;
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/tipo_respuesta_adlq";
+      var response = await _client.post(url, body: {});
 
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/tipo_respuesta_adlq";
-
-    response = await http.post(url, body: {});
-
-    var jsonData = json.decode(response.body);
-
-    if (response.statusCode == 200) {
-      return itemsRespuestasADLQ = jsonData['data'];
-    } else {
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        return itemsRespuestasADLQ = jsonData['data'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error en la solicitud getAllRespuestasADLQ: $e');
       return null;
-    }
-  }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      Navigator.pushNamed(context, '/');
     }
   }
 }
@@ -208,8 +215,12 @@ class ColumnWidgetAlimentacion extends StatefulWidget {
 }
 
 class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
@@ -220,6 +231,7 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -1215,59 +1227,13 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
       }
     }
 
-    // if (id_alimentacion == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_vestimenta == null) loginToast("Debe responder todas las preguntas");
-    // if (id_arreglos_hogar == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_aspecto_personal == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_bano == null) loginToast("Debe responder todas las preguntas");
-    // if (id_comprar_comida == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_comprension == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_conducir == null) loginToast("Debe responder todas las preguntas");
-    // if (id_conversacion == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_cuidado_hogar == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_empleo == null) loginToast("Debe responder todas las preguntas");
-    // if (id_escritura == null) loginToast("Debe responder todas las preguntas");
-    // if (id_evacuacion == null) loginToast("Debe responder todas las preguntas");
-    // if (id_lavado_ropa == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_lectura == null) loginToast("Debe responder todas las preguntas");
-    // if (id_manejo_efectivo == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_manejo_finanzas == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_mantenimiento_hogar == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_movilidad_barrio == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_poner_mesa == null) loginToast("Debe responder todas las preguntas");
-    // if (id_prepara_comida == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_recreacion == null) loginToast("Debe responder todas las preguntas");
-    // if (id_reuniones == null) loginToast("Debe responder todas las preguntas");
-    // if (id_tomar_medicacion == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_transporte_publico == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_uso_telefono == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_viaje_fuera_ambiente == null)
-    //   loginToast("Debe responder todas las preguntas");
-    // if (id_viajes == null) loginToast("Debe responder todas las preguntas");
-
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_adlq";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
-      "tipo_screening": tipo_screening,
+      "tipo_screening": tipo_screening.toString(),
       "id_alimentacion": id_alimentacion.toString(),
       "id_vestimenta": id_vestimenta.toString(),
       "id_arreglos_hogar": id_arreglos_hogar.toString(),

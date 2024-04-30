@@ -29,13 +29,17 @@ var screening_recordatorio;
 var usuarioModel;
 
 class _ScreeningCerebralState extends State<ScreeningCerebral> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
   }
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -153,7 +157,7 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
   get_tiposcreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
 
@@ -169,7 +173,7 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
     String URL_base = Env.URL_API;
     var url = URL_base + "/tipo_respuesta_salud_cerebral";
 
-    response = await http.post(url, body: {
+    response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
     });
 
@@ -212,9 +216,12 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
   ValueNotifier<bool> valueNotifierOtro = ValueNotifier<bool>(false);
   ValueNotifier<bool> _showAdditionalFieldsNotifier =
       ValueNotifier<bool>(false);
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => alert_screenings_generico(
         context,
@@ -224,6 +231,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -998,7 +1006,7 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_cerebral";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),

@@ -30,6 +30,8 @@ class RegisterPage extends StatefulWidget {
 final _formKey_registrar = GlobalKey<FormState>();
 
 class _FormRegisterState extends State<RegisterPage> {
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
     emailPaciente.text = '';
@@ -38,50 +40,59 @@ class _FormRegisterState extends State<RegisterPage> {
     apellidoPaciente.text = '';
     passwordRepetido.text = '';
     dni.text = '';
+
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: UniqueKey(),
-        resizeToAvoidBottomInset: false,
-        body: Form(
+      resizeToAvoidBottomInset: true,
+      key: UniqueKey(),
+      body: SingleChildScrollView(
+        child: Form(
           key: _formKey_registrar,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(5.0),
-                ),
-                Container(
-                  child: Image.asset('assets/logo1.png'),
-                  height: 110.0,
-                ),
-                Column(children: <Widget>[
-                  _crearEmail(),
-                  SizedBox(height: 10),
-                  _crearPassword(),
-                  SizedBox(height: 10),
-                  _repetirPassword(),
-                  SizedBox(height: 10),
-                  _crearApellido(),
-                  SizedBox(height: 10),
-                  _crearNombre(),
-                  SizedBox(height: 10),
-                  _crearDNI(),
-                  SizedBox(height: 10),
-                  CheckBoxCondiciones(),
-                  SizedBox(height: 10),
-                  _crearBotonRegistrar(context),
-                  SizedBox(height: 10),
-                  _crearBotonRegresar(context),
-                  SizedBox(height: 20),
-                ])
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(5.0),
+              ),
+              Container(
+                child: Image.asset('assets/logo1.png'),
+                height: 110.0,
+              ),
+              SizedBox(height: 20),
+              _crearEmail(),
+              SizedBox(height: 10),
+              _crearPassword(),
+              SizedBox(height: 10),
+              _repetirPassword(),
+              SizedBox(height: 10),
+              _crearApellido(),
+              SizedBox(height: 10),
+              _crearNombre(),
+              SizedBox(height: 10),
+              _crearDNI(),
+              SizedBox(height: 10),
+              CheckBoxCondiciones(),
+              SizedBox(height: 10),
+              _crearBotonRegistrar(context),
+              SizedBox(height: 10),
+              _crearBotonRegresar(context),
+              SizedBox(height: 20),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
   }
 
   // Widget _crearCheck() {
@@ -361,7 +372,7 @@ class _FormRegisterState extends State<RegisterPage> {
   registerPaciente() async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/register_paciente";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "email": emailPaciente.text,
       "password": passwordNuevo.text,
       "nombre": nombrePaciente.text,

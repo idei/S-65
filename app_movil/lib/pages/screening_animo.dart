@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -9,7 +8,6 @@ import '../services/usuario_services.dart';
 import 'package:app_salud/widgets/alert_informe.dart';
 import 'package:app_salud/widgets/alert_scaffold.dart';
 import 'env.dart';
-import 'ajustes.dart';
 
 var id_paciente;
 var id_medico;
@@ -28,10 +26,13 @@ class FormScreeningAnimo extends StatefulWidget {
 
 class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   final myController = TextEditingController();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => showCustomAlert(
           context,
           "Chequeo de Ánimo",
@@ -43,6 +44,7 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
 
   @override
   void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
     myController.dispose();
     super.dispose();
   }
@@ -76,7 +78,7 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
   get_tiposcreening(var codigo_screening) async {
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_tipo_screening";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "codigo_screening": codigo_screening,
     });
     print(response);
@@ -139,6 +141,42 @@ class _FormScreeningAnimoState extends State<FormScreeningAnimo> {
       ),
     );
   }
+
+  Future getAllRespuesta() async {
+    await getAllEventosAnimo();
+
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_respuesta_animo";
+    var response = await _client.post(url, body: {});
+
+    var jsonDate = json.decode(response.body);
+
+    if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
+      //setState(() {
+      itemsRespuestasAnimo = jsonDate['data'];
+      //});
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<List> getAllEventosAnimo() async {
+    var response;
+
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/tipo_eventos_animo";
+
+    response = await _client.post(url, body: {});
+
+    var jsonData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return eventoAnimo = jsonData['data'];
+    } else {
+      return null;
+    }
+  }
 }
 
 class ScreeningAnimo extends StatefulWidget {
@@ -150,6 +188,20 @@ class ScreeningAnimo extends StatefulWidget {
 
 class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   final _formKey_screening_animo = GlobalKey<FormState>();
+
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
   //----------------------------------------VARIABLES CHECKBOX -----------------------------------------------
 
@@ -290,7 +342,7 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_animo";
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "id_medico": id_medico.toString(),
       "id_recordatorio": id_recordatorio.toString(),
@@ -435,59 +487,23 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
           });
     }
   }
+
+  String cod_event_satisfecho = "ANI1";
+  String cod_event_abandonado = 'ANI2';
+  String cod_event_vacia = 'ANI3';
+  String cod_event_aburrida = 'ANI4';
+  String cod_event_humor = 'ANI5';
+  String cod_event_temor = 'ANI6';
+  String cod_event_feliz = 'ANI7';
+  String cod_event_desamparado = 'ANI8';
+  String cod_event_prefiere = "ANI9";
+  String cod_event_memoria = 'ANI10';
+  String cod_event_estar_vivo = 'ANI11';
+  String cod_event_inutil = 'ANI12';
+  String cod_event_energia = 'ANI13';
+  String cod_event_situacion = 'ANI14';
+  String cod_event_situacion_mejor = 'ANI15';
 }
-
-Future getAllRespuesta() async {
-  await getAllEventosAnimo();
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_respuesta_animo";
-  var response = await http.post(url, body: {});
-
-  var jsonDate = json.decode(response.body);
-
-  if (response.statusCode == 200 && jsonDate['status'] != "Vacio") {
-    //setState(() {
-    itemsRespuestasAnimo = jsonDate['data'];
-    //});
-    return true;
-  } else {
-    return false;
-  }
-}
-
-Future<List> getAllEventosAnimo() async {
-  var response;
-
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/tipo_eventos_animo";
-
-  response = await http.post(url, body: {});
-
-  var jsonData = json.decode(response.body);
-
-  if (response.statusCode == 200) {
-    return eventoAnimo = jsonData['data'];
-  } else {
-    return null;
-  }
-}
-
-String cod_event_satisfecho = "ANI1";
-String cod_event_abandonado = 'ANI2';
-String cod_event_vacia = 'ANI3';
-String cod_event_aburrida = 'ANI4';
-String cod_event_humor = 'ANI5';
-String cod_event_temor = 'ANI6';
-String cod_event_feliz = 'ANI7';
-String cod_event_desamparado = 'ANI8';
-String cod_event_prefiere = "ANI9";
-String cod_event_memoria = 'ANI10';
-String cod_event_estar_vivo = 'ANI11';
-String cod_event_inutil = 'ANI12';
-String cod_event_energia = 'ANI13';
-String cod_event_situacion = 'ANI14';
-String cod_event_situacion_mejor = 'ANI15';
 
 //-------------------------------------- ÄNIMO 1 -----------------------------------------------------
 

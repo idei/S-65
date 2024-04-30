@@ -21,13 +21,19 @@ var usuarioModel;
 var id_paciente;
 
 class _ScreeningState extends State<ScreeningPage> {
+  http.Client
+      _client_read_screening; // Cliente HTTP para realizar las solicitudes
+
   @override
   void initState() {
+    _client_read_screening = http.Client(); // Inicializar el cliente HTTP
     super.initState();
   }
 
   @override
   void dispose() {
+    _client_read_screening
+        .close(); // Cerrar el cliente HTTP cuando la página se destruye
     super.dispose();
   }
 
@@ -273,7 +279,7 @@ class _ScreeningState extends State<ScreeningPage> {
 
     String URL_base = Env.URL_API;
     var url = URL_base + "/read_screenings";
-    var response = await http.post(url, body: {
+    var response = await _client_read_screening.post(url, body: {
       "id_paciente": id_paciente.toString(),
       "select_screening": select_screening,
     });

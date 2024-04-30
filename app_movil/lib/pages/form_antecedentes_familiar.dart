@@ -19,16 +19,12 @@ var id_paciente;
 class _FormpruebaState extends State<FormAntecedentesFamiliares> {
   final myController = TextEditingController();
   var usuarioModel;
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    myController.dispose();
-    super.dispose();
   }
 
   @override
@@ -87,217 +83,138 @@ class _FormpruebaState extends State<FormAntecedentesFamiliares> {
           }),
     );
   }
-}
 
-var response = null;
-
-guardar_datos(BuildContext context) async {
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/save_antecedentes";
-  response = await http.post(url, body: {
-    "id_paciente": id_paciente,
-    "tipo_antecedente": "2",
-    "retraso": valueNotifierRetrasoMental.value.toString(),
-    "desorden": valueNotifierDesorden.value.toString(),
-    "deficit": valueNotifierDeficit.value.toString(),
-    "lesiones_cabeza": valueNotifierLesiones_cabeza.value.toString(),
-    "perdidas": valueNotifierPerdidas.value.toString(),
-    "accidentes_caidas": valueNotifierAccidentes_caidas.value.toString(),
-    "lesiones_espalda": valueNotifierLesiones_espalda.value.toString(),
-    "infecciones": valueNotifierInfecciones.value.toString(),
-    "toxinas": valueNotifierToxinas.value.toString(),
-    "acv": valueNotifierAcv.value.toString(),
-    "demencia": valueNotifierDemencia.value.toString(),
-    "parkinson": valueNotifierParkinson.value.toString(),
-    "epilepsia": valueNotifierEpilepsia.value.toString(),
-    "esclerosis": valueNotifierEsclerosis.value.toString(),
-    "huntington": valueNotifierHuntington.value.toString(),
-    "depresion": valueNotifierDepresion.value.toString(),
-    "trastorno": valueNotifierTrastorno.value.toString(),
-    "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
-    "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
-    "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
-    "cancer": valueNotifierCancer.value.toString(),
-    "cirujia": valueNotifierCirujia.value.toString(),
-    "trasplante": valueNotifierTrasplante.value.toString(),
-    "hipotiroidismo": valueNotifierHipotiroidismo.value.toString(),
-    "cardiologico": valueNotifierCardiologico.value.toString(),
-    "diabetes": valueNotifierDiabetes.value.toString(),
-    "hipertension": valueNotifierHipertension.value.toString(),
-    "colesterol": valueNotifierColesterol.value.toString(),
-    "cod_event_retraso": cod_event_retraso,
-    "cod_event_desorden": cod_event_desorden,
-    "cod_event_deficit": cod_event_deficit,
-    "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
-    "cod_event_perdidas": cod_event_perdidas,
-    "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
-    "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
-    "cod_event_infecciones": cod_event_infecciones,
-    "cod_event_toxinas": cod_event_toxinas,
-    "cod_event_acv": cod_event_acv,
-    "cod_event_demencia": cod_event_demencia,
-    "cod_event_parkinson": cod_event_parkinson,
-    "cod_event_epilepsia": cod_event_epilepsia,
-    "cod_event_esclerosis": cod_event_esclerosis,
-    "cod_event_huntington": cod_event_huntington,
-    "cod_event_depresion": cod_event_depresion,
-    "cod_event_trastorno": cod_event_trastorno,
-    "cod_event_esquizofrenia": cod_event_esquizofrenia,
-    "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
-    "cod_event_intoxicaciones": cod_event_intoxicaciones,
-    "cod_event_cancer": cod_event_cancer,
-    "cod_event_cirujia": cod_event_cirujia,
-    "cod_event_trasplante": cod_event_trasplante,
-    "cod_event_hipotiroidismo": cod_event_hipotiroidismo,
-    "cod_event_cardiologico": cod_event_cardiologico,
-    "cod_event_diabetes": cod_event_diabetes,
-    "cod_event_hipertension": cod_event_hipertension,
-    "cod_event_colesterol": cod_event_colesterol,
-  });
-
-  var responseDecoder = json.decode(response.body);
-  if (response.statusCode == 200) {
-    if (responseDecoder["status"] == "Success") {
-      _alert_informe(context, "Antecedentes Guardados", 1);
-      Navigator.pushNamed(context, '/antecedentes_familiares');
-    }
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    myController.dispose();
+    super.dispose();
   }
-}
 
-read_datos_paciente() async {
-  final completer = Completer<dynamic>();
+  read_datos_paciente() async {
+    final completer = Completer<dynamic>();
 
-  String URL_base = Env.URL_API;
-  var url = URL_base + "/antecedentes_medicos";
-  var response = await http.post(url, body: {
-    "id_paciente": id_paciente,
-    "tipo_antecedente": "2",
-    "cod_event_retraso": cod_event_retraso,
-    "cod_event_desorden": cod_event_desorden,
-    "cod_event_deficit": cod_event_deficit,
-    "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
-    "cod_event_perdidas": cod_event_perdidas,
-    "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
-    "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
-    "cod_event_infecciones": cod_event_infecciones,
-    "cod_event_toxinas": cod_event_toxinas,
-    "cod_event_acv": cod_event_acv,
-    "cod_event_demencia": cod_event_demencia,
-    "cod_event_parkinson": cod_event_parkinson,
-    "cod_event_epilepsia": cod_event_epilepsia,
-    "cod_event_esclerosis": cod_event_esclerosis,
-    "cod_event_huntington": cod_event_huntington,
-    "cod_event_depresion": cod_event_depresion,
-    "cod_event_trastorno": cod_event_trastorno,
-    "cod_event_esquizofrenia": cod_event_esquizofrenia,
-    "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
-    "cod_event_intoxicaciones": cod_event_intoxicaciones,
-    "cod_event_cancer": cod_event_cancer,
-    "cod_event_cirujia": cod_event_cirujia,
-    "cod_event_trasplante": cod_event_trasplante,
-    "cod_event_hipotiroidismo": cod_event_hipotiroidismo,
-    "cod_event_cardiologico": cod_event_cardiologico,
-    "cod_event_diabetes": cod_event_diabetes,
-    "cod_event_hipertension": cod_event_hipertension,
-    "cod_event_colesterol": cod_event_colesterol,
-  });
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/antecedentes_medicos";
+    var response = await _client.post(url, body: {
+      "id_paciente": id_paciente,
+      "tipo_antecedente": "2",
+      "cod_event_retraso": cod_event_retraso,
+      "cod_event_desorden": cod_event_desorden,
+      "cod_event_deficit": cod_event_deficit,
+      "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
+      "cod_event_perdidas": cod_event_perdidas,
+      "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
+      "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
+      "cod_event_infecciones": cod_event_infecciones,
+      "cod_event_toxinas": cod_event_toxinas,
+      "cod_event_acv": cod_event_acv,
+      "cod_event_demencia": cod_event_demencia,
+      "cod_event_parkinson": cod_event_parkinson,
+      "cod_event_epilepsia": cod_event_epilepsia,
+      "cod_event_esclerosis": cod_event_esclerosis,
+      "cod_event_huntington": cod_event_huntington,
+      "cod_event_depresion": cod_event_depresion,
+      "cod_event_trastorno": cod_event_trastorno,
+      "cod_event_esquizofrenia": cod_event_esquizofrenia,
+      "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
+      "cod_event_intoxicaciones": cod_event_intoxicaciones,
+      "cod_event_cancer": cod_event_cancer,
+      "cod_event_cirujia": cod_event_cirujia,
+      "cod_event_trasplante": cod_event_trasplante,
+      "cod_event_hipotiroidismo": cod_event_hipotiroidismo,
+      "cod_event_cardiologico": cod_event_cardiologico,
+      "cod_event_diabetes": cod_event_diabetes,
+      "cod_event_hipertension": cod_event_hipertension,
+      "cod_event_colesterol": cod_event_colesterol,
+    });
 
-  if (response.statusCode == 200) {
-    var responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      var responseData = json.decode(response.body);
 
-    if (responseData["status"] == "Success") {
-      var data = responseData['data'];
+      if (responseData["status"] == "Success") {
+        var data = responseData['data'];
 
-      valueNotifierRetrasoMental.value = data["retraso"] == 1 ? true : false;
+        valueNotifierRetrasoMental.value = data["retraso"] == 1 ? true : false;
 
-      valueNotifierDesorden.value = data["desorden"] == 1 ? true : false;
+        valueNotifierDesorden.value = data["desorden"] == 1 ? true : false;
 
-      valueNotifierDeficit.value = data["deficit"] == 1 ? true : false;
+        valueNotifierDeficit.value = data["deficit"] == 1 ? true : false;
 
-      valueNotifierLesiones_cabeza.value =
-          data["lesiones_cabeza"] == 1 ? true : false;
+        valueNotifierLesiones_cabeza.value =
+            data["lesiones_cabeza"] == 1 ? true : false;
 
-      valueNotifierPerdidas.value = data["perdidas"] == 1 ? true : false;
+        valueNotifierPerdidas.value = data["perdidas"] == 1 ? true : false;
 
-      valueNotifierAccidentes_caidas.value =
-          data["accidentes_caidas"] == 1 ? true : false;
+        valueNotifierAccidentes_caidas.value =
+            data["accidentes_caidas"] == 1 ? true : false;
 
-      valueNotifierLesiones_espalda.value =
-          data["lesiones_espalda"] == 1 ? true : false;
+        valueNotifierLesiones_espalda.value =
+            data["lesiones_espalda"] == 1 ? true : false;
 
-      valueNotifierInfecciones.value = data["infecciones"] == 1 ? true : false;
+        valueNotifierInfecciones.value =
+            data["infecciones"] == 1 ? true : false;
 
-      valueNotifierToxinas.value = data["toxinas"] == 1 ? true : false;
+        valueNotifierToxinas.value = data["toxinas"] == 1 ? true : false;
 
-      valueNotifierAcv.value = data["acv"] == 1 ? true : false;
+        valueNotifierAcv.value = data["acv"] == 1 ? true : false;
 
-      valueNotifierDemencia.value = data["demencia"] == 1 ? true : false;
+        valueNotifierDemencia.value = data["demencia"] == 1 ? true : false;
 
-      valueNotifierParkinson.value = data["parkinson"] == 1 ? true : false;
+        valueNotifierParkinson.value = data["parkinson"] == 1 ? true : false;
 
-      valueNotifierEpilepsia.value = data["epilepsia"] == 1 ? true : false;
+        valueNotifierEpilepsia.value = data["epilepsia"] == 1 ? true : false;
 
-      valueNotifierEsclerosis.value = data["esclerosis"] == 1 ? true : false;
+        valueNotifierEsclerosis.value = data["esclerosis"] == 1 ? true : false;
 
-      valueNotifierHuntington.value = data["huntington"] == 1 ? true : false;
+        valueNotifierHuntington.value = data["huntington"] == 1 ? true : false;
 
-      valueNotifierDepresion.value = data["depresion"] == 1 ? true : false;
+        valueNotifierDepresion.value = data["depresion"] == 1 ? true : false;
 
-      valueNotifierTrastorno.value = data["trastorno"] == 1 ? true : false;
+        valueNotifierTrastorno.value = data["trastorno"] == 1 ? true : false;
 
-      valueNotifierEsquizofrenia.value =
-          data["esquizofrenia"] == 1 ? true : false;
+        valueNotifierEsquizofrenia.value =
+            data["esquizofrenia"] == 1 ? true : false;
 
-      valueNotifierEnfermedad_desorden.value =
-          data["enfermedad_desorden"] == 1 ? true : false;
+        valueNotifierEnfermedad_desorden.value =
+            data["enfermedad_desorden"] == 1 ? true : false;
 
-      valueNotifierIntoxicaciones.value =
-          data["intoxicaciones"] == 1 ? true : false;
+        valueNotifierIntoxicaciones.value =
+            data["intoxicaciones"] == 1 ? true : false;
 
-      valueNotifierCancer.value = data["cancer"] == 1 ? true : false;
+        valueNotifierCancer.value = data["cancer"] == 1 ? true : false;
 
-      valueNotifierCirujia.value = data["cirujia"] == 1 ? true : false;
+        valueNotifierCirujia.value = data["cirujia"] == 1 ? true : false;
 
-      valueNotifierTrasplante.value = data["trasplante"] == 1 ? true : false;
+        valueNotifierTrasplante.value = data["trasplante"] == 1 ? true : false;
 
-      valueNotifierHipotiroidismo.value =
-          data["hipotiroidismo"] == 1 ? true : false;
+        valueNotifierHipotiroidismo.value =
+            data["hipotiroidismo"] == 1 ? true : false;
 
-      valueNotifierCardiologico.value =
-          data["cardiologico"] == 1 ? true : false;
+        valueNotifierCardiologico.value =
+            data["cardiologico"] == 1 ? true : false;
 
-      valueNotifierDiabetes.value = data["diabetes"] == 1 ? true : false;
+        valueNotifierDiabetes.value = data["diabetes"] == 1 ? true : false;
 
-      valueNotifierHipertension.value =
-          data["hipertension"] == 1 ? true : false;
+        valueNotifierHipertension.value =
+            data["hipertension"] == 1 ? true : false;
 
-      valueNotifierColesterol.value = data["colesterol"] == 1 ? true : false;
+        valueNotifierColesterol.value = data["colesterol"] == 1 ? true : false;
 
-      completer.complete(true);
-    } else {
-      if (responseData["status"] == "Vacio") {
         completer.complete(true);
       } else {
-        completer.completeError("Error en la respuesta");
+        if (responseData["status"] == "Vacio") {
+          completer.complete(true);
+        } else {
+          completer.completeError("Error en la respuesta");
+        }
       }
+    } else {
+      completer.completeError("Error en la solicitud");
     }
-  } else {
-    completer.completeError("Error en la solicitud");
+
+    return completer.future;
   }
-
-  return completer.future;
-}
-
-_alert_informe(context, message, colorNumber) {
-  var color;
-  colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
-
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    backgroundColor: color,
-    content: Text(message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white)),
-  ));
 }
 
 //--------------------------------- Antecedentes Familiares --------------------------
@@ -311,6 +228,14 @@ class AntecedentesFam extends StatefulWidget {
 
 class AntecedentesFamWidgetState extends State<AntecedentesFam> {
   final _formKey_antecedentes_familiares = GlobalKey<FormState>();
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -374,20 +299,27 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
             Colesterol(),
             SizedBox(height: 50),
             Center(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
+                icon: _isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: const CircularProgressIndicator(),
+                      )
+                    : const Icon(Icons.save_alt),
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  textStyle: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily),
                 ),
                 onPressed: () {
-                  guardar_datos(context);
+                  _startLoading();
                 },
-                child: Text(
-                  'Guardar Antecedentes',
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
-                  ),
-                ),
+                label: Text('Guardar Antecedentes',
+                    style: TextStyle(
+                        fontFamily:
+                            Theme.of(context).textTheme.headline1.fontFamily,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
             SizedBox(height: 30),
@@ -397,12 +329,146 @@ class AntecedentesFamWidgetState extends State<AntecedentesFam> {
     );
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Ajustes) {
-      Navigator.pushNamed(context, '/ajustes');
-    } else if (choice == Constants.Salir) {
-      print('Salir');
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+
+    super.dispose();
+  }
+
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardar_datos();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Datos",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  guardar_datos() async {
+    String URL_base = Env.URL_API;
+    var url = URL_base + "/save_antecedentes";
+    var response = await _client.post(url, body: {
+      "id_paciente": id_paciente,
+      "tipo_antecedente": "2",
+      "retraso": valueNotifierRetrasoMental.value.toString(),
+      "desorden": valueNotifierDesorden.value.toString(),
+      "deficit": valueNotifierDeficit.value.toString(),
+      "lesiones_cabeza": valueNotifierLesiones_cabeza.value.toString(),
+      "perdidas": valueNotifierPerdidas.value.toString(),
+      "accidentes_caidas": valueNotifierAccidentes_caidas.value.toString(),
+      "lesiones_espalda": valueNotifierLesiones_espalda.value.toString(),
+      "infecciones": valueNotifierInfecciones.value.toString(),
+      "toxinas": valueNotifierToxinas.value.toString(),
+      "acv": valueNotifierAcv.value.toString(),
+      "demencia": valueNotifierDemencia.value.toString(),
+      "parkinson": valueNotifierParkinson.value.toString(),
+      "epilepsia": valueNotifierEpilepsia.value.toString(),
+      "esclerosis": valueNotifierEsclerosis.value.toString(),
+      "huntington": valueNotifierHuntington.value.toString(),
+      "depresion": valueNotifierDepresion.value.toString(),
+      "trastorno": valueNotifierTrastorno.value.toString(),
+      "esquizofrenia": valueNotifierEsquizofrenia.value.toString(),
+      "enfermedad_desorden": valueNotifierEnfermedad_desorden.value.toString(),
+      "intoxicaciones": valueNotifierIntoxicaciones.value.toString(),
+      "cancer": valueNotifierCancer.value.toString(),
+      "cirujia": valueNotifierCirujia.value.toString(),
+      "trasplante": valueNotifierTrasplante.value.toString(),
+      "hipotiroidismo": valueNotifierHipotiroidismo.value.toString(),
+      "cardiologico": valueNotifierCardiologico.value.toString(),
+      "diabetes": valueNotifierDiabetes.value.toString(),
+      "hipertension": valueNotifierHipertension.value.toString(),
+      "colesterol": valueNotifierColesterol.value.toString(),
+      "cod_event_retraso": cod_event_retraso,
+      "cod_event_desorden": cod_event_desorden,
+      "cod_event_deficit": cod_event_deficit,
+      "cod_event_lesiones_cabeza": cod_event_lesiones_cabeza,
+      "cod_event_perdidas": cod_event_perdidas,
+      "cod_event_accidentes_caidas": cod_event_accidentes_caidas,
+      "cod_event_lesiones_espalda": cod_event_lesiones_espalda,
+      "cod_event_infecciones": cod_event_infecciones,
+      "cod_event_toxinas": cod_event_toxinas,
+      "cod_event_acv": cod_event_acv,
+      "cod_event_demencia": cod_event_demencia,
+      "cod_event_parkinson": cod_event_parkinson,
+      "cod_event_epilepsia": cod_event_epilepsia,
+      "cod_event_esclerosis": cod_event_esclerosis,
+      "cod_event_huntington": cod_event_huntington,
+      "cod_event_depresion": cod_event_depresion,
+      "cod_event_trastorno": cod_event_trastorno,
+      "cod_event_esquizofrenia": cod_event_esquizofrenia,
+      "cod_event_enfermedad_desorden": cod_event_enfermedad_desorden,
+      "cod_event_intoxicaciones": cod_event_intoxicaciones,
+      "cod_event_cancer": cod_event_cancer,
+      "cod_event_cirujia": cod_event_cirujia,
+      "cod_event_trasplante": cod_event_trasplante,
+      "cod_event_hipotiroidismo": cod_event_hipotiroidismo,
+      "cod_event_cardiologico": cod_event_cardiologico,
+      "cod_event_diabetes": cod_event_diabetes,
+      "cod_event_hipertension": cod_event_hipertension,
+      "cod_event_colesterol": cod_event_colesterol,
+    });
+
+    var responseDecoder;
+    if (response.statusCode == 200) {
+      responseDecoder = json.decode(response.body);
+
+      if (responseDecoder["status"] == "Success") {
+        _alert_informe(context, "Antecedentes Guardados", 1);
+        Navigator.pushNamed(context, '/antecedentes_familiares');
+      }
+    } else {
+      print('Error: $response.statusCode');
+      return null;
     }
+  }
+
+  _alert_informe(context, message, colorNumber) {
+    var color;
+    colorNumber == 1 ? color = Colors.green[800] : color = Colors.red[600];
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white)),
+    ));
   }
 }
 

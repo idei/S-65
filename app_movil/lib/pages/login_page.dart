@@ -36,6 +36,14 @@ class _LoginPage extends State<LoginPage> {
   var _obscureText = true;
   String _errorMessage;
 
+  http.Client _client; // Cliente HTTP para realizar las solicitudes
+
+  @override
+  void initState() {
+    _client = http.Client(); // Inicializar el cliente HTTP
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         key: UniqueKey(),
@@ -88,6 +96,12 @@ class _LoginPage extends State<LoginPage> {
         ));
   }
 
+  @override
+  void dispose() {
+    _client.close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
+
   fetchLogin() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final deviceName = await DeviceUtils.getDeviceName();
@@ -97,7 +111,7 @@ class _LoginPage extends State<LoginPage> {
 
     var url = URL_base + "/login_paciente";
 
-    var response = await http.post(url, body: {
+    var response = await _client.post(url, body: {
       "email": email.text,
       "password": password.text,
     });

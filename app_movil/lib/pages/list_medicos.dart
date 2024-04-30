@@ -30,6 +30,8 @@ class _ListMedicosState extends State<ListMedicos>
   var matricula;
   var rela_medico;
   var usuarioModel;
+  http.Client
+      _client_list_medicos; // Cliente HTTP para realizar las solicitudes
 
   @override
   void initState() {
@@ -45,6 +47,9 @@ class _ListMedicosState extends State<ListMedicos>
       parent: _animationController,
       curve: Curves.easeOut, // Curva de animación
     ));
+
+    _client_list_medicos = http.Client(); // Inicializar el cliente HTTP
+
     super.initState();
   }
 
@@ -271,44 +276,47 @@ class _ListMedicosState extends State<ListMedicos>
     );
   }
 
-  Future<List<MedicoModel>> fetchMedicos(var id_paciente) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/read_list_medicos";
-    var response = await http.post(
-      url,
-      body: {
-        "id_paciente": id_paciente.toString(),
-      },
-    );
+  @override
+  void dispose() {
+    _client_list_medicos
+        .close(); // Cerrar el cliente HTTP cuando la página se destruye
+    super.dispose();
+  }
 
-    var responseDecode = jsonDecode(response.body);
+  Future<List<MedicoModel>> fetchMedicos(int idPaciente) async {
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/read_list_medicos";
+      var response = await _client_list_medicos
+          .post(url, body: {"id_paciente": idPaciente.toString()});
 
-    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
-      final List<MedicoModel> medicos_items = [];
+      if (response.statusCode == 200) {
+        var responseDecode = jsonDecode(response.body);
 
-      for (var medicos in responseDecode['data']) {
-        medicos_items.add(MedicoModel.fromJson(medicos));
-      }
+        if (responseDecode['status'] != 'Vacio') {
+          List<MedicoModel> medicosItems = List<MedicoModel>.from(
+              responseDecode['data']
+                  .map((medico) => MedicoModel.fromJson(medico)));
 
-      bool buscarPorNombreMedico(List<MedicoModel> listaMedicos) {
-        return listaMedicos.any((medico) => medico.estado_habilitacion == 1);
-      }
+          _isCardVisible =
+              medicosItems.any((medico) => medico.estado_habilitacion == 1);
 
-      if (buscarPorNombreMedico(medicos_items)) {
-        _isCardVisible = true;
+          return medicosItems;
+        } else {
+          _isLoading = true;
+          return null;
+        }
       } else {
-        _isCardVisible = false;
+        throw Exception('Error en la solicitud HTTP: ${response.statusCode}');
       }
-
-      return medicos_items;
-    } else {
-      _isLoading = true;
-      return null;
+    } catch (e) {
+      print('Error al obtener los médicos: $e');
+      throw Exception('Error al obtener los médicos');
     }
   }
 
   void _handleAccept(var id_medico) async {
-    bool resultado = await update_estado_habilitacion(2, id_medico);
+    bool resultado = await updateEstadoHabilitacion(2, id_medico);
 
     if (resultado) {
       _alert_informe(context, "Médico vinculado correctamente", 1);
@@ -350,7 +358,7 @@ class _ListMedicosState extends State<ListMedicos>
   }
 
   void _handleCancel(var id_medico) async {
-    bool resultado = await update_estado_habilitacion(0, id_medico);
+    bool resultado = await updateEstadoHabilitacion(0, id_medico);
 
     if (resultado) {
       _alert_informe(context, "Médico rechazado correctamente", 1);
@@ -378,23 +386,27 @@ class _ListMedicosState extends State<ListMedicos>
     ));
   }
 
-  update_estado_habilitacion(var estado, var id_medico) async {
-    String URL_base = Env.URL_API;
-    var url = URL_base + "/update_estado_habilitacion_medico";
-    var response = await http.post(
-      url,
-      body: {
-        "id_paciente": id_paciente.toString(),
-        "id_medico": id_medico.toString(),
-        "estado_paciente_medico": estado.toString(),
-      },
-    );
+  Future<bool> updateEstadoHabilitacion(int estado, int idMedico) async {
+    try {
+      String URL_base = Env.URL_API;
+      var url = URL_base + "/update_estado_habilitacion_medico";
+      var response = await _client_list_medicos.post(
+        url,
+        body: {
+          "id_paciente": id_paciente.toString(),
+          "id_medico": idMedico.toString(),
+          "estado_paciente_medico": estado.toString(),
+        },
+      );
 
-    var responseDecode = jsonDecode(response.body);
-
-    if (response.statusCode == 200 && responseDecode['status'] != 'Vacio') {
-      return true;
-    } else {
+      if (response.statusCode == 200) {
+        var responseDecode = jsonDecode(response.body);
+        return responseDecode['status'] != 'Vacio';
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error al actualizar el estado de habilitación: $e');
       return false;
     }
   }
