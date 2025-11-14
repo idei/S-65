@@ -458,34 +458,33 @@ class ScreeningAnimoWidgetState extends State<ScreeningAnimo> {
   }
 
   showDialogMessage() async {
-    if (!_isLoading) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              child: Container(
-                height: 80,
-                width: 80,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(
-                      height: 10,
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Chequeo de Ánimo",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                     ),
-                    Text(
-                      "Guardando Información",
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
-            );
-          });
-    }
+            ),
+          );
+        });
   }
 
   String cod_event_satisfecho = "ANI1";

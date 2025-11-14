@@ -425,34 +425,32 @@ class _FormNutricionalState extends State<FormNutricional> {
   }
 
   showDialogMessage() async {
-    if (!_isLoading) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              child: Container(
-                height: 80,
-                width: 80,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(
-                      height: 10,
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Chequeo Nutricional",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
                     ),
-                    Text(
-                      "Guardando Información",
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.headline1.fontFamily,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
-            );
-          });
-    }
+            ),
+          );
+        });
   }
 }
 

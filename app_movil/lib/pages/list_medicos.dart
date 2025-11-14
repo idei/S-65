@@ -311,7 +311,6 @@ class _ListMedicosState extends State<ListMedicos>
       }
     } catch (e) {
       print('Error al obtener los médicos: $e');
-      throw Exception('Error al obtener los médicos');
     }
   }
 

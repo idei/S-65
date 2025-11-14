@@ -1303,7 +1303,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
                 //primary: Color.fromRGBO(157, 19, 34, 1),
                 ),
             onPressed: () {
-              guardarDatos(context);
+              _startLoading();
             },
             child: Text('GUARDAR',
                 style: TextStyle(
@@ -1319,6 +1319,50 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
     );
   }
 
+  bool _isLoading = false;
+  void _startLoading() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage();
+
+    await guardarDatos();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Chequeo de Quejas Cognitivas",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   loginToast(String toast) {
     return Fluttertoast.showToast(
         msg: toast,
@@ -1328,7 +1372,7 @@ class ScreeningQCQWidgetState extends State<ScreeningQCQ> {
         textColor: Colors.white);
   }
 
-  guardarDatos(BuildContext context) async {
+  guardarDatos() async {
     if (id_ate1 == null ||
         id_ate2 == null ||
         id_ate3 == null ||

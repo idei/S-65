@@ -12,7 +12,7 @@ class Avisos extends StatefulWidget {
   _AvisosState createState() => _AvisosState();
 }
 
-List<AvisosModel> avisos_items;
+List<AvisosModel> avisos_items = [];
 bool _isLoading = false;
 var usuarioModel;
 var id_paciente;

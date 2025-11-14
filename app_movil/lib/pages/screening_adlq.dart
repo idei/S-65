@@ -1181,6 +1181,8 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
       _isLoading = true;
     });
 
+    showDialogMessage();
+
     await guardarDatosADLQ();
 
     setState(() {
@@ -1276,6 +1278,35 @@ class _ColumnWidgetAlimentacionState extends State<ColumnWidgetAlimentacion> {
         _scaffold_messenger(context, "No se pudo guardar el Chequeo", 2);
       }
     }
+  }
+
+  showDialogMessage() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Chequeo Actividad de la Vida Diaria",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 }
 

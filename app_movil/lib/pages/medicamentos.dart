@@ -294,8 +294,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
         }
       } else {
         // Error en la solicitud HTTP
-        throw Exception(
-            'Error al obtener los medicamentos: ${response.statusCode}');
+        // throw Exception(
+        //     'Error al obtener los medicamentos: ${response.statusCode}');
       }
     } catch (e) {
       // Error en la ejecución de la función
@@ -360,12 +360,8 @@ class _MedicamentoState extends State<MedicamentoPage> {
                       ),
                     ),
                     onPressed: () {
-                      guardarFrecuenciaMedicamento(
-                        context,
-                        id_medicamento,
-                        dosis.text,
-                        frecuencia.text,
-                      );
+                      _startLoading(
+                          context, id_medicamento, dosis.text, frecuencia.text);
                     },
                   ),
                 )
@@ -380,7 +376,7 @@ class _MedicamentoState extends State<MedicamentoPage> {
               actions: <Widget>[
                 ElevatedButton(
                     onPressed: () {
-                      delete_medicamento(context, id_medicamento);
+                      _startLoadingDelete(context, id_medicamento);
                     },
                     child: Text("Si")),
                 ElevatedButton(
@@ -391,6 +387,76 @@ class _MedicamentoState extends State<MedicamentoPage> {
               ],
             );
           }
+        });
+  }
+
+  void _startLoading(BuildContext context, int id_medicamento, String dosis,
+      String frecuencia) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage(1);
+
+    await guardarFrecuenciaMedicamento(
+      context,
+      id_medicamento,
+      dosis,
+      frecuencia,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _startLoadingDelete(BuildContext context, int id_medicamento) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    showDialogMessage(2);
+
+    await delete_medicamento(context, id_medicamento);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  showDialogMessage(int optionSelect) async {
+    String optionText = "";
+    await Future.delayed(Duration(microseconds: 1));
+    if (optionSelect == 1) {
+      optionText = "Actualizando Medicamento";
+    } else {
+      optionText = "Eliminando Medicamento";
+    }
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    optionText,
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
         });
   }
 

@@ -1,14 +1,14 @@
-import 'package:app_salud/services/departamento_service.dart';
-import 'package:app_salud/services/genero_service.dart';
-import 'package:app_salud/services/grupo_conviviente_service.dart';
-import 'package:app_salud/services/medico_services.dart';
-import 'package:app_salud/services/nivel_educativo_service.dart';
-import 'package:app_salud/services/session_service.dart';
-import 'package:app_salud/services/usuario_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:app_salud/routes/routes.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'services/departamento_service.dart';
+import 'services/genero_service.dart';
+import 'services/grupo_conviviente_service.dart';
+import 'services/medico_services.dart';
+import 'services/nivel_educativo_service.dart';
+import 'services/session_service.dart';
+import 'services/usuario_services.dart';
+import 'routes/routes.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,21 +19,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => new UsuarioServices()),
-        ChangeNotifierProvider(create: (_) => new MedicoServices()),
-        ChangeNotifierProvider(create: (_) => new DepartamentoServices()),
-        ChangeNotifierProvider(create: (_) => new GeneroServices()),
-        ChangeNotifierProvider(create: (_) => new NivelEducativoService()),
-        ChangeNotifierProvider(create: (_) => new GrupoConvivienteServices()),
-        ChangeNotifierProvider(create: (_) => new AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UsuarioServices()),
+        ChangeNotifierProvider(create: (_) => MedicoServices()),
+        ChangeNotifierProvider(create: (_) => DepartamentoServices()),
+        ChangeNotifierProvider(create: (_) => GeneroServices()),
+        ChangeNotifierProvider(create: (_) => NivelEducativoService()),
+        ChangeNotifierProvider(create: (_) => GrupoConvivienteServices()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: WillPopScope(
         onWillPop: () async {
-          return true; // Cambia esto según tu lógica.
+          // Aquí puedes añadir la lógica específica de tu aplicación.
+          return Future.value(true);
         },
         child: MaterialApp(
           key: UniqueKey(),
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           supportedLocales: [
             const Locale('es', 'ES'),
           ],
@@ -49,7 +54,6 @@ class MyApp extends StatelessWidget {
           ),
           debugShowCheckedModeBanner: false,
           initialRoute: '/splash',
-          //initialRoute: '/screening_cerebral',
           routes: getApplicationRoutes(),
         ),
       ),

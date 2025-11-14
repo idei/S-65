@@ -240,6 +240,20 @@ class _VerRecordatorioState extends State<VerRecordatorio> {
                                   "bandera": "recordatorio"
                                 });
                           }
+
+                          if (tipo_screening == "SCER") {
+                            Navigator.of(context).pushReplacementNamed(
+                                '/screening_cerebral',
+                                arguments: {
+                                  "id_recordatorio": id_recordatorio,
+                                  "id_paciente": id_paciente,
+                                  "estado_recordatorio":
+                                      rela_estado_recordatorio,
+                                  "id_medico": id_medico,
+                                  "tipo_screening": tipo_screening,
+                                  "bandera": "recordatorio"
+                                });
+                          }
                         },
                         child: Text('Ir a Chequeo'),
                       ),

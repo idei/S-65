@@ -459,6 +459,8 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
       _isLoading = true;
     });
 
+    showDialogMessage();
+
     await guardar_datos();
 
     setState(() {
@@ -531,6 +533,36 @@ class _FormDatosClinicosState extends State<FormDatosClinicos> {
         loginToast("Error al guardar la información");
       }
     }
+  }
+
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Antecedentes Personales",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   var pulso_confirm = false;

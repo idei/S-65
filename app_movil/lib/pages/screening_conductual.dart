@@ -736,6 +736,8 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       _isLoading = true;
     });
 
+    showDialogMessage();
+
     await guardarDatosConductual(context);
 
     setState(() {
@@ -743,7 +745,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
     });
   }
 
-  showDialogMessage(context) async {
+  showDialogMessage() async {
     await Future.delayed(Duration(microseconds: 1));
     showDialog(
         context: context,
@@ -760,7 +762,7 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
                     height: 10,
                   ),
                   Text(
-                    "Guardando Información",
+                    "Guardando Chequeo Conductual",
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,
@@ -828,7 +830,6 @@ class _ColumnWidgetConductualState extends State<ColumnWidgetConductual> {
       }
     }
 
-    showDialogMessage(context);
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_conductual";
     var response = await _client.post(url, body: {

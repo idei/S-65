@@ -188,55 +188,72 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
                           loading
                               ? Container(
                                   alignment: Alignment.center,
-                                  child: CircularProgressIndicator())
+                                  child: CircularProgressIndicator(),
+                                )
                               : AnimatedContainer(
                                   duration: Duration(milliseconds: 400),
                                   height: _isExpandedBuscador ? 100.0 : 0.0,
-                                  child: searchTextField =
+                                  child: Column(
+                                    children: [
                                       AutoCompleteTextField<
                                           Medicamentos_database>(
-                                    key: key,
-                                    clearOnSubmit: false,
-                                    suggestions: list_medicamentos_vademecum,
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16.0,
-                                        fontFamily: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .fontFamily),
-                                    decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.fromLTRB(
-                                          10.0, 30.0, 10.0, 20.0),
-                                      hintText:
-                                          "Ingrese el nombre del medicamento",
-                                      hintStyle: TextStyle(
-                                          color: Colors.grey,
+                                        key: key,
+                                        clearOnSubmit: false,
+                                        suggestions:
+                                            list_medicamentos_vademecum,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16.0,
                                           fontFamily: Theme.of(context)
                                               .textTheme
                                               .headline1
-                                              .fontFamily),
-                                    ),
-                                    itemFilter: (item, query) {
-                                      return item.nombre_comercial
-                                          .toLowerCase()
-                                          .startsWith(query.toLowerCase());
-                                    },
-                                    itemSorter: (a, b) {
-                                      return a.nombre_comercial
-                                          .compareTo(b.nombre_comercial);
-                                    },
-                                    itemSubmitted: (item) {
-                                      setState(() {
-                                        searchTextField.textField.controller
-                                            .text = item.nombre_comercial;
-                                        data_id = item.id_medicamento;
-                                        print(data_id);
-                                      });
-                                    },
-                                    itemBuilder: (context, item) {
-                                      return row(item);
-                                    },
+                                              .fontFamily,
+                                        ),
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(
+                                              10.0, 30.0, 10.0, 20.0),
+                                          hintText:
+                                              "Ingrese el nombre del medicamento",
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey,
+                                            fontFamily: Theme.of(context)
+                                                .textTheme
+                                                .headline1
+                                                .fontFamily,
+                                          ),
+                                        ),
+                                        itemFilter: (item, query) {
+                                          return item.nombre_comercial
+                                              .toLowerCase()
+                                              .startsWith(query.toLowerCase());
+                                        },
+                                        itemSorter: (a, b) {
+                                          return a.nombre_comercial
+                                              .compareTo(b.nombre_comercial);
+                                        },
+                                        itemSubmitted: (item) {
+                                          setState(() {
+                                            searchTextField.textField.controller
+                                                .text = item.nombre_comercial;
+                                            data_id = item.id_medicamento;
+                                            print(data_id);
+                                          });
+                                        },
+                                        itemBuilder: (context, item) {
+                                          return row(item);
+                                        },
+                                      ),
+                                      if (list_medicamentos_vademecum.isEmpty)
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "No se encontró ningún medicamento.",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                           SizedBox(height: 40.0),
@@ -339,6 +356,8 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
       _isLoading = true;
     });
 
+    showDialogMessage();
+
     await guardar_medicamento(data_id, dosis, frecuencia);
 
     setState(() {
@@ -372,6 +391,35 @@ class _MedicamentoAddPageState extends State<MedicamentoAddPage> {
       _alert_informe(context, "Error al guardar el medicamento", 2);
       throw Exception('Error al guardar el medicamento');
     }
+  }
+
+  showDialogMessage() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Guardando Medicamento",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   getStringValuesSF(UsuarioServices usuarioServices) async {

@@ -326,7 +326,7 @@ class AntecedentesWidgetState extends State<Antecedentes> {
                     height: 10,
                   ),
                   Text(
-                    "Guardando Datos",
+                    "Guardando Antecedentes Personales",
                     style: TextStyle(
                       fontFamily:
                           Theme.of(context).textTheme.headline1.fontFamily,

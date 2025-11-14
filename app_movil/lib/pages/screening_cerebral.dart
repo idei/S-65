@@ -131,27 +131,27 @@ class _ScreeningCerebralState extends State<ScreeningCerebral> {
 
     get_tiposcreening("SCER");
 
-    tipo_screening = parametros["select_screening"];
+    // tipo_screening = parametros["select_screening"];
 
-    screening_recordatorio = false;
-    id_recordatorio = null;
-    id_medico = null;
+    // screening_recordatorio = false;
+    // id_recordatorio = null;
+    // id_medico = null;
 
-    // if (parametros["bandera"] == "recordatorio") {
-    //   screening_recordatorio = true;
-    //   id_recordatorio = parametros["id_recordatorio"];
-    //   id_paciente = id_paciente;
-    //   id_medico = parametros["id_medico"];
-    //   tipo_screening = parametros["tipo_screening"];
-    // } else {
-    //   if (parametros["bandera"] == "screening_nuevo") {
-    //     screening_recordatorio = false;
-    //     id_paciente = id_paciente;
-    //     id_recordatorio = null;
-    //     id_medico = null;
-    //     //tipo_screening = parametros["tipo_screening"];
-    //   }
-    // }
+    if (parametros["bandera"] == "recordatorio") {
+      screening_recordatorio = true;
+      id_recordatorio = parametros["id_recordatorio"];
+      id_paciente = id_paciente;
+      id_medico = parametros["id_medico"];
+      tipo_screening = parametros["select_screening"];
+    } else {
+      if (parametros["bandera"] == "screening_nuevo") {
+        screening_recordatorio = false;
+        id_paciente = id_paciente;
+        id_recordatorio = null;
+        id_medico = null;
+        //tipo_screening = parametros["tipo_screening"];
+      }
+    }
   }
 
   get_tiposcreening(var codigo_screening) async {
@@ -1002,8 +1002,6 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
       }
     }
 
-    showDialogMessage(context);
-
     String URL_base = Env.URL_API;
     var url = URL_base + "/respuesta_screening_cerebral";
     var response = await _client.post(url, body: {
@@ -1102,51 +1100,52 @@ class _ColumnWidgetCerebralState extends State<ColumnWidgetCerebral> {
       _isLoading = true;
     });
 
+    showDialogMessage();
     await guardarDatosSaludCerebral(context);
 
     setState(() {
       _isLoading = false;
     });
   }
-}
 
-loginToast(String toast) {
-  return Fluttertoast.showToast(
-      msg: toast,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white);
-}
+  loginToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white);
+  }
 
-showDialogMessage(context) async {
-  await Future.delayed(Duration(microseconds: 1));
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            height: 80,
-            width: 80,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "Guardando Información",
-                  style: TextStyle(
-                    fontFamily:
-                        Theme.of(context).textTheme.headline1.fontFamily,
+  showDialogMessage() async {
+    await Future.delayed(Duration(microseconds: 1));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 80,
+              width: 80,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
                   ),
-                )
-              ],
+                  Text(
+                    "Guardando Chequeo Cerebral",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.headline1.fontFamily,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      });
+          );
+        });
+  }
 }
 
 int _characterLimit = 60; // Cambia este valor según tus necesidades
